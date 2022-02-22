@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" type="image/x-icon" href="https://app.pedbox.co/assets/logos/logo_blanco.png"/>
+  <title>Historial Pedidos</title>
+
+  <!-- Fonts and icons -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <link href="/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <!-- CSS Files -->
+  <link id="pagestyle" href="/css/soft-ui-dashboard.css?v=1.0.3" rel="stylesheet" />
+  <!-- JQUERY UI -->
+  <link rel="stylesheet" href="/css/jquery-ui.min.css">
+  <!-- REPORTS CSS -->
+  <link rel="stylesheet" href="/css/reports.css">
+
+  <style>
+    .toggleShowCards{
+      transition: 0.5s;
+      border-radius: 1rem;
+      font-weight: 900 !important;
+      cursor: pointer;
+    }
+    .pdfIcon:hover{
+      background-color: white;
+    }
+    .pdfIcon{
+      border-radius: 50%;
+      padding: 5px;
+      cursor: pointer;
+    }
+    .tableOrdersHead{
+      border-bottom: solid 1px lightgray;
+    }
+    .tableOrdersHead td{
+      font-weight: 700;
+    }
+    .inputDate .choices__list--single{
+      margin-left: 30%;
+    }
+    .productsPrediction{
+      position: absolute;
+      z-index: 300;
+      border: solid 1px lightgray;
+      border-radius: 15px;
+      margin-top: 10px;
+      background-color: white;
+      box-shadow: 0 20px 27px 0 rgb(0 0 0 / 12%);
+      padding: 10px;
+      font-size: 13px;
+      max-height: 300px;
+      overflow: scroll;
+      width: 600px;
+      flex-direction: column;
+    }
+    .productsRow td{
+      font-size: 13px;
+    }
+    .activeNav .icon{
+      background-image: linear-gradient(310deg ,#7928ca,#ff0080);
+      color: white !important
+    }
+    .activeNav i{
+      color: white !important
+    }
+    .activeNav a{
+      background-color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
+    }
+  </style>
+</head>
+
+<body class="g-sidenav-show bg-gray-100">
+
+  <!-- Menu -->
+  <%- include('./partials/menu.ejs') %> 
+
+  <main class="main-content max-height-vh-100 h-100">
+
+    <!-- Cabecera -->
+    <%- include('./partials/header.ejs') %>
+
+    <!-- Content -->
+    <div class="p-4">
+
+      <!-- Cartera -->
+      <%- include('./partials/cartera.ejs') %>
+
+      <!-- Tablas -->
+      <div>
+        <div class="mt-4 d-flex justify-content-between align-items-center">
+          <div class="nav-wrapper position-relative end-0">
+            <ul class="nav nav-pills nav-fill p-1" role="tablist" style="cursor: pointer;">
+              <li class="nav-item">
+                <a class="nav-link mb-0 px-4 py-1 active" data-bs-toggle="tab"  role="tab" aria-controls="profile" aria-selected="true" href="#">
+                Historial de pedidos
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div style="cursor: pointer;" onclick="$('#modalNuevoPedido').modal('show')">
+            <h6 id="toggleShowCardsIcon" class="m-0"><i class="fas fa-plus" style="font-size: 20px;"></i> Realizar Pedido</h6>
+          </div>
+        </div>
+        <div id="tableContainer" class="card p-3"></div>
+      </div>
+
+    </div>
+
+    <!-- Modal Pedido-->
+    <div class="modal fade" id="modalNuevoPedido" style="z-index: 30000;">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content min-vh-90" style="min-height: 90vh;">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Nuevo Pedido</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: gray; border-radius: 50%;"></button>
+          </div>
+          <div class="modal-body d-flex flex-column" >
+            <div class="text-center mb-1">
+              <h6>HYUNDAUTOS MEDELLIN S.A.S. - - 900443638</h6>
+            </div>
+            <div class="d-flex gap-2 w-100 inputDate" >
+              <div class="w-50" style="position: relative;"> 
+                <select name="" id="direccion" class="form-control" style="padding-left: 30%">
+                  <option value="">A</option>
+                  <option value="">E</option>
+                  <option value="">R</option>
+                </select>
+                <div style="position: absolute; top: 10%; left: 2%;"> <h6>Dirección de envío:</h6></div>
+              </div>
+              <div class="w-50" style="position: relative;">
+                <input type="date" name="" id="inputDateModal" class="form-control" style="padding-left: 25%"> 
+                <div style="position: absolute; top: 10%; left: 2%;"> <h6>Fecha de envío:</h6></div>
+              </div>
+            </div>
+            <div class="w-100 mt-3" >
+
+              <div>
+
+                <div>
+                  <table class="w-100" style="border-collapse: separate; border-spacing: 10px;  table-layout:fixed;">
+                    <tr class="tableOrdersHead">
+                      <td style="width: 6%;">Código</td>
+                      <td style="width: 30%;">Producto</td>
+                      <td>Precio</td>
+                      <td style="width: 7%;">Cantidad</td>
+                      <td style="width: 10%;">Descuento</td>
+                      <td>Subtotal</td>
+                      <td>IVA</td>
+                      <td>Total</td>
+                      <td style="width: 5%;" onclick="addProduct()"><i class="fas fa-plus"></i></td>
+                    </tr>
+                    <tbody id="tableProductsBody">
+                      <tr value="1" class="productsRow">
+                        <td class="cod" style="position: absolute"><input type="text" name="" id="" class="form-control inputProduct" placeholder="Buscar Producto" style="max-width: 75%;"> <div id="predictionsBox1" style="display: none;" class="productsPrediction"></div> </td>
+                        <td class="descr" style="font-size: 13px"></td>
+                        <td class="prec">$0</td>
+                        <td class="cant"><input type="number" name="" id="" class="form-control inputAmount" min="1"></td>
+                        <td class="vdes">$0</td>
+                        <td class="subt">$0</td>
+                        <td class="iva">$0</td>
+                        <td class="total">$0</td>
+                        <td class="removeRow"><i class="fas fa-trash"></i></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="mt-2">
+                  <p> <span style="font-weight: 700;">NOTA:</span>  Apreciado cliente, si desea dar alguna recomendación u observación a su pedido como envío por una transportadora específica o anexar algún elemento, entre otras cosas lo puede hacer en el siguiente campo.</p>
+                  <textarea name="" id="" cols="30" rows="10" placeholder="Notas" class="form-control" style="height: 130px; resize: none;"></textarea>
+                </div>
+
+                <div class="mt-3 d-flex justify-content-end" style="position: relative;">
+                  <div class=" w-35" style="background-color: #f8f9fa; border-radius: 1rem; padding: 10px;">
+                    <div class="d-flex justify-content-between">
+                      <h6>Cantidad Items</h6>
+                      <h6 id="TotalCant">0</h6>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <h6>Subtotal</h6>
+                      <h6 id="TotalSubTotal">$0.00</h6>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <h6>Descuento</h6>
+                      <h6 id="TotalDes">$0.00</h6>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <h6>IVA</h6>
+                      <h6 id="TotalIVA">$0.00</h6>
+                    </div>
+                    <hr class="my-1">
+                    <div class="d-flex justify-content-between">
+                      <h6>Total</h6>
+                      <h6 id="TotalTotal">$0.00</h6>
+                    </div>
+                  </div>
+
+                  <div style="position: absolute; left: 0%; display: none" id="cartAlert" >
+                    <h6 style="color: red;">Atención: <span>el valor total de la orden debe ser mayor a $ 300,000.00</span></h6>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+          <hr class="m-0">
+          <div class="d-flex justify-content-center m-3 gap-3">
+            <button class="btn btn-secondary">Cancelar</button>
+            <button class="btn btn-primary">Enviar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Repetir Pedido-->
+    <div class="modal fade" id="modalRepetirPedido" style="z-index: 30000;">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content " >
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Repetir Pedido</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: gray; border-radius: 50%;"></button>
+          </div>
+          <div class="modal-body d-flex flex-column" >
+            <div id="tableContainerPedidoRepetido"></div>
+          </div>
+          <hr class="m-0">
+          <div class="d-flex justify-content-center m-3 gap-3">
+            <button class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Cancelar</button>
+            <button class="btn btn-primary" onclick="sendCartPedidoRepetido()">Repetir Pedido</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Estado Pedido-->
+    <div class="modal fade" id="modalEstadoPedido" style="z-index: 30000;">
+      <div class="modal-dialog modal-lg" role="document" style="width: 55vw;">
+        <div class="modal-content " >
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Repetir Pedido</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: gray; border-radius: 50%;"></button>
+          </div>
+          <div class="modal-body d-flex flex-column" style="background-color: #e9ecef;">
+
+            <div > 
+              <div class="d-flex justify-content-center gap-2 font-weight-bold" style="text-transform: uppercase">
+                Pedido
+                <div id="estadoPedido"></div>
+              </div>
+
+              <div class="d-flex justify-content-between mt-3" >
+                <div class="p-4 w-50" style="background-color: white; border-radius: 1rem; position: relative; box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);">
+                  <span class="font-weight-bold">
+                    Pedido Realizado
+                  </span>
+                  <div class="d-flex justify-content-center align-items-center" style="position: absolute; border-radius: 50%; border: solid 2px #cb0c9f; width: 50px; height: 50px; right: -7%; top: 15%; z-index: 30;">
+                    <i class="fas fa-clipboard-check" style="font-size: 30px;"></i>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-center flex-column w-50" style="background-color: white; border-radius: 1rem; position: relative; box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);">
+                  <div id="estadoFechaPedido"></div>
+                  <span id="estadoFechaPedidoH"></span>
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-between mt-3">
+                <div class="p-4 w-50" style="background-color: white; border-radius: 1rem; position: relative; box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);"> 
+                  <span class="font-weight-bold">
+                    Factura Generada
+                  </span>
+                  <div class="d-flex justify-content-center align-items-center" style="position: absolute; border-radius: 50%; border: solid 2px #cb0c9f; width: 50px; height: 50px; right: -7%; top: 15%; z-index: 30;" >
+                    <i class="fas fa-receipt" style="font-size: 30px;"></i>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-center flex-column w-50" style="background-color: white; border-radius: 1rem; position: relative; box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);"> 
+                  <div id="estadoFechaFactura"> </div>
+                  <span id="estadoFechaFacturaH"></span>
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-between mt-3">
+                <div class="p-4 w-50" style="background-color: white; border-radius: 1rem; position: relative; box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);">
+                  <div class="font-weight-bold">Transportador</div>
+                  <div id="estadoTransportador"></div>
+                  <div class="d-flex justify-content-center align-items-center" style="position: absolute; border-radius: 50%; border: solid 2px #cb0c9f; width: 50px; height: 50px; right: -7%; top: 15%; z-index: 30;">
+                    <i class="fas fa-truck" style="font-size: 30px;"></i>
+                  </div>
+                </div>
+                <div class="d-flex flex-column align-items-center justify-content-center w-50" style="background-color: white; border-radius: 1rem; position: relative; box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);">
+                  <div class="font-weight-bold">Fecha estimada de entrega</div>
+                  <div id="estadoFechaEstimada"></div>
+                  <span id="estadoFechaEstimadaH"></span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <!-- Scripts -->
+  <script src="/js/core/popper.min.js"></script>
+  <script src="/js/core/bootstrap.min.js"></script>
+  <script src="/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="/js/plugins/choices.min.js"></script>
+  <script src="/js/soft-ui-dashboard.min.js?v=1.0.3"></script>
+  <script src="/js/plugins/dragula/dragula.min.js"></script>
+  <script src="/js/plugins/jkanban/jkanban.js"></script>
+  <script src="/js/jquery.js"></script>
+  <script src="/js/jquery-ui.min.js"></script>
+  <script src="/js/plugins/datatables.js"></script>
+  <script src="/js/plugins/chartjs.min.js"></script>
+  <script src="/js/underscore-min.js"></script>
+  <script src="/js/helpers.js"></script>
+  <script src="/js/menu.js"></script>
+
+  <script>
+    let facturas = `<%- JSON.stringify(facturas) %>`;
+    facturas = JSON.parse(facturas).result.extranet;
+    console.log(facturas)
+
+    let pedidos = `<%- JSON.stringify(pedidos) %>`;
+    pedidos = JSON.parse(pedidos).result.extranet;
+    console.log(pedidos)
+
+    let session = `<%- JSON.stringify(session) %>`;
+    session = JSON.parse(session);
+    console.log(session)
+
+    const canSeePdf = true;
+    const canSeeEstadoPedido = true;
+    const pdfLink = "http://www.secst.cl/upfiles/documentos/19072016_1207am_578dc39115fe9.pdf";
+    const choicesPrice = new Choices($('#direccion')[0]);
+
+    const addProduct = () => {
+      let number = $("#tableProductsBody > tr").length + 1;
+      let element = `
+        <tr value="${number}" class="productsRow">
+          <td class="cod" style="position: absolute"><input type="text" name="" id="" class="form-control inputProduct" placeholder="Buscar Producto" style="max-width: 75%"> <div id="predictionsBox${number}" style="display: none;" class="productsPrediction"></div> </td>
+          <td class="descr" ></td>
+          <td class="prec">$0</td>
+          <td class="cant"><input type="number" name="" id="" class="form-control inputAmount" min="1" value="1"></td>
+          <td class="vdes">$0</td>
+          <td class="subt">$0</td>
+          <td class="iva">$0</td>
+          <td class="total">$0</td>
+          <td class="removeRow" ><i class="fas fa-trash"></i></td>
+        </tr>
+      `;
+      $("#tableProductsBody").append(element);
+    };
+
+    $(document).on('click','.removeRow',function(){
+      $(this).parent().remove();
+      printTotalCart();
+    });
+
+    $(document).on('keyup click','.inputProduct',function(){
+      if ($(this).val().length > 2) {
+        let criteria = $(this).val();
+        let row = $(this).parent().parent()[0]
+        row = row.getAttribute("value");
+
+        let dataProductsFiltred = _.filter(searchItemTest, o => {
+          if (o.description.toLowerCase().split(' ').join('').indexOf(criteria.toLowerCase()) > -1 ||
+              o.code.toLowerCase().split(' ').join('').indexOf(criteria.toLowerCase()) > -1 
+          ) return o;
+        }); 
+
+        $(".productsPrediction").html("");
+        for (const product in dataProductsFiltred) {
+          let productName =  `<div class="productPrediction" style="border-bottom: solid 1px lightgray; cursor: pointer" N="${row}" code="${dataProductsFiltred[product].code}" description="${dataProductsFiltred[product].description}" price="${dataProductsFiltred[product].prices_list[0].price}" discount="${dataProductsFiltred[product].discount}" >${dataProductsFiltred[product].description}</div>`;
+          $("#predictionsBox"+row).append(productName);
+        }
+        $("#predictionsBox"+row).css("display", "flex");
+      }
+    });
+
+    $(document).on('click','.productPrediction',function(){
+      let row = $(this).attr("N");
+      let tableBody = $("#tableProductsBody").children("tr");
+
+      for (let i = 0; i < tableBody.length; i++) {
+        if ($(tableBody[i]).attr("value") == row) {
+          let iva = $(this).attr("price") * 0.19;
+          let total = Number($(this).attr("price")) - Number($(this).attr("discount")) + iva;
+
+          $(tableBody[i]).find(".cod").text($(this).attr("code"))
+          $(tableBody[i]).find(".descr").text($(this).attr("description"))
+
+          $(tableBody[i]).find(".prec").text(nvFormatCash($(this).attr("price")))
+          $(tableBody[i]).find(".prec").attr("value", $(this).attr("price"))
+
+          $(tableBody[i]).find(".cant").find("input").val(1)
+
+          $(tableBody[i]).find(".vdes").text(nvFormatCash($(this).attr("discount")))
+          $(tableBody[i]).find(".vdes").attr("value", $(this).attr("discount"))
+
+          $(tableBody[i]).find(".subt").text(nvFormatCash($(this).attr("price")))
+          $(tableBody[i]).find(".subt").attr("value", $(this).attr("price"))
+
+          $(tableBody[i]).find(".iva").text(nvFormatCash(iva))
+          $(tableBody[i]).find(".iva").attr("value", iva)
+          $(tableBody[i]).find(".iva").attr("iva", iva)
+
+          $(tableBody[i]).find(".total").text(nvFormatCash(total));
+          $(tableBody[i]).find(".total").attr("value", total);
+
+          printTotalCart();
+        };
+      };
+    });
+
+    $(document).on('keyup mouseup', '.inputAmount', function(e) {       
+      let value = $(this).attr("value");  
+      let currentValue = $(this).val();  
+      
+      if (!(value == currentValue)) {
+        let cant = Number($(this).val())
+        let price = Number($(this).parent().parent().find(".prec").attr("value"))
+        let iva = Number($(this).parent().parent().find(".iva").attr("iva"))
+        let desc = Number($(this).parent().parent().find(".vdes").attr("value"))
+        let subT = 0;
+        let total = 0;
+        let ivaT = 0;
+
+        subT = price * cant;
+        ivaT = iva * cant;
+        desc = desc * cant;
+        total = subT + iva - desc;
+
+        console.log(total)
+
+        $(this).parent().parent().find(".iva").text(nvFormatCash(ivaT))
+        $(this).parent().parent().find(".iva").attr("value", ivaT)
+
+        $(this).parent().parent().find(".vdes").text(nvFormatCash(desc))
+        $(this).parent().parent().find(".vdes").attr("value", desc)
+
+        $(this).parent().parent().find(".subt").text(nvFormatCash(subT))
+        $(this).parent().parent().find(".subt").attr("value", subT)
+
+        $(this).parent().parent().find(".total").text(nvFormatCash(total))
+        $(this).parent().parent().find(".total").attr("value", total)
+
+        $(this).attr("value", currentValue);
+        printTotalCart();
+      }
+    });
+    
+    let dataPedidoRepetido;
+    $(document).on('click','.pedidoDetail',function(){
+      let id =  $(this).attr("id");
+      fetch("/historial-pedidos/"+id)
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        if (data.detalle) {
+          dataPedidoRepetido = data.detalle;
+          loadTablePedidoRepetido(data.detalle)
+          $("#modalRepetirPedido").modal("show");
+        }
+      });
+    });
+    
+    $(document).on('click',function(e){
+      if (e.target.className != 'productsPrediction' ) {
+        $(".productsPrediction").css("display", "none");
+      }
+    });
+
+    const printTotalCart = () => {
+      let amounts = $(".inputAmount");
+      let subT = $(".subt");
+      let des = $(".vdes");
+      let iva = $(".iva");
+      let total = $(".total");
+
+      let Tamount = 0;
+      let Tsub = 0;
+      let Tdes = 0;
+      let Tiva = 0;
+      let Ttotal = 0;
+
+      for (let i = 0; i < amounts.length; i++) {
+        Tamount += Number($(amounts[i]).val())
+        Tsub += Number($(subT[i]).attr("value"))
+        Tdes += Number($(des[i]).attr("value"))
+        Tiva += Number($(iva[i]).attr("value"))
+        Ttotal += Number($(total[i]).attr("value"))
+      }
+
+      $("#TotalCant").text(Tamount)
+      $("#TotalSubTotal").text(nvFormatCash(Tsub))
+      $("#TotalDes").text(nvFormatCash(Tdes))
+      $("#TotalIVA").text(nvFormatCash(Tiva))
+      $("#TotalTotal").text(nvFormatCash(Ttotal))
+
+      if (Ttotal < 300000) {
+        $("#cartAlert").show()
+      } else {
+        $("#cartAlert").hide()
+      }
+    }
+
+    const sendCartPedidoRepetido = () => {
+      localStorage.setItem("storeCart", JSON.stringify(dataPedidoRepetido)); 
+      // TODO: descomentar cuando este listo el carrito
+      window.location.replace("./invoice.html");
+    }
+
+    const loadTablePedidoRepetido = (data) => {
+      let table = `<table id="tableRepetirPedido" class="table align-items-center mb-1 table-hover" style="overflow:scroll; table-layout:fixed"></table>`;
+      let tableHead;
+
+      $("#tableContainerPedidoRepetido").html("");
+      $("#tableContainerPedidoRepetido").append(table)
+
+      let tableContent = '<tbody id="tableBody" class="mb-2">';
+
+      tableHead = `
+        <thead>
+          <tr id="tableHead">
+          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 iconCheck"> Cant </th>
+          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 pe-4 "><div style="position: relative; right: 10px">Despachadas</div></th>
+          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Código</th>
+          <th id="descriptionTable" class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Descripción</th>
+          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"><div style="position: relative; right: 10px">% Descuento</div></th>
+          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">% IVA</th>
+          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Valor</th>
+          </tr> 
+        </thead>  
+      `;
+      for(let i = 0; i < data.length; i++){
+        tableContent+= '<tr >';
+        tableContent+= `<td class="text-center">${data[i].cantidad}</td>`;
+        tableContent+= `<td class="text-center">${data[i].qty}</td>`;
+        tableContent+= `<td class="text-center">${data[i].codigo}</td>`;
+        tableContent+= `<td class="text-center">${data[i].descripcion}</td>`;
+        tableContent+= `<td class="text-center">${data[i].por_desc}%</td>`;
+        tableContent+= `<td class="text-center">${data[i].porcentaje_iva}%</td>`;
+        tableContent+= `<td class="text-center">${data[i].format_precio}</td>`;
+        tableContent+= '</tr>';
+      };
+
+      $("#tableRepetirPedido").append(tableHead);
+      $("#tableRepetirPedido").append(tableContent);
+      $("#tableContainerPedidoRepetido").show();
+      const tableObj = new simpleDatatables.DataTable("#tableRepetirPedido", {});
+
+      $("#descriptionTable").css("width", "45%");
+    }
+
+    const loadTable = (tableNombre, body) => {
+      let table = `<table id="${tableNombre}" class="table align-items-center mb-1 table-hover" style="overflow:scroll"></table>`;
+      let tableHead;
+
+      $("#tableContainer").hide("slide", { direction: "right" }, 300);
+      $("#tableContainer").html("");
+      $("#tableContainer").append(table)
+
+      let tableContent = '<tbody id="tableBody" class="mb-2">';
+
+      if (tableNombre == "tablaPedidos") {
+        tableHead = `
+          <thead>
+            <tr id="tableHead">
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 iconCheck" > # Pedido </th>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Fecha</th>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Valor</th>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Repetir Pedido</th>
+            </tr> 
+          </thead>  
+          `;
+        for(let i = 0; i < body.length; i++){
+          tableContent+= `<tr class="pedidoDetail" id="${body[i].numero}"" style="cursor: pointer">`;
+          tableContent+= `<td class="text-center"><a href="#">${body[i].numero}</a></td>`;
+          tableContent+= `<td class="text-center">${body[i].fecha}</td>`;
+          tableContent+= `<td class="text-center">${body[i].valor_total}</td>`;
+          tableContent+= `<td class="text-center"><i class="fas fa-plus"></i></td>`;
+          tableContent+= '</tr>';
+        };
+      }
+
+      if (tableNombre == "tablaPedidosEstado") {
+        tableHead = `
+          <thead>
+            <tr id="tableHead">
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 iconCheck" > # Pedido </th>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Fecha</th>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Valor</th>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Repetir Pedido</th>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Estado Pedido</th>
+            </tr> 
+          </thead>  
+          `;
+        for(let i = 0; i < body.length; i++){
+          let fecha = (body[i].dateText ? body[i].dateText : body[i].fecha)
+          let valor = (body[i].valor_totalText ? body[i].valor_totalText : nvFormatCash(body[i].valor_total));
+
+          tableContent+= '<tr class="pedidoDetail" style="cursor: pointer">';
+          tableContent+= `<td class="text-center numeroPedido" pedido="${body[i].numero}"><a href="#">${body[i].numero}</a></td>`;
+          tableContent+= `<td class="text-center">${nvFormatDate(fecha, "dddd DD de mmmm de YYYY")}</td>`;
+          tableContent+= `<td class="text-center">${valor}</td>`;
+          tableContent+= `<td class="text-center"><i class="fas fa-plus"></i></td>`;
+          tableContent+= `<td class="text-center estadoPedido"><i class="fas fa-truck"></i></td>`;
+          tableContent+= '</tr>';
+        };
+      }
+
+      tableContent+='</tbody>';
+
+      $("#"+tableNombre).append(tableHead);
+      $("#"+tableNombre).append(tableContent);
+      $("#tableContainer").show("slide", { direction: "left" }, 800);
+
+      const tableObj = new simpleDatatables.DataTable("#"+tableNombre, {});
+    }
+
+    // Modal estado Pedido
+    $(document).on("click", ".estadoPedido", function (e) {
+      $("#modalEstadoPedido").modal("show")
+
+      let numeroPedido = $(this).siblings(".numeroPedido").attr("pedido");
+      let estadoPedidoObject = _.find(pedidos.Table1, function(o){ return o.Pedido == numeroPedido; });
+
+      $("#estadoPedido").text(estadoPedidoObject.Pedido)
+      $("#estadoFechaEstimada").text(nvFormatDate(estadoPedidoObject.fecha_estima_entrega, "dddd DD de mmmm de YYYY"))
+      $("#estadoFechaPedidoH").text(nvFormatDate(estadoPedidoObject.fecha_estima_entrega, "HH:mm"))
+
+      $("#estadoFechaFactura").text(nvFormatDate(estadoPedidoObject.fecha_factura, "dddd DD de mmmm de YYYY"))
+      $("#estadoFechaFacturaH").text(nvFormatDate(estadoPedidoObject.fecha_factura, "HH:mm"))
+
+      $("#estadoFechaPedido").text(nvFormatDate(estadoPedidoObject.fecha_pedido, "dddd DD de mmmm de YYYY"))
+      $("#estadoFechaEstimadaH").text(nvFormatDate(estadoPedidoObject.fecha_pedido, "HH:mm"))
+      $("#estadoTransportador").text(estadoPedidoObject.transportador)
+
+      console.log(nvFormatDate(estadoPedidoObject.fecha_pedido, "dddd DD de mmmm de YYYY"))
+      console.log(numeroPedido, estadoPedidoObject)
+      e.stopPropagation();
+    })
+
+    Date.prototype.toDateInputValue = (function() {
+      var local = new Date(this);
+      local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+      return local.toJSON().slice(0,10);
+    });
+
+    $( document ).ready(function() {
+      loadCartera(facturas.Table[0]);
+      loadTable("tablaPedidos", pedidos.Table); // generar la tabla sin estado pedido
+      // loadTable("tablaPedidosEstado", pedidos.Table); // generar la tabla con estado pedido
+  
+      
+      $('#inputDateModal').val(new Date().toDateInputValue());
+    });
+
+
+    const dataTable = {
+          "rows": [
+              {
+                  "numero": "42366",
+                  "fecha": "2021-12-29T00:00:00-05:00",
+                  "valor_total": "24317385",
+                  "dateText": "Miercoles 29 de Diciembre, 2021",
+                  "valor_totalText": "$ 24,317,385"
+              },
+              {
+                  "numero": "42056",
+                  "fecha": "2021-12-20T00:00:00-05:00",
+                  "valor_total": "3889234",
+                  "dateText": "Lunes 20 de Diciembre, 2021",
+                  "valor_totalText": "$ 3,889,234"
+              },
+              {
+                  "numero": "41391",
+                  "fecha": "2021-12-03T00:00:00-05:00",
+                  "valor_total": "7522728",
+                  "dateText": "Viernes 03 de Diciembre, 2021",
+                  "valor_totalText": "$ 7,522,728"
+              },
+              {
+                  "numero": "40352",
+                  "fecha": "2021-11-19T00:00:00-05:00",
+                  "valor_total": "15183010",
+                  "dateText": "Viernes 19 de Noviembre, 2021",
+                  "valor_totalText": "$ 15,183,010"
+              },
+              {
+                  "numero": "40215",
+                  "fecha": "2021-11-18T00:00:00-05:00",
+                  "valor_total": "939156",
+                  "dateText": "Jueves 18 de Noviembre, 2021",
+                  "valor_totalText": "$ 939,156"
+              },
+              {
+                  "numero": "39859",
+                  "fecha": "2021-11-11T00:00:00-05:00",
+                  "valor_total": "1686400",
+                  "dateText": "Jueves 11 de Noviembre, 2021",
+                  "valor_totalText": "$ 1,686,400"
+              },
+              {
+                  "numero": "39500",
+                  "fecha": "2021-11-04T00:00:00-05:00",
+                  "valor_total": "6666572",
+                  "dateText": "Jueves 04 de Noviembre, 2021",
+                  "valor_totalText": "$ 6,666,572"
+              },
+              {
+                  "numero": "38847",
+                  "fecha": "2021-10-21T00:00:00-05:00",
+                  "valor_total": "2286112",
+                  "dateText": "Jueves 21 de Octubre, 2021",
+                  "valor_totalText": "$ 2,286,112"
+              },
+              {
+                  "numero": "38411",
+                  "fecha": "2021-10-12T00:00:00-05:00",
+                  "valor_total": "7789006",
+                  "dateText": "Martes 12 de Octubre, 2021",
+                  "valor_totalText": "$ 7,789,006"
+              },
+              {
+                  "numero": "38102",
+                  "fecha": "2021-10-07T00:00:00-05:00",
+                  "valor_total": "170141",
+                  "dateText": "Jueves 07 de Octubre, 2021",
+                  "valor_totalText": "$ 170,141"
+              },
+              {
+                  "numero": "38085",
+                  "fecha": "2021-10-07T00:00:00-05:00",
+                  "valor_total": "486170",
+                  "dateText": "Jueves 07 de Octubre, 2021",
+                  "valor_totalText": "$ 486,170"
+              },
+              {
+                  "numero": "38083",
+                  "fecha": "2021-10-07T00:00:00-05:00",
+                  "valor_total": "493949",
+                  "dateText": "Jueves 07 de Octubre, 2021",
+                  "valor_totalText": "$ 493,949"
+              },
+              {
+                  "numero": "38037",
+                  "fecha": "2021-10-07T00:00:00-05:00",
+                  "valor_total": "222454",
+                  "dateText": "Jueves 07 de Octubre, 2021",
+                  "valor_totalText": "$ 222,454"
+              },
+              {
+                  "numero": "37579",
+                  "fecha": "2021-10-01T00:00:00-05:00",
+                  "valor_total": "950269",
+                  "dateText": "Viernes 01 de Octubre, 2021",
+                  "valor_totalText": "$ 950,269"
+              },
+              {
+                  "numero": "37413",
+                  "fecha": "2021-09-29T00:00:00-05:00",
+                  "valor_total": "20394808",
+                  "dateText": "Miercoles 29 de Septiembre, 2021",
+                  "valor_totalText": "$ 20,394,808"
+              },
+              {
+                  "numero": "37284",
+                  "fecha": "2021-09-28T00:00:00-05:00",
+                  "valor_total": "214400",
+                  "dateText": "Martes 28 de Septiembre, 2021",
+                  "valor_totalText": "$ 214,400"
+              },
+              {
+                  "numero": "37275",
+                  "fecha": "2021-09-28T00:00:00-05:00",
+                  "valor_total": "5050853",
+                  "dateText": "Martes 28 de Septiembre, 2021",
+                  "valor_totalText": "$ 5,050,853"
+              },
+              {
+                  "numero": "36615",
+                  "fecha": "2021-09-14T00:00:00-05:00",
+                  "valor_total": "7358797",
+                  "dateText": "Martes 14 de Septiembre, 2021",
+                  "valor_totalText": "$ 7,358,797"
+              }
+          ],
+          "rowsTracing": []
+      }
+
+    const dataDetail = {
+      "Table": [
+        {
+          "codigo": "HY07194",
+          "descripcion": "AMORT. HYU. I10 DEL. DER.",
+          "seq": "264831",
+          "cantidad": "4",
+          "cantidad_despachada": "4",
+          "valor_unitario": "119524",
+          "porcentaje_iva": "19",
+          "porcentaje_descuento": "20"
+        },
+        {
+          "codigo": "HY07195",
+          "descripcion": "AMORT. HYU. I10 DEL. IZQ.",
+          "seq": "264832",
+          "cantidad": "4",
+          "cantidad_despachada": "4",
+          "valor_unitario": "119524",
+          "porcentaje_iva": "19",
+          "porcentaje_descuento": "20"
+        },
+        {
+          "codigo": "HY07196",
+          "descripcion": "AMORT. HYU. I10 TRAS.",
+          "seq": "264833",
+          "cantidad": "2",
+          "cantidad_despachada": "2",
+          "valor_unitario": "108876",
+          "porcentaje_iva": "19",
+          "porcentaje_descuento": "20"
+        }
+      ]
+    }
+
+    const searchItemTest = [
+  {
+      "id": 241001,
+      "code": "HY07169",
+      "description": "BUJE TEMPLETE HYU. TUCSON IX35/SPORTAGE REVOLUTION 4X2 TRAS. DER. (CORBATIN 76MM) - 55275-2S000 - CVKH-185R - CTR - ORIGINAL",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "https://api.pedbox.co:8590/files/attached/ur/HY07169.jpg",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2020-05-05 10:45:09",
+      "modified": "2021-11-28 18:52:41",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": [
+          {
+              "id": 4143784,
+              "description": "Lista de precio 1",
+              "id_item": 241001,
+              "code_list": 1,
+              "price": 58562,
+              "code_item": "HY07169"
+          }
+      ]
+  },
+  {
+      "id": 241002,
+      "code": "HY07170",
+      "description": "BUJE TEMPLETE HYU. TUCSON IX35/SPORTAGE REVOLUTION 4X2 TRAS. IZQ. (CORBATIN 76MM) - 55274-2S000 - CVKH-185L - CTR - ORIGINAL",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "https://api.pedbox.co:8590/files/attached/ur/HY07170.jpg",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2020-05-05 10:45:09",
+      "modified": "2021-11-28 18:52:41",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": [
+          {
+              "id": 4143785,
+              "description": "Lista de precio 1",
+              "id_item": 241002,
+              "code_list": 1,
+              "price": 46865,
+              "code_item": "HY07170"
+          }
+      ]
+  },
+  {
+      "id": 241829,
+      "code": "MZ01063",
+      "description": "JGO.VALVULA ADM MAZ. ALLEGROMV1.6 - 3876-A -  - BBB - ARGENTINA",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "https://api.pedbox.co:8590/files/attached/ur/MZ01063.png",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2020-05-05 10:47:22",
+      "modified": "2021-11-28 19:03:02",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": [
+          {
+              "id": 4144526,
+              "description": "Lista de precio 1",
+              "id_item": 241829,
+              "code_list": 1,
+              "price": 72399,
+              "code_item": "MZ01063"
+          }
+      ]
+  },
+  {
+      "id": 241834,
+      "code": "MZ01066",
+      "description": "JGO. VALVULA ADM MAZ. 3 / 1.6 - 4150-AN -  - BBB - ARGENTINA",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "https://api.pedbox.co:8590/files/attached/ur/MZ01066.png",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2020-05-05 10:47:23",
+      "modified": "2021-11-28 19:03:02",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": [
+          {
+              "id": 4144527,
+              "description": "Lista de precio 1",
+              "id_item": 241834,
+              "code_list": 1,
+              "price": 134188,
+              "code_item": "MZ01066"
+          }
+      ]
+  },
+  {
+      "id": 241835,
+      "code": "MZ01062",
+      "description": "JGO. VALVULA ADM MAZ. ALLEGRO 1.6 MN - 4048-AN -  - BBB - ARGENTINA",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "https://api.pedbox.co:8590/files/attached/ur/MZ01062.png",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2020-05-05 10:47:23",
+      "modified": "2021-11-28 19:03:01",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": [
+          {
+              "id": 4144525,
+              "description": "Lista de precio 1",
+              "id_item": 241835,
+              "code_list": 1,
+              "price": 82749,
+              "code_item": "MZ01062"
+          }
+      ]
+  },
+  {
+      "id": 241836,
+      "code": "MZ01067",
+      "description": "JGO. VALVULA MOTOR MAZ. 3 / 1.6 (ESC) - 4151-EN -  - BBB - ARGENTINA",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "https://api.pedbox.co:8590/files/attached/ur/MZ01067.png",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2020-05-05 10:47:23",
+      "modified": "2021-11-28 19:03:03",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": [
+          {
+              "id": 4144528,
+              "description": "Lista de precio 1",
+              "id_item": 241836,
+              "code_list": 1,
+              "price": 134188,
+              "code_item": "MZ01067"
+          }
+      ]
+  },
+  {
+      "id": 241967,
+      "code": "CV04037",
+      "description": "PLATINO DISTRI. CHEV. LUV 1.6 - PS-299V - 8-94206-144-0 - CENTURY - JAPON",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "https://api.pedbox.co:8590/files/attached/ur/CV04037.jpg",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2020-05-05 10:47:41",
+      "modified": "2021-11-28 18:39:07",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": [
+          {
+              "id": 4142699,
+              "description": "Lista de precio 1",
+              "id_item": 241967,
+              "code_list": 1,
+              "price": 4805,
+              "code_item": "CV04037"
+          }
+      ]
+  },
+  {
+      "id": 241968,
+      "code": "MT04010",
+      "description": "PLATINO DISTRI. MIT. MONTERO - PS-822V - MD-607394 - CENTURY - JAPON",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "https://api.pedbox.co:8590/files/attached/ur/MT04010.jpg",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2020-05-05 10:47:41",
+      "modified": "2021-11-28 19:00:27",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": [
+          {
+              "id": 4144346,
+              "description": "Lista de precio 1",
+              "id_item": 241968,
+              "code_list": 1,
+              "price": 4900,
+              "code_item": "MT04010"
+          }
+      ]
+  },
+  {
+      "id": 241969,
+      "code": "UN04018",
+      "description": "PLATINO DISTRI. MIT. MOTERO/NISSAN/TOY/DAIH/TODOS YP-201 - PS-411V - PS-98V - CENTURY - JAPON",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "https://api.pedbox.co:8590/files/attached/ur/UN04018.jpg",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2020-05-05 10:47:41",
+      "modified": "2021-11-28 19:31:35",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": [
+          {
+              "id": 4146725,
+              "description": "Lista de precio 1",
+              "id_item": 241969,
+              "code_list": 1,
+              "price": 4878,
+              "code_item": "UN04018"
+          }
+      ]
+  },
+  {
+      "id": 241970,
+      "code": "UN04014",
+      "description": "PLATINO DISTRI. TOY. 2F/3F/SJ410/F20/L300 - PS-197V - SD-102V - CENTURY - JAPON",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "https://api.pedbox.co/images/default_universal.jpg",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2020-05-05 10:47:41",
+      "modified": "2021-11-28 19:31:31",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": [
+          {
+              "id": 4146718,
+              "description": "Lista de precio 1",
+              "id_item": 241970,
+              "code_list": 1,
+              "price": 4805,
+              "code_item": "UN04014"
+          }
+      ]
+  },
+  {
+      "id": 241977,
+      "code": "NS04010",
+      "description": "PORTA PLATINO NISSAN TODOS - BN-001 - 22136-18005 - CENTURY - JAPON",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "https://api.pedbox.co/images/default_universal.jpg",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2020-05-05 10:47:42",
+      "modified": "2021-11-28 19:08:55",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": [
+          {
+              "id": 4144951,
+              "description": "Lista de precio 1",
+              "id_item": 241977,
+              "code_list": 1,
+              "price": 23754,
+              "code_item": "NS04010"
+          }
+      ]
+  },
+  {
+      "id": 246235,
+      "code": "CV01088",
+      "description": "PATIN (FIJO) CORREA DISTRIBUCION CHEV. OPTRA 1.8 ADVANCE - 96413863 - I96413863 - DAEJIN - COREA",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "https://api.pedbox.co:8590/files/attached/ur/CV01088.png",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2020-05-27 10:17:42",
+      "modified": "2021-11-28 18:37:14",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": [
+          {
+              "id": 4142553,
+              "description": "Lista de precio 1",
+              "id_item": 246235,
+              "code_list": 1,
+              "price": 32392,
+              "code_item": "CV01088"
+          }
+      ]
+  },
+  {
+      "id": 246236,
+      "code": "CV01089",
+      "description": "PATIN (LOCO) CORREA DISTRIBUCION CHEV. AVEO/OPTRA (96350526 - K6135) - 25191263 -  - VALEO - COREA",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "https://api.pedbox.co:8590/files/attached/ur/CV01089.png",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2020-05-27 10:17:42",
+      "modified": "2021-11-28 18:37:15",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": [
+          {
+              "id": 4142554,
+              "description": "Lista de precio 1",
+              "id_item": 246236,
+              "code_list": 1,
+              "price": 28155,
+              "code_item": "CV01089"
+          }
+      ]
+  },
+  {
+      "id": 246432,
+      "code": "HY01043",
+      "description": "PATIN (LOCO) CORREA ALTERNADOR HYU. TUCSON IX-35/KIA NEW SPORTAGE/SORENTO 2.2 C.C. DIESEL - 25281-2F000 - 252812F002 - GATES - COREA",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "https://api.pedbox.co:8590/files/attached/ur/HY01043.jpg",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2020-05-27 10:24:29",
+      "modified": "2021-11-28 18:48:16",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": [
+          {
+              "id": 4143412,
+              "description": "Lista de precio 1",
+              "id_item": 246432,
+              "code_list": 1,
+              "price": 109601,
+              "code_item": "HY01043"
+          }
+      ]
+  },
+  {
+      "id": 246433,
+      "code": "HY01043",
+      "description": "PATIN (LOCO) CORREA ALTERNADOR HYU. TUCSON IX-35/KIA NEW SPORTAGE/SORENTO 2.2 C.C. DIESEL - 25281-2F000 - 252812F002 - GATES - COREA",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "https://api.pedbox.co:8590/files/attached/ur/HY01043.jpg",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2020-05-27 10:24:29",
+      "modified": "2021-11-28 18:48:16",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": []
+  },
+  {
+      "id": 246434,
+      "code": "HY01044",
+      "description": "PATIN (LOCO) CORREA DISTRIBUCION HYU. VISION TODOS/GETZ/ELANTRA/EXCEL (K6125) - 24810-26020 - 2481026020 - VALEO - COREA",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "https://api.pedbox.co:8590/files/attached/ur/HY01044.jpg",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2020-05-27 10:24:30",
+      "modified": "2021-11-28 18:48:16",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": [
+          {
+              "id": 4143413,
+              "description": "Lista de precio 1",
+              "id_item": 246434,
+              "code_list": 1,
+              "price": 37063,
+              "code_item": "HY01044"
+          }
+      ]
+  },
+  {
+      "id": 246435,
+      "code": "HY01045",
+      "description": "PATIN CORREA DISTRIBUCION HYU. TUCSON GASOLINA/AVANTE/ELANTRA - 24810-23050 - 2481023050 - HYUNDAI MOBIS - GENUINO",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "https://api.pedbox.co:8590/files/attached/ur/HY01045.png",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2020-05-27 10:24:30",
+      "modified": "2021-11-28 18:48:17",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": [
+          {
+              "id": 4143414,
+              "description": "Lista de precio 1",
+              "id_item": 246435,
+              "code_list": 1,
+              "price": 50892,
+              "code_item": "HY01045"
+          }
+      ]
+  },
+  {
+      "id": 246436,
+      "code": "HY01046",
+      "description": "PATIN CORREA DISTRIBUCION HYU. TUCSON GASOLINA/AVANTE/ELANTRA (K6124) - 24810-23050 - 2481023050 - VALEO - COREA",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "https://api.pedbox.co:8590/files/attached/ur/HY01046.jpg",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2020-05-27 10:24:30",
+      "modified": "2021-11-28 18:48:18",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": [
+          {
+              "id": 4143415,
+              "description": "Lista de precio 1",
+              "id_item": 246436,
+              "code_list": 1,
+              "price": 39068,
+              "code_item": "HY01046"
+          }
+      ]
+  },
+  {
+      "id": 246572,
+      "code": "HY07150",
+      "description": "BUJE TEMPLETE HYU. IX-35/KIA REVOLUTION 4X4 TRAS. (CORBATIN 83MM) - 55274-3W000 - 55275-3W000 - ONNURI - COREA",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "https://api.pedbox.co:8590/files/attached/ur/HY07150.jpg",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2020-05-27 10:27:42",
+      "modified": "2021-11-28 18:52:34",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": [
+          {
+              "id": 4143774,
+              "description": "Lista de precio 1",
+              "id_item": 246572,
+              "code_list": 1,
+              "price": 50080,
+              "code_item": "HY07150"
+          }
+      ]
+  },
+  {
+      "id": 246573,
+      "code": "HY07150",
+      "description": "BUJE TEMPLETE HYU. IX-35/KIA REVOLUTION 4X4 TRAS. (CORBATIN 83MM) - 55274-3W000 - 55275-3W000 - ONNURI - COREA",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "https://api.pedbox.co:8590/files/attached/ur/HY07150.jpg",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2020-05-27 10:27:42",
+      "modified": "2021-11-28 18:52:34",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": []
+  },
+  {
+      "id": 246621,
+      "code": "KI01012",
+      "description": "PATIN CORREA ACCESORIOS KIA SPORTAGE REVOLUTION DIESEL/HYU. TUCSON IX-35 (ACANALADO) - 25287-27060 - 2528727060 - GATES - COREA",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "https://api.pedbox.co:8590/files/attached/ur/KI01012.png",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2020-05-27 10:29:34",
+      "modified": "2021-11-28 18:56:12",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": [
+          {
+              "id": 4144020,
+              "description": "Lista de precio 1",
+              "id_item": 246621,
+              "code_list": 1,
+              "price": 44565,
+              "code_item": "KI01012"
+          }
+      ]
+  },
+  {
+      "id": 246622,
+      "code": "KI01012",
+      "description": "PATIN CORREA ACCESORIOS KIA SPORTAGE REVOLUTION DIESEL/HYU. TUCSON IX-35 (ACANALADO) - 25287-27060 - 2528727060 - GATES - COREA",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "https://api.pedbox.co:8590/files/attached/ur/KI01012.png",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2020-05-27 10:29:34",
+      "modified": "2021-11-28 18:56:12",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": []
+  },
+  {
+      "id": 246623,
+      "code": "KI01013",
+      "description": "PATIN CORREA ACCESORIOS KIA SPORTAGE REVOLUTION/HYU. TUCSON IX-35 (25281-2F002) - 25281-2F001 -  - HYUNDAI MOBIS - GENUINO",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "https://api.pedbox.co:8590/files/attached/ur/KI01013.png",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2020-05-27 10:29:35",
+      "modified": "2021-11-28 18:56:13",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": [
+          {
+              "id": 4144021,
+              "description": "Lista de precio 1",
+              "id_item": 246623,
+              "code_list": 1,
+              "price": 134528,
+              "code_item": "KI01013"
+          }
+      ]
+  },
+  {
+      "id": 246624,
+      "code": "KI01013",
+      "description": "PATIN CORREA ACCESORIOS KIA SPORTAGE REVOLUTION/HYU. TUCSON IX-35 (25281-2F002) - 25281-2F001 -  - HYUNDAI MOBIS - GENUINO",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "https://api.pedbox.co:8590/files/attached/ur/KI01013.png",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2020-05-27 10:29:35",
+      "modified": "2021-11-28 18:56:13",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": []
+  },
+  {
+      "id": 281515,
+      "code": "HY01084",
+      "description": "PATIN AUX. CORREA HYU. TUCSON/NEW SPORTAGE 04/09 DIESEL************************************* - 24810-27250 -  - HYUNDAI MOBIS - GENUINO",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "https://api.pedbox.co:8590/files/attached/ur/HY01084.jpg",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2021-02-17 13:29:24",
+      "modified": "2021-11-28 18:48:43",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": [
+          {
+              "id": 4143453,
+              "description": "Lista de precio 1",
+              "id_item": 281515,
+              "code_list": 1,
+              "price": 79300,
+              "code_item": "HY01084"
+          }
+      ]
+  },
+  {
+      "id": 281582,
+      "code": "HY07249",
+      "description": "BUJE TEMPLETE HYU. IX-35/KIA REVOLUTION 4X4 TRAS. (CORBATIN 83MM) IZQ. - 55274-3W000 - CVKH-199L - CTR - ORIGINAL",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2021-02-17 13:34:07",
+      "modified": "2021-11-28 18:53:34",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": [
+          {
+              "id": 4143863,
+              "description": "Lista de precio 1",
+              "id_item": 281582,
+              "code_list": 1,
+              "price": 67635,
+              "code_item": "HY07249"
+          }
+      ]
+  },
+  {
+      "id": 281594,
+      "code": "HY07261",
+      "description": "BUJE TEMPLETE HYU. IX-35/KIA REVOLUTION 4X4 TRAS. (CORBATIN 83MM) DER. - 55275-3W000 - CVKH-199R - CTR - ORIGINAL",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2021-02-17 13:34:10",
+      "modified": "2021-11-28 18:53:42",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": [
+          {
+              "id": 4143875,
+              "description": "Lista de precio 1",
+              "id_item": 281594,
+              "code_list": 1,
+              "price": 67635,
+              "code_item": "HY07261"
+          }
+      ]
+  },
+  {
+      "id": 283743,
+      "code": "HY07281",
+      "description": "**BUJE TIJERA HYU. SONATA 01/05 (CORBATIN) - 54551-38000 - CVKK-30 - CTR - ORIGINAL",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2021-04-05 16:22:30",
+      "modified": "2021-11-28 18:53:56",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": [
+          {
+              "id": 4143894,
+              "description": "Lista de precio 1",
+              "id_item": 283743,
+              "code_list": 1,
+              "price": 21670,
+              "code_item": "HY07281"
+          }
+      ]
+  },
+  {
+      "id": 284831,
+      "code": "CV07201",
+      "description": "BUJE TIJERA INF. CHEV. SPARK GT (CORBATIN) - 95952783 -  - EFFIX - INDIA",
+      "ean": "",
+      "reference": "",
+      "id_unity": 1,
+      "id_tax": 1,
+      "price_cost": 0,
+      "price_sale": 0,
+      "has_list": 1,
+      "image": "",
+      "has_inventory": 0,
+      "has_batch": 0,
+      "min_amount_purchase": 0,
+      "discount": 0,
+      "status": 0,
+      "created": "2021-05-25 15:51:37",
+      "modified": "2021-11-28 18:43:14",
+      "migrated": 1,
+      "attachments": 0,
+      "attachments_attributes": 0,
+      "prices_list": []
+  }
+]
+  
+
+  </script>
+  
+</body>
+</html>

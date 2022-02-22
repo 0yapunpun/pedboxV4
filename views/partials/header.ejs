@@ -1,0 +1,65 @@
+<style>
+  .closeSession a{
+    transition: 0.3s;
+  }
+  .closeSession a:hover{
+    color: red;
+  }
+  .imgClass{
+    max-width: 100%;
+    max-height: 100%;
+    min-width: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+</style>
+
+<nav class="navbar navbar-main navbar-expand-lg position-sticky mt-4 top-1 px-0 mx-4 shadow-none border-radius-xl z-index-sticky" id="navbarBlur" data-scroll="true">
+  <div class="container-fluid py-1 px-3">
+    <div class="sidenav-toggler sidenav-toggler-inner d-xl-block d-none ">
+      <a href="javascript:;" class="nav-link text-body p-0">
+        <div class="sidenav-toggler-inner">
+          <i class="sidenav-toggler-line"></i>
+          <i class="sidenav-toggler-line"></i>
+          <i class="sidenav-toggler-line"></i>
+        </div>
+      </a>
+    </div>
+    <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
+      <ul class="navbar-nav  justify-content-end">
+        <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
+          <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
+            <div class="sidenav-toggler-inner">
+              <i class="sidenav-toggler-line"></i>
+              <i class="sidenav-toggler-line"></i>
+              <i class="sidenav-toggler-line"></i>
+            </div>
+          </a>
+        </li>
+        <li class="nav-item px-3 d-flex align-items-center" >
+          <a href="javascript:;" class="nav-link text-body p-0" onclick="showSidebar(1)" id="showSidebarMaster">
+            <i class="fa fa-cog  cursor-pointer"></i>
+          </a>
+        </li>
+        <li class="nav-item dropdown pe-2 d-flex align-items-center">
+          <a href="javascript:;" class="nav-link text-body p-0" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fa fa-bell cursor-pointer"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="w-50 d-flex justify-content-end align-items-center gap-2 me-3">
+      <div style="text-align: right;" class="d-flex flex-column">
+        <label class="m-0"  id="userNameHeader"> <%- session.user.name %> </label>
+        <label for="" class="m-0 closeSession" style="font-size: 11px; cursor: pointer;">
+          <a href="/logout">
+            Cerrar Sesion
+          </a>
+        </label>
+      </div>
+      <div style="width: 50px; height: 50px; border-radius: 50%; background-color: lightgray;">
+        <img src="https://api.pedbox.co:8590//<%- session.user.photo %>" class="imgClass" alt="" >
+      </div>
+    </div>
+  </div>
+</nav>

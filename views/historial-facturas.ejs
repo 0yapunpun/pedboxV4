@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" type="image/x-icon" href="https://app.pedbox.co/assets/logos/logo_blanco.png"/>
+  <title>Historial Facturas</title>
+
+  <!-- Fonts and icons -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <link href="/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <!-- CSS Files -->
+  <link id="pagestyle" href="/css/soft-ui-dashboard.css?v=1.0.3" rel="stylesheet" />
+  <!-- JQUERY UI -->
+  <link rel="stylesheet" href="/css/jquery-ui.min.css">
+  <!-- REPORTS CSS -->
+  <link rel="stylesheet" href="/css/reports.css">
+
+</head>
+
+<body class="g-sidenav-show bg-gray-100">
+
+  <!-- Menu -->
+  <%- include('./partials/menu.ejs') %> 
+
+  <main class="main-content max-height-vh-100 h-100">
+
+    <!-- Cabecera -->
+    <%- include('./partials/header.ejs') %>
+
+    <!-- Content -->
+    <div class="p-4">
+
+      <!-- Cartera -->
+      <%- include('./partials/cartera.ejs') %>
+
+      <!-- Tablas -->
+      <div>
+        <div class="mt-4 w-50">
+          <div class="nav-wrapper position-relative end-0">
+            <ul class="nav nav-pills nav-fill p-1" role="tablist" style="cursor: pointer;">
+              <li class="nav-item" onclick='loadTable("tablaFacturas", facturas.Table1)' >
+                <a class="nav-link mb-0 px-0 py-1 active" data-bs-toggle="tab"  role="tab" aria-controls="profile" aria-selected="true" href="#">
+                Facturas
+                </a>
+              </li>
+              <li class="nav-item" onclick='loadTable("tablaRecibos", recibos.Table)'>
+                <a class="nav-link mb-0 px-0 py-1" data-bs-toggle="tab" role="tab"  aria-selected="false" href="#">
+                Recibos
+                </a>
+              </li>
+              <li class="nav-item" onclick='loadTable("tablaNotas", notas.Table)'>
+                <a class="nav-link mb-0 px-0 py-1" data-bs-toggle="tab"  role="tab"  aria-selected="false" href="#">
+                Notas
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div id="tableContainer" class="card p-3"></div>
+      </div>
+    </div>
+
+    <!-- Modal PDF-->
+    <div class="modal fade" id="modalPdf">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content min-vh-90" style="min-height: 90vh;">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">PDF</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: gray; border-radius: 50%;"></button>
+          </div>
+          <div class="modal-body d-flex justify-content-center" id="pdfContainer">
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+  
+  <!-- Scripts -->
+  <script src="/js/core/popper.min.js"></script>
+  <script src="/js/core/bootstrap.min.js"></script>
+  <script src="/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="/js/plugins/choices.min.js"></script>
+  <script src="/js/soft-ui-dashboard.min.js?v=1.0.3"></script>
+  <script src="/js/plugins/dragula/dragula.min.js"></script>
+  <script src="/js/plugins/jkanban/jkanban.js"></script>
+  <script src="/js/jquery.js"></script>
+  <script src="/js/jquery-ui.min.js"></script>
+  <script src="/js/plugins/datatables.js"></script>
+  <script src="/js/plugins/chartjs.min.js"></script>
+  <script src="/js/underscore-min.js"></script>
+  <script src="/js/helpers.js"></script>
+  <script src="/js/menu.js"></script>
+  
+  <script>
+    let facturas = `<%- JSON.stringify(facturas) %>`;
+    facturas = JSON.parse(facturas).result.extranet;
+
+    let recibos = `<%- JSON.stringify(recibos) %>`;
+    recibos = JSON.parse(recibos).result.extranet;
+
+    let notas = `<%- JSON.stringify(notas) %>`;
+    notas = JSON.parse(notas).result.extranet;
+
+    let session = `<%- JSON.stringify(session) %>`;
+    session = JSON.parse(session).user;
+
+    // PDF prueba
+    const canSeePdf = false; //Para probar el modal del pdf
+    const pdfLink = "http://www.secst.cl/upfiles/documentos/19072016_1207am_578dc39115fe9.pdf";
+
+    const loadTable = (tableNombre, body) => {
+      let table = `<table id="${tableNombre}" class="table align-items-center mb-1 table-hover" style="overflow:scroll"></table>`;
+      let tableHead;
+
+      $("#tableContainer").html("");
+      $("#tableContainer").append(table)
+
+      let tableContent = '<tbody id="tableBody" class="mb-2">';
+      
+      if (tableNombre == "tablaFacturas") {
+        tableHead = `
+          <thead>
+            <tr id="tableHead">
+              <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 iconCheck" > # </th>
+              <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Fecha</th>
+              <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Subtotal</th>
+              <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">IVA</th>
+              <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Descuento</th>
+              <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Valor Total</th>
+            </tr> 
+          </thead>  
+        `;
+        try {
+          for(let i = 0; i < body.length; i++){
+            let pdf;
+            if (canSeePdf) {pdf = `<a onclick="openModalPdf('${pdfLink}')" href="#"> <i class="fas fa-file-pdf me-1"></i> PDF <br> ${body[i].Numero_Documento}</a>`} 
+            else {pdf = `<a href="${body[i].Url_fe}" target="_blank"> <i class="fas fa-file-pdf me-1"></i> PDF <br> ${body[i].Numero_Documento} </a>`}
+  
+            tableContent+= '<tr >';
+            tableContent+= `<td class="text-center" style="cursor: pointer">${pdf} </td>`;
+            tableContent+= `<td class="text-center">${body[i].Fecha_Emision}</td>`;
+            tableContent+= `<td class="text-center">$${numberWithCommas(body[i].Subtotal)}</td>`;
+            tableContent+= `<td class="text-center">$${numberWithCommas(body[i].Iva)}</td>`;
+            tableContent+= `<td class="text-center">$${numberWithCommas(body[i].Descuento)}</td>`;
+            tableContent+= `<td class="text-center">$${numberWithCommas(body[i].Valor_Documento)}</td>`;
+            tableContent+= '</tr>';
+          };
+        } catch (error) {
+          console.log("Tabla sin datos");
+        }
+      }
+
+      if (tableNombre == "tablaRecibos") {
+        tableHead = `
+        <thead>
+          <tr id="tableHead">
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 iconCheck" > # </th>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Fecha</th>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Valor</th>
+            </tr> 
+            </thead>  
+            `;
+        try {
+          for(let i = 0; i < body.length; i++){
+            tableContent+= '<tr >';
+            tableContent+= `<td class="text-center">${body[i].numero}</td>`;
+            tableContent+= `<td class="text-center">${body[i].fecha}</td>`;
+            tableContent+= `<td class="text-center">$${numberWithCommas(body[i].valor_total)}</td>`;
+            tableContent+= '</tr>';
+          };
+        } catch (error) {
+          console.log("Tabla sin datos");
+        }
+      }
+
+      if (tableNombre == "tablaNotas") {
+        tableHead = `
+          <thead>
+            <tr id="tableHead">
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 iconCheck" > # </th>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Descripción</th>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Fecha</th>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Valor</th>
+            </tr> 
+          </thead>  
+          `;
+        try {
+          for(let i = 0; i < body.length; i++){
+            tableContent+= '<tr >';
+            tableContent+= `<td class="text-center">${body[i].numero}</td>`;
+            tableContent+= `<td class="text-center">${body[i].fecha}</td>`;
+            tableContent+= `<td class="text-center">${body[i].fecha}</td>`;
+            tableContent+= `<td class="text-center">$${numberWithCommas(body[i].valor_total)}</td>`;
+            tableContent+= '</tr>';
+          };
+        } catch (error) {
+          console.log("Tabla sin datos");
+        }
+      }
+      tableContent+='</tbody>';
+
+      $("#"+tableNombre).append(tableHead);
+      $("#"+tableNombre).append(tableContent);
+      $("#tableContainer").show();
+
+      const tableObj = new simpleDatatables.DataTable("#"+tableNombre, {});
+    }
+
+    const openModalPdf = (link) => {
+      let element = `
+        <embed src="${link}" width="100%" >
+      `;
+      $("#pdfContainer").html("");
+      $("#pdfContainer").append(element);
+      $("#modalPdf").modal("show")
+    }
+
+    $("#exportPdfBtn").on("click", function () {
+      let nit = session.nit;
+      let id_company = session.dataCompany[0].id;
+
+      // TODO: revisar si el valor venderdor es simepre 56
+      window.open(`https://api.pedbox.co:8590/export_account_quotas?nit=${nit}&vendedor=56&id_company=${id_company}`, '_blank');
+    })
+
+    $( document ).ready(function() {
+      loadCartera(facturas.Table[0]);
+      loadTable("tablaFacturas", facturas.Table1);
+    });
+  </script>
+  
+</body>
+</html>

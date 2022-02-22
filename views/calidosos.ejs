@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" type="image/x-icon" href="https://app.pedbox.co/assets/logos/logo_blanco.png"/>
+  <title>Calidosos</title>
+
+  <!-- Fonts and icons -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <link href="/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <!-- CSS Files -->
+  <link id="pagestyle" href="/css/soft-ui-dashboard.css?v=1.0.3" rel="stylesheet" />
+  <!-- JQUERY UI -->
+  <link rel="stylesheet" href="/css/jquery-ui.min.css">
+  <!-- REPORTS CSS -->
+  <link rel="stylesheet" href="/css/reports.css">
+
+
+  <style>
+    .activeNav .icon{
+      background-image: linear-gradient(310deg ,#7928ca,#ff0080);
+      color: white !important
+    }
+    .activeNav i{
+      color: white !important
+    }
+    .activeNav a{
+      background-color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
+    }
+
+
+  </style>
+</head>
+
+<body class="g-sidenav-show bg-gray-100">
+
+  <!-- Menu -->
+  <%- include('./partials/menu.ejs') %>
+
+  <main class="main-content max-height-vh-100 h-100">
+
+    <!-- Cabecera -->
+    <%- include('./partials/header.ejs') %>
+
+    <!-- Cotent -->
+    <div class="p-4">
+      <div class="card p-3 m-2">
+        <div class="d-flex justify-content-between align-items-center">
+          <h6 class="m-0">Puntos Calidosos</h6>
+          <div style="color: #344767; cursor: pointer;" >  
+              <h6 class="m-0">Acumulados: <span id="totalpoints"></span></h6>
+          </div>
+          <div class="d-flex align-items-center gap-1" style="color: #344767; cursor: pointer;" onclick="redimirPuntos()">  
+            <div class=" icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg" style="cursor: pointer; position: relative;">
+                <i class="fas fa-gift" style="font-size: 15px" title="Redimir Puntos"></i>
+            </div>
+            <h6 class="m-0">Redimir</h6>
+          </div>
+        </div>
+        <div class="w-100 mt-3">
+          <table class="w-100" id="table">
+            <thead>
+              <tr>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Fecha</th>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Concepto</th>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Tipo Documento</th>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Documento</th>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Puntos</th>
+              </tr> 
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script src="/js/core/popper.min.js"></script>
+  <script src="/js/core/bootstrap.min.js"></script>
+  <script src="/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="/js/plugins/choices.min.js"></script>
+  <script src="/js/soft-ui-dashboard.min.js?v=1.0.3"></script>
+  <script src="/js/plugins/dragula/dragula.min.js"></script>
+  <script src="/js/plugins/jkanban/jkanban.js"></script>
+  <script src="/js/jquery.js"></script>
+  <script src="/js/jquery-ui.min.js"></script>
+  <script src="/js/plugins/datatables.js"></script>
+  <script src="/js/plugins/chartjs.min.js"></script>
+  <script src="/js/underscore-min.js"></script>
+  <script src="/js/helpers.js"></script>
+  <script src="/js/menu.js"></script>
+
+  <script>
+    let puntos = `<%- JSON.stringify(puntos) %>`;
+        puntos = JSON.parse(puntos).result;
+    let session = `<%- JSON.stringify(session) %>`;
+        session = JSON.parse(session);
+
+    const printTableData = (data) =>{
+      $("#tableBody").html("");
+      for (let i = 0; i < data.length; i++) {
+        let element = `
+          <tr>
+            <th class="text-left text-uppercase text-secondary text-xs font-weight-bolder opacity-7">${data[i].docDate}</th>
+            <th class="text-left text-uppercase text-secondary text-xs font-weight-bolder opacity-7">${data[i].concept}</th>
+            <th class="text-left text-uppercase text-secondary text-xs font-weight-bolder opacity-7">${data[i].docType}</th>
+            <th class="text-left text-uppercase text-secondary text-xs font-weight-bolder opacity-7">${data[i].docNum}</th>
+            <th class="text-left text-uppercase text-secondary text-xs font-weight-bolder opacity-7">${numberWithCommas(data[i].point)}</th>
+          </tr> 
+        `;
+        $("#tableBody").append(element)
+      }
+      const tableObj = new simpleDatatables.DataTable("#table", {
+        perPage: 30
+      });
+    };
+
+    const redimirPuntos = () => {
+      let id = session.user.nit;
+      let code = window.btoa(id);
+          code = "hHjIlL" + code;
+      let url = "https://loscalidosos.com/login/api/" + code;
+      window.open(url, '_blank');
+    }
+
+    $(document).ready(function () {
+      $("#totalpoints").text(numberWithCommas(puntos.points))
+      printTableData(puntos.pointsHistory)
+    })
+  </script>
+
+</body>
+</html>
