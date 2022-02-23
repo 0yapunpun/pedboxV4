@@ -15,6 +15,12 @@ router.get('/historial-transacciones', viewController.historialTransacciones);
 router.get('/historial-facturas', viewController.historialFacturas);
 router.get('/historial-pedidos', viewController.historialPedidos);
 router.get('/historial-pedidos/:numero', viewController.historialPedidosDetalle);
+router.get('/nuevo-pedido/:codigo', viewController.nuevoPedido);
+router.get('/infoVendedor/:id', viewController.getInfoVendedor);
+router.get('/catalogo', viewController.catalogo);
+router.get('/catalogo/productos', viewController.catalogoProductos);
+router.get('/catalogo/top', viewController.catalogoTop);
+router.get('/certificados', viewController.certificados);
 
 
 /* POST Services */

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" type="image/x-icon" href="https://app.pedbox.co/assets/logos/logo_blanco.png"/>
+  <title>Certificados</title>
+
+  <!-- Fonts and icons -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <link href="/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <!-- CSS Files -->
+  <link id="pagestyle" href="/css/soft-ui-dashboard.css?v=1.0.3" rel="stylesheet" />
+  <!-- JQUERY UI -->
+  <link rel="stylesheet" href="/css/jquery-ui.min.css">
+  <!-- REPORTS CSS -->
+  <link rel="stylesheet" href="/css/reports.css">
+
+  <style>
+    #inputYearContainer .choices__list--single {
+      padding-left: 30px;
+    }
+    .choices__list--dropdown .choices__item--selectable:after {
+      display: none !important;
+    }
+    .choices__list--dropdown .choices__item--selectable {
+      padding-right: 0 !important;
+    }
+    .choices__input{
+      display: none !important;
+    }
+    .choices{
+      width: 100% !important;
+    }
+    .certificadosButtons>div{
+      background-color: #e9ecef;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 1rem;
+      cursor: pointer;
+      transition: 0.5s;
+      box-shadow: 0 20px 27px 0 rgb(0 0 0 / 7%);
+    }
+    .certificadosButtons>div:hover{
+      transform: translateY(-10%)
+    }
+    .cardIcon{
+      border-radius: 0.5rem;
+      color: white;
+      padding: 5px 10px;
+      background-color: #cb0c9f;
+      margin-top: 5px;
+    }
+    .activeNav .icon{
+      background-image: linear-gradient(310deg ,#7928ca,#ff0080);
+      color: white !important
+    }
+    .activeNav i{
+      color: white !important
+    }
+    .activeNav a{
+      background-color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
+    }
+  </style>
+</head>
+
+<body class="g-sidenav-show bg-gray-100">
+
+  <!-- Menu -->
+  <%- include('./partials/menu.ejs') %> 
+
+  <main class="main-content max-height-vh-100 h-100">
+
+    <!-- Cabecera -->
+    <%- include('./partials/header.ejs') %>
+  
+      <!-- Cotent -->
+      <div class="p-4">
+        <div class="card p-3 m-3">
+          <h4>Certificados</h4>
+          <p>En este espacio podrá exportar un Certificado de Retención con solo seleccionar el año gravable y eligiendo el tipo de retención que desea visualizar</p>
+          <div class="d-flex flex-column justify-content-center align-items-center">
+            <div style="width: 150px; position: relative;" id="inputYearContainer">
+              <select name="" id="inputYear" > </select>
+              <label for="inputYear" style="position: absolute; top: 15%; left: 2%;">Año:</label>
+            </div>
+            <div class="d-flex gap-3 certificadosButtons">
+              <div class="text-center d-flex flex-column justify-content-center align-items-center" onclick="sendData(7)">
+                <h6 class="m-0">Retencion ICA</h6>
+                <div class="d-flex align-items-center gap-1">
+                  <div class="cardIcon" style="font-weight: 700;">
+                    <i class="fas fa-file-pdf" ></i>
+                    PDF
+                  </div>
+                </div>
+              </div>
+              <div class="text-center d-flex flex-column justify-content-center align-items-center" onclick="sendData(8)">
+                <h6 class="m-0">Retención en la fuente</h6>
+                <div class="d-flex align-items-center gap-1" >
+                  <div class="cardIcon" style="font-weight: 700;">
+                    <i class="fas fa-file-pdf"></i>
+                    PDF
+                  </div>
+                </div>
+              </div>
+              <div class="text-center d-flex flex-column justify-content-center align-items-center" onclick="sendData(9)">
+                <h6 class="m-0">Retencion IVA</h6>
+                <div class="d-flex align-items-center gap-1">
+                  <div class="cardIcon" style="font-weight: 700;">
+                    <i class="fas fa-file-pdf" ></i>
+                    PDF
+                  </div>
+                </div>
+              </div>
+              <div class="text-center d-flex flex-column justify-content-center align-items-center" onclick="sendData(50)" id="showOnPermission" style="display: none;">
+                <h6 class="m-0">Compras Anuales</h6>
+                <div class="d-flex align-items-center gap-1">
+                  <div class="cardIcon" style="font-weight: 700;">
+                    <i class="fas fa-file-pdf" ></i>
+                    PDF
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div> 
+      </div>
+      
+      <!-- Modal PDF-->
+      <div class="modal fade" id="modalPdf">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content min-vh-90" style="min-height: 90vh;">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">PDF</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: gray; border-radius: 50%;"></button>
+            </div>
+            <div class="modal-body d-flex justify-content-center" id="pdfContainer">
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+
+  <!-- Scripts -->
+  <script src="/js/core/popper.min.js"></script>
+  <script src="/js/core/bootstrap.min.js"></script>
+  <script src="/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="/js/plugins/choices.min.js"></script>
+  <script src="/js/soft-ui-dashboard.min.js?v=1.0.3"></script>
+  <script src="/js/plugins/dragula/dragula.min.js"></script>
+  <script src="/js/plugins/jkanban/jkanban.js"></script>
+  <script src="/js/jquery.js"></script>
+  <script src="/js/jquery-ui.min.js"></script>
+  <script src="/js/plugins/datatables.js"></script>
+  <script src="/js/plugins/chartjs.min.js"></script>
+  <script src="/js/underscore-min.js"></script>
+  <script src="/js/helpers.js"></script>
+  <script src="/js/menu.js"></script>
+    
+  <script>
+    let hasPermission = true;
+
+    const sendData = (data) => {
+      let year = $("#inputYear").val()
+      let type = data;
+
+      console.log(year, type)
+
+      https://pedbox.co:8531/exportar_retenciones?nit=900345431&tipo=82022&id_company=5&type=c&url=http://api.pedbox.co/images/invesa.png
+
+      let response = "http://www.secst.cl/upfiles/documentos/19072016_1207am_578dc39115fe9.pdf"
+      let element = `
+        <embed src="https://pedbox.co:8531/exportar_retenciones?nit=900345431&tipo=82022&id_company=5&type=c&url=http://api.pedbox.co/images/invesa.png" width="100%" >
+      `;
+      $("#pdfContainer").html("");
+      $("#pdfContainer").append(element);
+      $("#modalPdf").modal("show")
+    }
+      
+    $(document).ready(function () {
+      let year = new Date().getFullYear() 
+      for (let i = 0; i < 4; i++) {
+        let element = `
+          <option value="${year - i}">${year - i}</option>
+        `;
+        $("#inputYear").append(element);
+      };
+
+      const choices = new Choices($('#inputYear')[0], {
+        searchEnabled: false,
+        shouldSort: false,
+      });
+
+      if (hasPermission) {
+        $("#showOnPermission").show();
+      }
+    })
+  </script>
+
+</body>
+</html>

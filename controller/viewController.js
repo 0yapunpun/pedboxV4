@@ -11,7 +11,6 @@ controller.login = async(req, res, next) => {
 controller.loginValidate = async(req, res, next) => {
   const resp = await userController.login(req.body);
   if (resp.result=='ok') {
-    console.log(resp)
     req.session.login = true;
     req.session.urlSocket = resp.urlSocket;
     req.session.user = resp.user;
@@ -21,11 +20,6 @@ controller.loginValidate = async(req, res, next) => {
     delete resp.urlSocket;
   }
   return res.send(resp);
-  
-  // let resp = {"result": "ok"}
-  // req.session.login = true;
-  // return res.send(resp);
-
 }
 
 controller.logout = (req, res) => {
@@ -118,7 +112,7 @@ controller.historialPedidosDetalle = async (req, res, next) => {
 
   let itemsDetail = [];
   for (let i = 0; i < detalle.length; i++) {
-    let item = await service.repetirPedido(id_company, detalle[i].codigo);
+    let item = await service.detalleProductos(id_company, detalle[i].codigo);
         item = item.result.items[0];
 
     itemsDetail.push({
@@ -137,6 +131,116 @@ controller.historialPedidosDetalle = async (req, res, next) => {
   }
   res.send({'detalle': itemsDetail});
 }
+
+controller.nuevoPedido = async (req, res, next) => {
+  let id_company = req.session.user.id_company;
+  let codigo = req.params.codigo;
+
+  let productos = await service.detalleProductos(id_company, codigo);
+  res.send({"productos": productos})
+}
+
+controller.getInfoVendedor = async (req, res, next) => {
+  let id_person = req.params.id;
+
+  let info = await service.informacionVendedor(id_person);
+  res.send({'vendedor': info});
+}
+
+controller.catalogo = async (req, res, next) => {
+  // Validar login
+  if (!req.session.login) { return res.redirect('/login'); }
+  
+  res.render('catalogo', {'session': req.session});
+}
+
+controller.catalogoProductos = async (req, res, next) => {
+  let id_company = req.session.user.id_company;
+  let url_company = req.session.user.dataCompany[0].Url;
+  let nit = req.session.user.nit;
+  
+  let productos = await service.productos(url_company, nit, id_company);
+  let images = await service.imagenesProductos(id_company);
+
+  let items = productos.result.extranet.Table;
+  images = images.result.data;
+
+  items.forEach(item => {
+    item.qty = 1;
+    let imagen = images.find(a => a.code === item.codigo);
+    item.imagen = (imagen != undefined) ? imagen.image : null;
+    item.format_precio = nvFormatCash(item.precio, '$', 0);
+  });
+
+  for(let item of items) {
+    ['marca', 'modelo', 'categoria_x002F_parte', 'fabricante'].forEach((v) => {
+      item[v] = item[v] || '';
+    });
+    item['stock'] = 0;
+    if (item['Medellin']) {
+      [
+        'Medellin', 'Bogota', 'Barranquilla', 'Cali', 'Cali_x0020_Salonia',
+        'Medellin_x0020_transito', 'Bogota_x0020_transito',
+        'Barranquilla_x0020_transito', 'Preguntar_x0020_Disponibilidad'
+      ].forEach((v) => {
+        item[v] = parseInt(item[v] || '0');
+        item['stock'] += parseInt(item['cantidad']);
+      });
+    } else {
+      item['stock'] = parseInt(item['cantidad']);
+    }
+  }
+  res.send({"items":items})
+}
+
+controller.catalogoTop = async (req, res, next) => {
+  // Validar login
+  if (!req.session.login) { return res.redirect('/login'); }
+
+  let id_company = req.session.user.id_company;
+  let url_company = req.session.user.dataCompany[0].Url;
+  let nit = req.session.user.nit;
+
+  let productos = await service.topProductos(url_company, nit, id_company);
+  let images = await service.imagenesProductos(id_company);
+
+  let items = productos.result.extranet.Table;
+  images = images.result.data;
+
+  items.forEach(item => {
+    item.qty = 1;
+    let imagen = images.find(a => a.code === item.codigo);
+    item.imagen = (imagen != undefined) ? imagen.image : null;
+    item.format_precio = nvFormatCash(item.precio, '$', 0)
+  });
+  for(let item of items) {
+    ['marca', 'modelo', 'categoria_x002F_parte', 'fabricante'].forEach((v) => {
+      item[v] = item[v] || '';
+    });
+    item['stock'] = 0;
+    if (item['Medellin']) {
+      [
+        'Medellin', 'Bogota', 'Barranquilla', 'Cali', 'Cali_x0020_Salonia',
+        'Medellin_x0020_transito', 'Bogota_x0020_transito',
+        'Barranquilla_x0020_transito', 'Preguntar_x0020_Disponibilidad'
+      ].forEach((v) => {
+        item[v] = parseInt(item[v] || '0');
+        item['stock'] += parseInt(item['cantidad']);
+      });
+    } else {
+      item['stock'] = parseInt(item['cantidad']);
+    }
+  }
+  res.render('catalogo-top50', {'session': req.session, 'productos': items});
+}
+
+controller.certificados = async(req, res, next) => {
+  // Validar login
+  if (!req.session.login) { return res.redirect('/login'); }
+  
+  res.render('certificados', {'session': req.session});
+}
+
 
 function nvFormatCash(
   text = 0,

@@ -60,8 +60,32 @@ service.detallePedido = async(url_company, num_pedido) => {
   return data;
 }
 
-service.repetirPedido = async(id_company, codigo) => {
+service.detalleProductos = async(id_company, codigo) => {
   const url = urlKakashi+'get_items?id_company='+id_company+'&params='+codigo;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.productos = async(url_company, nit, id_company) => {
+  const url = urlKakashi+'get_extranet?nit='+nit+'&tipo=10&url='+url_company+'&id_company='+id_company;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.topProductos = async(url_company, nit, id_company) => {
+  const url = urlKakashi+'get_extranet?nit='+nit+'&tipo=34&url='+url_company+'&id_company='+id_company;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.imagenesProductos = async(id_company) => {
+  const url = urlKakashi+"get_items_image?id_company="+id_company;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.informacionVendedor = async(id_person) =>{
+  const url = urlKakashi+'get_info_seller?id_person='+id_person;
   const data =  await makeRequest(url);
   return data;
 }

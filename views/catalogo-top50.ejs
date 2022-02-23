@@ -1,0 +1,775 @@
+<!-- TODO:
+  -Mostrar u ocultar top 50 por permisos (IGB no lo tiene por ejemplo)
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" type="image/x-icon" href="https://app.pedbox.co/assets/logos/logo_blanco.png"/>
+  <title>Top 50</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <link href="/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <!-- CSS Files -->
+  <link id="pagestyle" href="/css/soft-ui-dashboard.css?v=1.0.3" rel="stylesheet" />
+  <!-- JQUERY UI -->
+  <link rel="stylesheet" href="/css/jquery-ui.min.css">
+  <!-- REPORTS CSS -->
+  <link rel="stylesheet" href="/css/reports.css">
+
+  <style>
+    .tags {
+      padding: 0.55em 0.9em;
+      font-size: 0.75em;
+      font-weight: 700;
+      line-height: 1;
+      color: #fff;
+      text-align: center;
+      white-space: nowrap;
+      vertical-align: baseline;
+      border-radius: 0.45rem;
+      transition: 0.5s;
+      cursor: pointer;
+    }
+    .tags:hover {
+      background-color: #8392ab;
+    }
+    #tagsContainer .closeTag{
+      display: none;
+    }
+    #appliedFilters .tags{
+      padding-left: 5px;
+    }
+    /* Libreria choice JS, Estilos para quitar padding indeseado del combobox */
+    .choices{
+      margin: 0;
+      min-width: 150px;
+    }
+    .choices__list--dropdown {
+      z-index: 1000;
+    }
+    .choices__list--dropdown .choices__item--selectable:after {
+      display: none !important;
+    }
+    .choices__list--dropdown .choices__item--selectable {
+      padding-right: 0 !important;
+    }
+    .choices__input{
+      display: none !important;
+    }
+
+    .selectVer .choices__list--single {
+      padding-left: 35px;
+    }
+    .selectOrdenar .choices__list--single {
+      padding-left: 75px;
+    }
+    .iconsHover{
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      padding: 5px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .iconsHover:hover{
+      background-color: #e9ecef;
+    }
+    .sidebarDropMenu{
+      margin: 5px;
+    }
+    .cardItemHover:hover{
+      background-color: #e9ecef;
+      transform: scale(1.05,1.05);
+      transition: 0.8s;
+    }
+    /* Paginator */
+
+    /* PAGER, estilos robados de simpleDataTable */
+    .dataTable-pagination ul {
+      margin: 0;
+      padding-left: 0;
+    }
+    .dataTable-pagination li {
+      list-style: none;
+      float: left;
+    }
+    .dataTable-pagination a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #8392AB;
+      padding: 0;
+      margin: 0 3px;
+      border: 1px solid #dee2e6;
+      border-radius: 50% !important;
+      width: 36px;
+      height: 36px;
+      font-size: 0.875rem;
+      margin-left: 0;
+    }
+    .dataTable-pagination a:hover {
+      background-color: #d9d9d9;
+    }
+    .dataTable-pagination .active a, .dataTable-pagination .active a:focus, .dataTable-pagination .active a:hover {
+      background: transparent;
+      background-image: linear-gradient(310deg, #7928CA 0%, #FF0080 100%);
+      box-shadow: 0 3px 5px -1px rgb(0 0 0 / 9%), 0 2px 3px -1px rgb(0 0 0 / 7%);
+      color: #fff;
+      border: none;
+      border-radius: 50% !important;
+    }
+    .dataTable-pagination .pager a {
+      font-weight: bold;
+    }
+
+    #modalAddedToCart{
+      position: absolute;
+      width: 300px;
+      min-height: 200px;
+      top: 23%;
+      right: 3%;
+      background-color: white;
+      border-radius: 1rem;
+      box-shadow: 0 20px 27px 0 rgba(0, 0, 0, 20%);
+      transition: 0.5s;
+    }
+
+    .alertsStyle{
+      position: fixed; 
+      color: white; 
+      bottom: 0%;
+      left: 50%;
+    }
+    .activeNav .icon{
+      background-image: linear-gradient(310deg ,#7928ca,#ff0080);
+      color: white !important
+    }
+    .activeNav i{
+      color: white !important
+    }
+    .activeNav a{
+      background-color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
+    }
+    .choices{
+      width: 100% !important;
+    }
+    #productsContainer .card-text{
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body class="g-sidenav-show bg-gray-100">
+
+  <!-- Menu -->
+  <%- include('./partials/menu.ejs') %> 
+
+  <main class="main-content max-height-vh-100 h-100">
+
+    <!-- Cabecera -->
+    <%- include('./partials/header.ejs') %>
+
+    <div class="container-fluid my-3 py-3">
+      <div class="row mb-5">
+
+        <div class="col-lg-12">
+          <div class="card card-body" >
+            <div class="row justify-content-center align-items-center">
+              <div class="col-md-3" style="position: relative;">
+                <input id="searchField" class="form-control" placeholder="Buscar..." style="padding-left: 30px;">
+                <div style="position: absolute; top: 8px; left: 22px; cursor: pointer;" onclick="filterSearchField()">
+                  <i class="fas fa-search" ></i>
+                </div>
+              </div>
+              <div class="col-md-3 selectOrdenar" style="position: relative;">
+                <select class="form-control" id="selectByPrice">
+                  <option value="0" selected>Por Defecto</option>
+                  <option value="1">Precio Menor</option>
+                  <option value="2">Precio Mayor</option>
+                </select>
+                <span style="position: absolute; top: 15%; left: 10%"><h6>Ordenar:</h6></span>
+              </div>
+              <div class="col-md-3 selectVer" style="position: relative;">
+                <select class="form-control" id="selectNumberRange">
+                  <option value="9" selected>9</option>
+                  <option value="15">15</option>
+                  <option value="30">30</option>
+                </select>
+                <span style="position: absolute; top: 15%; left: 10%"><h6>Ver:</h6></span>
+              </div>
+
+              <div class="col-md-3 d-flex justify-content-end gap-3" >
+                <div class="d-flex justify-content-center align-items-center gap-5 mt-1" >
+                  <div class=" icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg selectView" style="cursor: pointer; position: relative;">
+                    <div id="iconSelectView">
+                      <i class="fas fa-table" style="font-size: 15px" title="vista en tabla"></i>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-center align-items-center gap-5 mt-1" >
+                  <div class=" icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg" style="cursor: pointer; position: relative;" onclick='window.location.href = "./invoice.html"'>
+                    <i class="fas fa-shopping-cart" style="font-size: 15px" title="Carrito de compra"></i>
+                    <div id="cartIndicator" class="badge badge-sm badge-circle badge-floating badge-primary border-white" style="position: absolute; bottom: -25%; border: solid; color: white; padding: 10px !important;"></div>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-center align-items-center gap-5 mt-1" >
+                  <div class=" icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg" style="cursor: pointer; position: relative;" onclick='window.location.href = "./carrito.html"'>
+                    <i class="fas fa-dollar-sign" style="font-size: 15px" title="Carrito de Facturas"></i>
+                    <div id="invoicesIndicator" class="badge badge-sm badge-circle badge-floating badge-primary border-white" style="position: absolute; bottom: -25%; border: solid; color: white; padding: 10px !important;"></"></div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-9 mt-lg-0 mt-4" style="margin: 0 auto" id="catalogview">
+          <div id="productsContainer" class="d-flex flex-wrap justify-content-center gap-3 mt-4"></div>
+          <div id="paginator" class="d-flex justify-content-center mt-4">
+            <nav class="dataTable-pagination w-50">
+              <ul class="dataTable-pagination-list d-flex justify-content-center consolepaginatorUl">
+                <li class="pager" onclick="paginator('res')"><a  data-page="1" >‹</a></li>
+                <li class="pager" id="paginatorInsertBefore" onclick="paginator('sum')"><a  data-page="2">›</a></li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+
+        <div class="col-lg-9 mt-lg-0 mt-4 w-100" id="tableView" style="display: none; ">
+          <div class="card mt-4 w-80" id="tableContainer" style="margin: 0 auto">
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Alerts -->
+    <div class="alert alert-primary alert-dismissible fade show alertsStyle" role="alert" id="alertProductExist" style="display: none;">
+      <span class="alert-text">El producto ya fue agregado al carrito</span>
+      <button type="button" class="btn-close" onclick="$(this).parent().hide()">
+          <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+
+    <!-- Modales -->
+    <!-- Detalle -->
+    <div class="modal fade" id="modalDetalle">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Detalle</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: gray; border-radius: 50%;"></button>
+          </div>
+          <div class="modal-body" >
+            <div class="w-100 d-flex">
+              <div class="w-50">
+                <img id="modalDetalleImg" src="https://wali.igbcolombia.com/api/shared/images/mtz/AC32951.jpg" alt="" style="max-width: 100%; max-height: 100%;">
+              </div>
+              <div class="w-50 p-5 pt-1 pe-1 pb-2">
+                <div>
+                  <div>
+                    <h6 id="modalDetalleN"></h6>
+                  </div>
+                  <div>
+                    <h5 id="modalDetalleP"></h5>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-between gap-1">
+                    <div style="position: relative;" class="w-40">
+                      <input class="form-control" type="number" name="" id="numberProductsD" minlength="1" value="1" style="padding-left: 50px;">
+                      <h6 style="position: absolute; left: 5%; top: 15%" >Cant:</h6>
+                    </div>
+                    <div style="position: relative;" class="mb-2">
+                      <button onclick="addProductCart()" id="idProductD" class="btn btn-primary m-0 d-flex align-items-center" style="font-size: 10px; height: 39px;">
+                        <i class="fas fa-shopping-cart me-1" style="font-size: 20px" title="Carrito de compra"></i>
+                        AGREGAR AL CARRITO
+                      </button>
+                      <div class="text-center w-100" style="position: absolute; font-size: 13px;">
+                        <a href="#" onclick='window.location.href = "./invoice.html"'>Ver carrito</a>
+                      </div>
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="d-flex gap-2">
+                    <h6 class="m-0">Marca: </h6>
+                    <h6 class="text-secondary" id="modalDetalleM"></h6>
+                  </div>
+                  <div class="d-flex gap-2">
+                    <h6 class="m-0">Grupo: </h6>
+                    <h6 class="text-secondary" id="modalDetalleG"></h6>
+                  </div>
+                  <div class="d-flex gap-2">
+                    <h6 class="m-0">Sub-grupo: </h6>
+                    <h6 class="text-secondary" id="modalDetalleSG"></h6>
+                  </div>
+                  <div class="d-flex gap-2">
+                    <h6 class="m-0">Modelo Moto: </h6>
+                    <h6 class="text-secondary" id="modalDetalleModelo"></h6>
+                  </div>
+                  <div class="d-flex gap-2" id="modalDetalleT">
+                    <!-- <h6 class="m-0">Talla: </h6>
+                    <h6 class="text-secondary m-0" id="modalDetalleT">L</h6> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Producto agregado al carrito -->
+    <div id="modalAddedToCart" class="border" style="display: none;">
+      <div class="d-flex flex-column p-2 text-center">
+        <h6 style="margin: 5px;">Recién agregados a tu carrito de compras</h5>
+        <hr>
+        <div id="addedToCartItems" style="max-height: 280px; overflow: scroll;"> </div>
+        <hr class="mb-0">
+        <div class="d-flex flex-column p-3" style="font-size: 13px;">
+          <button class="btn btn-primary" style="margin: 3px; padding: 5px;" onclick='window.location.href = "./invoice.html"'>Ver Carrito</button>
+          <a href="#" onclick="$('#modalAddedToCart').css('display', 'none')" >Seguir Comprando</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script src="/js/core/popper.min.js"></script>
+  <script src="/js/core/bootstrap.min.js"></script>
+  <script src="/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="/js/plugins/choices.min.js"></script>
+  <script src="/js/soft-ui-dashboard.min.js?v=1.0.3"></script>
+  <script src="/js/plugins/dragula/dragula.min.js"></script>
+  <script src="/js/plugins/jkanban/jkanban.js"></script>
+  <script src="/js/jquery.js"></script>
+  <script src="/js/jquery-ui.min.js"></script>
+  <script src="/js/plugins/datatables.js"></script>
+  <script src="/js/plugins/chartjs.min.js"></script>
+  <script src="/js/underscore-min.js"></script>
+  <script src="/js/helpers.js"></script>
+  <script src="/js/menu.js"></script>
+  
+  <script>
+    let productos = `<%- JSON.stringify(productos) %>`;
+    productos = JSON.parse(productos);
+    console.log(productos)
+
+
+    const loadTable = (body) => {
+      $("#tableContainer").html("");
+
+      let table =  `          
+        <table id="tableProducts" class="mb-1 mt-2 w-100" style="width: 100%; table-layout: fixed">
+          <thead>
+            <tr>
+              <td class="imgCol text-uppercase text-secondary text-xxs text-center font-weight-bolder opacity-7 noSorter">Imagen</td>
+              <td class="productCol text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Producto</td>
+              <td class="atributesCol text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Atributos</td>
+              <td class="stockCol text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Stock</td>
+              <td class="text-uppercase text-secondary text-xxs text-center font-weight-bolder opacity-7 noSorter">Añadir</td>
+            </tr>
+          </thead>
+        </table>
+      `;
+
+      let tableContent = '<tbody id="tableBody">';
+      for(let i = 0; i < body.length; i++){
+        tableContent+= '<tr>';
+        tableContent+= `<td class="text-center" style="cursor: pointer">
+                          <div style="width: 60px; height: 60px"> <img class="card-img-top" src="${body[i].imagen}" alt="" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/d/da/Imagen_no_disponible.svg'" style="max-height: 100%; max-width: 100%; min-height: 100%; min-width: 100%;"></div>
+                        </td>`;
+        tableContent+= `<td style="font-size: 13px">
+                          <div><strong >Código: </strong>${body[i].codigo}</div>
+                          <div><strong >Descripción: </strong>${body[i].descripcion}</div>
+                        </td>`;
+        tableContent+= `<td style="font-size: 13px">
+                          ${(body[i].marca ? '<div><strong >Marca: </strong>'+body[i].marca+'</div>': "")}
+                          ${(body[i].grupo ? '<div><strong >Grupo: </strong>'+body[i].grupo+'</div>': "")}
+                          ${(body[i].sub_grupo ? '<div><strong >Subgrupo: </strong>'+body[i].sub_grupo+'</div>': "")}
+                          ${(body[i].modelo ? '<div><strong >Modelo: </strong>'+body[i].modelo+'</div>': "")}
+                          ${(body[i].tipo_llanta ? '<div><strong >Tipo LLanta: </strong>'+body[i].tipo_llanta+'</div>': "")}
+                          ${(body[i].anchollanta ? '<div><strong >Ancho Llanta: </strong>'+body[i].anchollanta+'</div>': "")}
+                          ${(body[i].perfil_llanta ? '<div><strong >Perfil Llanta: </strong>'+body[i].perfil_llanta+'</div>': "")}
+                          ${(body[i].rin_llanta ? '<div><strong >Rin Llanta: </strong>'+body[i].rin_llanta+'</div>': "")}
+                          ${(body[i].talla ? '<div><strong >Talla: </strong>'+body[i].talla+'</div>': "")}
+                          ${(body[i].base ? '<div><strong >Base: </strong>'+body[i].base+'</div>': "")}
+                        </td>`;
+        tableContent+= `<td class="text-center ">${body[i].stock}</td>`;
+        tableContent+= `<td>
+                          <div class="d-flex align-items-center justify-content-center gap-1">
+                            <input type="number" class="form-control inputAmount" id="" style="width: 70px" min="1">
+                            <i class="fas fa-plus addProductTableView" style="cursor: pointer" value="${body[i].codigo}"></i>
+                          </div>
+                        </td>`;
+        tableContent+= '</tr>';
+      };
+      tableContent+='</tbody>';
+      $("#tableContainer").append(table);
+      $("#tableProducts").append(tableContent);
+
+      const tableObj = new simpleDatatables.DataTable("#tableProducts", {
+        searchable: false,
+      });
+
+      $(".productCol").css("width", "30%")
+      $(".atributesCol").css("width", "30%")
+      $(".stockCol").css("width", "10%")
+      $(".imgCol").css("width", "13%")
+    }
+
+    $(document).on("click", ".addProductTableView", function () {
+      let codigo = $(this).attr("value");
+      let amount = ($(this).siblings(".inputAmount").val() ? Number($(this).siblings(".inputAmount").val()) : 1);
+      addProductCart(codigo, amount)
+    })
+
+    const selectView = (nS, nE) => {
+      if (currentView == "tarjetas") {
+        printProducts(nS, nE);
+      }
+      if (currentView == "tabla") {
+        loadTable(dataProductsPrint)
+      }
+    }
+
+    let currentView = "tarjetas";
+    $(document).on("click", ".selectView", function () {
+      if (currentView == "tarjetas") {
+        $("#catalogview").hide();
+        $(".selectVer").css("visibility", "hidden")
+        $("#tableView").show();
+
+        loadTable(dataProductsPrint)
+        currentView = "tabla";
+        setTimeout(() => {
+          $("#iconSelectView").html('<i class="fas fa-tag" style="font-size: 15px" title="vista en Tarjetas"></i>')
+        }, 200);
+        return;
+      }
+
+      if (currentView == "tabla") {
+        $("#tableView").hide();
+        $(".selectVer").css("visibility", "inherit")
+        $("#catalogview").show();
+
+        printProducts(0, 8);
+        currentView = "tarjetas";
+        setTimeout(() => {
+          $("#iconSelectView").html('<i class="fas fa-table" style="font-size: 15px" title="vista en tabla"></i>')
+        }, 200);
+        return;
+      }
+    })
+
+    const choicesPrice = new Choices($('#selectByPrice')[0]);
+    const choicesItems = new Choices($('#selectNumberRange')[0]);
+    $('.chzn-search').hide();
+
+    let dataProductsComplete;
+    let dataProductsPrint;
+
+    // Buscador
+    $(document).on("keyup", "#searchField", function (e) {
+      if (e.which == 13) {
+        filterSearchField()
+      };
+    })
+
+    // Modales
+    $(document).on("click", ".productCard", function (e) {
+      $("#modalDetalleT").html("");
+      $("#numberProductsD").val(1);
+
+      let img = $(this).attr("img");
+      let name = $(this).attr("name");
+      let price = $(this).attr("price");
+      let marca = $(this).attr("marca");
+      let grupo = $(this).attr("grupo");
+      let subgrupo = $(this).attr("subgrupo");
+      let modelo = $(this).attr("modelo");
+      let talla = $(this).attr("talla");
+      let codigo = $(this).attr("codigo");
+
+      $("#modalDetalleImg").attr("src", img)
+      $("#modalDetalleN").text(name)
+      $("#modalDetalleP").text(price)
+      $("#modalDetalleM").text(marca)
+      $("#modalDetalleG").text(grupo)
+      $("#modalDetalleSG").text(subgrupo)
+      $("#modalDetalleModelo").text(modelo)
+      $("#idProductD").attr("codigo",codigo)
+      if (talla) {
+        element = `
+          <h6 class="m-0">Talla: </h6>
+          <h6 class="text-secondary m-0">${talla}</h6>
+        `
+        $("#modalDetalleT").html(element)
+      }
+
+      $("#modalDetalle").modal("show")
+    })
+
+    // Paginador
+    $(document).on("click", ".addCart", function (e) {
+      e.stopPropagation();
+      let idProduct = $(this).attr("value");
+      addProductCart(idProduct);
+    })
+
+    $(document).on('click','.pagesList',function(){
+      $(".pagesList").removeClass("active")
+      $(this).addClass("active")
+    });
+
+    $(document).on('change','#selectByPrice',function(){
+      sortByPrice($(this).val())
+    });
+
+    $(document).on('change','#selectNumberRange',function(){
+      printPaginator();
+      printProducts(0, Number($(this).val()) - 1)
+    });
+
+    const printProducts = (nStart, nEnd)  => {
+      let dataPaginated = dataProductsPrint.slice(nStart, nEnd + 1);
+
+      $("#productsContainer").html("")
+      for (let i = 0; i < dataPaginated.length; i++) {
+        let element = `
+          <div class="card cardItemHover productCard" style="width: 31%" codigo="${dataPaginated[i].codigo}" name="${dataPaginated[i].descripcion}" price="${dataPaginated[i].format_precio }" marca="${dataPaginated[i].marca}" grupo="${dataPaginated[i].grupo}" subgrupo="${dataPaginated[i].sub_grupo}" modelo="${dataPaginated[i].modelo_moto}" talla="${dataPaginated[i].talla}" img="${dataPaginated[i].imagen}">
+            <div style="width: 100%; height: 50%"><img class="card-img-top" src="${dataPaginated[i].imagen}" alt="" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/d/da/Imagen_no_disponible.svg'" style="max-width: 100%; max-height: 100%; object-fit: scale-down"></div>
+            <div class="card-body pb-0 px-1 pt-2">
+              <ul class="list-group list-group-flush d-flex h-100" >
+                <li class="list-group-item flex-fill p-0 pb-2 ps-2 bg-transparent d-flex flex-column justify-content-between" >
+                  <h6 class="card-title "><span style="font-weight: 400"> ${dataPaginated[i].codigo} </span>- ${dataPaginated[i].descripcion}</h6>
+                  <p class="card-text"> ${dataPaginated[i].format_precio }</p>
+                </li>
+                <li class="list-group-item d-flex justify-content-between mx-1 my-1 bg-transparent">
+                  <div class="d-flex align-items-center addCart" style="cursor: pointer;" value="${dataPaginated[i].codigo}" >
+                    <i class="fas fa-shopping-cart me-1" style="font-size: 18px"></i>
+                    Agregar
+                  </div>
+                  <div class="d-flex align-items-center" style="cursor: pointer;" value="${dataPaginated[i].codigo}">
+                    <i class="fas fa-eye me-1" style="font-size: 18px"></i>
+                    Ver
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        `;
+        $("#productsContainer").append(element)
+      }
+
+      if (dataPaginated.length === 0) {
+        $("#productsContainer").html("<h6>No hay resultados para la busqueda</h6>")
+      }
+    };
+
+    let listItems = []
+    const printPaginator = () => {
+      let productsViewAmount = $("#selectNumberRange").val();
+      let paginatorLenght = Math.ceil(dataProductsPrint.length / productsViewAmount);
+      let nStart, nEnd;
+      listItems = [];
+
+      $(".pagesList").remove();
+      for (let i = 1; i <= paginatorLenght; i++) {
+        nEnd = productsViewAmount*i -1 ;
+        nStart = productsViewAmount*i - productsViewAmount ;
+        let element = `
+          <li class="pagesList" onclick="printFilteredPaginator(${i - 1})"><a data-page="${i}" onclick="printProducts(${nStart}, ${nEnd})"> ${i}</a></li>
+        `;
+        listItems.push(element);
+      };
+      printFilteredPaginator(0);
+    };
+
+    const printFilteredPaginator = (actual) => {
+      $(".pagesList").remove();
+      for (let i = actual - 1; i < actual+5; i++) {
+        $(listItems[i]).insertBefore($("#paginatorInsertBefore"))
+      }
+      let pagesList = $(".pagesList");
+      if (actual == 0) {
+        setTimeout(() => {
+          $(pagesList[0]).toggleClass("active")
+        }, 300);
+      } else {
+        setTimeout(() => {
+          $(pagesList[1]).toggleClass("active")
+        }, 300);
+      }
+    }
+
+    const paginator = (move) => {
+      let pages = $(".consolepaginatorUl").children();
+      for (let i = 0; i < pages.length; i++) {
+        if ($(pages[i]).hasClass("active")) {
+          switch(move) {
+            case "sum":
+              if (i == pages.length-2) {
+                console.log("ultimo");
+                break
+              }
+              $(pages[i]).removeClass("active");
+              $(pages[i+1]).addClass("active");
+              $(pages[i+1]).find("a").click();
+              break;
+            case "res":
+              if (i == 1) {
+                console.log("primero");
+                break
+              };
+              $(pages[i]).removeClass("active")
+              $(pages[i-1]).addClass("active")
+              $(pages[i-1]).find("a").click();
+              break;
+          }
+          return;
+        };
+      };
+    };
+
+    const sortByPrice = (state) => {
+      switch (state) {
+        case "0": //Por defecto
+          dataProductsPrint = dataProductsComplete;
+          selectView(0, 8)
+        break;
+        case "1": //Precio Menor
+          dataProductsPrint = _.sortBy(dataProductsComplete, function(o) { return o.precio; });
+          selectView(0, 8)
+        break;
+        case "2": //Precio mayor
+          console.log("?")
+          dataProductsPrint = _.sortBy(dataProductsComplete, function(o) { return o.precio; });
+          dataProductsPrint.reverse()
+          selectView(0, 8)
+          break;
+      }
+    };
+
+    const filterTags = (value) => {
+      value = value.trim();
+      dataProductsPrint = _.filter(dataProductsComplete, function (data) {
+        return data.grupo == value; 
+      });
+      selectView(0, 8)
+      printPaginator()
+    };
+
+    const filterSearchField = () => {
+      valueFilter = $("#searchField").val();
+      if (valueFilter.length <= 1) {
+        dataProductsPrint = dataProductsComplete;
+        selectView(0, 8)
+        return
+      }
+
+      dataProductsPrint = _.filter(dataProductsComplete, o => {
+        if (o.descripcion.toLowerCase().split(' ').join('').indexOf(valueFilter.toLowerCase()) > -1 ||
+            o.codigo.toLowerCase().split(' ').join('').indexOf(valueFilter.toLowerCase()) > -1
+        ) return o;
+      }); 
+      selectView(0, 8)
+      printPaginator()
+    };
+
+    const addProductCart = (idProduct) => {
+      let numberProducts;
+      let productID;
+      if (idProduct) {
+        numberProducts = 1;
+        productID = idProduct;
+      } else {
+        numberProducts = Number($("#numberProductsD").val());
+        productID = $("#idProductD").attr("codigo");
+      }
+      
+      let productToCar = _.findWhere(dataProductsComplete, {"codigo": productID});
+      productToCar.qty = numberProducts;
+
+      saveLocalStorage(productToCar);
+    }
+
+    const saveLocalStorage = (product) => {
+      if (localStorage.getItem("storeCart") === null) {
+        localStorage.setItem("storeCart", JSON.stringify([product]));
+      } else {
+        let localObject = JSON.parse(localStorage.getItem("storeCart"));
+        
+        let productExist = _.findWhere(localObject, {"codigo": product.codigo});
+        if (productExist) {productExistAlert(); return} 
+
+        localObject.push(product)
+        localStorage.setItem("storeCart", JSON.stringify(localObject));
+      }
+      loadPreviewCart();
+      setCartIconAmount();
+    }
+
+    const productExistAlert = () => {
+      $("#alertProductExist").show();
+      setTimeout(() => {
+        $("#alertProductExist").fadeOut();
+      }, 5000);
+    }
+
+    const loadPreviewCart = () => {
+      $("#modalAddedToCart").css("display", "block")
+      let products = JSON.parse(localStorage.getItem("storeCart"))
+
+      $("#addedToCartItems").html('')
+      for (let i = 0; i < products.length; i++) {
+        let element = `
+          <div class="d-flex mb-2">
+            <div style="min-width: 80px; height: 80px;" class="border">
+              <img src="${products[i].imagen}" alt="" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/d/da/Imagen_no_disponible.svg'" style="max-height: 100%; max-width: 100%; min-height: 100%; min-width: 100%;">
+            </div>
+            <div class="d-flex flex-column align-items-start ms-2">
+              <h6 class="m-0" style="word-break: break-all; text-align: left; font-weight: 900; font-size: 15px">${products[i].descripcion}</h6>
+              <h6 class="m-0" style="font-size: 13px;">Cantidad: <span style="font-weight: 400;">${products[i].qty}</span></h6>
+            </div>
+          </div>
+        `;
+        $("#addedToCartItems").append(element)
+      }
+    }
+
+    const setCartIconAmount = () => {
+      if (!(localStorage.getItem("storeCart") === null)) {
+        let amount = JSON.parse(localStorage.getItem("storeCart")).length;
+        $("#cartIndicator").html((amount ? amount : ""));
+      }
+      if (!(localStorage.getItem("storeInvoice") === null)) {
+        let amount = JSON.parse(localStorage.getItem("storeInvoice")).length;
+        $("#invoicesIndicator").html((amount ? amount : ""));
+      }
+    }
+
+    $( document ).ready(function() {
+      dataProductsComplete = productos;
+      dataProductsPrint = dataProductsComplete;
+
+      printPaginator();
+      selectView(0, 8)
+      setCartIconAmount();
+    });
+
+  </script>
+
+</body>
+</html>
