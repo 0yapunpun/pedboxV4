@@ -1,3 +1,7 @@
+<!-- TODO:
+  -Indicador/mensaje de retencion actualizada-creada
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -45,6 +49,18 @@
       border-radius: 0.5rem;
       box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
     }
+    .dataTable-sorter{
+      text-align: center !important;
+    }
+    .dataTable-sorter::before {
+      display: none !important;
+    }
+    .dataTable-sorter::after {
+      display: none !important;
+    }
+    .choices{
+      width: 100% !important;
+    }
   </style>
 </head>
 
@@ -63,7 +79,7 @@
       <div class="card p-3 m-2">
         <div class="d-flex justify-content-between align-items-center">
           <h5>Retenciones</h5>
-          <div style="color: #344767; cursor: pointer;" onclick="$('#modalNuevaRetencion').modal('show')">  
+          <div style="color: #344767; cursor: pointer;" onclick="cleanFormRetencion()">  
             <i class="fas fa-plus"></i>
             Añadir retención
           </div>
@@ -76,6 +92,7 @@
                 <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder ">Retención (%)</th>
                 <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder ">Tipo</th>
                 <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder ">Descripción</th>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder "></th>
               </tr> 
             </thead>
             <tbody id="tableBody">
@@ -102,16 +119,16 @@
             <div>
               <div>
                 <label for="porcentaje">Porcentaje</label>
-                <input type="number" class="form-control" id="porcentaje" min="0">
+                <input type="number" class="form-control" id="porcentaje" min="0" max="100">
               </div>
               <div>
                 <label for="selectRetencion">Tipo de retención</label>
                 <select name="" id="selectRetencion" class="form-control">
-                  <option value="Retención de IVA">Retención de IVA</option>
-                  <option value="Retención a la fuente">Retención a la fuente</option>
-                  <option value="Retención de industria y comercio">Retención de industria y comercio</option>
-                  <option value="Retención de CREE">Retención de CREE</option>
-                  <option value="Otro tipo de retención">Otro tipo de retención</option>
+                  <option value="1">Retención de IVA</option>
+                  <option value="2">Retención a la fuente</option>
+                  <option value="3">Retención de industria y comercio</option>
+                  <option value="4">Retención de CREE</option>
+                  <option value="5">Otro tipo de retención</option>
                 </select>
               </div>
             </div>
@@ -126,8 +143,9 @@
           </div>
           <hr class="m-0">
           <div class="d-flex justify-content-center m-3 gap-3">
-            <button class="btn btn-secondary">Cancelar</button>
-            <button class="btn btn-primary" onclick="getFormData()">Enviar</button>
+            <button class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Cancelar</button>
+            <button id="createBtn" class="btn btn-primary" onclick="getFormData()">Crear</button>
+            <button id="editBtn" class="btn btn-primary" onclick="updateRetencion()">Actualizar</button>
           </div>
         </div>
       </div>
@@ -153,44 +171,155 @@
   <script src="/js/menu.js"></script>
 
   <script>
-    const choicesPrice = new Choices($('#selectRetencion')[0]);
-    let tableObject = [];
-
+    let retenciones = `<%- JSON.stringify(retenciones) %>`;
+        retenciones = JSON.parse(retenciones).result;
+    let session = `<%- JSON.stringify(session) %>`;
+        session = JSON.parse(session);
+    console.log(retenciones)
+        
     const getFormData = () => {
-      $("#advertencia").hide();
-      let resObj = {
-        nombre: $("#nombre").val(),
-        porcentaje: $("#porcentaje").val(),
-        tipo:  $("#tipo").val(),
-        descripcion: $("#desc").val(),
-        state: $("#state").val()
-      }
+      let data = {
+        account: "",
+        description: $("#desc").val(),
+        id_company: session.user.id_company,
+        id_retention_type: $('#selectRetencion option:selected').val(),
+        name: $("#nombre").val(),
+        percentage: $("#porcentaje").val(),
+        status: ($("#state").is(":checked") ? 1 : 0)
+      } 
 
-      if (resObj.nombre == "" || resObj.porcentaje  == "") {
-        $("#advertencia").show();
-      } else {
-        console.log(resObj);
-        tableObject.push(resObj);
-        printTableData(tableObject);
+      if (data.nombre == "" || data.porcentaje  == "") {$("#advertencia").show(); return} 
+      if (data.percentage > 100) {alert("El porcentaje no puede ser mayor a 100"); return} 
 
-        $('#modalNuevaRetencion').modal('hide')
-      }
-    }
+      fetch('/retenciones/create', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(res => res.json())
+        .then(res =>{
+          location.reload()
+        })
+    };
 
-    const printTableData = (data) =>{
+    const printTableData = (data) => {
       for (let i = 0; i < data.length; i++) {
         let element = `
           <tr>
-            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">${data[i].nombre}</th>
-            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">${data[i].porcentaje}%</th>
-            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">${data[i].tipo}</th>
-            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">${(data[i].descripcion)}</th>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder  ">${data[i].name}</th>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder  ">${data[i].percentage}%</th>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder  ">${data[i].retention_type_description}</th>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder  ">${(data[i].description)}</th>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder" data-retencion='${JSON.stringify(data[i])}''>
+              <div class="d-flex align-items-center mb-0">
+                <div class="form-check form-switch">
+                  <input ${data[i].status == 1 ? "checked" : ""} class="form-check-input retentionState" type="checkbox" id="flexSwitchCheckDefault" style="height: 20px">
+                </div>
+                ${data[i].standard == 0 ? '<i class="fas fa-edit mb-1 ms-2 editRetencion" style="font-size: 17px; cursor: pointer"></i>' : ''}
+              </div>  
+            </th>
           </tr> 
         `;
         $("#tableBody").append(element)
       }
       const tableObj = new simpleDatatables.DataTable("#table", {});
+    };
+
+    const cleanFormRetencion = () => {
+      $("#nombre").val(""),
+      $("#porcentaje").val(""),
+      $("#selectRetencion").val("1"),
+      $("#desc").val(""),
+      $("#state").prop('checked', true)
+
+      $("#editBtn").hide()
+      $("#createBtn").show()
+      $('#modalNuevaRetencion').modal('show')
+    };
+
+    const updateRetencion = () => {
+      let data = {
+        account: $("#nombre").attr("data-account"),
+        description: $("#desc").val(),
+        id: $("#nombre").attr("data-id"),
+        id_retention_type: $('#selectRetencion option:selected').val(),
+        name: $("#nombre").val(),
+        percentage: $("#porcentaje").val(),
+        status: ($("#state").is(":checked") ? 1 : 0)
+      }  
+
+      fetch('/retenciones/update', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(res => res.json())
+        .then(res =>{
+          location.reload()
+        })
     }
+
+    $(document).on("click", ".editRetencion", function () {
+      let dataRetencion = $(this).closest("th").attr("data-retencion");
+          dataRetencion = JSON.parse(dataRetencion);
+      console.log(dataRetencion)
+
+      $("#nombre").val(dataRetencion.name),
+
+      $("#nombre").attr("data-account", dataRetencion.account),
+      $("#nombre").attr("data-id", dataRetencion.id),
+
+      $("#porcentaje").val(dataRetencion.percentage),
+      $("#selectRetencion").val(dataRetencion.id_retention_type),
+      $("#desc").val(dataRetencion.description),
+      dataRetencion.status == 1 ? $("#state").prop('checked', true) : $("#state").prop('checked', false)
+
+      $("#editBtn").show()
+      $("#createBtn").hide()
+      $('#modalNuevaRetencion').modal('show')
+    })
+
+    $(document).on("change", ".retentionState", function () {
+      let dataRetencion = $(this).closest("th").attr("data-retencion");
+          dataRetencion = JSON.parse(dataRetencion);
+      console.log(dataRetencion)
+      let state = $(this).is(':checked');
+      
+      let data = {
+        account: dataRetencion.account,
+        description: dataRetencion.description,
+        id: dataRetencion.id,
+        id_retention_type: dataRetencion.id_retention_type,
+        name: dataRetencion.name,
+        percentage: dataRetencion.percentage,
+        status: (state ? 1 : 0)
+      }  
+      
+      fetch('/retenciones/update', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(res => res.json())
+        .then(res =>{
+          console.log(res)
+        })
+    })
+
+    $(document).ready(function () {
+      if (retenciones.success) {
+        printTableData(retenciones.data.retention)
+      }
+    })
   </script>
 
 </body>

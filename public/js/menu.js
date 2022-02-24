@@ -41,6 +41,25 @@ $(document).on('mouseout', '#sidebarMenu', function() {
   }
 });
 
+$(document).ready(function () {
+  // Ocultar/Mostrar cartera
+  if (!(localStorage.getItem("carteraIsVisible") === null)) {
+    let carteraIsVisible = JSON.parse(localStorage.getItem("carteraIsVisible"));
+    if (!carteraIsVisible) {
+      $("#cards").hide();
+    } 
+  };
+  // Carts indicators
+  if (!(localStorage.getItem("storeInvoice") === null)) {
+    let localObjectLenght = JSON.parse(localStorage.getItem("storeInvoice")).length;
+    $("#invoicesIndicator").text((localObjectLenght ? localObjectLenght : ""))
+  } 
+  if (!(localStorage.getItem("storeCart") === null)) {
+    let localObjectLenght = JSON.parse(localStorage.getItem("storeCart")).length;
+    $("#cartIndicator").text((localObjectLenght ? localObjectLenght : ""))
+  }  
+})
+
 
 
 // TODO: como llamar la funcion desde aca, y con el obj session

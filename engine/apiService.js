@@ -8,7 +8,7 @@ const urlCalidosos = 'https://loscalidosos.com/';
 
 const options = (method, body) => { 
   var opt = {method: method, headers: {'Content-Type': 'application/json'}}; 
-  if (method == 'post') opt['body'] = JSON.stringify(body);
+  if (method == 'post' || method == 'put') opt['body'] = JSON.stringify(body);
   return opt;
 }
 
@@ -89,6 +89,48 @@ service.informacionVendedor = async(id_person) =>{
   const data =  await makeRequest(url);
   return data;
 }
+service.getRetenciones = async(id_company, id_country) =>{
+  const url = urlKakashi+'retentions?id_company='+id_company+'&id_country='+id_country;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.updateRetencion = async(body) =>{
+  const url = urlKakashi+'retentions';
+  const data =  await makeRequest(url, options('put', body));
+  return data;
+}
+
+service.createRetencion = async(body) =>{
+  const url = urlKakashi+'retentions';
+  const data =  await makeRequest(url, options('post', body));
+  return data;
+}
+
+service.getUsers = async(id_company, id_user_company) =>{
+  const url = urlKakashi+'get_usersextranet?id_company='+id_company+'&id_user_company='+id_user_company;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.getRoles = async(id_company, id_user_company) =>{
+  const url = urlKakashi+'get_role_extranet?id_company='+id_company+'&id_user_company='+id_user_company;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.updatePassword = async(body) =>{
+  const url = urlKakashi+'change_password_user';
+  const data =  await makeRequest(url, options('post', body));
+  return data;
+}
+
+service.userUpdate = async(body) =>{
+  const url = urlKakashi+'create_user_extranet';
+  const data =  await makeRequest(url, options('put', body));
+  return data;
+}
+
 
 const makeRequest = async (url, options) => {
   try {

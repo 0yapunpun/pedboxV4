@@ -24,10 +24,10 @@ tr th a {
     display: none;
 }
 .iconCheck a::before {
-    display: none;
+    display: none !important;
 }
 .iconCheck a::after {
-    display: none;
+    display: none !important;
 }
 
 

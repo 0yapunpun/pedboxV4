@@ -11,6 +11,7 @@ controller.login = async(req, res, next) => {
 controller.loginValidate = async(req, res, next) => {
   const resp = await userController.login(req.body);
   if (resp.result=='ok') {
+    console.log(resp)
     req.session.login = true;
     req.session.urlSocket = resp.urlSocket;
     req.session.user = resp.user;
@@ -84,6 +85,19 @@ controller.historialFacturas = async (req, res, next) => {
   let notas = await service.historialNotas(url_company, nit, id_company);
 
   res.render('historial-facturas', {'session': req.session, 'facturas': facturas, "recibos": recibos, "notas": notas});
+}
+
+controller.facturas = async(req, res, next) => {
+  // Validar login
+  if (!req.session.login) { return res.redirect('/login'); }
+
+  let url_company = req.session.user.dataCompany[0].Url;
+  let id_company = req.session.user.id_company;
+  let nit = req.session.user.nit;
+
+  let facturas = await service.historialFacturas(url_company, nit, id_company);
+  
+  res.render('facturas', {'session': req.session, 'facturas': facturas});
 }
 
 controller.historialPedidos = async (req, res, next) => {
@@ -239,28 +253,78 @@ controller.certificados = async(req, res, next) => {
   res.render('certificados', {'session': req.session});
 }
 
-// Pendientes
 controller.retenciones = async(req, res, next) => {
   // Validar login
   if (!req.session.login) { return res.redirect('/login'); }
+
+  let id_company = req.session.user.id_company;
+  let id_country = req.session.user.id_country;
+
+  let retenciones = await service.getRetenciones(id_company, id_country);
   
-  res.render('retenciones', {'session': req.session});
+  res.render('retenciones', {'session': req.session, 'retenciones': retenciones});
 }
 
-// Pendientes
+controller.retencionesUpdate = async (req, res, next) => {
+  let body = req.body;
+
+  let response = await service.updateRetencion(body);
+  res.send({"response": response})
+}
+
+controller.retencionesCreate = async (req, res, next) => {
+  let body = req.body;
+
+  let response = await service.createRetencion(body);
+  res.send({"response": response})
+}
+
 controller.usuarios = async(req, res, next) => {
   // Validar login
   if (!req.session.login) { return res.redirect('/login'); }
+
+  let id_company = req.session.user.id_company;
+  let id_user_company = req.session.user.id;
+
+  let users = await service.getUsers(id_company, id_user_company);
+  let roles = await service.getRoles(id_company, id_user_company);
   
-  res.render('usuarios', {'session': req.session});
+  res.render('usuarios', {'session': req.session, 'users': users, "roles": roles});
 }
 
-// Pendientes
-controller.facturas = async(req, res, next) => {
+controller.password = async(req, res, next) => {
+  let user = req.session.user.user;
+  let password = req.body.currentPass;
+  let newPassword = req.body.newPass;
+
+  let body = {
+    new_password: newPassword,
+    password: password,
+    user: user
+  }
+
+  console.log(body)
+
+  let response = await service.updatePassword(body);
+  
+  res.send({"response": response})
+}
+
+controller.updateUser = async(req, res, next) => {
+  let body = req.body;
+  let response = await service.userUpdate(body);
+  
+  res.send({"response": response})
+}
+
+controller.carritoCompras = async(req, res, next) => {
   // Validar login
   if (!req.session.login) { return res.redirect('/login'); }
   
-  res.render('facturas', {'session': req.session});
+  let id_person = req.session.user.id_person;
+  let address = await service.informacionVendedor(id_person);
+  
+  res.render('carrito-compras', {'session': req.session, "address": address});
 }
 
 // Pendientes
@@ -270,15 +334,6 @@ controller.carritoFacturas = async(req, res, next) => {
   
   res.render('carrito-facturas', {'session': req.session});
 }
-
-// Pendientes
-controller.carritoCompras = async(req, res, next) => {
-  // Validar login
-  if (!req.session.login) { return res.redirect('/login'); }
-  
-  res.render('carrito-compras', {'session': req.session});
-}
-
 
 
 

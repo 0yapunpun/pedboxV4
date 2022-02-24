@@ -45,7 +45,7 @@ const login = () => {
           $('#btn-f').show();
           loginActive = false;
         } else if(result.result == 'ok') {
-          window.location.href = '/helpdesk';
+          window.location.href = '/catalogo';
         }
       })
     } else {

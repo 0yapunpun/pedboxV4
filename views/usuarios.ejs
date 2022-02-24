@@ -1,3 +1,9 @@
+<!-- TODO:
+  -Selector de rol no funciona, la peticion llega vacia, no se pueden crear usuarios 
+  -Alert cambie actualziada correctamente
+  -Eliminar usuarios, como no se puede crear usaurios no he podido hacer prueba de eliminacion con usuarios de prueba
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -85,6 +91,18 @@
       border-radius: 0.5rem;
       box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
     }
+    .dataTable-sorter{
+      text-align: center !important;
+    }
+    .dataTable-sorter::before {
+      display: none !important;
+    }
+    .dataTable-sorter::after {
+      display: none !important;
+    }
+    .iconStyle{
+      cursor: pointer;
+    }
   </style>
 </head>
 
@@ -112,7 +130,6 @@
           <table class="w-100" id="table">
             <thead>
               <tr>
-                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder noSorter"></th>
                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder ">Nombre</th>
                 <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder ">Usuario</th>
                 <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder ">Rol</th>
@@ -193,8 +210,9 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: gray; border-radius: 50%;" onclick="clearFormNewPassword()"></button>
           </div>
           <div class="modal-body d-flex flex-column justify-content-center align-items-center" >
-            <h6 class="text-center" style="color: red; font-size: 13px; display: none; transition: 0.5s;" id="formPasswordAlert">La contraseña actual es incorrecta</h6>
-            <h6 class="text-center" style="color: red; font-size: 13px; display: none; transition: 0.5s;" id="formNewPasswordAlert">La contraseña nueva no coincide</h6>
+            <h6 class="text-center" style="color: red; font-size: 13px; display: none; transition: 0.5s;" id="formNewPasswordAlert">Las contraseñas no coinciden</h6>
+            <h6 class="text-center" style="color: red; font-size: 13px; display: none; transition: 0.5s;" id="formNewPasswordAlertEmpty">Complete todos los campos antes de enviar</h6>
+            <h6 class="text-center" style="color: red; font-size: 13px; display: none; transition: 0.5s;" id="formNewPasswordAlertWrong">Actual contraseña incorrecta</h6>
             <div class="w-50">
               <div class="flex-fill">
                 <label for="password">Actual Contraseña</label>
@@ -239,7 +257,15 @@
   <script src="/js/menu.js"></script>
 
   <script>
+    let users = `<%- JSON.stringify(users) %>`;
+        users = JSON.parse(users).result;
+    let roles = `<%- JSON.stringify(roles) %>`;
+        roles = JSON.parse(roles).result;
+    let session = `<%- JSON.stringify(session) %>`;
+        session = JSON.parse(session);
+
     let userUpload = {};
+    let userCode; 
 
     const openNewUserModal = () => {
       $("#buttonNewUser").show();
@@ -320,44 +346,55 @@
       console.log("usuario actualizado")
     }
 
-    const getUser = (element) => {
-      let userId = $(element).parent().parent().parent().parent().attr("userID");
-      userUpload = user.find(o => o.id == userId);
-      $("#modalChangePassword").modal("show");
-    };
 
-    const uploadPassword = () => {
+    const uploadPassword = () => { 
       let currentPassword = $("#currentPassword").val();
       let newPassword = $("#newPassword").val();
       let newPasswordConfirm = $("#confirmNewPassword").val();
 
-      if (currentPassword != userUpload.password) {
-        $("#formPasswordAlert").show();
-        return
-      } else {
-        $("#formPasswordAlert").hide()
-      };
+      if (currentPassword == "" || newPassword == "" || newPasswordConfirm == "" ) {$("#formNewPasswordAlertEmpty").show(); return}
+      else {$("#formNewPasswordAlertEmpty").hide()};
+      
+      if (newPassword != newPasswordConfirm) {$("#formNewPasswordAlert").show(); return} 
+      else {$("#formNewPasswordAlert").hide()};
 
-      if (newPassword != newPasswordConfirm) {
-        $("#formNewPasswordAlert").show();œ
-        return
-      } else {
-        $("#formNewPasswordAlert").hide()
-      };
+      let data = {
+        user: userCode,
+        currentPass : currentPassword,
+        newPass : newPassword,
+      }
 
-      // Actualizar objecto local de pruebas
-      let index = user.findIndex(o => o.id == userUpload.id);
-      user[index].password = newPassword;
-      console.log("contraseña actualizada exitosamente")
-      clearFormNewPassword();
+      fetch('/usuarios/updatePassword', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(res => res.json())
+      .then(res =>{
+        console.log(res)
+        if (res.response.err) {
+          $("#formNewPasswordAlertWrong").show()
+        } else {
+          $("#formNewPasswordAlertWrong").hide();
+            alert("Clave actualizada con exito. Inicie sesión nuevamente")
+            fetch("/logout")
+            .then(location.reload())     
+
+        }
+      })
+
     };
 
     const clearFormNewPassword = () => {
       $("#currentPassword").val("");
       $("#newPassword").val("");
       $("#confirmNewPassword").val("");
-      $("#modalChangePassword").modal("hide")
-      userUpload = {};
+      $("#formNewPasswordAlert").hide();
+      $("#formNewPasswordAlertEmpty").hide();
+      $("#formNewPasswordAlertWrong").hide();
     }
 
     const getFormData = () => {
@@ -399,7 +436,6 @@
       }
       console.log(data)
 
-
       user.push(data);
 
       $('#modalNewUser').modal('hide');
@@ -422,21 +458,21 @@
       for (let i = 0; i < data.length; i++) {
         let element = `
           <tr>
-            <th class="centerDiv text-uppercase text-secondary font-weight-bolder opacity-7"><div class="imgTable"><img src="" alt="" style="max-width: 100%; max-height: 100%;"></div></th>
-            <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7">${data[i].description}</th>
-            <th class="text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-7">${data[i].user}</th>
-            <th class="text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-7">${(data[i].role ? data[i].role : '-')}</th>
-            <th class="text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-7">${((data[i].status == 1 ? 'Activo' : 'Inactivo'))}</th>
-            <th class="text-center text-uppercase text-secondary font-weight-bolder opacity-7 dropdown" userId="${data[i].id}">
-              <div class="dropContainer">
-                <div class="hideDrop" type="button" id="dropdownMenuButton" ><i class="fas fa-ellipsis-v" ></i></div>
-                <div class="dropList" style="display: none"> 
-                  <li><a class="dropdown-item" onclick="getUser(this)">Cambiar Clave</a></li>
-                  <li><a class="dropdown-item" onclick="editUser(this)">Editar</a></li>
-                  <li><a class="dropdown-item" onclick="deleteUser(this)">Eliminar</a></li>
-                </div>
+            <td class="text-uppercase text-secondary text-xs font-weight-bolder ">${data[i].description}</td>
+            <td class="text-center text-uppercase text-secondary text-xs font-weight-bolder ">${data[i].user}</td>
+            <td class="text-center text-uppercase text-secondary text-xs font-weight-bolder ">${(data[i].role ? data[i].role : '-')}</td>
+            <td class="text-center text-uppercase text-secondary text-xs font-weight-bolder" data-user='${JSON.stringify(data[i])}'>
+              <span class="userState">${((data[i].status == 1 ? 'Activo' : 'Inactivo'))}</span>  
+              <div class="form-check form-switch d-flex justify-content-center mt-1">
+                <input ${data[i].status == 1 ? "checked" : ""} class="form-check-input userStateCbx" type="checkbox" id="flexSwitchCheckDefault" style="height: 20px">
               </div>
-            </th>
+            </td>
+            <td class="text-center text-uppercase text-secondary font-weight-bolder" userId="${data[i].user}">
+              <div class="d-flex gap-3">
+                <i class="fas fa-key iconStyle changePassword" title="Cambiar clave"></i>
+                <i class="fas fa-trash iconStyle" title="Eliminar"></i>
+              </div>
+            </td>
           </tr> 
         `;
         $("#tableBody").append(element)
@@ -444,12 +480,45 @@
       const tableObj = new simpleDatatables.DataTable("#table", {});
     };
 
-    $(document).on("click", ".hideDrop", function () {
-      if ($(this).parent().find(".dropList").is(":visible")) {
-        $(this).parent().find(".dropList").hide();
+    $(document).on("change", ".userStateCbx", function () {
+      let dataUser = $(this).closest("td").attr("data-user");
+          dataUser = JSON.parse(dataUser);
+      let state = $(this).is(':checked');
+
+      if (state) {
+        $(this).parent().parent().find("span").html("Activo")
       } else {
-        $(this).parent().find(".dropList").show();
+        $(this).parent().parent().find("span").html("Inactivo")
       }
+      
+      let data = {
+        change_password: 0,
+        id: dataUser.id,
+        id_company: dataUser.id_company,
+        id_role: dataUser.id_role,
+        id_type_user: session.user.id_type_user,
+        status: (state ? 1 : 0),
+        user: dataUser.user
+      }  
+
+      fetch('/usuarios/updateUser', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(res => res.json())
+        .then(res =>{
+          console.log(res)
+        })
+    })
+
+    $(document).on("click", ".changePassword", function () {
+      userCode = $(this).closest("td").attr("userId");
+      $("#modalChangePassword").modal("show");
+      clearFormNewPassword();
     })
 
     const loadRoles = (data) => {
@@ -459,33 +528,13 @@
         `;
         $("#inputRol").append(element)
       }
-      const choicesPrice = new Choices($('#inputRol')[0]);
+      // const choicesPrice = new Choices($('#inputRol')[0]);
     }
 
     $(document).ready(function () {
-      printTableData(user);
-      loadRoles(rolesTest);
+      printTableData(users.user);
+      loadRoles(roles.Rol);
     })
-
-    const user = [
-      {
-        "id": 9882,
-        "id_user_company": 10373,
-        "id_company": 37,
-        "description": "901410831-1 - MOTOPARTES REVOLUTIONSS S.A.S",
-        "user": "C901410831",
-        "password": "901410831",
-        "status": 1,
-        "id_role": 276,
-        "role": null
-      }
-    ];
-
-    const rolesTest = [
-      "role1",
-      "role2",
-      "role3"
-    ];
   </script>
 
 </body>

@@ -60,7 +60,7 @@ const loadCartera = (data) => {
   let saldoVencido = Number(data.Vr_Vencido_1_a_15) + Number(data.Vr_Vencido_16_a_30) + Number(data.Vr_Vencido_31_a_45) + Number(data.Vr_Vencido_46_a_60) + Number(data.Vr_Vencido_61_a_90) + Number(data.Vr_Vencido_91_a_120) + Number(data.Vr_Vencido_Mas_120);
   let saldoTotal = saldoVencido + Number(data.Vr_Saldo_Sin_Vencer);
   let cupoDisponible = cupoCredito - saldoVencido;
-      cupoDisponible = (cupoDisponible > 0 ? numberWithCommas(cupoDisponible) : 0)
+      cupoDisponible = (cupoDisponible > 0 ? cupoDisponible : 0)
 
   $("#containerSaldoTotal").html(numberWithCommas(saldoTotal))
   $("#containerSaldoVencido").html(numberWithCommas(saldoVencido))
@@ -103,13 +103,3 @@ const hideCards = () => {
     localStorage.setItem("carteraIsVisible", true);
   }
 };
-
-$(document).ready(function () {
-  // Ocultar/Mostrar cartera
-  if (!(localStorage.getItem("carteraIsVisible") === null)) {
-    let carteraIsVisible = JSON.parse(localStorage.getItem("carteraIsVisible"));
-    if (!carteraIsVisible) {
-      $("#cards").hide();
-    } 
-  }; 
-})

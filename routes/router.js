@@ -4,8 +4,6 @@ const viewController = require('../controller/viewController.js');
 
 /* View Routers */
 router.get('/', viewController.index);
-router.get('/helpdesk', viewController.helpdesk);
-router.get('/crm', viewController.crm);
 router.get('/login', viewController.login);
 router.get('/logout', viewController.logout);
 
@@ -21,15 +19,20 @@ router.get('/catalogo', viewController.catalogo);
 router.get('/catalogo/productos', viewController.catalogoProductos);
 router.get('/catalogo/top', viewController.catalogoTop);
 router.get('/certificados', viewController.certificados);
+router.get('/retenciones', viewController.retenciones);
+router.post('/retenciones/update', viewController.retencionesUpdate);
+router.post('/retenciones/create', viewController.retencionesCreate);
+router.get('/usuarios', viewController.usuarios);
+router.post('/usuarios/updatePassword', viewController.password);
+router.post('/usuarios/updateUser', viewController.updateUser);
+router.get('/facturas', viewController.facturas);
+
 
 // Por integrar
-router.get('/retenciones', viewController.retenciones);
-router.get('/usuarios', viewController.usuarios);
-router.get('/facturas', viewController.facturas);
 router.get('/carrito-facturas', viewController.carritoFacturas);
 router.get('/carrito-compras', viewController.carritoCompras);
-
-
+router.get('/helpdesk', viewController.helpdesk);
+router.get('/crm', viewController.crm);
 
 /* POST Services */
 router.post('/login', viewController.loginValidate);

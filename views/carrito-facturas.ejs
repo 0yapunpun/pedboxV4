@@ -199,26 +199,6 @@
       printTotalCart();
     };
 
-    const numberWithCommas = (x) => {
-      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
-
-    const nvFormatCash = (text) => {
-      let pre = "";
-      let decimal = 2;
-      let entero = 3;
-      let sepDecimal = '.';
-      let sepEntero = ','
-  
-      if(typeof(text) == 'string') {
-        text = parseFloat(text);
-      }
-      let regex = '\\d(?=(\\d{' + (entero || 3) + '})+' + (decimal > 0 ? '\\D' : '$') + ')';
-      let number = text.toFixed(Math.max(0, ~~decimal));
-      let space = (pre != "")? " ": "";
-      return "$ "+pre + space + (sepDecimal ? number.replace('.', sepDecimal) : number).replace(new RegExp(regex, 'g'), '$&' + (sepEntero || ','));
-    };
-
     const resetRow = (container) => {
       let row = $(container).parent().parent();
       let totalRow = $(row).find(".vtotal").attr("value")
