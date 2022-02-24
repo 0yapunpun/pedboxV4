@@ -14,8 +14,6 @@ controller.loginValidate = async(req, res, next) => {
     req.session.login = true;
     req.session.urlSocket = resp.urlSocket;
     req.session.user = resp.user;
-    // console.log("session", JSON.stringify(req.session));
-    // TODO: Almacenar datos de sesión
     delete resp.user;
     delete resp.urlSocket;
   }
@@ -240,6 +238,49 @@ controller.certificados = async(req, res, next) => {
   
   res.render('certificados', {'session': req.session});
 }
+
+// Pendientes
+controller.retenciones = async(req, res, next) => {
+  // Validar login
+  if (!req.session.login) { return res.redirect('/login'); }
+  
+  res.render('retenciones', {'session': req.session});
+}
+
+// Pendientes
+controller.usuarios = async(req, res, next) => {
+  // Validar login
+  if (!req.session.login) { return res.redirect('/login'); }
+  
+  res.render('usuarios', {'session': req.session});
+}
+
+// Pendientes
+controller.facturas = async(req, res, next) => {
+  // Validar login
+  if (!req.session.login) { return res.redirect('/login'); }
+  
+  res.render('facturas', {'session': req.session});
+}
+
+// Pendientes
+controller.carritoFacturas = async(req, res, next) => {
+  // Validar login
+  if (!req.session.login) { return res.redirect('/login'); }
+  
+  res.render('carrito-facturas', {'session': req.session});
+}
+
+// Pendientes
+controller.carritoCompras = async(req, res, next) => {
+  // Validar login
+  if (!req.session.login) { return res.redirect('/login'); }
+  
+  res.render('carrito-compras', {'session': req.session});
+}
+
+
+
 
 
 function nvFormatCash(

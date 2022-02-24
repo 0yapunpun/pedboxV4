@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" type="image/x-icon" href="https://app.pedbox.co/assets/logos/logo_blanco.png"/>
+  <title>Facturas</title>
+
+  <!-- Fonts and icons -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <link href="/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <!-- CSS Files -->
+  <link id="pagestyle" href="/css/soft-ui-dashboard.css?v=1.0.3" rel="stylesheet" />
+  <!-- JQUERY UI -->
+  <link rel="stylesheet" href="/css/jquery-ui.min.css">
+  <!-- REPORTS CSS -->
+  <link rel="stylesheet" href="/css/reports.css">
+
+  <style>
+    .noSorter .dataTable-sorter::after{
+      opacity: 0;
+    }
+    .noSorter .dataTable-sorter::before{
+      opacity: 0;
+    }
+    .activeNav .icon{
+      background-image: linear-gradient(310deg ,#7928ca,#ff0080);
+      color: white !important
+    }
+    .activeNav i{
+      color: white !important
+    }
+    .activeNav a{
+      background-color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
+    }
+  </style>
+</head>
+
+<body class="g-sidenav-show bg-gray-100">
+
+  <!-- Menu -->
+  <%- include('./partials/menu.ejs') %> 
+
+  <main class="main-content max-height-vh-100 h-100">
+
+    <!-- Cabecera -->
+    <%- include('./partials/header.ejs') %>
+
+    <!-- Content -->
+    <div class="p-4">
+      <!-- Cartera -->
+      <div>
+        <div class="d-flex justify-content-between align-items-center me-2 mb-2 ">
+          <div class="toggleShowCards p-1" onclick="hideCards()">
+            <h6 id="toggleShowCardsIcon" class="m-0"><i class="fas fa-minus"></i> Ocultar Cartera</h6>
+          </div>
+          <div class="d-flex align-items-center gap-3">
+
+            <div class="d-flex justify-content-center align-items-center gap-5 mt-1" >
+              <div class=" icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg" style="cursor: pointer; position: relative;" onclick='window.location.href = "./invoice.html"'>
+                <i class="fas fa-shopping-cart" style="font-size: 15px" title="Carrito de compra"></i>
+                <div id="cartIndicator" class="badge badge-sm badge-circle badge-floating badge-primary border-white" style="position: absolute; bottom: -25%; border: solid; color: white; padding: 10px !important;"></div>
+              </div>
+            </div>
+            <div class="d-flex justify-content-center align-items-center gap-5 mt-1" >
+              <div class=" icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg" style="cursor: pointer; position: relative;" onclick='window.location.href = "./carrito.html"'>
+                <i class="fas fa-dollar-sign" style="font-size: 15px" title="Carrito de Facturas"></i>
+                <div id="invoicesIndicator" class="badge badge-sm badge-circle badge-floating badge-primary border-white" style="position: absolute; bottom: -25%; border: solid; color: white; padding: 10px !important;"></div>
+              </div>
+            </div>
+            <div class="d-flex justify-content-center align-items-center gap-5 mt-1" >
+              <div class=" icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg" style="cursor: pointer; position: relative; width: auto; color: white; align-items: center; padding: 4px;" onclick=''>
+                <i class="fas fa-file-pdf" style="font-size: 15px; position: relative; top: 0px;"></i>
+                PDF
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <div id="cards">
+          <div style="display: flex; flex-direction: row;">
+            <div class="d-flex flex-wrap gap-2 w-50 justify-content-center" id="cardsContainer"></div>
+            <div  class="w-50 mx-3 card d-flex align-items-center justify-content-center">
+              <div class="chart" style="width: 100%;">
+                <canvas id="chart" class="chart-canvas" height="200"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tablas -->
+      <div>
+        <div class="mt-4 d-flex justify-content-between align-items-center">
+          <div class="nav-wrapper position-relative end-0">
+            <ul class="nav nav-pills nav-fill p-1" role="tablist" style="cursor: pointer;">
+              <li class="nav-item">
+                <a class="nav-link mb-0 px-4 py-1 active" data-bs-toggle="tab"  role="tab" aria-controls="profile" aria-selected="true" href="#">
+                Facturas por pagar
+                </a>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+        <div id="tableContainer" class="card">
+          <table id="table">
+            <thead>
+              <tr>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Documento&nbsp;&nbsp;&nbsp;</th>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Fecha</th>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Subtotal</th>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Descuento</th>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">IVA</th>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">V.Total</th>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">V.Aplicado</th>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">V.Saldo</th>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 noSorter">Agregar</th>
+              </tr> 
+            </thead>  
+            <tbody id="tableContent"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Scripts -->
+  <script src="/js/core/popper.min.js"></script>
+  <script src="/js/core/bootstrap.min.js"></script>
+  <script src="/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="/js/plugins/choices.min.js"></script>
+  <script src="/js/soft-ui-dashboard.min.js?v=1.0.3"></script>
+  <script src="/js/plugins/dragula/dragula.min.js"></script>
+  <script src="/js/plugins/jkanban/jkanban.js"></script>
+  <script src="/js/jquery.js"></script>
+  <script src="/js/jquery-ui.min.js"></script>
+  <script src="/js/plugins/datatables.js"></script>
+  <script src="/js/plugins/chartjs.min.js"></script>
+  <script src="/js/underscore-min.js"></script>
+  <script src="/js/helpers.js"></script>
+  <script src="/js/menu.js"></script>
+
+  <script>
+    // const tableObj = new simpleDatatables.DataTable("#table", {});
+    const hideCards = () => {
+      if ($("#cards").is(":visible")) {
+        $("#cards").fadeOut();
+        $("#toggleShowCardsIcon").html('<i class="fas fa-plus"></i> Mostrar Cartera')
+        localStorage.setItem("carteraIsVisible", false);
+      } else {
+        $("#cards").fadeIn();
+        $("#toggleShowCardsIcon").html('<i class="fas fa-minus"></i> Ocultar Cartera')
+        localStorage.setItem("carteraIsVisible", true);
+      }
+    };
+
+    const loadTablePedidoRepetido = (data) => {
+      let tableContent;
+      for(let i = 0; i < data.length; i++){
+        let icon;
+        if (isInLocalStorage(data[i].Numero_Documento)) {
+          icon = `<i class="fas fa-check iconCheck" style="display: none"></i><i class="fas fa-trash iconRemove"></i>`;
+        } else {
+          icon = `<i class="fas fa-check iconCheck"></i><i class="fas fa-trash iconRemove" style="display: none"></i>`;
+        }
+
+        tableContent+= '<tr >';
+        tableContent+= `<td class="text-center"><a target="_blank" href="${data[i].Url_fe}"> <i class="fas fa-file-pdf me-1"></i>PDF <br> ${data[i].Numero_Documento} </a></td>`;
+        tableContent+= `<td class="text-center">${data[i].Fecha_Vencimiento}</td>`;
+        tableContent+= `<td class="text-center">$${numberWithCommas(data[i].Subtotal)}</td>`;
+        tableContent+= `<td class="text-center">$${numberWithCommas(Math.round(data[i].Descuento))}</td>`;
+        tableContent+= `<td class="text-center">$${numberWithCommas(data[i].Iva)}</td>`;
+        tableContent+= `<td class="text-center">$${numberWithCommas(data[i].Valor_Documento)}</td>`;
+        tableContent+= `<td class="text-center">$${numberWithCommas(data[i].Valor_Aplicado)}</td>`;
+        tableContent+= `<td class="text-center">$${numberWithCommas(data[i].Valor_Saldo)}</td>`;
+        tableContent+= `<td class="text-center addRemoveCart" style="cursor: pointer" rowCC="${data[i].Numero_Documento}">${icon}</td>`;
+        tableContent+= '</tr>';
+      };
+
+      $("#tableContent").append(tableContent);
+      const tableObj = new simpleDatatables.DataTable("#table", {});
+    }
+
+    $(document).on("click", ".addRemoveCart", function () {
+      if (!(localStorage.getItem("storeInvoice") === null)) {
+        let localObjectLenght = JSON.parse(localStorage.getItem("storeInvoice")).length;
+        $("#invoicesIndicator").text((localObjectLenght ? localObjectLenght : ""))
+      } 
+    })
+
+    const isInLocalStorage = (data) => {
+      if (localStorage.getItem("storeInvoice") === null) {
+        return false;
+      } else {
+        let localObject = JSON.parse(localStorage.getItem("storeInvoice"));
+        let productExist = _.findWhere(localObject, {"Numero_Documento": data});
+        if (productExist) {return true} 
+        return false;
+      }
+    }
+
+    $(document).on("click", ".iconCheck", function () {
+      let nDocumento = $(this).parent().attr("rowCC");
+      let objectRow = dataTestTable.find(x => x.Numero_Documento == nDocumento);
+
+      if (localStorage.getItem("storeInvoice") === null) {
+        localStorage.setItem("storeInvoice", JSON.stringify([objectRow]));
+        $(this).hide();
+        $(this).siblings(".iconRemove").show();
+      } else {
+        let localObject = JSON.parse(localStorage.getItem("storeInvoice"));
+        
+        let productExist = _.findWhere(localObject, {"Numero_Documento": nDocumento});
+        if (productExist) {return} 
+
+        localObject.push(objectRow)
+        localStorage.setItem("storeInvoice", JSON.stringify(localObject));
+        $(this).hide();
+        $(this).siblings(".iconRemove").show();
+      }
+    });
+
+    $(document).on("click", ".iconRemove", function () {
+      let nDocumento = $(this).parent().attr("rowCC");
+      let localObject = JSON.parse(localStorage.getItem("storeInvoice"));
+      let localFiltered = localObject.filter(o => o.Numero_Documento !== nDocumento);
+      localStorage.setItem("storeInvoice", JSON.stringify(localFiltered));
+
+      $(this).hide();
+      $(this).siblings(".iconCheck").show();
+    });
+
+    const loadCards = (data) => {
+      for (const card in data.table) {
+        let element = `
+          <div class="card w-45">
+            <div class=" h-100">
+              <div class="card-header pb-0 p-3">
+                <div class="d-flex align-items-center">
+                  <i class="fas fa-tag me-2"></i>
+                  <h6 class="mb-0">${colorCard(card)[1]}</h6>
+                </div>
+              </div>
+              <div class="card-body p-3 d-flex justify-content-center align-items-center flex-column" style="cursor: pointer" >
+                <div class="text-center">
+                  <h4 style="color: ${colorCard(card)[0]}">$ <span>${numberWithCommas(data.table[card])}</span></h4>
+                </div> 
+              </div>
+            </div>
+          </div>
+        `;
+        $("#cardsContainer").append(element);
+      }
+    };
+
+    const colorCard = (cardName) => {
+      switch (cardName) {
+        case "totalBalance":
+          return ["#ffa726", "Saldo Total"]
+          break
+        case "overdueBalance":
+          return ["#ef5350", "Saldo Vencido"]
+          break
+        case "creditScore":
+          return ["#26c6da", "Cupo Crédito"]
+          break
+        default:
+          return ["#67bc6b", "Cupo Disponible"]
+          break
+      }
+    }
+
+    const numberWithCommas = (x) => {
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    // const nvFormatCash = (text) => {
+    //   let pre = "";
+    //   let decimal = 2;
+    //   let entero = 3;
+    //   let sepDecimal = '.';
+    //   let sepEntero = ',';
+  
+    //   if(typeof(text) == 'string') {
+    //     text = parseFloat(text);
+    //   }
+    //   let regex = '\\d(?=(\\d{' + (entero || 3) + '})+' + (decimal > 0 ? '\\D' : '$') + ')';
+    //   let number = text.toFixed(Math.max(0, ~~decimal));
+    //   let space = (pre != "")? " ": "";
+    //   return "$ "+pre + space + (sepDecimal ? number.replace('.', sepDecimal) : number).replace(new RegExp(regex, 'g'), '$&' + (sepEntero || ','));
+    // };
+
+    const loadChart = (data) =>{
+      console.log(data)
+        var ctx4 = document.getElementById("chart").getContext("2d");
+        new Chart(ctx4, {
+        type: "doughnut",
+        data: {
+          labels: ['Saldo Total', 'Saldo Vencido', 'Cupo Disponible'],
+          datasets: [{
+            label: "Projects",
+            weight: 9,
+            cutout: 60,
+            tension: 0.9,
+            pointRadius: 2,
+            borderWidth: 2,
+            backgroundColor: ['#ffa726', '#ef5350', '#67bc6b'],
+            data: [data.totalBalance, data.overdueBalance, data.availableSpace], //Revisar que los valores esten bien
+            fill: false
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            intersect: false,
+            mode: 'index',
+          },
+          scales: {
+            y: {
+              grid: {
+                drawBorder: false,
+                display: false,
+                drawOnChartArea: false,
+                drawTicks: false,
+              },
+              ticks: {
+                display: false
+              }
+            },
+            x: {
+              grid: {
+                drawBorder: false,
+                display: false,
+                drawOnChartArea: false,
+                drawTicks: false,
+              },
+              ticks: {
+                display: false,
+              }
+            },
+          },
+        },
+      });
+    }
+
+
+    $( document ).ready(function() {
+      loadCards(dataCards);
+      loadChart(dataCards.table);
+      loadTablePedidoRepetido(dataTestTable);
+
+
+      // Carts indicators
+      if (!(localStorage.getItem("storeInvoice") === null)) {
+        let localObjectLenght = JSON.parse(localStorage.getItem("storeInvoice")).length;
+        $("#invoicesIndicator").text((localObjectLenght ? localObjectLenght : ""))
+      } 
+      if (!(localStorage.getItem("storeCart") === null)) {
+        let localObjectLenght = JSON.parse(localStorage.getItem("storeCart")).length;
+        $("#cartIndicator").text((localObjectLenght ? localObjectLenght : ""))
+      } 
+      // Ocultar/Mostrar cartera
+      if (!(localStorage.getItem("carteraIsVisible") === null)) {
+        let carteraIsVisible = JSON.parse(localStorage.getItem("carteraIsVisible"));
+        if (!carteraIsVisible) {
+          $("#cards").hide();
+        } 
+      } 
+    });
+
+    // JSON prueba
+    const dataCards = {
+        "data": {
+            "Table": [
+                {
+                    "Codigo_Cliente": "C16741568",
+                    "Nombre_del_Cliente": "ALMACEN CLINIC RING ",
+                    "Vr_Saldo_Sin_Vencer": "0",
+                    "Vr_Vencido_1_a_15": "0",
+                    "Vr_Vencido_16_a_30": "22515705",
+                    "Vr_Vencido_31_a_45": "13749487",
+                    "Vr_Vencido_46_a_60": "0",
+                    "Vr_Vencido_61_a_90": "0",
+                    "Vr_Vencido_91_a_120": "0",
+                    "Vr_Vencido_Mas_120": "0",
+                    "cupo": "35872828",
+                    "Cupo": "35872828"
+                }
+            ],
+            "Table1": [
+                {
+                    "nit": "C16741568",
+                    "Tipo_Documento": "Factura",
+                    "Numero_Documento": "459936",
+                    "Fecha_Emision": "2021-12-22",
+                    "Fecha_Vencimiento": "2022-02-05",
+                    "Valor_Saldo": "6754000",
+                    "Valor_Documento": "6754000",
+                    "Valor_Aplicado": "0",
+                    "Dias_de_Gracia": "0",
+                    "Fecha_de_Corte": "2022-01-05",
+                    "Nro_Dias_Vencidos": "31",
+                    "sw": "1",
+                    "Iva": "1078370",
+                    "Retencion": "0",
+                    "Subtotal": "6539800",
+                    "Descuento": "980970",
+                    "Url_fe": "https://plataforma.facture.co/publicViewer/public-viewer/ODExMDExOTA5LzFjZjk4YWJiLTVmZjItNGU4OC05OTFkLTk4MmJmMTEzMTJjMy9hYTYyNTEyNS04YTA5LTQwYjEtOTNmNy03NDNiNTM1MGViNWM="
+                },
+                {
+                    "nit": "C16741568",
+                    "Tipo_Documento": "Factura",
+                    "Numero_Documento": "459939",
+                    "Fecha_Emision": "2021-12-22",
+                    "Fecha_Vencimiento": "2022-02-05",
+                    "Valor_Saldo": "5170967",
+                    "Valor_Documento": "5170967",
+                    "Valor_Aplicado": "0",
+                    "Dias_de_Gracia": "0",
+                    "Fecha_de_Corte": "2022-01-05",
+                    "Nro_Dias_Vencidos": "31",
+                    "sw": "1",
+                    "Iva": "825616",
+                    "Retencion": "0",
+                    "Subtotal": "5007000",
+                    "Descuento": "751050",
+                    "Url_fe": "https://plataforma.facture.co/publicViewer/public-viewer/ODExMDExOTA5L2JlYjhlNzM4LTY2MTMtNDYzZi04NTczLWQ0NTY3MDEwNGE2OS80MzQ2ZTEyZS05ZmNkLTQ5ODktYWM2NC1kZGI4NzQzZTlhNTk="
+                },
+                {
+                    "nit": "C16741568",
+                    "Tipo_Documento": "Factura",
+                    "Numero_Documento": "459945",
+                    "Fecha_Emision": "2021-12-22",
+                    "Fecha_Vencimiento": "2022-02-05",
+                    "Valor_Saldo": "1824520",
+                    "Valor_Documento": "1824520",
+                    "Valor_Aplicado": "0",
+                    "Dias_de_Gracia": "0",
+                    "Fecha_de_Corte": "2022-01-05",
+                    "Nro_Dias_Vencidos": "31",
+                    "sw": "1",
+                    "Iva": "291310",
+                    "Retencion": "0",
+                    "Subtotal": "1766600",
+                    "Descuento": "264990",
+                    "Url_fe": "https://plataforma.facture.co/publicViewer/public-viewer/ODExMDExOTA5LzQ4MmYxZGE2LTc3N2ItNDI1My04NmEwLWE2YWQzZjg5MzI2Mi81YmZhZWEzMy1jMzAxLTQ2NWEtYjljNy0zMjExZWNiNDFkZTc="
+                },
+                {
+                    "nit": "C16741568",
+                    "Tipo_Documento": "Factura",
+                    "Numero_Documento": "460931",
+                    "Fecha_Emision": "2021-12-30",
+                    "Fecha_Vencimiento": "2022-01-29",
+                    "Valor_Saldo": "9992097",
+                    "Valor_Documento": "9992097",
+                    "Valor_Aplicado": "0",
+                    "Dias_de_Gracia": "0",
+                    "Fecha_de_Corte": "2022-01-05",
+                    "Nro_Dias_Vencidos": "24",
+                    "sw": "1",
+                    "Iva": "1595377",
+                    "Retencion": "0",
+                    "Subtotal": "9675200",
+                    "Descuento": "1451280",
+                    "Url_fe": "https://plataforma.facture.co/publicViewer/public-viewer/ODExMDExOTA5L2MzZGNlYWZlLTAwM2MtNDg1Mi04NzA0LWJkZjE5ZDk4ODVhOC8yMjBhOWM3Mi1iNTBjLTRjYWYtODNjMy1hNWYzMzdiNWQxZGM="
+                },
+                {
+                    "nit": "C16741568",
+                    "Tipo_Documento": "Factura",
+                    "Numero_Documento": "460932",
+                    "Fecha_Emision": "2021-12-30",
+                    "Fecha_Vencimiento": "2022-01-29",
+                    "Valor_Saldo": "8727151",
+                    "Valor_Documento": "8727151",
+                    "Valor_Aplicado": "0",
+                    "Dias_de_Gracia": "0",
+                    "Fecha_de_Corte": "2022-01-05",
+                    "Nro_Dias_Vencidos": "24",
+                    "sw": "1",
+                    "Iva": "1393411",
+                    "Retencion": "0",
+                    "Subtotal": "8450400",
+                    "Descuento": "1267560",
+                    "Url_fe": "https://plataforma.facture.co/publicViewer/public-viewer/ODExMDExOTA5L2E3ODU4N2Y1LTNiYjctNGUwZi05MjMxLThmZDEyNzlkMTFmZC83MTZlNWNiMS1lNWM2LTRiNmYtODYxOC0wNzM3ZDFmN2I2ZTc="
+                },
+                {
+                    "nit": "C16741568",
+                    "Tipo_Documento": "Factura",
+                    "Numero_Documento": "460933",
+                    "Fecha_Emision": "2021-12-30",
+                    "Fecha_Vencimiento": "2022-01-29",
+                    "Valor_Saldo": "3796457",
+                    "Valor_Documento": "3796457",
+                    "Valor_Aplicado": "0",
+                    "Dias_de_Gracia": "0",
+                    "Fecha_de_Corte": "2022-01-05",
+                    "Nro_Dias_Vencidos": "24",
+                    "sw": "1",
+                    "Iva": "606157",
+                    "Retencion": "0",
+                    "Subtotal": "3676000",
+                    "Descuento": "551400",
+                    "Url_fe": "https://plataforma.facture.co/publicViewer/public-viewer/ODExMDExOTA5LzFlYWEwYWE1LTJiYWMtNDUyNC04NDA1LTAwMjNlZDg4NDIzMC85ZGQ2YTkzZC02OTIzLTRiNmUtOTBlMy1lNjkwYWI2MTViZmI="
+                }
+            ]
+        },
+        "table": {
+            "totalBalance": 36265192,
+            "overdueBalance": 36265192,
+            "creditScore": 35872828,
+            "availableSpace": 0
+        }
+    }
+  
+    const dataTestTable = [
+    {
+        "nit": "C901410831",
+        "Tipo_Documento": "Factura",
+        "Numero_Documento": "100952",
+        "Fecha_Emision": "2021-12-07",
+        "Fecha_Vencimiento": "2022-01-16",
+        "Valor_Saldo": "4035353",
+        "Valor_Documento": "4483726",
+        "Valor_Aplicado": "448373",
+        "Dias_de_Gracia": "0",
+        "Fecha_de_Corte": "2022-01-11",
+        "Nro_Dias_Vencidos": "5",
+        "sw": "1",
+        "Iva": "715889",
+        "Retencion": "0",
+        "Subtotal": "4957680",
+        "Descuento": "1189843.2",
+        "Url_fe": "https://plataforma.facture.co/publicViewer/public-viewer/OTAwMjU1NDE0LzdlMTc3NzgyLTE3OWMtNGQzOS04MGE4LTcxNGRhYmRmMmE1NS82YzJmZTY0YS1lNjRiLTRjNzItYTE3Ni0xMzExOWU3ODc0N2M="
+    },
+    {
+        "nit": "C901410831",
+        "Tipo_Documento": "Factura",
+        "Numero_Documento": "101267",
+        "Fecha_Emision": "2021-12-16",
+        "Fecha_Vencimiento": "2022-01-25",
+        "Valor_Saldo": "448373",
+        "Valor_Documento": "448373",
+        "Valor_Aplicado": "0",
+        "Dias_de_Gracia": "0",
+        "Fecha_de_Corte": "2022-01-11",
+        "Nro_Dias_Vencidos": "14",
+        "sw": "1",
+        "Iva": "71589",
+        "Retencion": "0",
+        "Subtotal": "495768",
+        "Descuento": "118984.32",
+        "Url_fe": "https://plataforma.facture.co/publicViewer/public-viewer/OTAwMjU1NDE0L2MzMmJjNzBkLWQ1NTAtNGQ4Yi1hMTg4LWE3ZTZjMDNhMDM2Yi9hZmE0MDRkZS0zMTJhLTQzZmQtYjNmMy0zNDc2ODRmYzFlODA="
+    },
+    {
+        "nit": "C901410831",
+        "Tipo_Documento": "Factura",
+        "Numero_Documento": "100407",
+        "Fecha_Emision": "2021-11-24",
+        "Fecha_Vencimiento": "2022-01-03",
+        "Valor_Saldo": "2740283",
+        "Valor_Documento": "2740283",
+        "Valor_Aplicado": "0",
+        "Dias_de_Gracia": "0",
+        "Fecha_de_Corte": "2022-01-11",
+        "Nro_Dias_Vencidos": "-8",
+        "sw": "1",
+        "Iva": "437524",
+        "Retencion": "0",
+        "Subtotal": "3154464",
+        "Descuento": "851705.28",
+        "Url_fe": "https://plataforma.facture.co/publicViewer/public-viewer/OTAwMjU1NDE0LzE5Y2ZiY2U1LWI0NTctNGU4Mi1iYmI5LTQ5M2ZlOTRkNWI1MS80YjkyYmNiMi1hMjI1LTRjODYtYTBjOS02MmJjODU5NjFmMzU="
+    }
+]
+  
+  </script>
+
+
+
+</body>
+</html>

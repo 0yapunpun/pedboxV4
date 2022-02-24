@@ -1,3 +1,6 @@
+<!-- TODO:
+  -Revisar permisos
+-->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -91,7 +94,7 @@
               <label for="inputYear" style="position: absolute; top: 15%; left: 2%;">Año:</label>
             </div>
             <div class="d-flex gap-3 certificadosButtons">
-              <div class="text-center d-flex flex-column justify-content-center align-items-center" onclick="sendData(7)">
+              <div class="text-center d-flex flex-column justify-content-center align-items-center" onclick="sendData(8)">
                 <h6 class="m-0">Retencion ICA</h6>
                 <div class="d-flex align-items-center gap-1">
                   <div class="cardIcon" style="font-weight: 700;">
@@ -100,7 +103,7 @@
                   </div>
                 </div>
               </div>
-              <div class="text-center d-flex flex-column justify-content-center align-items-center" onclick="sendData(8)">
+              <div class="text-center d-flex flex-column justify-content-center align-items-center" onclick="sendData(7)">
                 <h6 class="m-0">Retención en la fuente</h6>
                 <div class="d-flex align-items-center gap-1" >
                   <div class="cardIcon" style="font-weight: 700;">
@@ -166,23 +169,23 @@
   <script src="/js/menu.js"></script>
     
   <script>
+    let session = `<%- JSON.stringify(session) %>`;
+    session = JSON.parse(session);
+    console.log(session)
+
     let hasPermission = true;
 
     const sendData = (data) => {
       let year = $("#inputYear").val()
-      let type = data;
+      let type = "c";
+      let tipo = data
+      let logo = session.user.dataCompany[0].logo;
+      let id_company = session.user.id_company;
+      let nit = session.user.nit;
 
-      console.log(year, type)
-
-      https://pedbox.co:8531/exportar_retenciones?nit=900345431&tipo=82022&id_company=5&type=c&url=http://api.pedbox.co/images/invesa.png
-
-      let response = "http://www.secst.cl/upfiles/documentos/19072016_1207am_578dc39115fe9.pdf"
-      let element = `
-        <embed src="https://pedbox.co:8531/exportar_retenciones?nit=900345431&tipo=82022&id_company=5&type=c&url=http://api.pedbox.co/images/invesa.png" width="100%" >
-      `;
-      $("#pdfContainer").html("");
-      $("#pdfContainer").append(element);
-      $("#modalPdf").modal("show")
+      
+      let url = `https://pedbox.co:8531/exportar_retenciones?nit=${nit}&tipo=${tipo+year}&id_company=${id_company}&type=${type}&url=${logo}`;
+      window.open(url,'_blank');
     }
       
     $(document).ready(function () {

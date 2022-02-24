@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" type="image/x-icon" href="https://app.pedbox.co/assets/logos/logo_blanco.png"/>
+  <title>Retenciones</title>
+
+  <!-- Fonts and icons -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <link href="/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <!-- CSS Files -->
+  <link id="pagestyle" href="/css/soft-ui-dashboard.css?v=1.0.3" rel="stylesheet" />
+  <!-- JQUERY UI -->
+  <link rel="stylesheet" href="/css/jquery-ui.min.css">
+  <!-- REPORTS CSS -->
+  <link rel="stylesheet" href="/css/reports.css">
+
+  <style>
+    .choices__list--dropdown .choices__item--selectable:after {
+      display: none !important;
+    }
+    .choices__list--dropdown .choices__item--selectable {
+      padding-right: 0 !important;
+    }
+    .choices__input{
+      display: none !important;
+    }
+    .dataTable-top{
+      display: none !important;
+    }
+    .activeNav .icon{
+      background-image: linear-gradient(310deg ,#7928ca,#ff0080);
+      color: white !important
+    }
+    .activeNav i{
+      color: white !important
+    }
+    .activeNav a{
+      background-color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
+    }
+  </style>
+</head>
+
+<body class="g-sidenav-show bg-gray-100">
+  
+  <!-- Menu -->
+  <%- include('./partials/menu.ejs') %> 
+
+  <main class="main-content max-height-vh-100 h-100">
+
+    <!-- Cabecera -->
+    <%- include('./partials/header.ejs') %>
+
+    <!-- Cotent -->
+    <div class="p-4">
+      <div class="card p-3 m-2">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5>Retenciones</h5>
+          <div style="color: #344767; cursor: pointer;" onclick="$('#modalNuevaRetencion').modal('show')">  
+            <i class="fas fa-plus"></i>
+            Añadir retención
+          </div>
+        </div>
+        <div class="w-100 mt-3">
+          <table class="w-100" id="table">
+            <thead>
+              <tr>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder ">Nombre</th>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder ">Retención (%)</th>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder ">Tipo</th>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder ">Descripción</th>
+              </tr> 
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="modalNuevaRetencion" style="z-index: 30000;">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content" >
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Crear Retención</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: gray; border-radius: 50%;"></button>
+          </div>
+          <div class="modal-body d-flex flex-column" >
+            <h6 class="text-center" style="color: red; font-size: 13px; display: none;" id="advertencia">Nombre y Porcentaje son datos obligatorios</h6>
+            <div>
+              <label for="nombre">Nombre retención</label>
+              <input type="text" class="form-control" id="nombre">
+            </div>
+            <div>
+              <div>
+                <label for="porcentaje">Porcentaje</label>
+                <input type="number" class="form-control" id="porcentaje" min="0">
+              </div>
+              <div>
+                <label for="selectRetencion">Tipo de retención</label>
+                <select name="" id="selectRetencion" class="form-control">
+                  <option value="Retención de IVA">Retención de IVA</option>
+                  <option value="Retención a la fuente">Retención a la fuente</option>
+                  <option value="Retención de industria y comercio">Retención de industria y comercio</option>
+                  <option value="Retención de CREE">Retención de CREE</option>
+                  <option value="Otro tipo de retención">Otro tipo de retención</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label for="">Descripción</label>
+              <textarea name="" id="desc" cols="30" rows="10" class="form-control" style="resize: none;"></textarea>
+            </div>
+            <div class="form-check form-switch mt-2 d-flex justify-content-center align-items-center" >
+              <label class="m-0" for="activo" >Activo</label>
+              <input class="form-check-input" type="checkbox" id="state" checked="" style="margin-left: 10px;">
+            </div>
+          </div>
+          <hr class="m-0">
+          <div class="d-flex justify-content-center m-3 gap-3">
+            <button class="btn btn-secondary">Cancelar</button>
+            <button class="btn btn-primary" onclick="getFormData()">Enviar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+
+  <!-- Scripts -->
+  <script src="/js/core/popper.min.js"></script>
+  <script src="/js/core/bootstrap.min.js"></script>
+  <script src="/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="/js/plugins/choices.min.js"></script>
+  <script src="/js/soft-ui-dashboard.min.js?v=1.0.3"></script>
+  <script src="/js/plugins/dragula/dragula.min.js"></script>
+  <script src="/js/plugins/jkanban/jkanban.js"></script>
+  <script src="/js/jquery.js"></script>
+  <script src="/js/jquery-ui.min.js"></script>
+  <script src="/js/plugins/datatables.js"></script>
+  <script src="/js/plugins/chartjs.min.js"></script>
+  <script src="/js/underscore-min.js"></script>
+  <script src="/js/helpers.js"></script>
+  <script src="/js/menu.js"></script>
+
+  <script>
+    const choicesPrice = new Choices($('#selectRetencion')[0]);
+    let tableObject = [];
+
+    const getFormData = () => {
+      $("#advertencia").hide();
+      let resObj = {
+        nombre: $("#nombre").val(),
+        porcentaje: $("#porcentaje").val(),
+        tipo:  $("#tipo").val(),
+        descripcion: $("#desc").val(),
+        state: $("#state").val()
+      }
+
+      if (resObj.nombre == "" || resObj.porcentaje  == "") {
+        $("#advertencia").show();
+      } else {
+        console.log(resObj);
+        tableObject.push(resObj);
+        printTableData(tableObject);
+
+        $('#modalNuevaRetencion').modal('hide')
+      }
+    }
+
+    const printTableData = (data) =>{
+      for (let i = 0; i < data.length; i++) {
+        let element = `
+          <tr>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">${data[i].nombre}</th>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">${data[i].porcentaje}%</th>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">${data[i].tipo}</th>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">${(data[i].descripcion)}</th>
+          </tr> 
+        `;
+        $("#tableBody").append(element)
+      }
+      const tableObj = new simpleDatatables.DataTable("#table", {});
+    }
+  </script>
+
+</body>
+</html>

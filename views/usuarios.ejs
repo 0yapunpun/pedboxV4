@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" type="image/x-icon" href="https://app.pedbox.co/assets/logos/logo_blanco.png"/>
+  <title>Usuarios</title>
+
+  <!-- Fonts and icons -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <link href="/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <!-- CSS Files -->
+  <link id="pagestyle" href="/css/soft-ui-dashboard.css?v=1.0.3" rel="stylesheet" />
+  <!-- JQUERY UI -->
+  <link rel="stylesheet" href="/css/jquery-ui.min.css">
+  <!-- REPORTS CSS -->
+  <link rel="stylesheet" href="/css/reports.css">
+
+  <style>
+    .choices__list--dropdown .choices__item--selectable:after {
+      display: none !important;
+    }
+    .choices__list--dropdown .choices__item--selectable {
+      padding-right: 0 !important;
+    }
+    .choices__input{
+      display: none !important;
+    }
+    .dataTable-top{
+      display: none !important;
+    }
+    .imgTable{
+      width: 40px;
+      height: 40px;
+      background-color: gray;
+      border-radius: 50%;
+    }
+    .optionsRow{
+      cursor: pointer;
+    }
+    .noSorter .dataTable-sorter{
+      opacity: 0;
+    }
+    .centerDiv{
+      display: flex;
+      justify-content: center;
+    }
+    .dropdown-toggle:after{
+      display: none;
+    }
+    .dropdown-menu {
+      left: -140px !important;
+    }
+    .dropContainer{
+      position: relative;
+    }
+    .dropList {
+      border-radius: 1rem;
+      padding-left: 0;
+      position: absolute;
+      list-style-type: none;
+      text-transform: capitalize;
+      right: 0px;
+      background-color: white;
+    }
+    .hideElement{
+      display: none !important;
+    }
+    .showElement{
+      display: block !important;
+    }
+    .activeNav .icon{
+      background-image: linear-gradient(310deg ,#7928ca,#ff0080);
+      color: white !important
+    }
+    .activeNav i{
+      color: white !important
+    }
+    .activeNav a{
+      background-color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
+    }
+  </style>
+</head>
+
+<body class="g-sidenav-show bg-gray-100">
+
+  <!-- Menu -->
+  <%- include('./partials/menu.ejs') %> 
+
+  <main class="main-content max-height-vh-100 h-100">
+
+    <!-- Cabecera -->
+    <%- include('./partials/header.ejs') %>
+    
+    <!-- Cotent -->
+    <div class="p-4">
+      <div class="card p-3 m-2">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5>Usuarios</h5>
+          <div style="color: #344767; cursor: pointer;" onclick="openNewUserModal()">  
+            <i class="fas fa-plus"></i>
+            Añadir Usuario
+          </div>
+        </div>
+        <div class="w-100 mt-3">
+          <table class="w-100" id="table">
+            <thead>
+              <tr>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder noSorter"></th>
+                <th class="text-uppercase text-secondary text-xxs font-weight-bolder ">Nombre</th>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder ">Usuario</th>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder ">Rol</th>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder ">Estado</th>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder noSorter"></th>
+              </tr> 
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="modalNewUser" style="z-index: 30000;">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content" style="width: 120%;">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Crear Usuario</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: gray; border-radius: 50%;"></button>
+          </div>
+          <div class="modal-body d-flex flex-column" >
+            <h6 class="text-center" style="color: red; font-size: 13px; display: none; transition: 0.5s;" id="formAlert">Termina de llenar el formulario antes de enviar</h6>
+            <h6 class="text-center" style="color: red; font-size: 13px; display: none; transition: 0.5s;" id="formAlertPassword">Las contraseñas no coinciden</h6>
+            <div >
+              <label for="nombre">Nombre </label>
+              <input type="text" class="form-control" id="nombre">
+            </div>
+            <div class="mt-3">
+              <label for="usuario">Usuario </label>
+              <input type="text" class="form-control" id="usuario">
+            </div>
+            <div class="mt-3">
+              <div>
+                <label for="inputRol">Rol </label>
+                <select name="" id="inputRol" class="form-control">
+                  <!-- Contenido dinamico -->
+                </select>
+              </div>
+            </div>
+            <div class="d-flex gap-2 mt-3">
+              <div class="flex-fill">
+                <label for="password">Contraseña</label>
+                <input type="password" class="form-control" id="password">
+              </div>
+              <div class="flex-fill">
+                <label for="passwordConfirm">Confirmar Contraseña </label>
+                <input type="password" class="form-control" id="passwordConfirm">
+              </div>
+            </div>
+            <div class="d-flex justify-content-between mt-3 mx-5">
+              <div class="form-check form-switch d-flex justify-content-center align-items-center" >
+                <input class="form-check-input me-1" type="checkbox" id="state" checked="">
+                <label class="m-0" for="state" >Activo</label>
+              </div>
+              <div class="form-check form-switch  d-flex justify-content-center align-items-center" >
+                <input class="form-check-input me-1" type="checkbox" id="changePassword" checked="" >
+                <label class="m-0" for="changePassword" >Cambiar contraseña en el próximo login</label>
+              </div>
+            </div>
+          </div>
+          <hr class="m-0">
+          <div class="d-flex justify-content-center m-3 gap-3">
+            <button class="btn btn-secondary">Cancelar</button>
+            <button class="btn btn-primary" onclick="getFormData()" id="buttonNewUser">Enviar</button>
+            <button class="btn btn-primary" onclick="updateUser(this)" id="buttonUpdateUser">Actualizar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="modalChangePassword" style="z-index: 30000;">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content" style="width: 120%;">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Cambiar Contraseña</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: gray; border-radius: 50%;" onclick="clearFormNewPassword()"></button>
+          </div>
+          <div class="modal-body d-flex flex-column justify-content-center align-items-center" >
+            <h6 class="text-center" style="color: red; font-size: 13px; display: none; transition: 0.5s;" id="formPasswordAlert">La contraseña actual es incorrecta</h6>
+            <h6 class="text-center" style="color: red; font-size: 13px; display: none; transition: 0.5s;" id="formNewPasswordAlert">La contraseña nueva no coincide</h6>
+            <div class="w-50">
+              <div class="flex-fill">
+                <label for="password">Actual Contraseña</label>
+                <input type="password" class="form-control" id="currentPassword">
+              </div>
+              <div class="flex-fill">
+                <label for="password">Nueva Contraseña</label>
+                <input type="password" class="form-control" id="newPassword">
+              </div>
+              <div class="flex-fill">
+                <label for="passwordConfirm">Confirmar Contraseña</label>
+                <input type="password" class="form-control" id="confirmNewPassword">
+              </div>
+            </div>
+          </div>
+          <hr>
+          <div class="d-flex justify-content-center gap-3">
+            <button class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Cancelar</button>
+            <button class="btn btn-primary" onclick="uploadPassword()">Enviar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Script Plantilla -->
+  <!-- Scripts -->
+  <script src="/js/core/popper.min.js"></script>
+  <script src="/js/core/bootstrap.min.js"></script>
+  <script src="/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="/js/plugins/choices.min.js"></script>
+  <script src="/js/soft-ui-dashboard.min.js?v=1.0.3"></script>
+  <script src="/js/plugins/dragula/dragula.min.js"></script>
+  <script src="/js/plugins/jkanban/jkanban.js"></script>
+  <script src="/js/jquery.js"></script>
+  <script src="/js/jquery-ui.min.js"></script>
+  <script src="/js/plugins/datatables.js"></script>
+  <script src="/js/plugins/chartjs.min.js"></script>
+  <script src="/js/underscore-min.js"></script>
+  <script src="/js/helpers.js"></script>
+  <script src="/js/menu.js"></script>
+
+  <script>
+    let userUpload = {};
+
+    const openNewUserModal = () => {
+      $("#buttonNewUser").show();
+      $("#buttonUpdateUser").hide();
+
+      cleanForm(); 
+      $('#modalNewUser').modal('show')
+    }
+
+    const deleteUser = (element) => {
+      if (confirm('Are you sure you want to save this thing into the database?')) {
+        let userId = $(element).parent().parent().parent().parent().attr("userID");
+        let index = user.findIndex(o => o.id == userId);
+  
+        user.splice(index, 1);
+        printTableData(user);
+      } 
+    };
+
+    const editUser = (element) => {
+      $("#buttonNewUser").hide();
+      $("#buttonUpdateUser").show();
+
+      let userId = $(element).parent().parent().parent().parent().attr("userID");
+      let userObj = user.find(o => o.id == userId);
+
+      let state = (userObj.status == 1 ? true : false)
+
+      $("#nombre").val(userObj.description);
+      $("#usuario").val(userObj.user);
+      $("#inputRol").val(userObj.rolw);
+      $("#password").val(userObj.password);
+      $("#passwordConfirm").val(userObj.password);
+      $("#state").prop('checked',state)
+      $("#changePassword").prop('checked',false);
+
+      $("#buttonUpdateUser").attr("userID", userId)
+
+      $('#modalNewUser').modal('show');
+    }
+
+    const updateUser = (button) => {
+      let userData = {
+        name: $("#nombre").val(),
+        user: $("#usuario").val(),
+        rol:  $("#inputRol").val(),
+        password: $("#password").val(),
+        passwordConfirm: $("#passwordConfirm").val(),
+        state: ($("#state").val() == "on" ? 1 : 0),
+        changePasswordOnLoad: ($("#changePassword").val() == "on" ? 1 : 0)
+      };
+
+      if (userData.name == "" || userData.user == "" || userData.rol == "" || userData.password == "" || userData.passwordConfirm == "") {
+        $("#formAlert").show();
+        return
+      } else {
+        $("#formAlert").hide();
+      };
+      
+      if (!(userData.password == userData.passwordConfirm)) {
+        $("#formAlertPassword").show();
+        return
+      } else {
+        $("#formAlertPassword").hide();
+      };
+
+      let userId = $(button).attr("userId")
+      let index = user.findIndex(o => o.id == userId);
+
+      user[index].description = userData.name;
+      user[index].user = userData.user;
+      user[index].role = userData.rol;
+      user[index].status = userData.state;
+      user[index].password = userData.password;
+
+      printTableData(user);
+      $("#modalNewUser").modal("hide");
+      console.log("usuario actualizado")
+    }
+
+    const getUser = (element) => {
+      let userId = $(element).parent().parent().parent().parent().attr("userID");
+      userUpload = user.find(o => o.id == userId);
+      $("#modalChangePassword").modal("show");
+    };
+
+    const uploadPassword = () => {
+      let currentPassword = $("#currentPassword").val();
+      let newPassword = $("#newPassword").val();
+      let newPasswordConfirm = $("#confirmNewPassword").val();
+
+      if (currentPassword != userUpload.password) {
+        $("#formPasswordAlert").show();
+        return
+      } else {
+        $("#formPasswordAlert").hide()
+      };
+
+      if (newPassword != newPasswordConfirm) {
+        $("#formNewPasswordAlert").show();œ
+        return
+      } else {
+        $("#formNewPasswordAlert").hide()
+      };
+
+      // Actualizar objecto local de pruebas
+      let index = user.findIndex(o => o.id == userUpload.id);
+      user[index].password = newPassword;
+      console.log("contraseña actualizada exitosamente")
+      clearFormNewPassword();
+    };
+
+    const clearFormNewPassword = () => {
+      $("#currentPassword").val("");
+      $("#newPassword").val("");
+      $("#confirmNewPassword").val("");
+      $("#modalChangePassword").modal("hide")
+      userUpload = {};
+    }
+
+    const getFormData = () => {
+      let userData = {
+        name: $("#nombre").val(),
+        user: $("#usuario").val(),
+        rol:  $("#inputRol").val(),
+        password: $("#password").val(),
+        passwordConfirm: $("#passwordConfirm").val(),
+        state: ($("#state").val() == "on" ? 1 : 0),
+        changePasswordOnLoad: ($("#changePassword").val() == "on" ? 1 : 0)
+      }
+
+      if (userData.name == "" || userData.user == "" || userData.rol == "" || userData.password == "" || userData.passwordConfirm == "") {
+        $("#formAlert").show();
+        return
+      } else {
+        $("#formAlert").hide();
+      };
+      
+      if (!(userData.password == userData.passwordConfirm)) {
+        $("#formAlertPassword").show();
+        return
+      } else {
+        $("#formAlertPassword").hide();
+      };
+
+      let data = {
+        "id": 9882 + 1,
+        "id_user_company": 10373,
+        "id_company": 37,
+        "description": userData.name,
+        "user": userData.user,
+        "password": userData.password,
+        "status": userData.state,
+        "id_role": 276,
+        "role": userData.rol,
+        "change_password": userData.changePasswordOnLoad
+      }
+      console.log(data)
+
+
+      user.push(data);
+
+      $('#modalNewUser').modal('hide');
+      printTableData(user);
+      cleanForm();
+    }
+
+    const cleanForm = () => {
+      $("#nombre").val("");
+      $("#usuario").val("");
+      $("#inputRol").val("");
+      $("#password").val("");
+      $("#passwordConfirm").val("");
+      $("#state").prop('checked',true)
+      $("#changePassword").prop('checked',true)
+    }
+
+    const printTableData = (data) =>{
+      $("#tableBody").html("");
+      for (let i = 0; i < data.length; i++) {
+        let element = `
+          <tr>
+            <th class="centerDiv text-uppercase text-secondary font-weight-bolder opacity-7"><div class="imgTable"><img src="" alt="" style="max-width: 100%; max-height: 100%;"></div></th>
+            <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7">${data[i].description}</th>
+            <th class="text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-7">${data[i].user}</th>
+            <th class="text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-7">${(data[i].role ? data[i].role : '-')}</th>
+            <th class="text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-7">${((data[i].status == 1 ? 'Activo' : 'Inactivo'))}</th>
+            <th class="text-center text-uppercase text-secondary font-weight-bolder opacity-7 dropdown" userId="${data[i].id}">
+              <div class="dropContainer">
+                <div class="hideDrop" type="button" id="dropdownMenuButton" ><i class="fas fa-ellipsis-v" ></i></div>
+                <div class="dropList" style="display: none"> 
+                  <li><a class="dropdown-item" onclick="getUser(this)">Cambiar Clave</a></li>
+                  <li><a class="dropdown-item" onclick="editUser(this)">Editar</a></li>
+                  <li><a class="dropdown-item" onclick="deleteUser(this)">Eliminar</a></li>
+                </div>
+              </div>
+            </th>
+          </tr> 
+        `;
+        $("#tableBody").append(element)
+      }
+      const tableObj = new simpleDatatables.DataTable("#table", {});
+    };
+
+    $(document).on("click", ".hideDrop", function () {
+      if ($(this).parent().find(".dropList").is(":visible")) {
+        $(this).parent().find(".dropList").hide();
+      } else {
+        $(this).parent().find(".dropList").show();
+      }
+    })
+
+    const loadRoles = (data) => {
+      for (let i = 0; i < data.length; i++) {
+        let element = `
+          <option value="${data[i]}">${data[i]}</option>
+        `;
+        $("#inputRol").append(element)
+      }
+      const choicesPrice = new Choices($('#inputRol')[0]);
+    }
+
+    $(document).ready(function () {
+      printTableData(user);
+      loadRoles(rolesTest);
+    })
+
+    const user = [
+      {
+        "id": 9882,
+        "id_user_company": 10373,
+        "id_company": 37,
+        "description": "901410831-1 - MOTOPARTES REVOLUTIONSS S.A.S",
+        "user": "C901410831",
+        "password": "901410831",
+        "status": 1,
+        "id_role": 276,
+        "role": null
+      }
+    ];
+
+    const rolesTest = [
+      "role1",
+      "role2",
+      "role3"
+    ];
+  </script>
+
+</body>
+</html>

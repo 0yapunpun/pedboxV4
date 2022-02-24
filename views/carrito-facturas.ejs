@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" type="image/x-icon" href="https://app.pedbox.co/assets/logos/logo_blanco.png"/>
+  <title>Carrito Facturas</title>
+
+  <!-- Fonts and icons -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <link href="/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <!-- CSS Files -->
+  <link id="pagestyle" href="/css/soft-ui-dashboard.css?v=1.0.3" rel="stylesheet" />
+  <!-- JQUERY UI -->
+  <link rel="stylesheet" href="/css/jquery-ui.min.css">
+  <!-- REPORTS CSS -->
+  <link rel="stylesheet" href="/css/reports.css">
+
+  <style>
+    .tableHead td{
+      font-weight: 700;
+    };
+    .fontsizeTable{
+      font-size: 13px !important;
+    }
+    .fontsizeTable h6{
+      font-size: 13px;
+    }
+    .cursorPointer{
+      cursor: pointer;
+    }
+    .activeNav .icon{
+      background-image: linear-gradient(310deg ,#7928ca,#ff0080);
+      color: white !important
+    }
+    .activeNav i{
+      color: white !important
+    }
+    .activeNav a{
+      background-color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
+    }
+  </style>
+</head>
+
+<body class="g-sidenav-show bg-gray-100">
+
+  <!-- Menu -->
+  <%- include('./partials/menu.ejs') %> 
+
+  <main class="main-content max-height-vh-100 h-100">
+
+    <!-- Cabecera -->
+    <%- include('./partials/header.ejs') %>
+
+    <!-- Content -->
+    <div class="p-4">
+      <div class="card p-3">
+        <div class="text-center mb-1">
+          <h5>Facturas por pagar</h5>
+        </div>
+        <div class="w-100 mt-3" >
+          <div>
+            <div>
+              <table class="w-100" style="border-collapse: separate; border-spacing: 10px;  table-layout:fixed; border-collapse: collapse;">
+                <tr class="tableHead">
+                  <td style="width: 15%;" class="text-center">Factura</td>
+                  <td class="text-center">Cuentas</td>
+                  <td style="width: 38%;" class="text-center">Retenciones</td>
+                  <td style="width: 13%;" class="text-center">Abono</td>
+                  <td style="width: 12%;" class="text-center">Saldo</td>
+                  <td style="width: 4%;"></td>
+                </tr>
+                <tbody id="tableBody" class="tableBody">
+                </tbody>
+              </table>
+            </div>
+            <div class="mt-5 d-flex justify-content-between" style="position: relative;">
+              <div class="w-35" style="opacity: 0; background-color: #f8f9fa; border-radius: 1rem; padding: 10px;" id="listaRetenciones">
+                <div class="d-flex align-items-center gap-3">
+                  <i class="fas fa-list"></i>
+                  <h6 class="m-0">Lista de Retenciones</h6>
+                </div>
+                <hr class="m-0">
+                <div id="retentionListContainer"></div>
+              </div>
+              <div class=" w-35" style="background-color: #f8f9fa; border-radius: 1rem; padding: 10px;">
+                <div class="d-flex align-items-center gap-3">
+                  <i class="far fa-credit-card"></i>
+                  <h6 class="m-0">Total</h6> 
+                </div>
+                <hr class="m-0">
+                <div class="d-flex justify-content-between">
+                  <h6>Abono</h6>
+                  <span id="totalAbono">$0</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <h6>Subtotal</h6>
+                  <span id="totalSubTotal">$0</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <h6>Retenciones</h6>
+                  <span class="totalRetencion">$0</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <h6>IVA</h6>
+                  <span id="totalIVA">$0</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <h6>Total</h6>
+                  <span id="totalTotal">$0</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <h6>Saldo</h6>
+                  <span id="totalSaldo">$0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="text-center mt-5">
+          <button class="btn btn-primary">Enviar</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script src="/js/core/popper.min.js"></script>
+  <script src="/js/core/bootstrap.min.js"></script>
+  <script src="/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="/js/plugins/choices.min.js"></script>
+  <script src="/js/soft-ui-dashboard.min.js?v=1.0.3"></script>
+  <script src="/js/plugins/dragula/dragula.min.js"></script>
+  <script src="/js/plugins/jkanban/jkanban.js"></script>
+  <script src="/js/jquery.js"></script>
+  <script src="/js/jquery-ui.min.js"></script>
+  <script src="/js/plugins/datatables.js"></script>
+  <script src="/js/plugins/chartjs.min.js"></script>
+  <script src="/js/underscore-min.js"></script>
+  <script src="/js/helpers.js"></script>
+  <script src="/js/menu.js"></script>
+
+  <script>
+    const loadProdutcs = (data) => {
+      for (let i = 0; i < data.length; i++) {
+        let saldo = data[i].Valor_Saldo - data[i].Valor_Saldo;
+
+        data[i].Descuento = Math.round(Number(data[i].Descuento));
+        data[i].Subtotal = Math.round(Number(data[i].Subtotal));
+        data[i].Iva = Math.round(Number(data[i].Iva));
+        data[i].Valor_Saldo = Math.round(Number(data[i].Valor_Saldo));
+
+        let element = `
+          <tr class="fontsizeTable rowTable" style="background-color: #f8f9fa; border-bottom: solid 5px white; border-radius: 1rem" >
+            <td class="p-2" style="border-top-left-radius: 1rem; border-bottom-left-radius: 1rem">
+              <div class="d-flex ref" style="font-size: 13px" facturaRef="${data[i].Numero_Documento}">
+                <h6 class="m-0 me-1">REF: </h6>${data[i].Numero_Documento}
+              </div>
+              <div class="d-flex" style="font-size: 13px">
+                <h6 class="m-0 me-1">Doc: </h6>${data[i].Tipo_Documento}
+              </div>
+              <div class="d-flex" style="font-size: 13px">
+                <h6 class="m-0 me-1">Fecha: </h6> ${data[i].Fecha_Emision}
+              </div>
+            </td>
+            <td style="font-size:13px" class="p-2">
+              <div class="d-flex gap-1 justify-content-between">
+                <h6 class="m-0 me-1">Subtotal: </h6>
+                <div class="subt fontsizeTable" value="${data[i].Subtotal}">$${numberWithCommas(data[i].Subtotal)}</div>
+              </div>
+              <div class="d-flex gap-1 justify-content-between">
+                <h6 class="m-0 me-1">IVA: </h6>
+                <div class="iva" value="${data[i].Iva}">$${numberWithCommas(data[i].Iva)}</div>
+              </div>
+              <div class="d-flex gap-1 justify-content-between">
+                <h6 class="m-0 me-1">Descuento: </h6>
+                <div class="vdes" value="${data[i].Descuento}">$${numberWithCommas(data[i].Descuento)}</div>
+              </div>
+              <div class="d-flex gap-1 justify-content-between">
+                <h6 class="m-0 me-1">Total: </h6>
+                <div class="vtotal" value="${data[i].Valor_Saldo}">$${numberWithCommas(data[i].Valor_Saldo)}</div>
+              </div>
+            </td>
+            <td style="font-size:13px" class="text-center p-2 retentionTd" style="width: 13%;"><div onclick="addRetentionField(this)" class="cursorPointer"><i class="fas fa-plus me-1"></i>Agregar</div></td>
+            <td style="font-size:13px" class="p-2"><input type="number" class="form-control vAbono" name="" id="" min="0" max="${data[i].Valor_Saldo}" value="${data[i].Valor_Saldo}" originalValue="${data[i].Valor_Saldo}"></td>
+            <td style="font-size:13px" class="vSaldo p-2" value="${saldo}">$${saldo}</td>
+            <td style="font-size:13px; border-top-right-radius: 1rem; border-bottom-right-radius: 1rem" class="p-2"><div onclick="resetRow(this)" class="cursorPointer"><i class="fas fa-redo"></div></i></td>
+          </tr>
+        `;
+        $("#tableBody").append(element);
+      } 
+      printTotalCart();
+    };
+
+    const numberWithCommas = (x) => {
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    const nvFormatCash = (text) => {
+      let pre = "";
+      let decimal = 2;
+      let entero = 3;
+      let sepDecimal = '.';
+      let sepEntero = ','
+  
+      if(typeof(text) == 'string') {
+        text = parseFloat(text);
+      }
+      let regex = '\\d(?=(\\d{' + (entero || 3) + '})+' + (decimal > 0 ? '\\D' : '$') + ')';
+      let number = text.toFixed(Math.max(0, ~~decimal));
+      let space = (pre != "")? " ": "";
+      return "$ "+pre + space + (sepDecimal ? number.replace('.', sepDecimal) : number).replace(new RegExp(regex, 'g'), '$&' + (sepEntero || ','));
+    };
+
+    const resetRow = (container) => {
+      let row = $(container).parent().parent();
+      let totalRow = $(row).find(".vtotal").attr("value")
+
+      $(row).find(".vAbono").val(totalRow);
+      $(row).find(".vAbono").attr("value", totalRow);
+
+      $(row).find(".vSaldo").val(0);
+      $(row).find(".vSaldo").text("$0");
+
+      $(row).find(".selectRetention").parent().remove();
+      $(row).find(".retentionTd").attr("value", 0);
+
+      printTotalCart();
+    }
+
+    const addRetentionField = (container) => {
+      let appliedRetention = [];
+      let fieldsRetentionRow = $(container).parent().find(".selectRetention");
+
+      for (let i = 0; i < fieldsRetentionRow.length; i++) {
+        if ($(fieldsRetentionRow[i]).attr("idRetention")) {
+          appliedRetention.push(Number($(fieldsRetentionRow[i]).attr("idRetention")))
+        }
+      }
+
+      let retenciones = `<select name="" class="form-control selectRetention" style="width: 230%; font-size: 13px">`;
+          retenciones += '<option value="" selected disabled hidden>...</option>'
+
+      for (let i = 0; i < retencionData.retention.length; i++) {
+        if (appliedRetention.includes(retencionData.retention[i].id)) {continue}
+        retenciones += `<option value="${retencionData.retention[i].name}" porcentaje="${retencionData.retention[i].percentage}" idRetention="${retencionData.retention[i].id}">${retencionData.retention[i].name} - (${retencionData.retention[i].percentage}%)</option>`;
+      }
+      retenciones += `</select>`;
+
+      let element = `
+        <div class="d-flex gap-1 align-items-center mt-1">
+          ${retenciones}
+          <input type="number" name="" id="" min="0" class="form-control calcRetencion">
+          <div onclick="removeRetention(this)" class="cursorPointer" ><i class="fas fa-trash" style="color: #d60808"></i></div>
+        </div>
+      `;
+      $(container).parent().append(element);
+    };
+
+    const removeRetention = (container) => {
+      let fields = $(container).parent().parent();
+      let retentionContainer = $(container).parent().parent();
+      let abonoContainer = $(container).parent().parent().parent().find(".vAbono");
+
+      $(container).parent().remove();
+      fields = $(fields).find(".calcRetencion")
+
+      let retentionTotal = 0;
+      for (let i = 0; i < fields.length; i++) {
+        retentionTotal += Number($(fields[i]).val())
+      }
+
+      $(retentionContainer).attr("value", retentionTotal);
+      calcAbono(abonoContainer)
+    }
+
+    const calcRetentions = (container) => {
+      let fields = $(container).parent().parent().find(".calcRetencion");
+      let retentionTotal = 0;
+      for (let i = 0; i < fields.length; i++) {
+        retentionTotal += Number($(fields[i]).val())
+      }
+      $(container).parent().parent().attr("value", retentionTotal);
+      calcAbono($(container).parent().parent().parent().find(".vAbono"))
+    }
+
+    const getListRetentions = () => {
+      let rows = $(".rowTable");
+      let retentionList = [];
+
+      for (let i = 0; i < rows.length; i++) {
+        let retentionRowRef = $(rows[i]).find(".ref").attr("facturaRef")
+        let totalRetentionRow = $(rows[i]).find(".retentionTd").attr("value");
+        retentionList.push({retentionRowRef, totalRetentionRow})
+        
+      }
+
+      $("#retentionListContainer").html("");
+     
+      for (let i = 0; i < retentionList.length; i++) {
+        let value = (retentionList[i].totalRetentionRow ? numberWithCommas(retentionList[i].totalRetentionRow ) : "0")
+        let element = `
+          <div class="d-flex justify-content-between">
+            <h6>Factura: <span style="font-weight: 400; color: #67748e">${retentionList[i].retentionRowRef}</span> </h6>
+            <span class="">$${value}</span>
+          </div>
+        `;
+        $("#retentionListContainer").append(element)
+      }
+    }
+
+    const calcAbono = (abono) => {
+      let currentAbono = $(abono).attr("originalValue");
+      let retencion = $(abono).parent().siblings(".retentionTd").attr("value");
+      let newAbono = currentAbono - retencion;
+
+
+      $(abono).val(newAbono);
+      $(abono).attr("value", newAbono);
+      printTotalCart();
+    }
+
+    $(document).on('change','.selectRetention',function(){
+      let porcentaje = Number($(this).find("option:selected").attr("porcentaje"));
+      let subT = Number($(this).parent().parent().parent().find(".subt").attr("value"));
+      let calc = Math.round((porcentaje / 100) * subT);
+      let idRetention = $(this).find("option:selected").attr("idRetention");
+      
+      $(this).attr("idRetention", idRetention)
+      $(this).siblings(".calcRetencion").val(calc);
+      $(this).siblings(".calcRetencion").attr("value", calc);
+      calcRetentions(this)
+    });
+
+    $(document).on('keyup mouseup', '.calcRetencion', function(e) {       
+      let value = $(this).attr("value");  
+      let currentValue = $(this).val();  
+
+      if (!(value == currentValue)) {
+        $(this).attr("value", currentValue);
+        calcRetentions(this)
+      }
+    });
+
+    const printTotalCart = () => {
+      let subT = $(".subt");
+      let iva = $(".iva");
+      let retention = $(".retentionTd");
+      let total = $(".vtotal");
+      let abono = $(".vAbono");
+      let vSaldo = $(".vSaldo");
+      
+      let TsubT = 0;
+      let Tiva = 0;
+      let Tretention = 0;
+      let Ttotal = 0;
+      let Tabono = 0;
+      let Tsaldo = 0;
+      
+      for (let i = 0; i < subT.length; i++) {
+        TsubT += Number($(subT[i]).attr("value"))
+        Tiva += Number($(iva[i]).attr("value"))
+        Tretention += Number(($(retention[i]).attr("value") ? $(retention[i]).attr("value") : 0))
+        Ttotal += Number($(total[i]).attr("value"))
+        Tabono += Number($(abono[i]).attr("value"))
+        Tsaldo += Number($(vSaldo[i]).attr("value"))
+      }
+
+      if (!Tretention) {
+        $("#listaRetenciones").css("opacity", "0")
+      } else {
+        getListRetentions();
+        $("#listaRetenciones").css("opacity", "1")
+      }
+
+      $("#totalAbono").text("$"+(Tabono ? numberWithCommas(Tabono) : "0"))
+      $("#totalSubTotal").text("$"+(TsubT ? numberWithCommas(TsubT): "0"))
+      $(".totalRetencion").text("$"+(Tretention ? numberWithCommas(Tretention) : "0"))
+      $("#totalIVA").text("$"+(Tiva ? numberWithCommas(Tiva) : "0"))
+      $("#totalTotal").text("$"+(Ttotal ? numberWithCommas(Ttotal) : "0"))
+      $("#totalSaldo").text("$"+(Tsaldo ? numberWithCommas(Tsaldo): "0"))
+    };
+
+    $(document).on('keyup mouseup', '.vAbono', function(e) {       
+      let value = $(this).attr("value");  
+      let currentValue = $(this).val();  
+
+      if (!(value == currentValue)) {
+        let cantAbono = Number($(this).val())
+        let total = $(this).parent().parent().find(".vtotal").attr("value")
+        let newAbono = total - currentValue;
+        
+        $(this).parent().parent().find(".vSaldo").attr("value", newAbono)
+        $(this).parent().parent().find(".vSaldo").text("$"+numberWithCommas(newAbono))
+
+        $(this).attr("value", currentValue);
+        printTotalCart();
+      }
+    });
+
+    const getLocalStorage = () => {
+      if ((localStorage.getItem("storeInvoice") === null)) {return}
+      
+      let localObject = JSON.parse(localStorage.getItem("storeInvoice"));
+      console.log(localObject)
+      loadProdutcs(localObject)
+    }
+
+    $(document).ready(function () {
+      getLocalStorage();
+    })
+
+    let retencionData = {
+      "retention": [
+      {
+      "id": 2,
+      "standard": 1,
+      "id_company": 15,
+      "account": "",
+      "status": 1,
+      "name": "Arrendamiento de bienes raíces",
+      "percentage": 3.5,
+      "id_retention_type": 2,
+      "retention_type_description": "Retención en la fuente",
+      "description": "Retención aplicada a pagos de arrendamiento de bienes raíces"
+      },
+      {
+      "id": 3,
+      "standard": 1,
+      "id_company": 15,
+      "account": "",
+      "status": 1,
+      "name": "Compras",
+      "percentage": 2.5,
+      "id_retention_type": 2,
+      "retention_type_description": "Retención en la fuente",
+      "description": "Retención aplicada a compras declarantes"
+      },
+      {
+      "id": 4,
+      "standard": 1,
+      "id_company": 15,
+      "account": "",
+      "status": 1,
+      "name": "Compras",
+      "percentage": 3.5,
+      "id_retention_type": 2,
+      "retention_type_description": "Retención en la fuente",
+      "description": "Retención aplicada a compras no declarantes"
+      },
+      {
+      "id": 5,
+      "standard": 1,
+      "id_company": 15,
+      "account": "",
+      "status": 1,
+      "name": "Horarios y comisiones",
+      "percentage": 10,
+      "id_retention_type": 2,
+      "retention_type_description": "Retención en la fuente",
+      "description": "Retención aplicada a personas naturales"
+      },
+      {
+      "id": 6,
+      "standard": 1,
+      "id_company": 15,
+      "account": "",
+      "status": 1,
+      "name": "Horarios y comisiones",
+      "percentage": 11,
+      "id_retention_type": 2,
+      "retention_type_description": "Retención en la fuente",
+      "description": "Retención aplicada a personas jurídicas"
+      },
+      {
+      "id": 7,
+      "standard": 1,
+      "id_company": 15,
+      "account": "",
+      "status": 1,
+      "name": "Servicios de aseo y vigilancia",
+      "percentage": 2,
+      "id_retention_type": 2,
+      "retention_type_description": "Retención en la fuente",
+      "description": "Retención aplicada a pagos de servicios en aseo y/o vigilancia"
+      },
+      {
+      "id": 8,
+      "standard": 1,
+      "id_company": 15,
+      "account": "",
+      "status": 1,
+      "name": "Servicios de hoteles y restaurantes",
+      "percentage": 3.5,
+      "id_retention_type": 2,
+      "retention_type_description": "Retención en la fuente",
+      "description": "Retención aplicada por servicios de hoteles, restaurantes y hospedaje"
+      },
+      {
+      "id": 9,
+      "standard": 1,
+      "id_company": 15,
+      "account": "",
+      "status": 1,
+      "name": "Servicios en general",
+      "percentage": 4,
+      "id_retention_type": 2,
+      "retention_type_description": "Retención en la fuente",
+      "description": "Retención aplicada a pagos de personas declarantes"
+      },
+      {
+      "id": 10,
+      "standard": 1,
+      "id_company": 15,
+      "account": "",
+      "status": 1,
+      "name": "Servicios en general",
+      "percentage": 6,
+      "id_retention_type": 2,
+      "retention_type_description": "Retención en la fuente",
+      "description": "Retención aplicada a pagos de personas no declarantes"
+      },
+      {
+      "id": 11,
+      "standard": 1,
+      "id_company": 15,
+      "account": "",
+      "status": 1,
+      "name": "ReteICA",
+      "percentage": 0,
+      "id_retention_type": 3,
+      "retention_type_description": "Retención de Industria y Comercio",
+      "description": "Retención de industria y comercio"
+      },
+      {
+      "id": 12,
+      "standard": 1,
+      "id_company": 15,
+      "account": "",
+      "status": 1,
+      "name": "ReteIVA",
+      "percentage": 15,
+      "id_retention_type": 1,
+      "retention_type_description": "Retención de IVA",
+      "description": "Retención sobre el total del IVA asociado a una factura"
+      },
+      {
+      "id": 13,
+      "standard": 1,
+      "id_company": 15,
+      "account": "",
+      "status": 1,
+      "name": "ReteCREE",
+      "percentage": 0.4,
+      "id_retention_type": 4,
+      "retention_type_description": "Retención de CREE",
+      "description": ""
+      },
+      {
+      "id": 14,
+      "standard": 1,
+      "id_company": 15,
+      "account": "",
+      "status": 1,
+      "name": "ReteCREE",
+      "percentage": 0.8,
+      "id_retention_type": 4,
+      "retention_type_description": "Retención de CREE",
+      "description": ""
+      },
+      {
+      "id": 15,
+      "standard": 1,
+      "id_company": 15,
+      "account": "",
+      "status": 1,
+      "name": "ReteCREE",
+      "percentage": 1.6,
+      "id_retention_type": 4,
+      "retention_type_description": "Retención de CREE",
+      "description": ""
+      },
+      {
+      "id": 16,
+      "standard": 1,
+      "id_company": 15,
+      "account": "",
+      "status": 1,
+      "name": "Transporte de carga",
+      "percentage": 1,
+      "id_retention_type": 2,
+      "retention_type_description": "Retención en la fuente",
+      "description": ""
+      },
+      {
+      "id": 33,
+      "standard": 0,
+      "id_company": 15,
+      "account": "",
+      "status": 1,
+      "name": "devolucion",
+      "percentage": 0,
+      "id_retention_type": 5,
+      "retention_type_description": "Otro tipo de retención",
+      "description": "devolucion"
+      },
+      {
+      "id": 34,
+      "standard": 0,
+      "id_company": 15,
+      "account": "",
+      "status": 1,
+      "name": "Descuento PP",
+      "percentage": 15,
+      "id_retention_type": 5,
+      "retention_type_description": "Otro tipo de retención",
+      "description": "Descuento por pronto pago"
+      },
+      {
+      "id": 35,
+      "standard": 0,
+      "id_company": 15,
+      "account": "",
+      "status": 1,
+      "name": "Descuento PP",
+      "percentage": 10,
+      "id_retention_type": 5,
+      "retention_type_description": "Otro tipo de retención",
+      "description": "Descuento por pronto pago"
+      }
+      ],
+      "retention_type": [
+      {
+      "id": 1,
+      "description": "Retención de IVA"
+      },
+      {
+      "id": 2,
+      "description": "Retención en la fuente"
+      },
+      {
+      "id": 3,
+      "description": "Retención de Industria y Comercio"
+      },
+      {
+      "id": 4,
+      "description": "Retención de CREE"
+      },
+      {
+      "id": 5,
+      "description": "Otro tipo de retención"
+      }
+      ]
+      }
+  </script>
+</body>
+</html>

@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" type="image/x-icon" href="https://app.pedbox.co/assets/logos/logo_blanco.png"/>
+  <title>Carrito Catalogo</title>
+
+  <!-- Fonts and icons -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <link href="/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <!-- CSS Files -->
+  <link id="pagestyle" href="/css/soft-ui-dashboard.css?v=1.0.3" rel="stylesheet" />
+  <!-- JQUERY UI -->
+  <link rel="stylesheet" href="/css/jquery-ui.min.css">
+  <!-- REPORTS CSS -->
+  <link rel="stylesheet" href="/css/reports.css">
+
+  <style>
+    .cartSuccess{
+      color: #3c763d;
+      background-color: #dff0d8;
+      border: solid 1px #d6e9c6;
+      border-radius: 1rem;
+    }
+    .choices{
+      margin: 0;
+      min-width: 150px;
+    }
+    .choices__list--dropdown {
+      z-index: 1000;
+    }
+    .choices__list--dropdown .choices__item--selectable:after {
+      display: none !important;
+    }
+    .choices__list--dropdown .choices__item--selectable {
+      padding-right: 0 !important;
+    }
+    .choices__input{
+      display: none !important;
+    }
+
+    .selectDic .choices__list--single {
+      padding-left: 75px;
+    }
+    .activeNav .icon{
+      background-image: linear-gradient(310deg ,#7928ca,#ff0080);
+      color: white !important
+    }
+    .activeNav i{
+      color: white !important
+    }
+    .activeNav a{
+      background-color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
+    }
+
+  </style>
+</head>
+
+<body class="g-sidenav-show bg-gray-100">
+
+  <!-- Menu -->
+  <%- include('./partials/menu.ejs') %> 
+
+  <main class="main-content max-height-vh-100 h-100">
+
+    <!-- Cabecera -->
+    <%- include('./partials/header.ejs') %>
+
+    <!-- Content -->
+    <div class="p-4">
+      <div class="w-100 p-3 mb-2 text-center cartSuccess">
+        <i class="fas fa-shopping-cart" style="font-size: 20px" title="Carrito de compra"></i>
+        <span id="amountProducts">0</span> Producto(s) en el carrito
+      </div>
+      <div class="w-100 card p-4 d-flex justify-content-center flex-row gap-2">
+        <button type="button" class="btn btn-primary w-20 my-0" onclick="clearCart()">Limpiar Carrito</button>
+        <div style="position: relative;" class="w-40 selectDic"> 
+          <label for="" class="m-0" style="position: absolute; top: 25%; left: 5%;">Dirección:</label>
+          <select name="" id="direction" class="form-control" style="padding-left: 24%;">
+          </select>
+        </div>
+        <div class="w-40" style="position: relative;">
+          <label for="" class="m-0" style="position: absolute; top: 25%; left: 5%;">Fecha de envío:</label>
+          <input type="date" name="" id="inputDate" class="form-control" style="padding-left: 33%;">
+        </div>
+      </div>
+
+      <div id="itemsCart"> </div>
+
+      <div>
+        <div class="card mt-2 p-3">
+          <div class="w-100 d-flex">
+            <div class="flex-fill d-flex flex-column justify-content-between" >
+              <button type="button" class="btn btn-primary my-0 w-30" onClick="javascript:window.location.href='./settings.html'">Volver al catálogo</button>
+              <div>
+                <h6>¿Quieres dejar una nota? Escribre aquí</h6>
+                <textarea name="" id="" class="form-control" style=" min-height: 35px; max-width: 50%; resize: none; border: none; border-bottom: solid 1px lightgray;" placeholder="Escribe aquí..."></textarea>
+              </div>
+            </div>
+
+            <div style="min-width: 30%; background-color: #f8f9fa; border-radius: 1rem; padding: 10px;" >
+              <div class="d-flex justify-content-between">
+                <h6>Subtotal:</h6>
+                <h6 style="color: #8392ab;" id="subTotal">$0.00</h6>
+              </div>
+              <div class="d-flex justify-content-between">
+                <h6>Descuento:</h6>
+                <h6 style="color: #8392ab;" id="totalDes">$0.00</h6>
+              </div>
+              <div class="d-flex justify-content-between">
+                <h6>IVA:</h6>
+                <h6 style="color: #8392ab;" id="totalIva">$0.0</h6>
+              </div>
+              <hr>
+              <div class="d-flex justify-content-between">
+                <h6>Total:</h6>
+                <h6 id="totalPrice">$0.0</h6>
+              </div>
+            </div>
+          </div>
+          <div class="mt-2">
+            <button class="btn btn-primary" onclick="sendCart()">Enviar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script src="/js/core/popper.min.js"></script>
+  <script src="/js/core/bootstrap.min.js"></script>
+  <script src="/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="/js/plugins/choices.min.js"></script>
+  <script src="/js/soft-ui-dashboard.min.js?v=1.0.3"></script>
+  <script src="/js/plugins/dragula/dragula.min.js"></script>
+  <script src="/js/plugins/jkanban/jkanban.js"></script>
+  <script src="/js/jquery.js"></script>
+  <script src="/js/jquery-ui.min.js"></script>
+  <script src="/js/plugins/datatables.js"></script>
+  <script src="/js/plugins/chartjs.min.js"></script>
+  <script src="/js/underscore-min.js"></script>
+  <script src="/js/helpers.js"></script>
+  <script src="/js/menu.js"></script>
+
+  <script>
+    const sendCart = () => {
+      let objt = {
+        "createMonitoring": "true",
+        "Sellers": [
+            {
+              "id_warehouse": 309,
+              "id_seller": 4852
+            }
+        ],
+        "EncQuotation": {
+            "imei": "0.0.0.0",
+            "id_company": "36",
+            "nit_customer": "C16741568",
+            "id_warehouse": "309",
+            "id_seller": "4852",
+            "id_user": "4852",
+            "longitude": "",
+            "latitude": "",
+            "state": 1,
+            "id_address": "ALMACEN CLINIC RING",
+            "amount": "1021377",
+            "note": "pedido de prueba eliminar",
+            "date": "20211210 16:00:00",
+            "date_send": "",
+            "document_ref": "",
+            "equipment": "Extranet",
+            "type": 2000,
+            "id_mobile": "",
+            "id_payment_way": "0",
+            "id_limit_time": "0",
+            "tax": "163077"
+        },
+        "DetQuotation": [ //data products
+
+        ],
+        "Monitoring": [],
+        "Parameters": {
+            "setNumQuotation": "true",
+            "sendMail": "true",
+            "createMonitoring": "true"
+        }
+      };
+
+      let localObject = JSON.parse(localStorage.getItem("storeCart"));
+      for (let i = 0; i < localObject.length; i++) {
+        objt.DetQuotation.push({
+            " id_company": "36",
+            "type": "2000",
+            "seq": "001",
+            "product": "AC23744             ",
+            "amount": "000001",
+            "price": "000342600",
+            "percentaje_tax": "65094",
+            "discount1": "0000000000",
+            "discount2": "0000000000",
+            "discount3": "0000000.00",
+            "por_desc": "0000000000",
+            "price_unit": "Und",
+            "id_warehouse": "     1",
+            "amount_unity": "000001"
+        })
+        
+      }
+      console.log(objt)
+    }
+
+    $(document).on('keyup mouseup', '.inputAmount', function(e) {       
+      let value = $(this).attr("value");  
+      let currentValue = $(this).val();        
+      
+      if (value == currentValue) {
+        console.log("Not changed");
+      } else {
+        let codigo = $(this).attr("codigo")
+        let precio = Number($(this).attr("price"));
+        let iva = (Number($(this).attr("iva")) ? Number($(this).attr("iva")) : 0) ;
+        let descuento = (Number($(this).attr("descu")) ? Number($(this).attr("descu")) : 0);
+        let total = 0;
+
+        precio = precio * currentValue;
+        iva = iva * currentValue;
+        descuento = descuento * currentValue;
+        total = (precio + iva) - descuento; 
+
+        $("#pre"+codigo).html(nvFormatCash(precio));
+        $("#pre"+codigo).attr("price", precio);
+
+        $("#des"+codigo).html(nvFormatCash(descuento));
+        $("#des"+codigo).attr("price", descuento);
+
+        $("#iva"+codigo).html(nvFormatCash(iva));
+        $("#iva"+codigo).attr("price", iva);
+
+        $("#total"+codigo).html(nvFormatCash(total));
+        $("#total"+codigo).attr("price", total);
+
+        $(this).attr("value", currentValue);
+        updateTotalCart();
+      }
+    });
+
+    const setDirections = (obj) => {
+      for (let i = 0; i < obj.address.length; i++) {
+        let element = `
+          <option value="1">${obj.address[i].address}</option>
+        `
+        $("#direction").append(element)
+      }
+      const choicesPrice = new Choices($('#direction')[0]);
+    }
+
+    const nvFormatCash = (text) => {
+      let pre = "";
+      let decimal = 2;
+      let entero = 3;
+      let sepDecimal = '.';
+      let sepEntero = ','
+  
+      if(typeof(text) == 'string') {
+        text = parseFloat(text);
+      }
+      let regex = '\\d(?=(\\d{' + (entero || 3) + '})+' + (decimal > 0 ? '\\D' : '$') + ')';
+      let number = text.toFixed(Math.max(0, ~~decimal));
+      let space = (pre != "")? " ": "";
+      return "$ "+pre + space + (sepDecimal ? number.replace('.', sepDecimal) : number).replace(new RegExp(regex, 'g'), '$&' + (sepEntero || ','));
+    };
+
+    const getLocalStorage = () => {
+      if ((localStorage.getItem("storeCart") === null)) {return}
+      
+      let localObject = JSON.parse(localStorage.getItem("storeCart"));
+      checkIVA(localObject);
+      loadProducst(localObject)
+    }
+
+    const checkIVA = (data) => {
+      for (let i = 0; i < data.length; i++) {
+
+        if (!data[i].iva) {
+          let iva = data[i].precio * 0.19;
+          data[i].iva = iva;
+        };
+      };
+      localStorage.setItem("storeCart", JSON.stringify(data))
+    };
+
+    const removeItemCart = (item) => {
+      let localObject = JSON.parse(localStorage.getItem("storeCart"));
+      let filtered = localObject.filter(function(el) { return el.codigo != item; });
+      $("#amountProducts").text(filtered.length)
+
+      if (filtered.length == 0) {
+        localStorage.removeItem('storeCart');
+      } else {
+        localStorage.setItem("storeCart", JSON.stringify(filtered));
+      }
+
+    };
+
+    // TODO
+    const clearCart = () => {
+      localStorage.removeItem('storeCart');
+      $("#amountProducts").text("0")
+
+      $(".cartItem").remove();
+      updateTotalCart();
+    }
+
+    $(document).on('click','.removeProduct',function(){
+      let codigoProduct = $(this).attr("codigo");
+      removeItemCart(codigoProduct);
+
+      $(this).parent().parent().parent().parent().parent().parent().remove()
+      updateTotalCart();
+    });
+
+    const updateTotalCart = () => {
+      let items = $(".cartItem");
+      let subTotal = 0,
+          totalDes = 0,
+          totalIva = 0,
+          totalFinalPrice = 0;
+      
+      for (let i = 0; i < items.length; i++) {
+        subTotal += Number($(items[i]).find(".priceProduct").attr("price"));
+        totalDes += Number($(items[i]).find(".descuentoProduct").attr("price"));
+        totalIva += Number($(items[i]).find(".ivaProduct").attr("price"));
+        totalFinalPrice += Number($(items[i]).find(".priceTotal").attr("price"));
+      }
+
+      $("#subTotal").text(nvFormatCash(subTotal));
+      $("#totalDes").text(nvFormatCash(totalDes))
+      $("#totalIva").text(nvFormatCash(totalIva))
+      $("#totalPrice").text(nvFormatCash(totalFinalPrice))
+    }
+
+    const loadProducst = (data) => {
+      let amount = data.length; 
+      $("#amountProducts").text(amount)
+
+      let subTotal = 0;
+      let totalDes = 0;
+      let totalIva = 0;
+      let totalPrice = 0;
+
+      console.log(data)
+
+      for (let i = 0; i < data.length; i++) {
+        let cant = (data[i].qty ? data[i].qty : data[i].cantidad);
+        
+        let precio = (data[i].precio ? data[i].precio : 0);
+        precio = precio * Number(cant);
+
+        let descuento = (data[i].descuento ? data[i].descuento : 0);
+        descuento = descuento * Number(cant);
+
+        let iva = (data[i].iva ? data[i].iva : 0);
+        iva = iva * Number(cant);
+
+        let total = precio + iva - descuento;
+        
+        subTotal += precio;
+        totalDes += descuento;
+        totalIva += iva;
+        totalPrice = subTotal + totalIva - descuento;
+        
+        let element = `
+          <div class="card cartItem mt-2 p-3 ">
+            <div class="w-100">
+              <div class="d-flex ">
+                <div class="d-flex" style="min-width: 70%;">
+                  <div style="width: 200px; height: 200px;" >
+                    <img src="${(data[i].imagen.image ? data[i].imagen.image : data[i].imagen )}" alt="" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/d/da/Imagen_no_disponible.svg'" alt="" style="max-height: 100%; max-width: 100%">
+                  </div>
+                  <div class="px-3 w-100">
+                    <h6> ${data[i].descripcion}</h6>
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                      <button type="button" class="btn btn-primary my-0 removeProduct" codigo="${data[i].codigo}">Eliminar del carrito</button>
+                      <div style="position: relative;">
+                        <label for="" class="m-0" style="position: absolute; top: 25%; left: 5%;">Cant:</label>
+                        <input value="${(cant)}" price="${data[i].precio}" iva="${data[i].iva ? data[i].iva : 0}" descu="${(data[i].descuento ? data[i].descuento : 0)}"  codigo="${data[i].codigo}" type="number" name="" id="" min="1" class="form-control inputAmount" style="padding-left: 30%;">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div style="min-width: 30%; background-color: #f8f9fa; border-radius: 1rem; padding: 10px;" >
+                  <div class="d-flex justify-content-between">
+                    <h6>Subtotal:</h6>
+                    <h6 class="priceProduct" style="color: #8392ab;" id="pre${data[i].codigo}" price="${precio}">${nvFormatCash(precio)}</h6>
+                  </div>
+                  <div class="d-flex justify-content-between">
+                    <h6>Descuento:</h6>
+                    <h6 class="descuentoProduct" style="color: #8392ab;" id="des${data[i].codigo}" price="${descuento}">${nvFormatCash(descuento)}</h6>
+                  </div>
+                  <div class="d-flex justify-content-between">
+                    <h6>IVA:</h6>
+                    <h6 class="ivaProduct" style="color: #8392ab;" id="iva${data[i].codigo}" price="${iva}">${nvFormatCash(iva)}</h6>
+                  </div>
+                  <hr>
+                  <div class="d-flex justify-content-between">
+                    <h6>Total:</h6>
+                    <h6 class="priceTotal" price="${total}" id="total${data[i].codigo}">${nvFormatCash(total)}</h6>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        $("#itemsCart").append(element)
+      };
+
+      subTotal = nvFormatCash(subTotal)
+      totalDes = nvFormatCash(totalDes)
+      totalIva = nvFormatCash(totalIva)
+      totalPrice = nvFormatCash(totalPrice)
+
+      $("#subTotal").text(subTotal);
+      $("#totalDes").text(totalDes)
+      $("#totalIva").text(totalIva)
+      $("#totalPrice").text(totalPrice)
+    }
+
+    // Correct time zone support
+    Date.prototype.toDateInputValue = (function() {
+      var local = new Date(this);
+      local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+      return local.toJSON().slice(0,10);
+    });
+
+    $( document ).ready(function() {
+      setDirections(objDirecciones)
+      getLocalStorage();
+      $('#inputDate').val(new Date().toDateInputValue());
+    });
+
+    var objDirecciones = { //Este objeto con las direcciones viene del servicio. Pendiente de organizar a la hora de integrar
+      "seller": [
+        {
+          "nit": "56",
+          "user": "i56",
+          "id_warehouse": 309,
+          "list": 4,
+          "id_seller": 4852
+        }
+      ],
+      "address": [
+        {
+          "code": "ALMACEN CLINIC RING",
+          "address": "CL 21 NO 11 D-09"
+        },
+        {
+          "code": "ALMACEN CLINIC RIN",
+          "address": "CR 15 12 39"
+        },
+        {
+          "code": "SUCURSAL CHAPINERO",
+          "address": "CR 15 41 05"
+        }
+      ]
+    }
+
+    
+  </script>
+
+</body>
+
+</html>

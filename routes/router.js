@@ -22,6 +22,14 @@ router.get('/catalogo/productos', viewController.catalogoProductos);
 router.get('/catalogo/top', viewController.catalogoTop);
 router.get('/certificados', viewController.certificados);
 
+// Por integrar
+router.get('/retenciones', viewController.retenciones);
+router.get('/usuarios', viewController.usuarios);
+router.get('/facturas', viewController.facturas);
+router.get('/carrito-facturas', viewController.carritoFacturas);
+router.get('/carrito-compras', viewController.carritoCompras);
+
+
 
 /* POST Services */
 router.post('/login', viewController.loginValidate);
