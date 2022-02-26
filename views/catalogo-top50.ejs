@@ -364,9 +364,7 @@
   
   <script>
     let productos = `<%- JSON.stringify(productos) %>`;
-    productos = JSON.parse(productos);
-    console.log(productos)
-
+        productos = JSON.parse(productos);
 
     const loadTable = (body) => {
       $("#tableContainer").html("");
@@ -768,6 +766,8 @@
       printPaginator();
       selectView(0, 8)
       setCartIconAmount();
+
+      $("#menuCatalogoTop").addClass("activeNav")
     });
 
   </script>

@@ -1,18 +1,18 @@
 // *** Menu and header functions
 // Controlar color del menu
 const loadColorsBrand = function (data) {
-  $(".menuHeader").css("background-color", data.color1);
-  $(".menuBody").css("background-color", data.color2);
-  $(".menuBody").find("h6").attr("style", "color:" + data.color4);
-  $(".menuBody").find(".nav-link-text").attr("style", "color:" + data.color4);
-  $(".menuBody").find(".activeNav ").find(".icon-shape").attr("style", "background-color:"+data.color3+" !important; background-image:none");
-  $(".menuBody .activeNav a").css("background-color", "transparent");
+  // $(".menuHeader").css("background-color", data.color1);
+  // $(".menuBody").css("background-color", data.color2);
+  // $(".menuBody").find("h6").attr("style", "color:" + data.color4);
+  // $(".menuBody").find(".nav-link-text").attr("style", "color:" + data.color4);
+  // $(".menuBody").find(".activeNav ").find(".icon-shape").attr("style", "background-color:"+data.color3+" !important; background-image:none");
+  // $(".menuBody .activeNav a").css("background-color", "transparent");
 
   $("#imgMenuHeadSmall")
   $("#imgMenuHead")
   $("#imgMenuUser")
   $("#menuUserName")
-  $("#menuCompanyName")
+  $("#menuCompanyName").text(data.company);
 };
 
 // Escondear imagen usuario cuando el menu esta collapsado
@@ -204,4 +204,4 @@ let objSession = {
   "token": ""
 }
 
-loadColorsBrand(objSession.user[0].dataCompany[0].colors);
+// loadColorsBrand(session.user);

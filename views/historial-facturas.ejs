@@ -1,3 +1,7 @@
+<!-- TODO:
+  -Permisos 
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -140,8 +144,8 @@
         try {
           for(let i = 0; i < body.length; i++){
             let pdf;
-            if (canSeePdf) {pdf = `<a onclick="openModalPdf('${pdfLink}')" href="#"> <i class="fas fa-file-pdf me-1"></i> PDF <br> ${body[i].Numero_Documento}</a>`} 
-            else {pdf = `<a href="${body[i].Url_fe}" target="_blank"> <i class="fas fa-file-pdf me-1"></i> PDF <br> ${body[i].Numero_Documento} </a>`}
+            if (canSeePdf) {pdf = `<a onclick="openModalPdf('${pdfLink}')" href="#"> <i class="fas fa-file-pdf me-1"></i>  <br> ${body[i].Numero_Documento}</a>`} 
+            else {pdf = `<a href="${body[i].Url_fe}" target="_blank"> <i class="fas fa-file-pdf me-1"></i>  <br> ${body[i].Numero_Documento} </a>`}
   
             tableContent+= '<tr >';
             tableContent+= `<td class="text-center" style="cursor: pointer">${pdf} </td>`;
@@ -233,6 +237,8 @@
     $( document ).ready(function() {
       loadCartera(facturas.Table[0]);
       loadTable("tablaFacturas", facturas.Table1);
+      
+      $("#menuHistorialDocumentos").addClass("activeNav")
     });
   </script>
   

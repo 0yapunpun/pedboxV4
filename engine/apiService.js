@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const { sendCarritoCompras } = require('../controller/viewController');
 const { showLog } = require('./helpers');
 const service = {};
 const urlPedbox = 'http://api.pedbox.co:5037/';
@@ -89,6 +90,7 @@ service.informacionVendedor = async(id_person) =>{
   const data =  await makeRequest(url);
   return data;
 }
+
 service.getRetenciones = async(id_company, id_country) =>{
   const url = urlKakashi+'retentions?id_company='+id_company+'&id_country='+id_country;
   const data =  await makeRequest(url);
@@ -131,6 +133,17 @@ service.userUpdate = async(body) =>{
   return data;
 }
 
+service.sendCarritoCompras = async(body) =>{
+  const url = urlPedbox1+'documentos';
+  const data =  await makeRequest(url, options('POST', body));
+  return data;
+}
+
+service.sendCarritoFacturas = async(body) =>{
+  const url = urlKakashi+'start-payment';
+  const data =  await makeRequest(url, options('POST', body));
+  return data;
+}
 
 const makeRequest = async (url, options) => {
   try {

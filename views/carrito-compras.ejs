@@ -1,5 +1,5 @@
 <!-- TODO:
-  -Armado objeto enviar pedido
+  -Prueba de pedido real
 -->
 
 <!DOCTYPE html>
@@ -102,10 +102,10 @@
         <div class="card mt-2 p-3">
           <div class="w-100 d-flex">
             <div class="flex-fill d-flex flex-column justify-content-between" >
-              <button type="button" class="btn btn-primary my-0 w-30" onClick="javascript:window.location.href='./settings.html'">Volver al catálogo</button>
+              <button type="button" class="btn btn-primary my-0 w-30" onClick="javascript:window.location.href='/catalogo'">Volver al catálogo</button>
               <div>
                 <h6>¿Quieres dejar una nota? Escribre aquí</h6>
-                <textarea name="" id="" class="form-control" style=" min-height: 35px; max-width: 50%; resize: none; border: none; border-bottom: solid 1px lightgray;" placeholder="Escribe aquí..."></textarea>
+                <textarea name="" id="pNota" class="form-control" style=" min-height: 35px; max-width: 50%; resize: none; border: none; border-bottom: solid 1px lightgray;" placeholder="Escribe aquí..."></textarea>
               </div>
             </div>
 
@@ -130,7 +130,7 @@
             </div>
           </div>
           <div class="mt-2">
-            <button class="btn btn-primary" onclick="sendCart()">Enviar</button>
+            <button class="btn btn-primary" onclick="onPay()">Pagar</button>
           </div>
         </div>
       </div>
@@ -151,87 +151,32 @@
   <script src="/js/plugins/datatables.js"></script>
   <script src="/js/plugins/chartjs.min.js"></script>
   <script src="/js/underscore-min.js"></script>
+  <script src="/js/sweetalert2.all.min.js"></script>
   <script src="/js/helpers.js"></script>
   <script src="/js/menu.js"></script>
 
   <script>
     let address = `<%- JSON.stringify(address) %>`;
         address = JSON.parse(address);
-    console.log(address)
+    let session = `<%- JSON.stringify(session) %>`;
+        session = JSON.parse(session).user;
+    let seller = address.result.result.seller[0];
 
+    let finalValues = {
+      total : 0,
+      ivaTotal : 0,
+      descuenTotal : 0,
+      subTotal : 0
+    };
+    const IVA = 0.19;
 
-    const sendCart = () => {
-      let objt = {
-        "createMonitoring": "true",
-        "Sellers": [
-            {
-              "id_warehouse": 309,
-              "id_seller": 4852
-            }
-        ],
-        "EncQuotation": {
-            "imei": "0.0.0.0",
-            "id_company": "36",
-            "nit_customer": "C16741568",
-            "id_warehouse": "309",
-            "id_seller": "4852",
-            "id_user": "4852",
-            "longitude": "",
-            "latitude": "",
-            "state": 1,
-            "id_address": "ALMACEN CLINIC RING",
-            "amount": "1021377",
-            "note": "pedido de prueba eliminar",
-            "date": "20211210 16:00:00",
-            "date_send": "",
-            "document_ref": "",
-            "equipment": "Extranet",
-            "type": 2000,
-            "id_mobile": "",
-            "id_payment_way": "0",
-            "id_limit_time": "0",
-            "tax": "163077"
-        },
-        "DetQuotation": [ //data products
-
-        ],
-        "Monitoring": [],
-        "Parameters": {
-            "setNumQuotation": "true",
-            "sendMail": "true",
-            "createMonitoring": "true"
-        }
-      };
-
-      let localObject = JSON.parse(localStorage.getItem("storeCart"));
-      for (let i = 0; i < localObject.length; i++) {
-        objt.DetQuotation.push({
-            " id_company": "36",
-            "type": "2000",
-            "seq": "001",
-            "product": "AC23744             ",
-            "amount": "000001",
-            "price": "000342600",
-            "percentaje_tax": "65094",
-            "discount1": "0000000000",
-            "discount2": "0000000000",
-            "discount3": "0000000.00",
-            "por_desc": "0000000000",
-            "price_unit": "Und",
-            "id_warehouse": "     1",
-            "amount_unity": "000001"
-        })
-        
-      }
-      console.log(objt)
-    }
 
     $(document).on('keyup mouseup', '.inputAmount', function(e) {       
       let value = $(this).attr("value");  
       let currentValue = $(this).val();        
       
       if (value == currentValue) {
-        console.log("Not changed");
+        console.log("Amount didn't change");
       } else {
         let codigo = $(this).attr("codigo")
         let precio = Number($(this).attr("price"));
@@ -258,13 +203,23 @@
 
         $(this).attr("value", currentValue);
         updateTotalCart();
+
+        // Update cart item amount
+        let items = JSON.parse(localStorage.getItem("storeCart"));
+        console.log(items)
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].codigo == codigo) {
+            items[i].qty = currentValue;
+          }
+        };
+        localStorage.setItem("storeCart", JSON.stringify(items));
       }
     });
 
-    const setDirections = (obj) => {
+    const setAddress = (obj) => {
       for (let i = 0; i < obj.address.length; i++) {
         let element = `
-          <option value="1">${obj.address[i].address}</option>
+          <option value="${obj.address[i].code}">${obj.address[i].address}</option>
         `
         $("#direction").append(element)
       }
@@ -281,7 +236,6 @@
 
     const checkIVA = (data) => {
       for (let i = 0; i < data.length; i++) {
-
         if (!data[i].iva) {
           let iva = data[i].precio * 0.19;
           data[i].iva = iva;
@@ -300,7 +254,6 @@
       } else {
         localStorage.setItem("storeCart", JSON.stringify(filtered));
       }
-
     };
 
     const clearCart = () => {
@@ -333,6 +286,11 @@
         totalFinalPrice += Number($(items[i]).find(".priceTotal").attr("price"));
       }
 
+      finalValues.total = totalFinalPrice;
+      finalValues.ivaTotal = totalIva;
+      finalValues.descuenTotal = totalDes;
+      finalValues.subTotal = subTotal;
+
       $("#subTotal").text(nvFormatCash(subTotal));
       $("#totalDes").text(nvFormatCash(totalDes))
       $("#totalIva").text(nvFormatCash(totalIva))
@@ -347,8 +305,6 @@
       let totalDes = 0;
       let totalIva = 0;
       let totalPrice = 0;
-
-      console.log(data)
 
       for (let i = 0; i < data.length; i++) {
         let cant = (data[i].qty ? data[i].qty : data[i].cantidad);
@@ -433,14 +389,95 @@
       return local.toJSON().slice(0,10);
     });
 
+    const onPay = () => {
+      let device = { "ip": '0.0.0.0' };
+      if (!seller['id_warehouse'] || !seller['id_seller']) {
+        Swal.fire({
+          title: "¡Revisar configuración!",
+          text: "Usted no tiene vendedor asociado. \Contacta a tú proveedor.",
+          icon: "info",
+          button: "Cerrar"
+        });
+        return
+      }
+
+      let hasPermissions = false;
+      session.permission.forEach(permission => {
+        if(permission.code == '8020_VIEW_PRICE' || permission.code == '8060_SEND_ORDER_SELLER'){
+          hasPermissions = true;
+        }
+      });
+
+      if (hasPermissions) {
+        sendToAPI(device);
+      } else {
+        sendToPedbox(device);
+      };
+    };
+
+    async function sendToPedbox(device){
+      updateTotalCart(); // Recalc total values
+      let items = JSON.parse(localStorage.getItem("storeCart"));
+
+      let data = {
+        pbodega: seller['id_warehouse'].toString(),
+        pnit: session.nit.toString(),
+        pvendedor: session.permission.find(a => a.content == '8050_SELLER_ORDER') || seller['nit'].toString() || seller['id_seller'].toString(),
+        pfecha: '',
+        pcondicion: '0',
+        pdias: '0',
+        pdescuento: finalValues.descuenTotal.toString(),
+        ptotal: Math.round(finalValues.total).toString(),
+        pnota: $("#pNota").val().trim(),   
+        pequipo: 'Extranet',
+        pitems: items.map((a, i) => {
+          return addCharacter(i + 1, 3, "0") +
+          addCharacter(a['codigo'], 20, " ", 'right') +
+          addCharacter(a['qty'], 6, "0") +
+          addCharacter(parseFloat(a['precio']).toFixed(0), 9, "0") +
+          addCharacter((IVA * 100), 3, "0") +
+          addCharacter(parseFloat(a['por_desc'] || "0").toFixed(0), 10, "0") +
+          addCharacter("", 10, "0") +
+          addCharacter("0.00", 10, "0") +
+          addCharacter('0' || '0', 10, "0") +
+          addCharacter("Und", 3, "0") +
+          addCharacter(a['bodega'] || "", 6, " ") +
+          addCharacter("1", 6, "0")
+        }).join("|"),
+        plongitud: "",
+        platitud: "",
+        pempresa: session.id_company.toString(),
+        pimei: device.ip,
+        pusuario: 'MMORRIS', 
+        pfechadespacho: "",
+        ptipo: "1",
+        popt2: "0",
+        op: "pedido",
+        pdireccion: $('#direction option:selected').val(),
+        popt1: $('#direction option:selected').text(),
+        pdocumento: ""
+      };
+
+      fetch("/carrito-compras", {
+        method:"POST",
+        body: JSON.stringify(data),
+        headers: {"Content-type": "application/json"}
+      })
+      .then(res => res.json())
+      .then(res => {
+        console.log(res)
+        // TODO: eliminar local storage despues del envio
+      })
+    }
+
     $( document ).ready(function() {
-      setDirections(address.result.result)
+      setAddress(address.result.result)
       getLocalStorage();
       $('#inputDate').val(new Date().toDateInputValue());
+
+      $("#menuCarritoCompras").addClass("activeNav")
     });
 
   </script>
-
 </body>
-
 </html>

@@ -11,7 +11,7 @@ controller.login = async(req, res, next) => {
 controller.loginValidate = async(req, res, next) => {
   const resp = await userController.login(req.body);
   if (resp.result=='ok') {
-    console.log(resp)
+    // console.log(resp)
     req.session.login = true;
     req.session.urlSocket = resp.urlSocket;
     req.session.user = resp.user;
@@ -23,8 +23,8 @@ controller.loginValidate = async(req, res, next) => {
 
 controller.logout = (req, res) => {
   req.session.destroy((err) => {
-      if(err) return console.error(err);
-      res.redirect('/login'); return;
+    if(err) return console.error(err);
+    res.redirect('/login'); return;
   });
 }
 
@@ -107,11 +107,14 @@ controller.historialPedidos = async (req, res, next) => {
   let url_company = req.session.user.dataCompany[0].Url;
   let id_company = req.session.user.id_company;
   let nit = req.session.user.nit;
+  let id_person = req.session.user.id_person;
 
   let facturas = await service.historialFacturas(url_company, nit, id_company);
-  let pedidos = await service.historialPedidos(url_company, nit, id_company)
+  let pedidos = await service.historialPedidos(url_company, nit, id_company);
+  let vendedor = await service.informacionVendedor(id_person);
 
-  res.render('historial-pedidos', {'session': req.session, 'facturas': facturas, 'pedidos': pedidos});
+
+  res.render('historial-pedidos', {'session': req.session, 'vendedor': vendedor, 'facturas': facturas, 'pedidos': pedidos});
 }
 
 controller.historialPedidosDetalle = async (req, res, next) => {
@@ -142,6 +145,12 @@ controller.historialPedidosDetalle = async (req, res, next) => {
     });
   }
   res.send({'detalle': itemsDetail});
+}
+
+controller.historialPedidosPedido = async (req, res, next) => {
+  let body = req.body;
+  let response = await service.sendCarritoCompras(body);
+  res.send({"response": response})
 }
 
 controller.nuevoPedido = async (req, res, next) => {
@@ -219,29 +228,33 @@ controller.catalogoTop = async (req, res, next) => {
   let items = productos.result.extranet.Table;
   images = images.result.data;
 
-  items.forEach(item => {
-    item.qty = 1;
-    let imagen = images.find(a => a.code === item.codigo);
-    item.imagen = (imagen != undefined) ? imagen.image : null;
-    item.format_precio = nvFormatCash(item.precio, '$', 0)
-  });
-  for(let item of items) {
-    ['marca', 'modelo', 'categoria_x002F_parte', 'fabricante'].forEach((v) => {
-      item[v] = item[v] || '';
+  try {
+    items.forEach(item => {
+      item.qty = 1;
+      let imagen = images.find(a => a.code === item.codigo);
+      item.imagen = (imagen != undefined) ? imagen.image : null;
+      item.format_precio = nvFormatCash(item.precio, '$', 0)
     });
-    item['stock'] = 0;
-    if (item['Medellin']) {
-      [
-        'Medellin', 'Bogota', 'Barranquilla', 'Cali', 'Cali_x0020_Salonia',
-        'Medellin_x0020_transito', 'Bogota_x0020_transito',
-        'Barranquilla_x0020_transito', 'Preguntar_x0020_Disponibilidad'
-      ].forEach((v) => {
-        item[v] = parseInt(item[v] || '0');
-        item['stock'] += parseInt(item['cantidad']);
+    for(let item of items) {
+      ['marca', 'modelo', 'categoria_x002F_parte', 'fabricante'].forEach((v) => {
+        item[v] = item[v] || '';
       });
-    } else {
-      item['stock'] = parseInt(item['cantidad']);
+      item['stock'] = 0;
+      if (item['Medellin']) {
+        [
+          'Medellin', 'Bogota', 'Barranquilla', 'Cali', 'Cali_x0020_Salonia',
+          'Medellin_x0020_transito', 'Bogota_x0020_transito',
+          'Barranquilla_x0020_transito', 'Preguntar_x0020_Disponibilidad'
+        ].forEach((v) => {
+          item[v] = parseInt(item[v] || '0');
+          item['stock'] += parseInt(item['cantidad']);
+        });
+      } else {
+        item['stock'] = parseInt(item['cantidad']);
+      }
     }
+  } catch (error) {
+    items = [];
   }
   res.render('catalogo-top50', {'session': req.session, 'productos': items});
 }
@@ -303,8 +316,6 @@ controller.password = async(req, res, next) => {
     user: user
   }
 
-  console.log(body)
-
   let response = await service.updatePassword(body);
   
   res.send({"response": response})
@@ -327,12 +338,29 @@ controller.carritoCompras = async(req, res, next) => {
   res.render('carrito-compras', {'session': req.session, "address": address});
 }
 
+controller.sendCarritoCompras = async(req, res, next) => {
+  let data = req.body;
+  let response = await service.sendCarritoCompras(data);
+  res.send({"response": response})
+}
+
+controller.sendCarritoFacturas = async(req, res, next) => {
+  let data = req.body;
+  let response = await service.sendCarritoFacturas(data);
+  res.send({"response": response})
+}
+
 // Pendientes
 controller.carritoFacturas = async(req, res, next) => {
   // Validar login
   if (!req.session.login) { return res.redirect('/login'); }
-  
-  res.render('carrito-facturas', {'session': req.session});
+
+  let id_company = req.session.user.id_company;
+  let id_country = req.session.user.id_country;
+
+  let retenciones = await service.getRetenciones(id_company, id_country);
+   
+  res.render('carrito-facturas', {'session': req.session, "retenciones": retenciones});
 }
 
 

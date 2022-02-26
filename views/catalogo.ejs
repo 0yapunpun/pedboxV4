@@ -1,6 +1,7 @@
 <!-- TODO:
   - Quitar filtros al hacer click en la card (no solo en la x)
   - Añadir preloader (al boton para mostrar vista en tabla)
+  - Enrutar boton ir al carrito de la ventana flotante, cerrar ventana cuando se hace click fuera de ella, fixed positioned
 -->
 
 <!DOCTYPE html>
@@ -1127,7 +1128,8 @@
         } else {
           getProductsData();
         }
-      })
+      });
+      $("#menuCatalogo").addClass("activeNav")
     });
   </script>
 

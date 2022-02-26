@@ -2,6 +2,7 @@ const server = 'https://api.pedbox.co:8590/';
 const urlSocket = localStorage.getItem('urlSocket');
 const nameSpace = localStorage.getItem('namespace');
 var loginActive = false;
+let ipAddress;
 
 if(!_.isNull(nameSpace) && !_.isNull(urlSocket)) {
   window.location.href = 'chat.html';
@@ -20,6 +21,7 @@ $('#pass').on('keypress',function(e) {
 });
 
 const login = () => {
+  $.getJSON("https://api.ipify.org/?format=json", (resultIpify) => {ipAddress = resultIpify.ip});
   const user = $('#user').val();
   const pass = $('#pass').val();
 
@@ -31,7 +33,7 @@ const login = () => {
 
       $.ajax({
         type: 'POST',
-        data: {"user": user, "password": pass, "mobile": false},
+        data: {"user": user, "password": pass, "ipAddress": ipAddress, "remember": undefined},
         error: (request, status, error) => {
           showError();
           $('#btn-loading').hide();

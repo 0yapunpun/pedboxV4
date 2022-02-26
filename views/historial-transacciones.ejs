@@ -43,6 +43,9 @@
             <thead id="tableHead"></thead>
             <tbody id="tableBody"></tbody>
           </table>
+          <div style="text-align: center; display: none;" id="emptyResponse">
+            <span >Sin historial de transacciones</span>
+          </div>
         </div>
       </div>
     </div>
@@ -93,7 +96,13 @@
     }
 
     $(document).ready(function () {
-      printTable(historial.data)
+      try {
+        printTable(historial.data)
+      } catch (error) {
+        $("#emptyResponse").show();
+      }
+      
+      $("#menuHistorialTransacciones").addClass("activeNav")
     });
   </script>
 

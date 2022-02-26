@@ -103,3 +103,18 @@ const hideCards = () => {
     localStorage.setItem("carteraIsVisible", true);
   }
 };
+
+// Armado para envio de pedidos
+const addCharacter = (n, length, character, position) => {
+  character = character || "0";
+  position = position || "left";
+  n = n.toString();
+  while(n.length < length){
+    if(position != "left"){
+      n =  n + character;
+    }else{
+      n = character + n;
+    }
+  }
+  return n;
+}

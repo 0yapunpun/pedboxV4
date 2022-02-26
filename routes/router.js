@@ -12,6 +12,7 @@ router.get('/calidosos', viewController.calidosos);
 router.get('/historial-transacciones', viewController.historialTransacciones);
 router.get('/historial-facturas', viewController.historialFacturas);
 router.get('/historial-pedidos', viewController.historialPedidos);
+router.post('/historial-pedidos', viewController.historialPedidosPedido);
 router.get('/historial-pedidos/:numero', viewController.historialPedidosDetalle);
 router.get('/nuevo-pedido/:codigo', viewController.nuevoPedido);
 router.get('/infoVendedor/:id', viewController.getInfoVendedor);
@@ -27,10 +28,12 @@ router.post('/usuarios/updatePassword', viewController.password);
 router.post('/usuarios/updateUser', viewController.updateUser);
 router.get('/facturas', viewController.facturas);
 
+router.get('/carrito-compras', viewController.carritoCompras);
+router.post('/carrito-compras', viewController.sendCarritoCompras);
+router.get('/carrito-facturas', viewController.carritoFacturas);
+router.post('/carrito-facturas', viewController.sendCarritoFacturas);
 
 // Por integrar
-router.get('/carrito-facturas', viewController.carritoFacturas);
-router.get('/carrito-compras', viewController.carritoCompras);
 router.get('/helpdesk', viewController.helpdesk);
 router.get('/crm', viewController.crm);
 

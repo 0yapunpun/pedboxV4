@@ -1,3 +1,7 @@
+<!-- TODO:
+  -Agregar boton de eliminar factura
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -124,7 +128,7 @@
           </div>
         </div>
         <div class="text-center mt-5">
-          <button class="btn btn-primary">Enviar</button>
+          <button class="btn btn-primary" onclick="onPay()">Pagar</button>
         </div>
       </div>
     </div>
@@ -144,10 +148,17 @@
   <script src="/js/plugins/datatables.js"></script>
   <script src="/js/plugins/chartjs.min.js"></script>
   <script src="/js/underscore-min.js"></script>
+  <script src="/js/sweetalert2.all.min.js"></script>
   <script src="/js/helpers.js"></script>
   <script src="/js/menu.js"></script>
 
   <script>
+    let retencionData = `<%- JSON.stringify(retenciones) %>`;
+        retencionData = JSON.parse(retencionData).result.data;
+    let session = `<%- JSON.stringify(session) %>`;
+        session = JSON.parse(session);
+    console.log(session)
+
     const loadProdutcs = (data) => {
       for (let i = 0; i < data.length; i++) {
         let saldo = data[i].Valor_Saldo - data[i].Valor_Saldo;
@@ -189,7 +200,9 @@
               </div>
             </td>
             <td style="font-size:13px" class="text-center p-2 retentionTd" style="width: 13%;"><div onclick="addRetentionField(this)" class="cursorPointer"><i class="fas fa-plus me-1"></i>Agregar</div></td>
-            <td style="font-size:13px" class="p-2"><input type="number" class="form-control vAbono" name="" id="" min="0" max="${data[i].Valor_Saldo}" value="${data[i].Valor_Saldo}" originalValue="${data[i].Valor_Saldo}"></td>
+            <td style="font-size:13px" class="p-2">
+              <input type="number" class="form-control vAbono" name="" id="" min="0" max="${data[i].Valor_Saldo}" value="${data[i].Valor_Saldo}" originalValue="${data[i].Valor_Saldo}">
+            </td>
             <td style="font-size:13px" class="vSaldo p-2" value="${saldo}">$${saldo}</td>
             <td style="font-size:13px; border-top-right-radius: 1rem; border-bottom-right-radius: 1rem" class="p-2"><div onclick="resetRow(this)" class="cursorPointer"><i class="fas fa-redo"></div></i></td>
           </tr>
@@ -283,7 +296,6 @@
       }
 
       $("#retentionListContainer").html("");
-     
       for (let i = 0; i < retentionList.length; i++) {
         let value = (retentionList[i].totalRetentionRow ? numberWithCommas(retentionList[i].totalRetentionRow ) : "0")
         let element = `
@@ -300,7 +312,6 @@
       let currentAbono = $(abono).attr("originalValue");
       let retencion = $(abono).parent().siblings(".retentionTd").attr("value");
       let newAbono = currentAbono - retencion;
-
 
       $(abono).val(newAbono);
       $(abono).attr("value", newAbono);
@@ -387,258 +398,58 @@
 
     const getLocalStorage = () => {
       if ((localStorage.getItem("storeInvoice") === null)) {return}
-      
       let localObject = JSON.parse(localStorage.getItem("storeInvoice"));
-      console.log(localObject)
       loadProdutcs(localObject)
+    }
+
+    const onPay = () => {
+      let pagoMinimo = 0; // De donde sale este valor
+      let abonoTotal = 0;
+      let abonosField = $(".vAbono");
+      for (let i = 0; i < abonosField.length; i++) {
+        abonoTotal += Number($(abonosField[i]).val())
+      }
+
+      if ((pagoMinimo != 0 && abonoTotal >= pagoMinimo) || (pagoMinimo == 0)) {
+        let rows = $("#tableBody tr");
+        let dataFacturas = [];
+        for (let i = 0; i < rows.length; i++) {
+          dataFacturas.push({
+            "invoice": $(rows[i]).find(".ref").attr("facturaref"),
+            "total": $(rows[i]).find(".vAbono").val()
+          })  
+        }
+        let data = {
+          "nit_customer": session.user.nit,
+          "id_company": session.user.id_company,
+          "invoices": dataFacturas
+        };
+
+        fetch("/carrito-compras", {
+        method:"POST",
+        body: JSON.stringify(data),
+        headers: {"Content-type": "application/json"}
+        })
+        .then(res => res.json())
+        .then(res => {
+          console.log(res)
+          // TODO: eliminar local storage despues del envio
+        })
+      } else {
+        Swal.fire({
+          title: "¡No se pudo completar el pago!",
+          text: "El pago mínimo permitido es aaaaaaaaaaaa",
+          icon: "info",
+          button: "Cerrar"
+        });
+      }
     }
 
     $(document).ready(function () {
       getLocalStorage();
+      $("#menuCarritoFacturas").addClass("activeNav")
     })
-
-    let retencionData = {
-      "retention": [
-      {
-      "id": 2,
-      "standard": 1,
-      "id_company": 15,
-      "account": "",
-      "status": 1,
-      "name": "Arrendamiento de bienes raíces",
-      "percentage": 3.5,
-      "id_retention_type": 2,
-      "retention_type_description": "Retención en la fuente",
-      "description": "Retención aplicada a pagos de arrendamiento de bienes raíces"
-      },
-      {
-      "id": 3,
-      "standard": 1,
-      "id_company": 15,
-      "account": "",
-      "status": 1,
-      "name": "Compras",
-      "percentage": 2.5,
-      "id_retention_type": 2,
-      "retention_type_description": "Retención en la fuente",
-      "description": "Retención aplicada a compras declarantes"
-      },
-      {
-      "id": 4,
-      "standard": 1,
-      "id_company": 15,
-      "account": "",
-      "status": 1,
-      "name": "Compras",
-      "percentage": 3.5,
-      "id_retention_type": 2,
-      "retention_type_description": "Retención en la fuente",
-      "description": "Retención aplicada a compras no declarantes"
-      },
-      {
-      "id": 5,
-      "standard": 1,
-      "id_company": 15,
-      "account": "",
-      "status": 1,
-      "name": "Horarios y comisiones",
-      "percentage": 10,
-      "id_retention_type": 2,
-      "retention_type_description": "Retención en la fuente",
-      "description": "Retención aplicada a personas naturales"
-      },
-      {
-      "id": 6,
-      "standard": 1,
-      "id_company": 15,
-      "account": "",
-      "status": 1,
-      "name": "Horarios y comisiones",
-      "percentage": 11,
-      "id_retention_type": 2,
-      "retention_type_description": "Retención en la fuente",
-      "description": "Retención aplicada a personas jurídicas"
-      },
-      {
-      "id": 7,
-      "standard": 1,
-      "id_company": 15,
-      "account": "",
-      "status": 1,
-      "name": "Servicios de aseo y vigilancia",
-      "percentage": 2,
-      "id_retention_type": 2,
-      "retention_type_description": "Retención en la fuente",
-      "description": "Retención aplicada a pagos de servicios en aseo y/o vigilancia"
-      },
-      {
-      "id": 8,
-      "standard": 1,
-      "id_company": 15,
-      "account": "",
-      "status": 1,
-      "name": "Servicios de hoteles y restaurantes",
-      "percentage": 3.5,
-      "id_retention_type": 2,
-      "retention_type_description": "Retención en la fuente",
-      "description": "Retención aplicada por servicios de hoteles, restaurantes y hospedaje"
-      },
-      {
-      "id": 9,
-      "standard": 1,
-      "id_company": 15,
-      "account": "",
-      "status": 1,
-      "name": "Servicios en general",
-      "percentage": 4,
-      "id_retention_type": 2,
-      "retention_type_description": "Retención en la fuente",
-      "description": "Retención aplicada a pagos de personas declarantes"
-      },
-      {
-      "id": 10,
-      "standard": 1,
-      "id_company": 15,
-      "account": "",
-      "status": 1,
-      "name": "Servicios en general",
-      "percentage": 6,
-      "id_retention_type": 2,
-      "retention_type_description": "Retención en la fuente",
-      "description": "Retención aplicada a pagos de personas no declarantes"
-      },
-      {
-      "id": 11,
-      "standard": 1,
-      "id_company": 15,
-      "account": "",
-      "status": 1,
-      "name": "ReteICA",
-      "percentage": 0,
-      "id_retention_type": 3,
-      "retention_type_description": "Retención de Industria y Comercio",
-      "description": "Retención de industria y comercio"
-      },
-      {
-      "id": 12,
-      "standard": 1,
-      "id_company": 15,
-      "account": "",
-      "status": 1,
-      "name": "ReteIVA",
-      "percentage": 15,
-      "id_retention_type": 1,
-      "retention_type_description": "Retención de IVA",
-      "description": "Retención sobre el total del IVA asociado a una factura"
-      },
-      {
-      "id": 13,
-      "standard": 1,
-      "id_company": 15,
-      "account": "",
-      "status": 1,
-      "name": "ReteCREE",
-      "percentage": 0.4,
-      "id_retention_type": 4,
-      "retention_type_description": "Retención de CREE",
-      "description": ""
-      },
-      {
-      "id": 14,
-      "standard": 1,
-      "id_company": 15,
-      "account": "",
-      "status": 1,
-      "name": "ReteCREE",
-      "percentage": 0.8,
-      "id_retention_type": 4,
-      "retention_type_description": "Retención de CREE",
-      "description": ""
-      },
-      {
-      "id": 15,
-      "standard": 1,
-      "id_company": 15,
-      "account": "",
-      "status": 1,
-      "name": "ReteCREE",
-      "percentage": 1.6,
-      "id_retention_type": 4,
-      "retention_type_description": "Retención de CREE",
-      "description": ""
-      },
-      {
-      "id": 16,
-      "standard": 1,
-      "id_company": 15,
-      "account": "",
-      "status": 1,
-      "name": "Transporte de carga",
-      "percentage": 1,
-      "id_retention_type": 2,
-      "retention_type_description": "Retención en la fuente",
-      "description": ""
-      },
-      {
-      "id": 33,
-      "standard": 0,
-      "id_company": 15,
-      "account": "",
-      "status": 1,
-      "name": "devolucion",
-      "percentage": 0,
-      "id_retention_type": 5,
-      "retention_type_description": "Otro tipo de retención",
-      "description": "devolucion"
-      },
-      {
-      "id": 34,
-      "standard": 0,
-      "id_company": 15,
-      "account": "",
-      "status": 1,
-      "name": "Descuento PP",
-      "percentage": 15,
-      "id_retention_type": 5,
-      "retention_type_description": "Otro tipo de retención",
-      "description": "Descuento por pronto pago"
-      },
-      {
-      "id": 35,
-      "standard": 0,
-      "id_company": 15,
-      "account": "",
-      "status": 1,
-      "name": "Descuento PP",
-      "percentage": 10,
-      "id_retention_type": 5,
-      "retention_type_description": "Otro tipo de retención",
-      "description": "Descuento por pronto pago"
-      }
-      ],
-      "retention_type": [
-      {
-      "id": 1,
-      "description": "Retención de IVA"
-      },
-      {
-      "id": 2,
-      "description": "Retención en la fuente"
-      },
-      {
-      "id": 3,
-      "description": "Retención de Industria y Comercio"
-      },
-      {
-      "id": 4,
-      "description": "Retención de CREE"
-      },
-      {
-      "id": 5,
-      "description": "Otro tipo de retención"
-      }
-      ]
-      }
+  
   </script>
 </body>
 </html>
