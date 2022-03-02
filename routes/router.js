@@ -1,43 +1,45 @@
 const express = require('express');
 const router = express.Router();
 const viewController = require('../controller/viewController.js');
+const b2bController = require('../controller/b2bController.js');
 
-/* View Routers */
 router.get('/', viewController.index);
 router.get('/login', viewController.login);
+router.post('/login', viewController.loginValidate);
 router.get('/logout', viewController.logout);
 
-// B2B
-router.get('/calidosos', viewController.calidosos);
-router.get('/historial-transacciones', viewController.historialTransacciones);
-router.get('/historial-facturas', viewController.historialFacturas);
-router.get('/historial-pedidos', viewController.historialPedidos);
-router.post('/historial-pedidos', viewController.historialPedidosPedido);
-router.get('/historial-pedidos/:numero', viewController.historialPedidosDetalle);
-router.get('/nuevo-pedido/:codigo', viewController.nuevoPedido);
-router.get('/infoVendedor/:id', viewController.getInfoVendedor);
-router.get('/catalogo', viewController.catalogo);
-router.get('/catalogo/productos', viewController.catalogoProductos);
-router.get('/catalogo/top', viewController.catalogoTop);
-router.get('/certificados', viewController.certificados);
-router.get('/retenciones', viewController.retenciones);
-router.post('/retenciones/update', viewController.retencionesUpdate);
-router.post('/retenciones/create', viewController.retencionesCreate);
-router.get('/usuarios', viewController.usuarios);
-router.post('/usuarios/updatePassword', viewController.password);
-router.post('/usuarios/updateUser', viewController.updateUser);
-router.get('/facturas', viewController.facturas);
-
-router.get('/carrito-compras', viewController.carritoCompras);
-router.post('/carrito-compras', viewController.sendCarritoCompras);
-router.get('/carrito-facturas', viewController.carritoFacturas);
-router.post('/carrito-facturas', viewController.sendCarritoFacturas);
+// b2b
+router.get('/calidosos', b2bController.calidosos);
+router.get('/historial-transacciones', b2bController.historialTransacciones);
+router.get('/historial-facturas', b2bController.historialFacturas);
+router.get('/historial-pedidos', b2bController.historialPedidos);
+router.post('/historial-pedidos', b2bController.historialPedidosPedido);
+router.get('/historial-pedidos/:numero', b2bController.historialPedidosDetalle);
+router.get('/cotizaciones', b2bController.cotizaciones);
+router.get('/nuevo-pedido/:codigo', b2bController.nuevoPedido);
+router.get('/infoVendedor/:id', b2bController.getInfoVendedor);
+router.get('/catalogo', b2bController.catalogo);
+router.get('/catalogo/productos', b2bController.catalogoProductos);
+router.get('/catalogo/top', b2bController.catalogoTop);
+router.get('/certificados', b2bController.certificados);
+router.get('/retenciones', b2bController.retenciones);
+router.post('/retenciones/update', b2bController.retencionesUpdate);
+router.post('/retenciones/create', b2bController.retencionesCreate);
+router.get('/usuarios', b2bController.usuarios);
+router.post('/usuarios/updatePassword', b2bController.password);
+router.post('/usuarios/updateUser', b2bController.updateUser);
+router.get('/facturas', b2bController.facturas);
+router.get('/carrito-compras', b2bController.carritoCompras);
+router.post('/carrito-compras', b2bController.sendCarritoCompras);
+router.get('/carrito-facturas', b2bController.carritoFacturas);
+router.post('/carrito-facturas', b2bController.sendCarritoFacturas);
+router.get('/permisos', b2bController.permisos);
+router.post('/permisos', b2bController.updatePemiso);
+router.post('/permisos/nuevo-permiso', b2bController.createPermiso);
 
 // Por integrar
 router.get('/helpdesk', viewController.helpdesk);
 router.get('/crm', viewController.crm);
 
-/* POST Services */
-router.post('/login', viewController.loginValidate);
 
 module.exports = router;

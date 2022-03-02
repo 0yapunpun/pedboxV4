@@ -118,3 +118,22 @@ const addCharacter = (n, length, character, position) => {
   }
   return n;
 }
+
+// Formatear JSON invalidos
+const handleJSON = (s) => {
+  if (s == null && s == "") { return }
+  // Remove special characters
+  s = s.replace(/\\n/g, "\\n")  
+        .replace(/\\'/g, "\\'")
+        .replace(/\\"/g, '\\"')
+        .replace(/\\&/g, "\\&")
+        .replace(/\\r/g, "\\r")
+        .replace(/\\t/g, "\\t")
+        .replace(/\\b/g, "\\b")
+        .replace(/\\f/g, "\\f")
+        .replace(/\r\n/g, "''")
+        .replace(/\r/g, "' '")
+        .replace(/\r?\n|\r/g, '');
+        
+  return JSON.parse(s)
+}

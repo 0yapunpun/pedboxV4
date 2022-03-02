@@ -19,6 +19,9 @@
   <link rel="stylesheet" href="/css/jquery-ui.min.css">
   <!-- REPORTS CSS -->
   <link rel="stylesheet" href="/css/reports.css">
+  <!-- Custom -->
+  <link rel="stylesheet" href="/css/custom/tables.css">
+  <link rel="stylesheet" href="" id="colorBrand">
 
   <style>
     .noSorter .dataTable-sorter::after{
@@ -27,18 +30,7 @@
     .noSorter .dataTable-sorter::before{
       opacity: 0;
     }
-    .activeNav .icon{
-      background-image: linear-gradient(310deg ,#7928ca,#ff0080);
-      color: white !important
-    }
-    .activeNav i{
-      color: white !important
-    }
-    .activeNav a{
-      background-color: white;
-      border-radius: 0.5rem;
-      box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
-    }
+
     .dataTable-sorter{
       text-align: center !important;
     }
@@ -47,6 +39,9 @@
     }
     .dataTable-sorter::after {
       display: none !important;
+    }
+    tr td {
+      font-size: 14px;
     }
   </style>
 </head>
@@ -82,10 +77,10 @@
 
         </div>
         <div id="tableContainer" class="card p-3">
-          <table id="table">
+          <table id="table" style="table-layout: fixed;">
             <thead>
               <tr>
-                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Documento</th>
+                <th class="w-10 text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Documento</th>
                 <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Fecha</th>
                 <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Subtotal</th>
                 <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Descuento</th>
@@ -93,7 +88,7 @@
                 <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">V.Total</th>
                 <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">V.Aplicado</th>
                 <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">V.Saldo</th>
-                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 noSorter">Agregar</th>
+                <th class="w-5 text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 noSorter">Agregar</th>
               </tr> 
             </thead>  
             <tbody id="tableContent"></tbody>
@@ -102,6 +97,8 @@
       </div>
     </div>
 
+    <!-- preloader -->
+    <%- include('./partials/preloader.ejs') %> 
   </main>
 
   <!-- Scripts -->
@@ -123,10 +120,14 @@
 
   <script>
     let facturas = `<%- JSON.stringify(facturas) %>`;
-    facturas = JSON.parse(facturas).result.extranet;
+        facturas = JSON.parse(facturas).result.extranet;
+    let session = `<%- JSON.stringify(session) %>`;
+        session = JSON.parse(session);
+    let catalogName = "storeCatalog" + session.user.id;
+    let cartInvoiceName = "storeInvoice" + session.user.id;
+    
 
     const loadTablePedidoRepetido = (data) => {
-      console.log(data)
       let tableContent;
       for(let i = 0; i < data.length; i++){
         let icon;
@@ -137,7 +138,7 @@
         }
 
         tableContent+= '<tr >';
-        tableContent+= `<td class="text-center"><a target="_blank" href="${data[i].Url_fe}"> <i class="fas fa-file-pdf me-1"></i>PDF <br> ${data[i].Numero_Documento} </a></td>`;
+        tableContent+= `<td class="text-center"><a target="_blank" href="${data[i].Url_fe}"> <i class="fas fa-file-pdf me-1"></i> <br> ${data[i].Numero_Documento} </a></td>`;
         tableContent+= `<td class="text-center">${data[i].Fecha_Vencimiento}</td>`;
         tableContent+= `<td class="text-center">$${numberWithCommas(data[i].Subtotal)}</td>`;
         tableContent+= `<td class="text-center">$${numberWithCommas(Math.round(data[i].Descuento))}</td>`;
@@ -154,17 +155,17 @@
     }
 
     $(document).on("click", ".addRemoveCart", function () {
-      if (!(localStorage.getItem("storeInvoice") === null)) {
-        let localObjectLenght = JSON.parse(localStorage.getItem("storeInvoice")).length;
+      if (!(localStorage.getItem(cartInvoiceName) === null)) {
+        let localObjectLenght = JSON.parse(localStorage.getItem(cartInvoiceName)).length;
         $("#invoicesIndicator").text((localObjectLenght ? localObjectLenght : ""))
       } 
     })
 
     const isInLocalStorage = (data) => {
-      if (localStorage.getItem("storeInvoice") === null) {
+      if (localStorage.getItem(cartInvoiceName) === null) {
         return false;
       } else {
-        let localObject = JSON.parse(localStorage.getItem("storeInvoice"));
+        let localObject = JSON.parse(localStorage.getItem(cartInvoiceName));
         let productExist = _.findWhere(localObject, {"Numero_Documento": data});
         if (productExist) {return true} 
         return false;
@@ -176,18 +177,18 @@
           objectRow = JSON.parse(objectRow)
       let nDocumento = objectRow.Numero_Documento;
 
-      if (localStorage.getItem("storeInvoice") === null) {
-        localStorage.setItem("storeInvoice", JSON.stringify([objectRow]));
+      if (localStorage.getItem(cartInvoiceName) === null) {
+        localStorage.setItem(cartInvoiceName, JSON.stringify([objectRow]));
         $(this).hide();
         $(this).siblings(".iconRemove").show();
       } else {
-        let localObject = JSON.parse(localStorage.getItem("storeInvoice"));
+        let localObject = JSON.parse(localStorage.getItem(cartInvoiceName));
         
         let productExist = _.findWhere(localObject, {"Numero_Documento": nDocumento});
         if (productExist) {return} 
 
         localObject.push(objectRow)
-        localStorage.setItem("storeInvoice", JSON.stringify(localObject));
+        localStorage.setItem(cartInvoiceName, JSON.stringify(localObject));
         $(this).hide();
         $(this).siblings(".iconRemove").show();
       }
@@ -198,9 +199,9 @@
           objectRow = JSON.parse(objectRow)
       let nDocumento = objectRow.Numero_Documento;
 
-      let localObject = JSON.parse(localStorage.getItem("storeInvoice"));
+      let localObject = JSON.parse(localStorage.getItem(cartInvoiceName));
       let localFiltered = localObject.filter(o => o.Numero_Documento !== nDocumento);
-      localStorage.setItem("storeInvoice", JSON.stringify(localFiltered));
+      localStorage.setItem(cartInvoiceName, JSON.stringify(localFiltered));
 
       $(this).hide();
       $(this).siblings(".iconCheck").show();
@@ -212,6 +213,7 @@
       loadTablePedidoRepetido(facturas.Table1);
 
       $("#menuFacturas").addClass("activeNav")
+      $("#preloader").hide();
     });
   </script>
 

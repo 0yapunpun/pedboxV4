@@ -25,6 +25,7 @@
   <link rel="stylesheet" href="/css/jquery-ui.min.css">
   <!-- REPORTS CSS -->
   <link rel="stylesheet" href="/css/reports.css">
+  <link rel="stylesheet" href="" id="colorBrand">
 
   <style>
     .choices__list--dropdown .choices__item--selectable:after {
@@ -79,18 +80,7 @@
     .showElement{
       display: block !important;
     }
-    .activeNav .icon{
-      background-image: linear-gradient(310deg ,#7928ca,#ff0080);
-      color: white !important
-    }
-    .activeNav i{
-      color: white !important
-    }
-    .activeNav a{
-      background-color: white;
-      border-radius: 0.5rem;
-      box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
-    }
+
     .dataTable-sorter{
       text-align: center !important;
     }
@@ -121,7 +111,7 @@
       <div class="card p-3 m-2">
         <div class="d-flex justify-content-between align-items-center">
           <h5>Usuarios</h5>
-          <div style="color: #344767; cursor: pointer;" onclick="openNewUserModal()">  
+          <div id="newUserBtn" style="color: #344767; cursor: pointer;" onclick="openNewUserModal()">  
             <i class="fas fa-plus"></i>
             Añadir Usuario
           </div>
@@ -236,6 +226,9 @@
         </div>
       </div>
     </div>
+
+    <!-- preloader -->
+    <%- include('./partials/preloader.ejs') %> 
   </main>
 
   <!-- Script Plantilla -->
@@ -463,14 +456,14 @@
             <td class="text-center text-uppercase text-secondary text-xs font-weight-bolder ">${(data[i].role ? data[i].role : '-')}</td>
             <td class="text-center text-uppercase text-secondary text-xs font-weight-bolder" data-user='${JSON.stringify(data[i])}'>
               <span class="userState">${((data[i].status == 1 ? 'Activo' : 'Inactivo'))}</span>  
-              <div class="form-check form-switch d-flex justify-content-center mt-1">
+              <div class="form-check form-switch d-flex justify-content-center mt-1 stateUser">
                 <input ${data[i].status == 1 ? "checked" : ""} class="form-check-input userStateCbx" type="checkbox" id="flexSwitchCheckDefault" style="height: 20px">
               </div>
             </td>
             <td class="text-center text-uppercase text-secondary font-weight-bolder" userId="${data[i].user}">
               <div class="d-flex gap-3">
                 <i class="fas fa-key iconStyle changePassword" title="Cambiar clave"></i>
-                <i class="fas fa-trash iconStyle" title="Eliminar"></i>
+                <i class="fas fa-trash iconStyle deleteUser" title="Eliminar"></i>
               </div>
             </td>
           </tr> 
@@ -528,13 +521,42 @@
         `;
         $("#inputRol").append(element)
       }
-      // const choicesPrice = new Choices($('#inputRol')[0]);
+    }
+
+    const handlePermissions = function (data) {
+      let permissions = data.user.permission;
+      let permissionIndex; 
+
+      permissionIndex = permissions.findIndex(x => x.code === "5400_CAN_VIEW_EXTERNAL_USERS");
+      if (permissionIndex  != -1 && permissions[permissionIndex].content == "S") {
+
+      };
+
+      permissionIndex = permissions.findIndex(x => x.code === "5400_CAN_CREATE_EXTERNAL_USERS");
+      if (permissionIndex  == -1 || permissions[permissionIndex].content == "N") {
+        $("#newUserBtn").hide();
+      };
+
+      permissionIndex = permissions.findIndex(x => x.code === "5400_CAN_EDIT_EXTERNAL_USERS");
+      if (permissionIndex  == -1 || permissions[permissionIndex].content == "N") {
+        $(".stateUser").remove();
+        $(".deleteUser").hide();
+        $(".changePassword").hide();
+      };
+
+      permissionIndex = permissions.findIndex(x => x.code === "5400_CAN_DELETE_EXTERNAL_USERS");
+      if (permissionIndex  == -1 || permissions[permissionIndex].content == "N") {
+        $(".deleteUser").hide();
+      };
     }
 
     $(document).ready(function () {
       printTableData(users.user);
       loadRoles(roles.Rol);
-      $("#menuUsuarios").addClass("activeNav")
+      handlePermissions(session)
+      
+      $("#menuUsuarios").addClass("activeNav");
+      $("#preloader").hide();
     })
   </script>
 

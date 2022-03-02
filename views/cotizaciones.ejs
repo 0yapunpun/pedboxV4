@@ -1,5 +1,6 @@
 <!-- TODO:
   -Añadir preloarders
+  -Revisar pq no funciona
 -->
 
 <!DOCTYPE html>
@@ -9,7 +10,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" type="image/x-icon" href="https://app.pedbox.co/assets/logos/logo_blanco.png"/>
-  <title>Historial Pedidos</title>
+  <title>Cotizaciones</title>
 
   <!-- Fonts and icons -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
@@ -98,7 +99,7 @@
             <ul class="nav nav-pills nav-fill p-1" role="tablist" style="cursor: pointer;">
               <li class="nav-item">
                 <a class="nav-link mb-0 px-4 py-1 active" data-bs-toggle="tab"  role="tab" aria-controls="profile" aria-selected="true" href="#">
-                Historial de pedidos
+                Lista de cotizaciones
                 </a>
               </li>
             </ul>
@@ -337,7 +338,7 @@
     let vendedor = `<%- JSON.stringify(vendedor) %>`;
         vendedor = JSON.parse(vendedor).result;
     let cartName = "storeCart" + session.user.id;
-    let cartInvoiceName = "storeInvoice" + session.user.id;
+
 
     const canSeePdf = true;
     const canSeeEstadoPedido = true;
@@ -828,7 +829,7 @@
 
       $('#inputDateModal').val(new Date().toDateInputValue());
 
-      $("#menuHistorialPedidos").addClass("activeNav");
+      $("#menuCotizaciones").addClass("activeNav");
       $("#preloader").hide();
     });
   </script>

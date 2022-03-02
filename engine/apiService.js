@@ -135,13 +135,32 @@ service.userUpdate = async(body) =>{
 
 service.sendCarritoCompras = async(body) =>{
   const url = urlPedbox1+'documentos';
-  const data =  await makeRequest(url, options('POST', body));
+  const data =  await makeRequest(url, options('post', body));
   return data;
 }
 
 service.sendCarritoFacturas = async(body) =>{
   const url = urlKakashi+'start-payment';
-  const data =  await makeRequest(url, options('POST', body));
+  const data =  await makeRequest(url, options('post', body));
+  return data;
+}
+
+service.getPermisos = async(id_company, id_user_company) => {
+  const url = urlKakashi+'get_permission?id_company='+id_company;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.updatePemiso = async(body) => {
+  const url = urlKakashi+'update_permission';
+  const data =  await makeRequest(url, options('put', body));
+  return data;
+}
+
+service.createPermiso = async(body) => {
+  console.log(body)
+  const url = urlKakashi+'create_role_permission';
+  const data =  await makeRequest(url, options('post', body));
   return data;
 }
 

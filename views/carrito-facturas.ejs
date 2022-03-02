@@ -1,5 +1,4 @@
 <!-- TODO:
-  -Agregar boton de eliminar factura
 -->
 
 <!DOCTYPE html>
@@ -23,6 +22,7 @@
   <link rel="stylesheet" href="/css/jquery-ui.min.css">
   <!-- REPORTS CSS -->
   <link rel="stylesheet" href="/css/reports.css">
+  <link rel="stylesheet" href="" id="colorBrand">
 
   <style>
     .tableHead td{
@@ -37,18 +37,7 @@
     .cursorPointer{
       cursor: pointer;
     }
-    .activeNav .icon{
-      background-image: linear-gradient(310deg ,#7928ca,#ff0080);
-      color: white !important
-    }
-    .activeNav i{
-      color: white !important
-    }
-    .activeNav a{
-      background-color: white;
-      border-radius: 0.5rem;
-      box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
-    }
+
   </style>
 </head>
 
@@ -132,6 +121,9 @@
         </div>
       </div>
     </div>
+
+    <!-- preloader -->
+    <%- include('./partials/preloader.ejs') %> 
   </main>
 
   <!-- Scripts -->
@@ -157,7 +149,8 @@
         retencionData = JSON.parse(retencionData).result.data;
     let session = `<%- JSON.stringify(session) %>`;
         session = JSON.parse(session);
-    console.log(session)
+    let cartName = "storeCart" + session.user.id;
+    let cartInvoiceName = "storeInvoice" + session.user.id;
 
     const loadProdutcs = (data) => {
       for (let i = 0; i < data.length; i++) {
@@ -397,8 +390,8 @@
     });
 
     const getLocalStorage = () => {
-      if ((localStorage.getItem("storeInvoice") === null)) {return}
-      let localObject = JSON.parse(localStorage.getItem("storeInvoice"));
+      if ((localStorage.getItem(cartInvoiceName) === null)) {return}
+      let localObject = JSON.parse(localStorage.getItem(cartInvoiceName));
       loadProdutcs(localObject)
     }
 
@@ -448,6 +441,8 @@
     $(document).ready(function () {
       getLocalStorage();
       $("#menuCarritoFacturas").addClass("activeNav")
+
+      $("#preloader").hide();
     })
   
   </script>

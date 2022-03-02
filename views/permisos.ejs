@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" type="image/x-icon" href="https://app.pedbox.co/assets/logos/logo_blanco.png"/>
+  <title>Permisos</title>
+
+  <!-- Fonts and icons -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <link href="/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <!-- CSS Files -->
+  <link id="pagestyle" href="/css/soft-ui-dashboard.css?v=1.0.3" rel="stylesheet" />
+  <!-- JQUERY UI -->
+  <link rel="stylesheet" href="/css/jquery-ui.min.css">
+  <!-- REPORTS CSS -->
+  <link rel="stylesheet" href="/css/reports.css">
+  <link rel="stylesheet" href="" id="colorBrand">
+
+  <style>
+    .fieldsSize{
+      width: 300px !important;
+    }
+    /* Animation sidebar angles*/
+    .collapseAnimation1{
+      transform: rotate(90deg);
+      transition: all 0.5s;
+    }
+    .collapseAnimation2{
+      transform: rotate(-90deg);
+      transition: all 0.5s;
+    }
+    /* Libreria choice JS, Estilos para quitar padding indeseado del combobox */
+    .choices{
+      margin: 0;
+      min-width: 150px;
+    }
+    .choices__list--dropdown {
+        z-index: 1000;
+    }
+    .choices__list--dropdown .choices__item--selectable:after {
+        display: none !important;
+    }
+    .choices__list--dropdown .choices__item--selectable {
+        padding-right: 0 !important;
+    }
+    .inputTextItem{
+      border-top: none;
+      border-left: none;
+      border-right: none;
+      border-radius: 0;
+    }
+    .inputTextItem:focus{
+      outline: none;
+      box-shadow: none;
+      border-color: inherit;
+    }
+
+  </style>
+
+</head>
+
+<body class="g-sidenav-show  bg-gray-100">
+
+  <!-- Menu -->
+  <%- include('./partials/menu.ejs') %> 
+
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg " style="min-height: 100vh;">
+
+    <!-- Cabecera -->
+    <%- include('./partials/header.ejs') %>
+     
+    <div class="w-100 p-3 ps-5">
+      <h4>Asignación de permisos por rol</h4>
+      <h6>Permisos para la plataforma</h6>
+    </div>
+
+    <div class="p-4 pt-1">
+      <div class="d-flex flex-row w-100 min-vh-100  card ">
+
+        <div class="w-20 p-3 border-end" id="sideBarPermissions">
+          <!-- Element 1 -->
+          <!-- <div>
+            <button class="d-flex w-100 justify-content-between border-0 p-0 mb-2 bg-transparent collapseIndicator" data-bs-toggle="collapse" href="#collapseSection2" role="button" aria-expanded="false">
+              <h6 class="m-0">
+                Gráficas
+              </h6>
+              <div>
+                <i class="fas fa-angle-left collapseAnimation2"></i>
+              </div>
+            </button>
+            <div class="collapse py-2 ps-2 rounded" id="collapseSection2">
+              <div class="d-flex justify-content-between align-items-center">
+                <p class="m-0 font-weight-bold">Hola</p>
+                <i class="fas fa-check"></i>
+              </div>
+            </div>
+            <hr class="horizontal dark">
+          </div> -->
+
+        </div>
+
+        <div class="w-80" >
+          <div class="d-flex justify-content-between w-100 border-bottom p-3">
+            <select class="form-control fieldsSize" name="rolesSelect" id="rolesSelect">
+              <!-- <option value="volvo">Volvo</option>
+              <option value="saab">Saab</option>
+              <option value="mercedes">Mercedes</option>
+              <option value="audi">Audi</option> -->
+            </select>
+            <div class="d-flex align-items-center" style="position: relative">
+              <i class="fas fa-search" style="position: absolute; left: 10px; cursor: pointer;" id="searchButton"></i>
+              <input class="form-control fieldsSize" style="padding-left: 30px;" type="text" name="" id="searchField"> 
+            </div>
+            
+          </div>
+          <div id="displayFiltered"> 
+            <!-- <div class="border-bottom mx-2 p-2">
+              <div class="px-2 py-1">Administar App - Chat</div>
+              <div class="form-switch d-flex justify-content-between px-4">
+                <label class="form-check-label" for="flexSwitchCheckDefault">Checked switch</label>
+                <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" checked="">
+              </div>
+              <div class="form-switch d-flex justify-content-between px-4">
+                <label class="form-check-label" for="flexSwitchCheckDefault">Checked switch</label>
+                <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" checked="">
+              </div>
+              <div class="form-switch d-flex justify-content-between px-4">
+                <label class="form-check-label" for="flexSwitchCheckDefault">Checked switch</label>
+                <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" checked="">
+              </div>
+              <div class="form-switch d-flex justify-content-between px-4">
+                <label class="form-check-label" for="flexSwitchCheckDefault">Checked switch</label>
+                <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" checked="">
+              </div>
+              <div class="form-switch d-flex justify-content-between px-4">
+                <label class="form-check-label" for="flexSwitchCheckDefault">Checked switch</label>
+                <input class="form-control inputTextItem" type="text" id="flexSwitchCheckDefault" style="max-width: 150px;">
+              </div>
+            </div> -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- preloader -->
+    <%- include('./partials/preloader.ejs') %> 
+  </main>
+
+  <!-- Scripts -->
+  <script src="/js/core/popper.min.js"></script>
+  <script src="/js/core/bootstrap.min.js"></script>
+  <script src="/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="/js/plugins/choices.min.js"></script>
+  <script src="/js/soft-ui-dashboard.min.js?v=1.0.3"></script>
+  <script src="/js/plugins/dragula/dragula.min.js"></script>
+  <script src="/js/plugins/jkanban/jkanban.js"></script>
+  <script src="/js/jquery.js"></script>
+  <script src="/js/jquery-ui.min.js"></script>
+  <script src="/js/plugins/datatables.js"></script>
+  <script src="/js/plugins/chartjs.min.js"></script>
+  <script src="/js/underscore-min.js"></script>
+  <script src="/js/helpers.js"></script>
+  <script src="/js/menu.js"></script>
+
+  <script>    
+    let permisos = `<%- JSON.stringify(permisos) %>`;
+        permisos = handleJSON(permisos)
+    let session = `<%- JSON.stringify(session) %>`;
+        session = JSON.parse(session);
+
+    // cache data
+    let dataRoles = permisos.result.permission.roles,
+        dataGroups = permisos.result.permission.groups,
+        dataConfiguration = permisos.result.permission.configuration;
+
+    // Cache configurations 
+    let idGroup,
+        idPermission,
+        idDescription;
+    
+    // Sidebar
+    const loadSidebar = function (data) {
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].subgroups.length ) {
+          let element = `
+            <div>
+              <button href="#collapse${data[i].id}" class="d-flex w-100 justify-content-between border-0 p-0 pb-1 bg-transparent collapseIndicator" data-bs-toggle="collapse"  role="button" aria-expanded="false">
+                <h6 class="m-0">
+                  ${data[i].description}
+                </h6>
+                <div>
+                  <i class="fas fa-angle-left collapseAnimation2"></i>
+                </div>
+              </button>
+              <div class="collapse pb-2 ps-2 rounded" id="collapse${data[i].id}">
+  
+              </div>
+              <hr class="horizontal dark" style="margin: 5px"> 
+            </div>
+          `;
+          $("#sideBarPermissions").append(element);  
+        }
+
+        // Agregar items al collapse del sidebar
+        for (let e = 0; e < data[i].subgroups.length; e++) {
+          if (data[i].subgroups[e].active == 1) {
+            let innerElement =`
+              <div idPermission="${data[i].subgroups[e].id}" idGroup="${data[i].subgroups[e].id_role_group}" idName="${data[i].subgroups[e].description}" idSubgroup="${data[i].subgroups[e].id}"  class="sideBarItem selectedIndicator d-flex justify-content-between align-items-center my-1 mt-0" style="cursor: pointer">
+                <p class="m-0 font-weight-bold" style="font-size: 13px">${data[i].subgroups[e].description}</p>
+                <i class="fas fa-check" style="display: none"></i>
+              </div>
+            `;
+            $("#collapse"+data[i].id).append(innerElement)  
+          }
+        }
+        // Ocultar collapse en caso de que no tenga ningún item
+        if ($("#collapse"+data[i].id).find("div").length == 0) {
+          $("#collapse"+data[i].id).parent().hide();
+        }
+      }
+    }; 
+
+    // Input list filter
+    const loadInputSelect = function (data) {
+      for (let i = 0; i < data.length; i++) {
+        element = `
+          <option value="${data[i].description}">${data[i].description}</option>
+        `;
+        $("#rolesSelect").append(element);
+      };
+      $("#rolesSelect").prepend(`<option value="" selected>Todos *</option>`);
+
+      const choices = new Choices($('#rolesSelect')[0]);
+    }
+
+    // Load Permissions list 
+    const loadPermissions = function (description, group, permissions, roles) {
+      $("#displayFiltered").html("");
+
+      for (let i = 0; i < group.length; i++) { //Grouds
+        for (let e = 0; e < roles.length; e++) { //Roles
+          element = `
+            <div class="border-bottom p-3">
+              <h6>${roles[e].description} - ${group[i].description} - ${description.description}</h6>
+            </div>
+          `;
+          $("#displayFiltered").append(element);
+
+          let dataPermissions = roles[e].permission;
+
+          for (let o = 0; o < permissions.length; o++) { //Permissions
+            permissionsListMarked = _.filter(dataPermissions, function (data) {
+              return data.id_configuration == permissions[o].id; 
+            });
+            let state, idPerimission;
+            if (permissionsListMarked.length != 0) { state = permissionsListMarked[0].content; idPerimission = permissionsListMarked[0].id}
+            element = `
+              <div class="form-switch d-flex justify-content-between align-items-center px-4 my-3">
+                <label class="form-check-label m-0" for="flexSwitchCheckDefault" data-id="${permissions[o].id}" idPermission="${idPerimission}" idRole="${roles[e].id}" idCompany="${roles[e].id_company}" idConfig="${permissions[o].id}" idSubgroup="${description.id}" >${permissions[o].description_es}</label>
+                ${(permissions[o].type == 1 ? 
+                  `<input ${(state == "S" ? "checked" : "")}  class="checkActualization form-check-input" type="checkbox" id="flexSwitchCheckDefault" > `:
+                  `<input ${(state ? "value='"+state+"'" : "value='N'")} class="textActualization form-control text-end inputTextItem p-0 pe-1" type="text" id="flexSwitchCheckDefault" style="max-width: 150px;">`
+                  )}
+              </div>
+            `;
+            $("#displayFiltered>div:last").append(element);
+          }
+        }
+      }
+    };
+
+    // filter data
+    const prepareData = function (textFilter) {
+      roleFilter = $("#rolesSelect").val();
+      if (roleFilter) { //Filter roles
+        roles = _.filter(dataRoles, function (data) {
+          return data.description == roleFilter; 
+        });
+      } else {
+        roles = dataRoles;
+      }
+
+      groupFilter = _.filter(dataGroups, function (data) {
+        return data.id == idGroup; 
+      });
+
+      permissionsList = _.filter(dataConfiguration, function (data) {
+        return data.id_role_subgroup == idPermission; 
+      });
+
+      if (textFilter) { permissionsList = textFilter} //Load with text filtered
+
+    
+      loadPermissions(idDescription, groupFilter, permissionsList, roles)
+    }
+
+    // Set configuration and load view
+    $(document).on( "click", ".sideBarItem", function(){
+      idGroup = $(this).attr("idGroup");
+      idPermission = $(this).attr("idPermission");
+      idDescription = {"description" : $(this).attr("idName"), "id": $(this).attr("idSubgroup")};
+    
+      prepareData();
+    });
+
+    // Load view filtered
+    $(document).on( "change", "#rolesSelect ", function(){
+      prepareData();
+    });
+
+    // SearchBar
+    $(document).on("keyup", "#searchField", function (e) {
+      if (e.which == 13) {
+        let stringFilter = $(this).val();
+        filterByValue(stringFilter)
+      };
+    })
+
+    $(document).on("click", "#searchButton", function (e) {
+      let stringFilter = $("#searchField").val();
+      filterByValue(stringFilter)
+    })
+
+    const filterByValue = function (stringFilter) {
+        permissionsList = _.filter(dataConfiguration, function (data) {
+          return data.id_role_subgroup == idPermission; 
+        });
+        let filteredByText = _.filter(permissionsList, o => {
+          if (o.description_es.toLowerCase().split(' ').join('').indexOf(stringFilter.toLowerCase()) > -1 ) return o;
+        });
+        prepareData(filteredByText);
+      }
+
+    // Data update
+    $(document).on("change", ".checkActualization", function () {
+      let data = {
+        "id": $(this).prev().attr("idPermission"), 
+        "id_role": Number($(this).prev().attr("idRole")),
+        "id_company": Number($(this).prev().attr("idCompany")),
+        "id_configuration": Number($(this).prev().attr("idConfig")),
+        "content": ($(this).is(":checked") ? "S" : "N"),
+        "type": 1,
+        "visible": 1,
+        "user_update": session.user.id,
+        "user" : session.user.user,
+      };
+
+      if (data.id == 'undefined') {
+        delete data.id;
+        fetch('/permisos/nuevo-permiso', {
+          method: 'POST',
+          headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+          body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(res => {
+          if (res.response.err) {
+            alert("No fue posible actualizar permiso")
+          } else {
+            alert("Permiso actualziado")
+          }
+        });
+      } else {
+        alert("El permiso existia")
+        fetch('permisos', {
+          method: 'POST',
+          headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+          body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(res => {
+          if (res.response.err) {
+            alert("No fue posible actualizar permiso")
+          } else {
+            alert("Permiso actualziado")
+          }
+        });
+      }
+    });
+
+    $(document).on("change", ".textActualization", function () {
+      data = {
+        "id": $(this).prev().attr("idPermission"), 
+        "id_role": $(this).prev().attr("idRole"),
+        "id_company": $(this).prev().attr("idCompany"),
+        "id_configuration": $(this).prev().attr("idConfig"),
+        "id_subgroup": $(this).prev().attr("idSubgroup"),
+        "content": $(this).val(),
+        "description": $(this).prev().text(),
+        "type": 2,
+        "visible": 1, 
+        "user_update": session.user.id
+      };
+
+      if (data.id == 'undefined') {
+        delete data.id;
+
+        fetch('/permisos/nuevo-permiso', {
+          method: 'POST',
+          headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+          body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(res => {
+          if (res.response.err) {
+            alert("No fue posible actualizar permiso")
+          } else {
+            alert("Permiso actualziado")
+          }
+        });
+      } else {
+        fetch('permisos', {
+          method: 'POST',
+          headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+          body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(res => {
+          if (res.response.err) {
+            alert("No fue posible actualizar permiso")
+          } else {
+            alert("Permiso actualziado")
+          }
+        });
+      }
+    })
+
+    // Sidebar visual effects
+    $(document).on( "click", ".collapseIndicator ", function(){
+      $(this).find("i").toggleClass("collapseAnimation1 collapseAnimation2")
+    });
+    $(document).on( "click", ".selectedIndicator ", function(){
+      $(".selectedIndicator").css("color", "inherit")
+      $(this).css("color", "#252f40")
+    });
+
+    const handlePermissions = function (data) {
+      let permissions = data.user.permission;
+      let permissionIndex; 
+
+      permissionIndex = permissions.findIndex(x => x.code === "5100_CAN_ACCESS_PERMISSIONS");
+      if (permissionIndex  != -1 && permissions[permissionIndex].content == "S") {
+        return true
+      };
+      return false
+    }
+
+    $(document).ready(function () {
+      if (handlePermissions(session)) {
+        loadSidebar(dataGroups);
+        loadInputSelect(dataRoles);
+      } else {
+        console.error("No tienes permisos para acceder a este modulo")
+      }
+
+      $("#menuPermisos").addClass("activeNav");
+      $("#preloader").hide();
+    })
+  </script>
+
+</body>
+</html>

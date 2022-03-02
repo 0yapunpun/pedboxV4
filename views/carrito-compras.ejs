@@ -9,7 +9,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" type="image/x-icon" href="https://app.pedbox.co/assets/logos/logo_blanco.png"/>
-  <title>Carrito Catalogo</title>
+  <title>Carrito Compras</title>
 
   <!-- Fonts and icons -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
@@ -23,6 +23,7 @@
   <link rel="stylesheet" href="/css/jquery-ui.min.css">
   <!-- REPORTS CSS -->
   <link rel="stylesheet" href="/css/reports.css">
+  <link rel="stylesheet" href="" id="colorBrand">
 
   <style>
     .cartSuccess{
@@ -51,18 +52,7 @@
     .selectDic .choices__list--single {
       padding-left: 75px;
     }
-    .activeNav .icon{
-      background-image: linear-gradient(310deg ,#7928ca,#ff0080);
-      color: white !important
-    }
-    .activeNav i{
-      color: white !important
-    }
-    .activeNav a{
-      background-color: white;
-      border-radius: 0.5rem;
-      box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
-    }
+
 
   </style>
 </head>
@@ -84,13 +74,13 @@
         <span id="amountProducts">0</span> Producto(s) en el carrito
       </div>
       <div class="w-100 card p-4 d-flex justify-content-center flex-row gap-2">
-        <button type="button" class="btn btn-primary w-20 my-0" onclick="clearCart()">Limpiar Carrito</button>
-        <div style="position: relative;" class="w-40 selectDic"> 
+        
+        <div style="position: relative;" class="w-40 selectDic flex-fill"> 
           <label for="" class="m-0" style="position: absolute; top: 25%; left: 5%;">Dirección:</label>
           <select name="" id="direction" class="form-control" style="padding-left: 24%;">
           </select>
         </div>
-        <div class="w-40" style="position: relative;">
+        <div class="w-40 flex-fill" style="position: relative;">
           <label for="" class="m-0" style="position: absolute; top: 25%; left: 5%;">Fecha de envío:</label>
           <input type="date" name="" id="inputDate" class="form-control" style="padding-left: 33%;">
         </div>
@@ -102,7 +92,10 @@
         <div class="card mt-2 p-3">
           <div class="w-100 d-flex">
             <div class="flex-fill d-flex flex-column justify-content-between" >
-              <button type="button" class="btn btn-primary my-0 w-30" onClick="javascript:window.location.href='/catalogo'">Volver al catálogo</button>
+              <div>
+                <button type="button" class="btn btn-primary my-0 w-30" style="width: auto !important;" onClick="javascript:window.location.href='/catalogo'">Volver al catálogo</button>
+                <button type="button" class="btn btn-primary w-20 my-0" style="width: auto !important;" onclick="clearCart()">Limpiar Carrito</button>
+              </div>
               <div>
                 <h6>¿Quieres dejar una nota? Escribre aquí</h6>
                 <textarea name="" id="pNota" class="form-control" style=" min-height: 35px; max-width: 50%; resize: none; border: none; border-bottom: solid 1px lightgray;" placeholder="Escribe aquí..."></textarea>
@@ -129,13 +122,18 @@
               </div>
             </div>
           </div>
-          <div class="mt-2">
+          <div class="mt-2 text-center">
             <button class="btn btn-primary" onclick="onPay()">Pagar</button>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- preloader -->
+    <%- include('./partials/preloader.ejs') %> 
   </main>
+
+  
 
   <!-- Scripts -->
   <script src="/js/core/popper.min.js"></script>
@@ -159,8 +157,11 @@
     let address = `<%- JSON.stringify(address) %>`;
         address = JSON.parse(address);
     let session = `<%- JSON.stringify(session) %>`;
-        session = JSON.parse(session).user;
+        session = JSON.parse(session);
     let seller = address.result.result.seller[0];
+
+    let cartName = "storeCart" + session.user.id;
+    let cartInvoiceName = "storeInvoice" + session.user.id;
 
     let finalValues = {
       total : 0,
@@ -205,14 +206,14 @@
         updateTotalCart();
 
         // Update cart item amount
-        let items = JSON.parse(localStorage.getItem("storeCart"));
+        let items = JSON.parse(localStorage.getItem(cartName));
         console.log(items)
         for (let i = 0; i < items.length; i++) {
           if (items[i].codigo == codigo) {
             items[i].qty = currentValue;
           }
         };
-        localStorage.setItem("storeCart", JSON.stringify(items));
+        localStorage.setItem(cartName, JSON.stringify(items));
       }
     });
 
@@ -227,9 +228,9 @@
     }
 
     const getLocalStorage = () => {
-      if ((localStorage.getItem("storeCart") === null)) {return}
+      if ((localStorage.getItem(cartName) === null)) {return}
       
-      let localObject = JSON.parse(localStorage.getItem("storeCart"));
+      let localObject = JSON.parse(localStorage.getItem(cartName));
       checkIVA(localObject);
       loadProducst(localObject)
     }
@@ -241,23 +242,23 @@
           data[i].iva = iva;
         };
       };
-      localStorage.setItem("storeCart", JSON.stringify(data))
+      localStorage.setItem(cartName, JSON.stringify(data))
     };
 
     const removeItemCart = (item) => {
-      let localObject = JSON.parse(localStorage.getItem("storeCart"));
+      let localObject = JSON.parse(localStorage.getItem(cartName));
       let filtered = localObject.filter(function(el) { return el.codigo != item; });
       $("#amountProducts").text(filtered.length)
 
       if (filtered.length == 0) {
-        localStorage.removeItem('storeCart');
+        localStorage.removeItem(cartName);
       } else {
-        localStorage.setItem("storeCart", JSON.stringify(filtered));
+        localStorage.setItem(cartName, JSON.stringify(filtered));
       }
     };
 
     const clearCart = () => {
-      localStorage.removeItem('storeCart');
+      localStorage.removeItem(cartName);
       $("#amountProducts").text("0")
 
       $(".cartItem").remove();
@@ -402,7 +403,7 @@
       }
 
       let hasPermissions = false;
-      session.permission.forEach(permission => {
+      session.user.permission.forEach(permission => {
         if(permission.code == '8020_VIEW_PRICE' || permission.code == '8060_SEND_ORDER_SELLER'){
           hasPermissions = true;
         }
@@ -417,12 +418,12 @@
 
     async function sendToPedbox(device){
       updateTotalCart(); // Recalc total values
-      let items = JSON.parse(localStorage.getItem("storeCart"));
+      let items = JSON.parse(localStorage.getItem(cartName));
 
       let data = {
         pbodega: seller['id_warehouse'].toString(),
-        pnit: session.nit.toString(),
-        pvendedor: session.permission.find(a => a.content == '8050_SELLER_ORDER') || seller['nit'].toString() || seller['id_seller'].toString(),
+        pnit: session.user.nit.toString(),
+        pvendedor: session.user.permission.find(a => a.content == '8050_SELLER_ORDER') || seller['nit'].toString() || seller['id_seller'].toString(),
         pfecha: '',
         pcondicion: '0',
         pdias: '0',
@@ -446,7 +447,7 @@
         }).join("|"),
         plongitud: "",
         platitud: "",
-        pempresa: session.id_company.toString(),
+        pempresa: session.user.id_company.toString(),
         pimei: device.ip,
         pusuario: 'MMORRIS', 
         pfechadespacho: "",
@@ -476,6 +477,8 @@
       $('#inputDate').val(new Date().toDateInputValue());
 
       $("#menuCarritoCompras").addClass("activeNav")
+
+      $("#preloader").hide();
     });
 
   </script>

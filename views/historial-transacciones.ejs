@@ -19,7 +19,21 @@
   <link rel="stylesheet" href="/css/jquery-ui.min.css">
   <!-- REPORTS CSS -->
   <link rel="stylesheet" href="/css/reports.css">
+  <!-- Custom -->
+  <link rel="stylesheet" href="/css/custom/tables.css">
+  <link rel="stylesheet" href="" id="colorBrand">
 
+  <style>
+    .dataTable-sorter{
+      text-align: center !important;
+    }
+    .dataTable-sorter::before {
+      display: none !important;
+    }
+    .dataTable-sorter::after {
+      display: none !important;
+    }
+  </style>
 </head>
 
 <body class="g-sidenav-show bg-gray-100">
@@ -44,11 +58,15 @@
             <tbody id="tableBody"></tbody>
           </table>
           <div style="text-align: center; display: none;" id="emptyResponse">
-            <span >Sin historial de transacciones</span>
+            <span >Historial de transacciones no disponible</span>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- preloader -->
+    <%- include('./partials/preloader.ejs') %> 
+    
   </main>
 
   <!-- Scripts -->
@@ -71,6 +89,8 @@
   <script>
     let historial = `<%- JSON.stringify(historial) %>`;
         historial = JSON.parse(historial).result;
+    let session = `<%- JSON.stringify(session) %>`;
+        session = JSON.parse(session);
 
     const printTable = (data) =>{
       for (let i = 0; i < data.headers.length; i++) {
@@ -102,7 +122,8 @@
         $("#emptyResponse").show();
       }
       
-      $("#menuHistorialTransacciones").addClass("activeNav")
+      $("#menuHistorialTransacciones").addClass("activeNav");
+      $("#preloader").hide();
     });
   </script>
 
