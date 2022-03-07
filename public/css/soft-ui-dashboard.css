@@ -21627,15 +21627,13 @@ body.swal2-toast-shown .swal2-container.swal2-bottom-end, body.swal2-toast-shown
   border-radius: 1rem; }
 
 .swal2-styled.swal2-confirm {
-  background-image: linear-gradient(310deg, #2152ff, #21d4fd);
   background-color: transparent;
   padding: 0.75rem 1.5rem;
   font-size: 0.75rem;
   border-radius: 0.5rem; }
   .swal2-styled.swal2-confirm:hover, .swal2-styled.swal2-confirm:focus {
-    background-image: linear-gradient(310deg, #2152ff, #21d4fd) !important;
     outline: 0;
-    box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.09), 0 2px 3px -1px rgba(0, 0, 0, 0.07); }
+  }
 
 .swal2-confirm.btn.bg-gradient-success {
   margin-left: 10px;

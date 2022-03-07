@@ -26,7 +26,8 @@
   <link rel="stylesheet" href="/css/reports.css">
   <!-- Custom -->
   <link rel="stylesheet" href="/css/custom/tables.css">
-  <link rel="stylesheet" href="" id="colorBrand">
+  <!-- Color Page -->
+  <%- include('./partials/colors.ejs') %> 
   
 
   <style>
@@ -212,7 +213,7 @@
             <!-- contenido dinamico -->
           </div>
           <div class="card p-2 mt-4 ">
-            <div id="tagsContainer">
+            <div id="tagsContainer" class="overflow-hidden">
               <!-- contenido dinamico -->
             </div>
           </div>
@@ -220,23 +221,41 @@
 
         <!-- Vista catalogo -->
         <div class="col-lg-9 mt-lg-0 mt-4" id="catalogview" >
-          <div id="productsContainer" class="d-flex flex-wrap justify-content-center gap-3 mt-4"></div>
-          <div id="paginator" class="d-flex justify-content-center mt-4">
-            <nav class="dataTable-pagination w-50">
-              <ul class="dataTable-pagination-list d-flex justify-content-center consolepaginatorUl">
-                <li class="pager" onclick="paginator('res')"><a  data-page="1" >‹</a></li>
-                  <!-- contenido dinamico -->
-                <li class="pager" id="paginatorInsertBefore" onclick="paginator('sum')"><a  data-page="2">›</a></li>
-              </ul>
-            </nav>
+          <div id="productsContainer" class="d-flex flex-wrap justify-content-center gap-3 mt-4">
+            <!-- Contenido dinamico -->
           </div>
         </div>
 
         <!-- Vista Tabla -->
         <div class="col-lg-9 mt-lg-0 mt-4" id="tableView" style="display: none;">
           <div class="card mt-4 p-3" id="tableContainer">
+
+            <table>
+              <thead>
+                <tr>
+                  <td class="imgCol text-uppercase text-secondary text-xxs text-center font-weight-bolder opacity-7 noSorter">Imagen</td>
+                  <td class="productCol text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Producto</td>
+                  <td class="atributesCol text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Atributos</td>
+                  <td class="stockCol text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Stock</td>
+                  <td class="text-uppercase text-secondary text-xxs text-center font-weight-bolder opacity-7 noSorter">Añadir</td>
+                </tr>
+              </thead>
+              <tbody id="tableBody">
+
+              </tbody>
+            </table>
             <!-- contenido dinamico -->
           </div>
+        </div>
+
+        <div id="paginator" class="d-flex justify-content-center mt-4">
+          <nav class="dataTable-pagination w-50" style="position: relative; left: 13%">
+            <ul class="dataTable-pagination-list d-flex justify-content-center consolepaginatorUl">
+              <li class="pager" onclick="paginator('res')"><a  data-page="1" >‹</a></li>
+                <!-- contenido dinamico -->
+              <li class="pager" id="paginatorInsertBefore" onclick="paginator('sum')"><a  data-page="2">›</a></li>
+            </ul>
+          </nav>
         </div>
       </div>
     </div>
@@ -286,28 +305,10 @@
                     </div>
                   </div>
                   <hr>
-                  <div class="d-flex gap-2">
-                    <h6 class="m-0">Marca: </h6>
-                    <h6 class="text-secondary" id="modalDetalleM"></h6>
-                  </div>
-                  <div class="d-flex gap-2">
-                    <h6 class="m-0">Grupo: </h6>
-                    <h6 class="text-secondary" id="modalDetalleG"></h6>
-                  </div>
-                  <div class="d-flex gap-2">
-                    <h6 class="m-0">Sub-grupo: </h6>
-                    <h6 class="text-secondary" id="modalDetalleSG"></h6>
-                  </div>
-                  <div class="d-flex gap-2">
-                    <h6 class="m-0">Modelo Moto: </h6>
-                    <h6 class="text-secondary" id="modalDetalleModelo"></h6>
-                  </div>
-                  <div class="d-flex gap-2" id="modalDetalleT">
-                    <!-- <h6 class="m-0">Talla: </h6>
-                    <h6 class="text-secondary m-0" id="modalDetalleT">L</h6> -->
+                  <div id="datilProductItems">
+                    <!-- Contenido Dinamico -->
                   </div>
                 </div>
-
               </div>
             </div>
           </div>
@@ -354,45 +355,38 @@
   <script>
     let session = `<%- JSON.stringify(session) %>`;
         session = JSON.parse(session);
-    let cartName = "storeCart" + session.user.id;
-    let catalogName = "storeCatalog" + session.user.id;
-    let cartInvoiceName = "storeInvoice" + session.user.id;
 
-    const choicesPrice = new Choices($('#selectByPrice')[0]);
-    const choicesItems = new Choices($('#selectNumberRange')[0]);
-    $('.chzn-search').hide();
+    let cartName = "storeCart" + session.user.id;
+    let cartInvoiceName = "storeInvoice" + session.user.id;
+    let catalogName = "storeCatalog" + session.user.id;
+    let filters = session.user.permission.find(e => e.code == "8050_MANEJA_FILTROS_DINAMICOS")
 
     let dataProductsComplete;
     let dataProductsPrint;
-    let dataSidebar = {
-      "marca" : {},
-      "grupo" : {},
-      "sub_grupo" : {},
-      "modelo_moto" : {},
-      "tipo_llanta" : {},
-      "anchollanta" : {},
-      "perfil_llanta" : {},
-      "rin_llanta" : {},
-      "talla" : {},
-    }
+    let dataSidebar = {};
+    let dataSidebarMaster;
+    let dataTagsObjectName = "grupo";
+
+    const choicesPrice = new Choices($('#selectByPrice')[0]);
+    const choicesItems = new Choices($('#selectNumberRange')[0]);
     
     // *** Events Bind 
     // Tags
     $(document).on('click','#tagsContainer .tags',function(){
-      $("#appliedFiltersContainer").fadeIn("fast");
-      $("#tagsContainer").parent().fadeOut("fast");
+      $("#appliedFiltersContainer").show("fast");
+      $("#tagsContainer").parent().hide("fast");
 
       tagText = $(this).text().trim()
 
-      filterTags($(this).text());
-      filterCollapse("grupo", tagText);
+      filterTags(tagText);
+      filterCollapse(dataTagsObjectName, tagText);
     });
 
     $(document).on('click','#appliedFilters .removeFilterTag',function(){
       $(this).parent().remove();
       
       if($('#appliedFilters').children().length == 0){
-        $("#tagsContainer").parent().fadeIn("fast");
+        $("#tagsContainer").parent().show("fast");
         $("#appliedFiltersContainer").hide();
         dataProductsPrint = dataProductsComplete;
         selectView(0, 8)
@@ -427,31 +421,30 @@
       $("#modalDetalleT").html("");
       $("#numberProductsD").val(1);
 
-      let img = $(this).attr("img");
-      let name = $(this).attr("name");
-      let price = $(this).attr("price");
-      let marca = $(this).attr("marca");
-      let grupo = $(this).attr("grupo");
-      let subgrupo = $(this).attr("subgrupo");
-      let modelo = $(this).attr("modelo");
-      let talla = $(this).attr("talla");
-      let codigo = $(this).attr("codigo");
+      let obj = JSON.parse($(this).attr("data-object"))
+
+      let img = obj.imagen;
+      let name = obj.descripcion;
+      let price = obj.format_precio;
+      let codigo = obj.codigo;
+
+      $("#datilProductItems").html("")
+      for (const key in dataSidebarMaster) {
+        if (obj[key] != "") {
+          let element = `
+            <div class="d-flex gap-2">
+              <h6 class="m-0" style="text-transform: capitalize;">${key.replace("_", " ")}: </h6>
+              <h6 class="text-secondary" id="modalDetalleG">${(obj[key])}</h6>
+            </div>
+          `;
+          $("#datilProductItems").append(element)
+        }
+      }
 
       $("#modalDetalleImg").attr("src", img)
       $("#modalDetalleN").text(name)
       $("#modalDetalleP").text(price)
-      $("#modalDetalleM").text(marca)
-      $("#modalDetalleG").text(grupo)
-      $("#modalDetalleSG").text(subgrupo)
-      $("#modalDetalleModelo").text(modelo)
       $("#idProductD").attr("codigo",codigo)
-      if (talla) {
-        element = `
-          <h6 class="m-0">Talla: </h6>
-          <h6 class="text-secondary m-0">${talla}</h6>
-        `
-        $("#modalDetalleT").html(element)
-      }
 
       $("#modalDetalle").modal("show")
     })
@@ -494,7 +487,9 @@
           $(".selectVer").css("visibility", "hidden")
           $("#tableView").show();
             
-          loadTable(dataProductsPrint)
+          printProductsTable(0, 8);
+          printFilteredPaginator(0)
+          // loadTable(dataProductsPrint)
           currentView = "tabla";
           setTimeout(() => {
             $("#iconSelectView").html('<i class="fas fa-tag" style="font-size: 15px" title="vista en Tarjetas"></i>')
@@ -508,6 +503,7 @@
           $("#catalogview").show();
           
           printProducts(0, 8);
+          printFilteredPaginator(0)
           currentView = "tarjetas";
           setTimeout(() => {
             $("#iconSelectView").html('<i class="fas fa-table" style="font-size: 15px" title="vista en tabla"></i>')
@@ -525,7 +521,8 @@
 
     //  *** Funciones
     const printTags = () => {
-      let groups = Object.keys(dataSidebar.grupo)
+      let groups = Object.keys(dataSidebar[dataTagsObjectName])
+
       for (let i = 0; i < groups.length; i++) {
         let element = `
           <div class="badge tags choices-dark m-1 is-highlighted" key="grupo" value="${groups[i]}">
@@ -537,68 +534,15 @@
       }
     }
 
+    // Calcular la cantidad de elementos en el filtro
     const collapseData = (data) => {
-      if (data.marca != "" ) {
-        if (data.marca in dataSidebar.marca){
-          dataSidebar.marca[data.marca] = dataSidebar.marca[data.marca]+1;
-        } else {
-          dataSidebar.marca[data.marca] = 1;
-        }
-      }
-      if (data.grupo != "" ) {
-        if (data.grupo in dataSidebar.grupo){
-          dataSidebar.grupo[data.grupo] = dataSidebar.grupo[data.grupo]+1;
-        } else {
-          dataSidebar.grupo[data.grupo] = 1;
-        }
-      }
-      if (data.sub_grupo != "" ) {
-        if (data.sub_grupo in dataSidebar.sub_grupo){
-          dataSidebar.sub_grupo[data.sub_grupo] = dataSidebar.sub_grupo[data.sub_grupo]+1;
-        } else {
-          dataSidebar.sub_grupo[data.sub_grupo] = 1;
-        }
-      }
-      if (data.modelo_moto != "" ) {
-        if (data.modelo_moto in dataSidebar.modelo_moto){
-          dataSidebar.modelo_moto[data.modelo_moto] = dataSidebar.modelo_moto[data.modelo_moto]+1;
-        } else {
-          dataSidebar.modelo_moto[data.modelo_moto] = 1;
-        }
-      }
-      if (data.tipo_llanta != "" ) {
-        if (data.tipo_llanta in dataSidebar.tipo_llanta){
-          dataSidebar.tipo_llanta[data.tipo_llanta] = dataSidebar.tipo_llanta[data.tipo_llanta]+1;
-        } else {
-          dataSidebar.tipo_llanta[data.tipo_llanta] = 1;
-        }
-      }
-      if (data.anchollanta != "" ) {
-        if (data.anchollanta in dataSidebar.anchollanta){
-          dataSidebar.anchollanta[data.tipo_llanta] = dataSidebar.anchollanta[data.anchollanta]+1;
-        } else {
-          dataSidebar.anchollanta[data.anchollanta] = 1;
-        }
-      }
-      if (data.perfil_llanta != "" ) {
-        if (data.perfil_llanta in dataSidebar.perfil_llanta){
-          dataSidebar.perfil_llanta[data.perfil_llanta] = dataSidebar.perfil_llanta[data.perfil_llanta]+1;
-        } else {
-          dataSidebar.perfil_llanta[data.perfil_llanta] = 1;
-        }
-      }
-      if (data.rin_llanta != "" ) {
-        if (data.rin_llanta in dataSidebar.rin_llanta){
-          dataSidebar.rin_llanta[data.rin_llanta] = dataSidebar.rin_llanta[data.rin_llanta]+1;
-        } else {
-          dataSidebar.rin_llanta[data.rin_llanta] = 1;
-        }
-      }
-      if (data.talla != "" ) {
-        if (data.talla in dataSidebar.talla){
-          dataSidebar.talla[data.talla] = dataSidebar.talla[data.talla]+1;
-        } else {
-          dataSidebar.talla[data.talla] = 1;
+      for (const key in dataSidebar) {
+        if (data[key] != "") {
+          if (data[key] in dataSidebar[key]) {
+            dataSidebar[key][data[key]] = dataSidebar[key][data[key]] + 1;
+          } else {
+            dataSidebar[key][data[key]] = 1;
+          }
         }
       }
     }
@@ -608,7 +552,7 @@
       let dataSidebarElements = Object.keys(dataSidebar)
       for (let i = 0; i < dataSidebarElements.length; i++) {
         let objLength = Object.keys(dataSidebar[dataSidebarElements[i]]).length;
-
+ 
         let element = `
           <div>
             <button class="d-flex w-100 justify-content-between border-0 p-0 mb-2 bg-transparent collapseIndicator" data-bs-toggle="collapse" href="#collapse${dataSidebarElements[i]}" role="button" aria-expanded="false">
@@ -648,7 +592,7 @@
       $("#productsContainer").html("")
       for (let i = 0; i < dataPaginated.length; i++) {
         let element = `
-          <div class="card cardItemHover productCard" style="width: 31%" codigo="${dataPaginated[i].codigo}" name="${dataPaginated[i].descripcion}" price="${dataPaginated[i].format_precio}" marca="${dataPaginated[i].marca}" grupo="${dataPaginated[i].grupo}" subgrupo="${dataPaginated[i].sub_grupo}" modelo="${dataPaginated[i].modelo_moto}" talla="${dataPaginated[i].talla}" img="${dataPaginated[i].imagen}">
+          <div class="card cardItemHover productCard" style="width: 31%" codigo="${dataPaginated[i].codigo}" name="${dataPaginated[i].descripcion}" price="${dataPaginated[i].format_precio}" marca="${dataPaginated[i].marca}" grupo="${dataPaginated[i].grupo}" subgrupo="${dataPaginated[i].sub_grupo}" modelo="${dataPaginated[i].modelo_moto}" talla="${dataPaginated[i].talla}" img="${dataPaginated[i].imagen}" data-object='${JSON.stringify(dataPaginated[i])}'>
             <img class="card-img-top" src="${dataPaginated[i].imagen}" alt="" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/d/da/Imagen_no_disponible.svg'" >
             <div class="card-body pb-0 px-1 pt-2">
               <ul class="list-group list-group-flush d-flex h-100" >
@@ -680,6 +624,52 @@
       $("#preloader").hide();
     };
 
+    // Vista Clasica
+    const printProductsTable = (nStart, nEnd)  => {
+      let dataPaginated = dataProductsPrint.slice(nStart, nEnd + 1);
+      let body = dataPaginated;
+
+      $("#tableBody").html("")
+      let tableContent = "";
+      for(let i = 0; i < body.length; i++){
+        tableContent+= '<tr>';
+        tableContent+= `<td class="text-center" style="cursor: pointer">
+                          <div style="width: 60px; height: 60px"> <img class="card-img-top" src="${body[i].imagen}" alt="" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/d/da/Imagen_no_disponible.svg'" ></div>
+                        </td>`;
+        tableContent+= `<td style="font-size: 13px">
+                          <div><strong >Código: </strong>${body[i].codigo}</div>
+                          <div><strong >Descripción: </strong>${body[i].descripcion}</div>
+                        </td>`;
+        tableContent+= `<td style="font-size: 13px">
+                          <div><strong >Marca: </strong>${body[i].marca}</div>
+                          <div><strong >Grupo: </strong>${body[i].grupo}</div>
+                          <div><strong >Subgrupo: </strong>${body[i].sub_grupo}</div>
+                          ${(body[i].modelo ? '<div><strong >Modelo: </strong>'+body[i].modelo+'</div>': "")}
+                          ${(body[i].tipo_llanta ? '<div><strong >Tipo LLanta: </strong>'+body[i].tipo_llanta+'</div>': "")}
+                          ${(body[i].anchollanta ? '<div><strong >Ancho Llanta: </strong>'+body[i].anchollanta+'</div>': "")}
+                          ${(body[i].perfil_llanta ? '<div><strong >Perfil Llanta: </strong>'+body[i].perfil_llanta+'</div>': "")}
+                          ${(body[i].rin_llanta ? '<div><strong >Rin Llanta: </strong>'+body[i].rin_llanta+'</div>': "")}
+                          ${(body[i].talla ? '<div><strong >Talla: </strong>'+body[i].talla+'</div>': "")}
+                          ${(body[i].base ? '<div><strong >Base: </strong>'+body[i].base+'</div>': "")}
+                        </td>`;
+        tableContent+= `<td class="text-center ">${body[i].stock}</td>`;
+        tableContent+= `<td>
+                          <div class="d-flex align-items-center justify-content-center gap-1">
+                            <input type="number" class="form-control inputAmount" id="" style="width: 70px" min="1">
+                            <i class="fas fa-plus addProductTableView" style="cursor: pointer; margin-left: 5px" value="${body[i].codigo}"></i>
+                          </div>
+                        </td>`;
+        tableContent+= '</tr>';
+      };
+      $("#tableBody").append(tableContent);
+        $(".productCol").css("width", "30%")
+
+      if (dataPaginated.length === 0) {
+        $("#tableContainer").html("<h6>No hay resultados para la busqueda</h6>")
+      }
+      $("#preloader").hide();
+    };
+
     let listItems = []
     const printPaginator = () => {
       let productsViewAmount = $("#selectNumberRange").val();
@@ -692,7 +682,7 @@
         nEnd = productsViewAmount*i -1 ;
         nStart = productsViewAmount*i - productsViewAmount ;
         let element = `
-          <li class="pagesList" onclick="printFilteredPaginator(${i - 1})"><a data-page="${i}" onclick="printProducts(${nStart}, ${nEnd})"> ${i}</a></li>
+          <li class="pagesList" onclick="printFilteredPaginator(${i - 1})"><a data-page="${i}" onclick="onSelectPage(${nStart}, ${nEnd})"> ${i}</a></li>
         `;
         listItems.push(element);
       };
@@ -744,16 +734,26 @@
       };
     };
 
+    const onSelectPage = (nStart, nEnd) => {
+      if ($("#catalogview").is(":visible")) {
+        printProducts(nStart, nEnd)
+      } else {
+        printProductsTable(nStart, nEnd)
+      }
+    };
+
     const sortByPrice = (state) => {
       switch (state) {
         case "0": //Por defecto
           dataProductsPrint = dataProductsComplete;
           selectView(0, 8);
+          printFilteredPaginator(0)
           
         break;
         case "1": //Precio Menor
           dataProductsPrint = _.sortBy(dataProductsComplete, function(o) { return o.precio; });
           selectView(0, 8);
+          printFilteredPaginator(0)
           
         break;
         case "2": //Precio mayor
@@ -764,9 +764,8 @@
     };
 
     const filterTags = (value) => {
-      value = value.trim();
       dataProductsPrint = _.filter(dataProductsComplete, function (data) {
-        return data.grupo == value; 
+        return data[dataTagsObjectName] == value; 
       });
       selectView(0, 8)
       printPaginator()
@@ -785,30 +784,20 @@
             o.codigo.toLowerCase().split(' ').join('').indexOf(valueFilter.toLowerCase()) > -1
         ) return o;
       }); 
+
       selectView(0, 8)
       printPaginator()
     };
 
     const filterCollapse = (key, value) => {
-      valueFilter = value.replace(/\([^()]*\)/g, '') // Expresion regular para parentesis del string
-    
-      console.log(key, valueFilter)
+      valueFilter = value.replace(/\([^()]*\)/g, '') // Expresion regular para quitar parentesis del string
+
       dataProductsPrint = _.filter(dataProductsPrint, o => {
         if (o[key].toLowerCase().split(' ').join('').indexOf(valueFilter.toLowerCase().split(' ').join('')) > -1 ) return o;
       }); 
-      
+
       // Reload collapse
-      dataSidebar = { 
-        "marca" : {},
-        "grupo" : {},
-        "sub_grupo" : {},
-        "modelo_moto" : {},
-        "tipo_llanta" : {},
-        "anchollanta" : {},
-        "perfil_llanta" : {},
-        "rin_llanta" : {},
-        "talla" : {},
-      }
+      dataSidebar = JSON.parse(JSON.stringify(dataSidebarMaster)) 
       for (let i = 0; i < dataProductsPrint.length; i++) {
         collapseData(dataProductsPrint[i]);
       }
@@ -843,18 +832,7 @@
         if (o[key].toLowerCase().split(' ').join('').indexOf(valueFilter.toLowerCase().split(' ').join('')) > -1 ) return o;
       }); 
 
-      // clean collapse values
-      dataSidebar = { 
-        "marca" : {},
-        "grupo" : {},
-        "sub_grupo" : {},
-        "modelo_moto" : {},
-        "tipo_llanta" : {},
-        "anchollanta" : {},
-        "perfil_llanta" : {},
-        "rin_llanta" : {},
-        "talla" : {},
-      }
+      dataSidebar = JSON.parse(JSON.stringify(dataSidebarMaster)) 
       for (let i = 0; i < dataProductsPrint.length; i++) {
         collapseData(dataProductsPrint[i]);
       }
@@ -928,22 +906,10 @@
       }
     }
 
-    const setCartIconAmount = () => {
-      if (!(localStorage.getItem(cartName) === null)) {
-        let amount = JSON.parse(localStorage.getItem(cartName)).length;
-        $("#cartIndicator").html((amount ? amount : ""));
-      }
-      if (!(localStorage.getItem(cartName) === null)) {
-        let amount = JSON.parse(localStorage.getItem(cartName)).length;
-        $("#invoicesIndicator").html((amount ? amount : ""));
-      }
-    }
-
     const getProductsData = () => {
       fetch("/catalogo/productos") 
         .then(response => response.json())
         .then(data => {
-          console.log(data.items)
           createIndexedDB(data.items)
         }) 
         .catch(error => console.log('Request failed', error));
@@ -963,81 +929,18 @@
       }
     }
 
-    const loadTable = (body) => {
-      $("#tableContainer").html("");
-
-      let table =  `          
-        <table id="tableProducts" class="mb-1 mt-2 w-100" style="width: 100%; table-layout: fixed">
-          <thead>
-            <tr>
-              <td class="imgCol text-uppercase text-secondary text-xxs text-center font-weight-bolder opacity-7 noSorter">Imagen</td>
-              <td class="productCol text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Producto</td>
-              <td class="atributesCol text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Atributos</td>
-              <td class="stockCol text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Stock</td>
-              <td class="text-uppercase text-secondary text-xxs text-center font-weight-bolder opacity-7 noSorter">Añadir</td>
-            </tr>
-          </thead>
-        </table>
-      `;
-
-      let tableContent = '<tbody id="tableBody">';
-      for(let i = 0; i < body.length; i++){
-        tableContent+= '<tr>';
-        tableContent+= `<td class="text-center" style="cursor: pointer">
-                          <div style="width: 60px; height: 60px"> <img class="card-img-top" src="${body[i].imagen}" alt="" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/d/da/Imagen_no_disponible.svg'" ></div>
-                        </td>`;
-        tableContent+= `<td style="font-size: 13px">
-                          <div><strong >Código: </strong>${body[i].codigo}</div>
-                          <div><strong >Descripción: </strong>${body[i].descripcion}</div>
-                        </td>`;
-        tableContent+= `<td style="font-size: 13px">
-                          <div><strong >Marca: </strong>${body[i].marca}</div>
-                          <div><strong >Grupo: </strong>${body[i].grupo}</div>
-                          <div><strong >Subgrupo: </strong>${body[i].sub_grupo}</div>
-                          ${(body[i].modelo ? '<div><strong >Modelo: </strong>'+body[i].modelo+'</div>': "")}
-                          ${(body[i].tipo_llanta ? '<div><strong >Tipo LLanta: </strong>'+body[i].tipo_llanta+'</div>': "")}
-                          ${(body[i].anchollanta ? '<div><strong >Ancho Llanta: </strong>'+body[i].anchollanta+'</div>': "")}
-                          ${(body[i].perfil_llanta ? '<div><strong >Perfil Llanta: </strong>'+body[i].perfil_llanta+'</div>': "")}
-                          ${(body[i].rin_llanta ? '<div><strong >Rin Llanta: </strong>'+body[i].rin_llanta+'</div>': "")}
-                          ${(body[i].talla ? '<div><strong >Talla: </strong>'+body[i].talla+'</div>': "")}
-                          ${(body[i].base ? '<div><strong >Base: </strong>'+body[i].base+'</div>': "")}
-                        </td>`;
-        tableContent+= `<td class="text-center ">${body[i].stock}</td>`;
-        tableContent+= `<td>
-                          <div class="d-flex align-items-center justify-content-center gap-1">
-                            <input type="number" class="form-control inputAmount" id="" style="width: 70px" min="1">
-                            <i class="fas fa-plus addProductTableView" style="cursor: pointer" value="${body[i].codigo}"></i>
-                          </div>
-                        </td>`;
-        tableContent+= '</tr>';
-      };
-      tableContent+='</tbody>';
-      $("#tableContainer").append(table);
-      $("#tableProducts").append(tableContent);
-
-      const tableObj = new simpleDatatables.DataTable("#tableProducts", {
-        searchable: false,
-      });
-
-      $(".productCol").css("width", "30%")
-      $(".atributesCol").css("width", "30%")
-      $(".stockCol").css("width", "10%")
-      $(".imgCol").css("width", "13%")
-      $("#preloader").hide();
-    }
-
     const selectView = (nS, nE) => {
       if (currentView == "tarjetas") {
         printProducts(nS, nE);
       }
       if (currentView == "tabla") {
-        loadTable(dataProductsPrint)
+        printProductsTable(nS, nE);
       }
     }
 
     const createIndexedDB = (data) => {
       if (!window.indexedDB) {
-        console.log("Tu navegador no soporta indexedDB");
+        console.error("Tu navegador no soporta indexedDB");
         return;
       }
 
@@ -1050,7 +953,6 @@
         const store = db.createObjectStore("products", { keyPath: "id", autoIncrement: true });
       }
       request.onsuccess = (event) => {
-        console.log("Database opened successfully");   
         const db = request.result;
         const transaction = db.transaction("products", "readwrite");
         const store = transaction.objectStore("products");
@@ -1093,9 +995,35 @@
           };
         }
       )
-    }
+    };
+
+    const handlePermissions = () => {
+      let permissions = session.user.permission;
+      let permissionIndex; 
+
+      permissionIndex = permissions.findIndex(x => x.code === "8085_VIEW_CLASIC");
+      if (permissionIndex  == -1 || permissions[permissionIndex].content == "N") {
+        $("#iconSelectView").parent().hide();
+      };
+    };
 
     $( document ).ready(function() {
+      handlePermissions(); 
+      $("#menuCatalogo").addClass("activeNav");
+
+      // Obtener filtros catalogo
+      if (filters) {
+        filters = filters.content.split(",");
+        for (let i = 0; i < filters.length; i++) {
+          dataSidebar[filters[i]] = {};
+        }
+        // Se copia el objeto dataSidebar para poder reiniciar los filtros cuando se necesite
+        dataSidebarMaster = JSON.parse(JSON.stringify(dataSidebar)) 
+      };
+
+      // Nombre del objeto de donde salen las tags
+      if (session.user.id_company == 5){dataTagsObjectName = "producto"} 
+
       // Comprobar si la lista de productos esta en el localStorage (indexedDB)
       databaseExists(catalogName, function (state) {
         if (state) {
@@ -1111,14 +1039,13 @@
             printTags();
             printCollapse();
             printPaginator();
-            selectView(0, 8)
+            selectView(0, 8);
             setCartIconAmount();
           })
         } else {
           getProductsData();
         }
       });
-      $("#menuCatalogo").addClass("activeNav");
     });
   </script>
 

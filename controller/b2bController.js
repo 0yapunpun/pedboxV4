@@ -1,10 +1,25 @@
 const controller = {};
-const _ = require('underscore');
 const userController = require('../controller/usersController.js');
 const service = require('../engine/apiService.js');
+const config = require('../engine/config.js');
 const { nvFormatCash } = require('./helpers.js');
+const _ = require('underscore');
+const multer  = require('multer');
 const moment = require('moment');
 const { response } = require('express');
+
+var now = Date.now();
+
+var stoaregeDocumentoUsuario = multer.diskStorage({
+  destination: function (req, file, callback) {
+    callback(null, config.urlBase+'/public/img/documentos-usuario');
+  },
+  filename: function (req, file, callback) {
+      var name = now+'-'+file.originalname;
+      callback(null, name);
+  }
+});
+var uploadDocumentoUsuario = multer({ storage: stoaregeDocumentoUsuario }).single('file');
 
 controller.calidosos = async (req, res, next) => {
   // Validar login
@@ -142,6 +157,8 @@ controller.catalogoProductos = async (req, res, next) => {
 
   let items = productos.result.extranet.Table;
   images = images.result.data;
+
+  
 
   try {
     items.forEach(item => {
@@ -351,13 +368,18 @@ controller.createPermiso = async(req, res, next) => {
   res.send({'response': response});
 }
 
-controller.cotizaciones = async(req, res, next) => {
+controller.documentosUsuario = async(req, res, next) => {
   // Validar login
   if (!req.session.login) { return res.redirect('/login'); }
 
-  // TODO WHat ????
-  res.render('cotizaciones', {'session': req.session});
+  res.render('documentos-usuario', {'session': req.session});
+}
 
+controller.uploadDocumentoUsuario = async(req, res, next) => {
+  uploadDocumentoUsuario(req, res, (err) => {
+    if (err) { console.log('error uploading image', err); } else {console.log('image uploaded') };
+  })
+  res.send({'file': now});
 }
 
 module.exports = controller

@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-const { sendCarritoCompras } = require('../controller/viewController');
+// const { sendCarritoCompras } = require('../controller/viewController');
 const { showLog } = require('./helpers');
 const service = {};
 const urlPedbox = 'http://api.pedbox.co:5037/';

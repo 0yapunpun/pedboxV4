@@ -21,7 +21,8 @@
   <link rel="stylesheet" href="/css/reports.css">
   <!-- Custom -->
   <link rel="stylesheet" href="/css/custom/tables.css">
-  <link rel="stylesheet" href="" id="colorBrand">
+  <!-- Color Page -->
+  <%- include('./partials/colors.ejs') %> 
 
   <style>
     .tags {
@@ -711,7 +712,19 @@
       }
     }
 
+    const handlePermissions = () => {
+      let permissions = session.user.permission;
+      let permissionIndex; 
+
+      permissionIndex = permissions.findIndex(x => x.code === "8085_VIEW_CLASIC");
+      if (permissionIndex  == -1 || permissions[permissionIndex].content == "N") {
+        $("#iconSelectView").parent().hide();
+      };
+    };
+
     $( document ).ready(function() {
+      handlePermissions(); 
+
       dataProductsComplete = productos;
       dataProductsPrint = dataProductsComplete;
 
@@ -719,7 +732,6 @@
       selectView(0, 8);
 
       $("#menuCatalogoTop").addClass("activeNav");
-
       $("#preloader").hide();
     });
 

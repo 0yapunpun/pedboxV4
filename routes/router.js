@@ -15,7 +15,7 @@ router.get('/historial-facturas', b2bController.historialFacturas);
 router.get('/historial-pedidos', b2bController.historialPedidos);
 router.post('/historial-pedidos', b2bController.historialPedidosPedido);
 router.get('/historial-pedidos/:numero', b2bController.historialPedidosDetalle);
-router.get('/cotizaciones', b2bController.cotizaciones);
+// router.get('/cotizaciones', b2bController.cotizaciones);
 router.get('/nuevo-pedido/:codigo', b2bController.nuevoPedido);
 router.get('/infoVendedor/:id', b2bController.getInfoVendedor);
 router.get('/catalogo', b2bController.catalogo);
@@ -36,6 +36,8 @@ router.post('/carrito-facturas', b2bController.sendCarritoFacturas);
 router.get('/permisos', b2bController.permisos);
 router.post('/permisos', b2bController.updatePemiso);
 router.post('/permisos/nuevo-permiso', b2bController.createPermiso);
+router.get('/documentos-usuario', b2bController.documentosUsuario);
+router.post('/documentos-usuario/upload', b2bController.uploadDocumentoUsuario);
 
 // Por integrar
 router.get('/helpdesk', viewController.helpdesk);

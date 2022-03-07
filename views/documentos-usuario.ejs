@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" type="image/x-icon" href="https://app.pedbox.co/assets/logos/logo_blanco.png"/>
+  <title>Documentos Usuarios</title>
+
+  <!-- Fonts and icons -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <link href="/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <!-- CSS Files -->
+  <link id="pagestyle" href="/css/soft-ui-dashboard.css?v=1.0.3" rel="stylesheet" />
+  <!-- JQUERY UI -->
+  <link rel="stylesheet" href="/css/jquery-ui.min.css">
+  <!-- REPORTS CSS -->
+  <link rel="stylesheet" href="/css/reports.css">
+  <!-- Color Page -->
+  <%- include('./partials/colors.ejs') %> 
+
+  <style>
+    .inputFile{
+      border: dashed 2px lightgray;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 0.5rem;
+      padding: 3px;
+    }  
+    .removeDocument{
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body class="g-sidenav-show bg-gray-100">
+
+  <!-- Menu -->
+  <%- include('./partials/menu.ejs') %> 
+
+  <main class="main-content max-height-vh-100 h-100">
+
+    <!-- Cabecera -->
+    <%- include('./partials/header.ejs') %>
+  
+      <!-- Cotent -->
+      <div class="p-4">
+        <div class="card p-3 m-3">
+            <div class="d-flex">
+              <div class="w-60">
+                <h6 class="mb-4">Mis Documentos</h6>
+                <div id="documentsContainer">
+                  <!-- Contenido Dinamico -->
+                </div>
+              </div>
+              <div class="w-40 ms-3 ps-3" style="border-left: solid 1px lightgray;">
+                <h6 class="mb-4">Subir Documento</h6>
+                <form action="" enctype="multipart/form-data" id="f-upload">
+                  <input type="file" name="file" id="inputDocument"  accept=".xlsx,.xls, image/*, .doc, .docx, .pptx,.txt,.pdf" hidden> 
+                </form>
+                <div class="inputFile" >
+                  <span id="fileName">
+                    Seleccione Archivo
+                  </span>
+                </div>
+
+                <div class="mt-2"> 
+                  <label for="">Seleccione Tipo de Documento:</label>
+                  <select name="" id="inputKind" class="form-control">
+                    <option value="-1" selected disabled hidden>...</option>
+                    <!-- Contenido dinamico -->
+                  </select>
+                </div>
+
+                <div class="text-center mt-3">
+                  <button class="btn btn-primary" onclick="sendData()">Enviar</button>
+                </div>
+              </div>
+            </div>
+        </div> 
+      </div>
+
+      <!-- preloader -->
+      <%- include('./partials/preloader.ejs') %> 
+    </main>
+
+
+  <!-- Scripts -->
+  <script src="/js/core/popper.min.js"></script>
+  <script src="/js/core/bootstrap.min.js"></script>
+  <script src="/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="/js/plugins/choices.min.js"></script>
+  <script src="/js/soft-ui-dashboard.min.js?v=1.0.3"></script>
+  <script src="/js/plugins/dragula/dragula.min.js"></script>
+  <script src="/js/plugins/jkanban/jkanban.js"></script>
+  <script src="/js/jquery.js"></script>
+  <script src="/js/jquery-ui.min.js"></script>
+  <script src="/js/plugins/datatables.js"></script>
+  <script src="/js/plugins/chartjs.min.js"></script>
+  <script src="/js/underscore-min.js"></script>
+  <script src="/js/helpers.js"></script>
+  <script src="/js/plugins/dropzone.min.js"></script>
+  <script src="/js/sweetalert2.all.min.js"></script>
+  <script src="/js/menu.js"></script>
+    
+  <script>
+    let session = `<%- JSON.stringify(session) %>`;
+        session = JSON.parse(session);
+
+    $('input[type=file]').change(function(){
+      $("#fileName").text(this.files[0].name)
+    })
+
+    $(".inputFile").on("click", function (e) {
+      $('#inputDocument').trigger("click");
+      e.stopPropagation(); //Necesary line
+    })
+
+    $(document).on("click", ".removeDocument", function (){
+      Swal.fire({
+        title: '¿Está Seguro de eliminar este documento?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#302560',
+        cancelButtonColor: '#8392AB',
+        confirmButtonText: 'Sí',
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true
+      }).then((result) => {
+        let id = $(this).attr("data-id")
+        alert("se eliminara el documento"+ id)
+        if (result.isConfirmed) {
+          $(this).parent().parent().remove();
+        }
+      })
+    })
+
+    const loadMasters = (data) => {
+      for (let i = 0; i < data.length; i++) {
+        let element = `
+          <option value="${data[i].code}">${data[i].type}</option>
+        `;
+        $("#inputKind").append(element)
+      }
+    }
+
+    const loadDocuments = (data) => {
+      for (let i = 0; i < data.length; i++) {
+        let element = `
+          <div>
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="d-flex">
+                <div class="d-flex justify-content-center align-items-center m-3" style="width: 30px;">
+                  <a href="/img/documentos-usuario/${data[i].file_name}" target="_blank">
+                    <i class="fas fa-file" style="font-size: 25px;"></i>
+                  </a>
+                </div>
+                <div class="d-flex flex-column justify-content-center">
+                  <h6 class="fw-bolder m-0">${data[i].document}</h6>
+                  <label style="opacity: 0.7;" class="m-0">Fecha: <span>${data[i].date}</span></label>
+                </div>
+              </div>
+              <div class="removeDocument" data-id="${data[i].id_document}">
+                <i class="fas fa-trash" style="color: red;" ></i>
+              </div>
+            </div>
+            <hr class="horizontal dark my-1">
+          </div>
+        `;
+        $("#documentsContainer").append(element)
+      }
+    }
+
+    const sendData = () => {
+      if ($('#inputKind option:selected').val() == ""){
+        Swal.fire({
+          title: 'Selecciona tipo de documento antes de enviar',
+          confirmButtonText: 'Continuar',
+        })
+      }
+
+      if ($("#inputDocument").val() == ''){
+        Swal.fire({
+          title: 'Sube tu archivo antes de enviar',
+          confirmButtonText: 'Continuar',
+        })
+      }
+
+      var formData = new FormData($("#f-upload")[0]);
+      let filenane = $("#inputDocument")[0].files[0].name;
+      $.ajax({
+          url: '/documentos-usuario/upload',
+          type: 'POST',
+          data: formData,
+          processData: false,
+          contentType: false,
+      }).done(function (data) {
+        let nameFile = data.file+'-'+filenane;
+        let documentName = $('#inputKind option:selected').text();
+        let documentId = $('#inputKind option:selected').val();
+        let date = getCurrentDate();
+        let id = 1111; //TODO: la id será la respuesta del servicio
+        let id_company ;
+        let nit;
+
+        console.log(documentName)
+        let element = `
+         <div>
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="d-flex">
+                <div class="d-flex justify-content-center align-items-center m-3" style="width: 30px;">
+                  <a href="/img/documentos-usuario/${nameFile}" target="_blank">
+                    <i class="fas fa-file" style="font-size: 25px;"></i>
+                  </a>
+                </div>
+                <div class="d-flex flex-column justify-content-center">
+                  <h6 class="fw-bolder m-0">${documentName}</h6>
+                  <label style="opacity: 0.7;" class="m-0">Fecha: <span>${date}</span></label>
+                </div>
+              </div>
+              <div class="removeDocument" data-id="${id}">
+                <i class="fas fa-trash" style="color: red;"></i>
+              </div>
+            </div>
+            <hr class="horizontal dark my-1">
+          </div>
+        `;
+        $("#documentsContainer").append(element)
+
+        $("#inputDocument").val('');
+        $("#fileName").text('Selecciona Archivo');
+        $("#inputKind").val('-1');
+      });
+    }
+      
+    $(document).ready(function () {
+      loadMasters(x);
+      loadDocuments(y);
+
+      $("#menuDocumentosUsuario").addClass("activeNav")
+      $("#preloader").hide();
+    })
+
+    // *** test
+    let x = [
+      {
+        code : "1",
+        type : "RUT"
+      },
+      {
+        code : "2",
+        type : "Certificado Bancario"
+      },
+      {
+        code : "3",
+        type : "RAUT"
+      },
+    ];
+
+    let y = [
+      {
+        id_document: 3,
+        id_type_document: 1,
+        document: "Certificado Bancario",
+        file_name: "politica-tratamiento-de-datos.pdf",
+        date: "3/11/1111"
+      }
+    ];
+  </script>
+
+</body>
+</html>

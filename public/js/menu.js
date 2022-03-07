@@ -1,13 +1,4 @@
 // *** Menu and header functions
-// Controlar color por compañia
-const loadColorsBrand = function (data) {
-  let company = data.user.id_company;
-  console.log(company)
-
-  if (company == 36 || company == 5  || company == 10) {$("#colorBrand").attr("href", "/css/custom/color1.css")}
-  if (company == 15) {$("#colorBrand").attr("href", "/css/custom/color2.css")}
-};
-
 // Escondear imagen usuario cuando el menu esta collapsado
 const menuState = function () { 
   if ($("body").hasClass("g-sidenav-hidden")) {
@@ -60,6 +51,21 @@ const handlePermissionsMenu = (data) => {
   };
 };
 
+const setCartIconAmount = () => {
+  try {
+    if (!(localStorage.getItem(cartInvoiceName) === null)) {
+      let localObjectLenght = JSON.parse(localStorage.getItem(cartInvoiceName)).length;
+      $("#invoicesIndicator").text((localObjectLenght ? localObjectLenght : ""))
+    } 
+    if (!(localStorage.getItem(cartName) === null)) {
+      let localObjectLenght = JSON.parse(localStorage.getItem(cartName)).length;
+      $("#cartIndicator").text((localObjectLenght ? localObjectLenght : ""))
+    }  
+  } catch (error) {
+    // Esta vista no tiene boton de carrito    
+  }
+}
+
 $(document).ready(function () {
   // Foto de perfil
   let fotoPerfil = (session.user.photo ? "https://api.pedbox.co:8590" + session.user.photo : session.user.dataCompany[0].logo)
@@ -73,20 +79,10 @@ $(document).ready(function () {
       $("#cards").hide();
     } 
   };
+  
   // Carts indicators
-  try {
-    if (!(localStorage.getItem(cartInvoiceName) === null)) {
-      let localObjectLenght = JSON.parse(localStorage.getItem(cartInvoiceName)).length;
-      $("#invoicesIndicator").text((localObjectLenght ? localObjectLenght : ""))
-    } 
-    if (!(localStorage.getItem(cartName) === null)) {
-      let localObjectLenght = JSON.parse(localStorage.getItem(cartName)).length;
-      $("#cartIndicator").text((localObjectLenght ? localObjectLenght : ""))
-    }  
-  } catch (error) {
-    console.log("This view has no cart", error)    
-  }
+  setCartIconAmount();
 
-  loadColorsBrand(session);
+  // loadColorsBrand(session);
   handlePermissionsMenu(session);
 })
