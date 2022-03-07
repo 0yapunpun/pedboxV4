@@ -1,6 +1,16 @@
 
 const helpers = {};
 
+helpers.hasPermission = (permissions, permission) => {
+  let permissionIndex; 
+
+  permissionIndex = permissions.findIndex(x => x.code === permission);
+  if (permissionIndex == -1 || permissions[permissionIndex].content == "N") {
+    return false
+  };
+  return true
+}
+
 helpers.nvFormatCash = (
   text = 0,
   pre = "",

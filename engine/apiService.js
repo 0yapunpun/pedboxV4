@@ -68,7 +68,8 @@ service.detalleProductos = async(id_company, codigo) => {
 }
 
 service.productos = async(url_company, nit, id_company) => {
-  const url = urlKakashi+'get_extranet?nit='+nit+'&tipo=10&url='+url_company+'&id_company='+id_company;
+  const extranet = (id_company == 39 ? 12 : 10) // El catalogo de "universal de respuestos" es consultado en un extranet diferente
+  const url = urlKakashi+'get_extranet?nit='+nit+'&tipo='+extranet+'&url='+url_company+'&id_company='+id_company;
   const data =  await makeRequest(url);
   return data;
 }

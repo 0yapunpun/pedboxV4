@@ -12,7 +12,8 @@ var app = express();
 app.use(session({secret: 'calidosos_session', saveUninitialized: true, resave: true}));
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', [path.join(__dirname, 'views'),
+                  path.join(__dirname, 'views/elements'),]);
 app.set('view engine', 'ejs');
 
 //Midleware para  configurar el server para permitir cross domain

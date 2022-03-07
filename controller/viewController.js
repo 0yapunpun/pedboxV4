@@ -37,6 +37,15 @@ controller.index = async(req, res, next) => {
   res.render('index', {'session': req.session});
 }
 
+controller.noPermission = async(req, res, next) => {
+  // Validar login
+  if (!req.session.login) { return res.redirect('/login'); }
+
+  res.render('elements/no-permission', {'session': req.session});
+}
+
+//** Vistas no integradas
+
 controller.helpdesk = async(req, res, next) => {
   // Validar login
   if (!req.session.login) { return res.redirect('/login'); }

@@ -7,6 +7,7 @@ router.get('/', viewController.index);
 router.get('/login', viewController.login);
 router.post('/login', viewController.loginValidate);
 router.get('/logout', viewController.logout);
+router.get('/no-permission', viewController.noPermission);
 
 // b2b
 router.get('/calidosos', b2bController.calidosos);

@@ -173,12 +173,16 @@
                     <div id="cartIndicator" class="badge badge-sm badge-circle badge-floating badge-primary border-white" style="position: absolute; bottom: -25%; border: solid; color: white; padding: 10px !important;"></div>
                   </div>
                 </div>
+
                 <div class="d-flex justify-content-center align-items-center gap-5 mt-1" >
-                  <div class=" icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg" style="cursor: pointer; position: relative;" onclick='window.location.href = "/carrito-facturas"'>
-                    <i class="fas fa-dollar-sign" style="font-size: 15px" title="Carrito de Facturas"></i>
-                    <div id="invoicesIndicator" class="badge badge-sm badge-circle badge-floating badge-primary border-white" style="position: absolute; bottom: -25%; border: solid; color: white; padding: 10px !important;"></"></div>
+                  <div id="iconCarritoFacturas">
+                    <div class=" icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg" style="cursor: pointer; position: relative;" onclick='window.location.href = "/carrito-facturas"'>
+                      <i class="fas fa-dollar-sign" style="font-size: 15px" title="Carrito de Facturas"></i>
+                      <div id="invoicesIndicator" class="badge badge-sm badge-circle badge-floating badge-primary border-white" style="position: absolute; bottom: -25%; border: solid; color: white; padding: 10px !important;"></div>
+                    </div>
                   </div>
                 </div>
+
               </div>
 
             </div>
@@ -512,7 +516,7 @@
       for (let i = 0; i < dataPaginated.length; i++) {
         let element = `
           <div class="card cardItemHover productCard" style="width: 31%" codigo="${dataPaginated[i].codigo}" name="${dataPaginated[i].descripcion}" price="${dataPaginated[i].format_precio }" marca="${dataPaginated[i].marca}" grupo="${dataPaginated[i].grupo}" subgrupo="${dataPaginated[i].sub_grupo}" modelo="${dataPaginated[i].modelo_moto}" talla="${dataPaginated[i].talla}" img="${dataPaginated[i].imagen}">
-            <div style="width: 100%; height: 50%"><img class="card-img-top" src="${dataPaginated[i].imagen}" alt="" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/d/da/Imagen_no_disponible.svg'" style="max-width: 100%; max-height: 100%; object-fit: scale-down"></div>
+            <div style="width: 100%; height: 50%; min-height: 200px; max-height: 200px"><img class="card-img-top" src="${dataPaginated[i].imagen}" alt="" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/d/da/Imagen_no_disponible.svg'" style="max-width: 100%; max-height: 100%; object-fit: scale-down"></div>
             <div class="card-body pb-0 px-1 pt-2">
               <ul class="list-group list-group-flush d-flex h-100" >
                 <li class="list-group-item flex-fill p-0 pb-2 ps-2 bg-transparent d-flex flex-column justify-content-between" >
@@ -719,6 +723,11 @@
       permissionIndex = permissions.findIndex(x => x.code === "8085_VIEW_CLASIC");
       if (permissionIndex  == -1 || permissions[permissionIndex].content == "N") {
         $("#iconSelectView").parent().hide();
+      };
+
+      permissionIndex = permissions.findIndex(x => x.code === "8005_CAN_PAY_INVOICES_EXTRANET");
+      if (permissionIndex  == -1 || permissions[permissionIndex].content == "N") {
+        $("#iconCarritoFacturas").hide();
       };
     };
 

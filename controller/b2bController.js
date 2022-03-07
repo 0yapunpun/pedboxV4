@@ -2,7 +2,7 @@ const controller = {};
 const userController = require('../controller/usersController.js');
 const service = require('../engine/apiService.js');
 const config = require('../engine/config.js');
-const { nvFormatCash } = require('./helpers.js');
+const { nvFormatCash, hasPermission } = require('./helpers.js');
 const _ = require('underscore');
 const multer  = require('multer');
 const moment = require('moment');
@@ -23,7 +23,8 @@ var uploadDocumentoUsuario = multer({ storage: stoaregeDocumentoUsuario }).singl
 
 controller.calidosos = async (req, res, next) => {
   // Validar login
-  if (!req.session.login) { return res.redirect('/login'); }
+  if (!req.session.login) { return res.redirect('/login');}
+  if (!(hasPermission(req.session.user.permission ,"8028_CAN_ACCESS_TO_CALIDOSOS"))) {return res.redirect('/no-permission');}
 
   let body = {"doc": req.session.user.nit};
   let puntos = await service.calidosos(body);
@@ -34,6 +35,7 @@ controller.calidosos = async (req, res, next) => {
 controller.historialTransacciones = async (req, res, next) => {
   // Validar login
   if (!req.session.login) { return res.redirect('/login'); }
+  if (!(hasPermission(req.session.user.permission ,"8065_VIEW_ECOMMERCE"))) {return res.redirect('/no-permission');}
 
   let url_company = req.session.user.dataCompany[0].Url;
   let id_company = req.session.user.id_company;
@@ -47,6 +49,7 @@ controller.historialTransacciones = async (req, res, next) => {
 controller.historialFacturas = async (req, res, next) => {
   // Validar login
   if (!req.session.login) { return res.redirect('/login'); }
+  if (!(hasPermission(req.session.user.permission ,"8010_CAN_VIEW_DOCUMENT_HISTORY_EXTRANET"))) {return res.redirect('/no-permission');}
 
   let url_company = req.session.user.dataCompany[0].Url;
   let id_company = req.session.user.id_company;
@@ -62,6 +65,7 @@ controller.historialFacturas = async (req, res, next) => {
 controller.facturas = async(req, res, next) => {
   // Validar login
   if (!req.session.login) { return res.redirect('/login'); }
+  if (!(hasPermission(req.session.user.permission ,"8035_CAN_VIEW_PORTFOLIO_EXTRANET"))) {return res.redirect('/no-permission');}
 
   let url_company = req.session.user.dataCompany[0].Url;
   let id_company = req.session.user.id_company;
@@ -75,6 +79,7 @@ controller.facturas = async(req, res, next) => {
 controller.historialPedidos = async (req, res, next) => {
   // Validar login
   if (!req.session.login) { return res.redirect('/login'); }
+  if (!(hasPermission(req.session.user.permission ,"8020_CAN_VIEW_ORDERS_EXTRANET"))) {return res.redirect('/no-permission');}
 
   let url_company = req.session.user.dataCompany[0].Url;
   let id_company = req.session.user.id_company;
@@ -143,6 +148,7 @@ controller.getInfoVendedor = async (req, res, next) => {
 controller.catalogo = async (req, res, next) => {
   // Validar login
   if (!req.session.login) { return res.redirect('/login'); }
+  if (!(hasPermission(req.session.user.permission ,"8065_VIEW_ECOMMERCE"))) {return res.redirect('/no-permission');}
   
   res.render('catalogo', {'session': req.session});
 }
@@ -157,8 +163,6 @@ controller.catalogoProductos = async (req, res, next) => {
 
   let items = productos.result.extranet.Table;
   images = images.result.data;
-
-  
 
   try {
     items.forEach(item => {
@@ -196,6 +200,7 @@ controller.catalogoProductos = async (req, res, next) => {
 controller.catalogoTop = async (req, res, next) => {
   // Validar login
   if (!req.session.login) { return res.redirect('/login'); }
+  if (!(hasPermission(req.session.user.permission ,"8029_VIEW_TOP_50_PRODUCTS"))) {return res.redirect('/no-permission');}
 
   let id_company = req.session.user.id_company;
   let url_company = req.session.user.dataCompany[0].Url;
@@ -206,8 +211,6 @@ controller.catalogoTop = async (req, res, next) => {
 
   let items = productos.result.extranet.Table;
   images = images.result.data;
-
-  console.log("??", items)
 
   try {
     items.forEach(item => {
@@ -243,7 +246,8 @@ controller.catalogoTop = async (req, res, next) => {
 
 controller.certificados = async(req, res, next) => {
   // Validar login
-  if (!req.session.login) { return res.redirect('/login'); }
+  if (!req.session.login) { return res.redirect('/login')}
+  if (!(hasPermission(req.session.user.permission ,"8025_CAN_EXPORT_CERTIFICATES_EXTRANET"))) {return res.redirect('/no-permission');}
   
   res.render('certificados', {'session': req.session});
 }
@@ -251,6 +255,7 @@ controller.certificados = async(req, res, next) => {
 controller.retenciones = async(req, res, next) => {
   // Validar login
   if (!req.session.login) { return res.redirect('/login'); }
+  if (!(hasPermission(req.session.user.permission ,"8030_CAN_CONFIGURE_EXTRANET"))) {return res.redirect('/no-permission');}
 
   let id_company = req.session.user.id_company;
   let id_country = req.session.user.id_country;
@@ -277,6 +282,7 @@ controller.retencionesCreate = async (req, res, next) => {
 controller.usuarios = async(req, res, next) => {
   // Validar login
   if (!req.session.login) { return res.redirect('/login'); }
+  if (!(hasPermission(req.session.user.permission ,"8030_CAN_CONFIGURE_EXTRANET"))) {return res.redirect('/no-permission');}
 
   let id_company = req.session.user.id_company;
   let id_user_company = req.session.user.id;
@@ -313,6 +319,8 @@ controller.updateUser = async(req, res, next) => {
 controller.carritoCompras = async(req, res, next) => {
   // Validar login
   if (!req.session.login) { return res.redirect('/login'); }
+  if (!(hasPermission(req.session.user.permission ,"8045_CAN_VIEW_SHOPPING_CAR"))) {return res.redirect('/no-permission');}
+  // TODO problema de con permisos del usuario de igb 
   
   let id_person = req.session.user.id_person;
   let address = await service.informacionVendedor(id_person);
@@ -335,6 +343,7 @@ controller.sendCarritoFacturas = async(req, res, next) => {
 controller.carritoFacturas = async(req, res, next) => {
   // Validar login
   if (!req.session.login) { return res.redirect('/login'); }
+  if (!(hasPermission(req.session.user.permission ,"8005_CAN_PAY_INVOICES_EXTRANET"))) {return res.redirect('/no-permission');}
 
   let id_company = req.session.user.id_company;
   let id_country = req.session.user.id_country;
@@ -347,6 +356,7 @@ controller.carritoFacturas = async(req, res, next) => {
 controller.permisos = async(req, res, next) => {
   // Validar login
   if (!req.session.login) { return res.redirect('/login'); }
+  if ((req.session.user.type_user == "E")) {return res.redirect('/no-permission');}
   
   let id_user_company = req.session.user.id;
   let id_company = req.session.user.id_company;
