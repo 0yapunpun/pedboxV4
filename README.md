@@ -1,10 +1,11 @@
-**Pedbox versión cuatro:**
+**Pedbox V4***
 
----
-
-## Pruebas pendientes: 
+## pendientes: 
 - Prueba de armado de pedido, vista historial-pedido, carrito-compras, carrito-facturas
-- Prueba de permisos 
+- Prueba de catalogos con todas las empresas 
+- Implementar colores de empresas faltantes
+- Implementar login con estilos cambiados por empresa
+- implementar cookie session
 
 ## Notas: 
 - El object session y el script menu.js deben estar en todas las vistas con menu y cabecera
@@ -16,11 +17,5 @@
 
   <!-- 
     <script src="/js/menu.js"></script> 
-  -->
-
-- La link tag con el id "colorBrand" es utilizada para controlar los colores de la página
-
-  <!-- 
-    <link rel="stylesheet" href="" id="colorBrand">
   -->
 
