@@ -148,7 +148,7 @@ controller.getInfoVendedor = async (req, res, next) => {
 controller.catalogo = async (req, res, next) => {
   // Validar login
   if (!req.session.login) { return res.redirect('/login'); }
-  if (!(hasPermission(req.session.user.permission ,"8065_VIEW_ECOMMERCE"))) {return res.redirect('/no-permission');}
+  if (!(hasPermission(req.session.user.permission ,"8045_CAN_VIEW_SHOPPING_CAR"))) {return res.redirect('/no-permission');}
   
   res.render('catalogo', {'session': req.session});
 }

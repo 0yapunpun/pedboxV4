@@ -109,8 +109,8 @@
         <div class="collapse show" id="collapseBtoB">
           <ul class="navbar-nav ">
 
-            <% 
-              permissionIndex = session.user.permission.findIndex(x => x.code === "8065_VIEW_ECOMMERCE");
+            <%
+              permissionIndex = session.user.permission.map(e => e.code).lastIndexOf("8045_CAN_VIEW_SHOPPING_CAR");
               if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
             %>
               <li class="nav-item" id="menuCatalogo">
@@ -118,13 +118,15 @@
                   <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
                     <i class="fas fa-boxes" style="color: #252f40; font-size: 12px"></i>
                   </div>
-                  <span class="nav-link-text ms-1 font-weight-bold">Catalogo de Productos</span>
+                  <span class="nav-link-text ms-1 font-weight-bold">
+                    <%- (session.user.id_company == 15 || session.user.id_company == 37 ? "Catalogo de Productos" : "Consulta de Inventario") %>
+                  </span>
                 </a>
               </li>
             <% } %>
 
             <% 
-              permissionIndex = session.user.permission.findIndex(x => x.code === "8029_VIEW_TOP_50_PRODUCTS");
+              permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8029_VIEW_TOP_50_PRODUCTS");
               if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
             %>
               <li class="nav-item" id="menuCatalogoTop">
@@ -138,7 +140,7 @@
             <% } %>
 
             <% 
-              permissionIndex = session.user.permission.findIndex(x => x.code === "8045_CAN_VIEW_SHOPPING_CAR");
+              permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8045_CAN_VIEW_SHOPPING_CAR");
               if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
             %>
               <li class="nav-item" id="menuCarritoCompras">
@@ -152,7 +154,7 @@
             <% } %>
 
             <% 
-              permissionIndex = session.user.permission.findIndex(x => x.code === "8028_CAN_ACCESS_TO_CALIDOSOS");
+              permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8028_CAN_ACCESS_TO_CALIDOSOS");
               if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
             %>
               <li class="nav-item" id="menuCalidosos">
@@ -166,7 +168,7 @@
             <% } %>
 
             <% 
-              permissionIndex = session.user.permission.findIndex(x => x.code === "8020_CAN_VIEW_ORDERS_EXTRANET");
+              permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8020_CAN_VIEW_ORDERS_EXTRANET");
               if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
             %>
               <li class="nav-item" id="menuHistorialPedidos">
@@ -180,7 +182,7 @@
             <% } %>
 
             <% 
-              permissionIndex = session.user.permission.findIndex(x => x.code === "8010_CAN_VIEW_DOCUMENT_HISTORY_EXTRANET");
+              permissionIndex = session.user.permission.map(e => e.code).lastIndexOf("8010_CAN_VIEW_DOCUMENT_HISTORY_EXTRANET");
               if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
             %>
               <li class="nav-item" id="menuHistorialDocumentos">
@@ -194,7 +196,7 @@
             <% } %>
 
             <% 
-              permissionIndex = session.user.permission.findIndex(x => x.code === "8065_VIEW_ECOMMERCE");
+              permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8065_VIEW_ECOMMERCE");
               if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
             %>
               <li class="nav-item" id="menuHistorialTransacciones">
@@ -208,7 +210,7 @@
             <% } %>
 
             <% 
-              permissionIndex = session.user.permission.findIndex(x => x.code === "8015_CAN_VIEW_QUOTATION_EXTRANET");
+              permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8015_CAN_VIEW_QUOTATION_EXTRANET");
               if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
             %>
               <li class="nav-item" id="menuHistorialPedidos">
@@ -222,7 +224,7 @@
             <% } %>
 
             <% 
-              permissionIndex = session.user.permission.findIndex(x => x.code === "8035_CAN_VIEW_PORTFOLIO_EXTRANET");
+              permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8035_CAN_VIEW_PORTFOLIO_EXTRANET");
               if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
             %>
               <li class="nav-item" id="menuFacturas">
@@ -236,7 +238,7 @@
             <% } %>
 
             <% 
-              permissionIndex = session.user.permission.findIndex(x => x.code === "8005_CAN_PAY_INVOICES_EXTRANET");
+              permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8005_CAN_PAY_INVOICES_EXTRANET");
               if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
             %>
               <li class="nav-item" id="menuCarritoFacturas">
@@ -250,7 +252,7 @@
             <% } %>
 
             <% 
-              permissionIndex = session.user.permission.findIndex(x => x.code === "8025_CAN_EXPORT_CERTIFICATES_EXTRANET");
+              permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8025_CAN_EXPORT_CERTIFICATES_EXTRANET");
               if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
             %>
               <li class="nav-item" id="menuCertificados">
@@ -276,7 +278,7 @@
       </li>
 
       <% 
-        permissionIndex = session.user.permission.findIndex(x => x.code === "8030_CAN_CONFIGURE_EXTRANET");
+        permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8030_CAN_CONFIGURE_EXTRANET");
         if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
       %>
         <li class="nav-item" >
@@ -294,9 +296,8 @@
                 </a>
               </li>
 
-              
               <% 
-                permissionIndex = session.user.permission.findIndex(x => x.code === "8000_CAN_ACCESS_EXTRANET");
+                permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "5100_CAN_ACCESS_PERMISSIONS");
                 if ((permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") && (session.user.type_user != "E")) { 
               %>
                 <li class="nav-item" id="menuPermisos">

@@ -599,7 +599,7 @@
       let table = `<table id="${tableNombre}" class="table align-items-center mb-1 table-hover" style="overflow:scroll"></table>`;
       let tableHead;
 
-      $("#tableContainer").hide("slide", { direction: "right" }, 300);
+      $("#tableContainer").hide();
       $("#tableContainer").html("");
       $("#tableContainer").append(table)
 
@@ -619,8 +619,8 @@
         for(let i = 0; i < body.length; i++){
           tableContent+= `<tr>`;
           tableContent+= `<td class="text-center">${body[i].numero}</td>`;
-          tableContent+= `<td class="text-center">${body[i].fecha}</td>`;
-          tableContent+= `<td class="text-center">${body[i].valor_total}</td>`;
+          tableContent+= `<td class="text-center">${nvFormatDate(body[i].fecha, "dddd DD de mmmm de YYYY")}</td>`;
+          tableContent+= `<td class="text-center">${nvFormatCash(body[i].valor_total)}</td>`; 
           tableContent+= `<td class="text-center pedidoDetail" id="${body[i].numero}" style="cursor: pointer"><i class="fas fa-plus"></i></td>`;
           tableContent+= '</tr>';
         };
@@ -656,7 +656,7 @@
 
       $("#"+tableNombre).append(tableHead);
       $("#"+tableNombre).append(tableContent);
-      $("#tableContainer").show("slide", { direction: "left" }, 800);
+      $("#tableContainer").show();
 
       const tableObj = new simpleDatatables.DataTable("#"+tableNombre, {});
     }
@@ -814,7 +814,7 @@
 
     const handlePermissions = function (permissions) {
       let permissionIndex; 
-      permissionIndex = permissions.findIndex(x => x.code ==="8090_VIEW_TIME_LINE_ORDER");
+      permissionIndex = permissions.map(e => e.code).lastIndexOf( "8090_VIEW_TIME_LINE_ORDER");
       if (permissionIndex  != -1 && permissions[permissionIndex].content == "S") {
         loadTable("tablaPedidosEstado", pedidos.Table); 
       } else {

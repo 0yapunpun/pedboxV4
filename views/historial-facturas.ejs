@@ -188,7 +188,7 @@
           for(let i = 0; i < body.length; i++){
             tableContent+= '<tr >';
             tableContent+= `<td class="text-center">${body[i].numero}</td>`;
-            tableContent+= `<td class="text-center">${body[i].fecha}</td>`;
+            tableContent+= `<td class="text-center">${nvFormatDate(body[i].fecha, "dddd DD de mmmm de YYYY")}</td>`;
             tableContent+= `<td class="text-center">$${numberWithCommas(body[i].valor_total)}</td>`;
             tableContent+= '</tr>';
           };
@@ -212,8 +212,8 @@
           for(let i = 0; i < body.length; i++){
             tableContent+= '<tr >';
             tableContent+= `<td class="text-center">${body[i].numero}</td>`;
-            tableContent+= `<td class="text-center">${body[i].fecha}</td>`;
-            tableContent+= `<td class="text-center">${body[i].fecha}</td>`;
+            tableContent+= `<td class="text-center">${body[i].descripcion}</td>`;
+            tableContent+= `<td class="text-center">${nvFormatDate(body[i].fecha, "dddd DD de mmmm de YYYY")}</td>`;
             tableContent+= `<td class="text-center">$${numberWithCommas(body[i].valor_total)}</td>`;
             tableContent+= '</tr>';
           };

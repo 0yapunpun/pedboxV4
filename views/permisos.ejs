@@ -445,7 +445,7 @@
       let permissions = data.user.permission;
       let permissionIndex; 
 
-      permissionIndex = permissions.findIndex(x => x.code === "5100_CAN_ACCESS_PERMISSIONS");
+      permissionIndex = permissions.map(e => e.code).lastIndexOf( "5100_CAN_ACCESS_PERMISSIONS");
       if (permissionIndex  != -1 && permissions[permissionIndex].content == "S") {
         return true
       };

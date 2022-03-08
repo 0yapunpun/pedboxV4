@@ -528,24 +528,24 @@
       let permissions = data.user.permission;
       let permissionIndex; 
 
-      permissionIndex = permissions.findIndex(x => x.code === "5400_CAN_VIEW_EXTERNAL_USERS");
+      permissionIndex = permissions.map(e => e.code).lastIndexOf( "5400_CAN_VIEW_EXTERNAL_USERS");
       if (permissionIndex  != -1 && permissions[permissionIndex].content == "S") {
 
       };
 
-      permissionIndex = permissions.findIndex(x => x.code === "5400_CAN_CREATE_EXTERNAL_USERS");
+      permissionIndex = permissions.map(e => e.code).lastIndexOf( "5400_CAN_CREATE_EXTERNAL_USERS");
       if (permissionIndex  == -1 || permissions[permissionIndex].content == "N") {
         $("#newUserBtn").hide();
       };
 
-      permissionIndex = permissions.findIndex(x => x.code === "5400_CAN_EDIT_EXTERNAL_USERS");
+      permissionIndex = permissions.map(e => e.code).lastIndexOf( "5400_CAN_EDIT_EXTERNAL_USERS");
       if (permissionIndex  == -1 || permissions[permissionIndex].content == "N") {
         $(".stateUser").remove();
         $(".deleteUser").hide();
         $(".changePassword").hide();
       };
 
-      permissionIndex = permissions.findIndex(x => x.code === "5400_CAN_DELETE_EXTERNAL_USERS");
+      permissionIndex = permissions.map(e => e.code).lastIndexOf( "5400_CAN_DELETE_EXTERNAL_USERS");
       if (permissionIndex  == -1 || permissions[permissionIndex].content == "N") {
         $(".deleteUser").hide();
       };

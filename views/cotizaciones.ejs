@@ -815,7 +815,7 @@
 
     const handlePermissions = function (permissions) {
       let permissionIndex; 
-      permissionIndex = permissions.findIndex(x => x.code ==="8090_VIEW_TIME_LINE_ORDER");
+      permissionIndex = permissions.map(e => e.code).lastIndexOf( "8090_VIEW_TIME_LINE_ORDER");
       if (permissionIndex  != -1 && permissions[permissionIndex].content == "S") {
         loadTable("tablaPedidosEstado", pedidos.Table); 
       } else {

@@ -241,13 +241,13 @@
         <div class="col-lg-9 mt-lg-0 mt-4" id="tableView" style="display: none;">
           <div class="card mt-4 p-3" id="tableContainer">
 
-            <table>
+            <table style="table-layout: fixed; width:100%">
               <thead>
                 <tr>
-                  <td class="imgCol text-uppercase text-secondary text-xxs text-center font-weight-bolder opacity-7 noSorter">Imagen</td>
+                  <td style="width:12%" class="imgCol text-uppercase text-secondary text-xxs text-center font-weight-bolder opacity-7 noSorter">Imagen</td>
                   <td class="productCol text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Producto</td>
                   <td class="atributesCol text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Atributos</td>
-                  <td class="stockCol text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Stock</td>
+                  <td style="width: 10%" class="stockCol text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Stock</td>
                   <td class="text-uppercase text-secondary text-xxs text-center font-weight-bolder opacity-7 noSorter">Añadir</td>
                 </tr>
               </thead>
@@ -370,10 +370,12 @@
     let cartName = "storeCart" + session.user.id;
     let cartInvoiceName = "storeInvoice" + session.user.id;
     let catalogName = "storeCatalog" + session.user.id;
+    let currentView = "tarjetas";
 
     let filters = ["grupo","subgrupo","linea","modelo","marca"]; //Default filterts
-    let hasCustomFilters = session.user.permission.findIndex(e => e.code == "8050_MANEJA_FILTROS_DINAMICOS");
-    let otherFilters = (session.user.permission.findIndex(e => e.code == "8045_SHOW_OTHER_RELATED_FILTERS"));
+    
+    let hasCustomFilters = session.user.permission.map(e => e.code).lastIndexOf("8050_MANEJA_FILTROS_DINAMICOS");
+    let otherFilters = session.user.permission.map(e => e.code).lastIndexOf("8045_SHOW_OTHER_RELATED_FILTERS");
 
     let dataProductsComplete;
     let dataProductsPrint;
@@ -491,7 +493,6 @@
       printProducts(0, Number($(this).val()) - 1)
     });
 
-    let currentView = "tarjetas";
     $(document).on("click", ".selectView", function () {
       $("#preloader").show();
 
@@ -1010,14 +1011,21 @@
       let permissions = session.user.permission;
       let permissionIndex; 
 
-      permissionIndex = permissions.findIndex(x => x.code === "8085_VIEW_CLASIC");
+      permissionIndex = permissions.map(e => e.code).lastIndexOf( "8085_VIEW_CLASIC")
       if (permissionIndex  == -1 || permissions[permissionIndex].content == "N") {
         $("#iconSelectView").parent().hide();
       };
 
-      permissionIndex = permissions.findIndex(x => x.code === "8005_CAN_PAY_INVOICES_EXTRANET");
+      permissionIndex = permissions.map(e => e.code).lastIndexOf( "8005_CAN_PAY_INVOICES_EXTRANET");
       if (permissionIndex  == -1 || permissions[permissionIndex].content == "N") {
         $("#iconCarritoFacturas").hide();
+      };
+
+      permissionIndex = permissions.map(e => e.code).lastIndexOf( "8065_VIEW_ECOMMERCE");
+      if (permissionIndex  == -1 || permissions[permissionIndex].content == "N") {
+        currentView = "tabla"
+        $("#catalogview").hide()
+        $("#tableView").show()
       };
     };
 

@@ -27,7 +27,7 @@
       </div>
 
       <% 
-        permissionIndex = session.user.permission.findIndex(x => x.code === "8005_CAN_PAY_INVOICES_EXTRANET");
+        permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8005_CAN_PAY_INVOICES_EXTRANET");
         if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
       %>
         <div class="d-flex justify-content-center align-items-center gap-5 mt-1" >

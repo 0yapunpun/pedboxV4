@@ -3,8 +3,7 @@ const helpers = {};
 
 helpers.hasPermission = (permissions, permission) => {
   let permissionIndex; 
-
-  permissionIndex = permissions.findIndex(x => x.code === permission);
+  permissionIndex = permissions.map(e => e.code).lastIndexOf(permission);
   if (permissionIndex == -1 || permissions[permissionIndex].content == "N") {
     return false
   };

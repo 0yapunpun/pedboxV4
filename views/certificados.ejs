@@ -111,7 +111,7 @@
                   </div>
                 </div>
               </div>
-              <div class="text-center d-flex flex-column justify-content-center align-items-center" onclick="sendData(50)" id="showOnPermission" style="display: none;">
+              <div class="text-center d-flex flex-column justify-content-center align-items-center" onclick="sendData(50)" id="showOnPermission">
                 <h6 class="m-0">Compras Anuales</h6>
                 <div class="d-flex align-items-center gap-1">
                   <div class="cardIcon bg-primary" style="font-weight: 700;">
@@ -165,8 +165,6 @@
     let session = `<%- JSON.stringify(session) %>`;
         session = JSON.parse(session);
 
-    let hasPermission = true;
-
     const sendData = (data) => {
       let year = $("#inputYear").val()
       let type = "c";
@@ -174,13 +172,24 @@
       let logo = session.user.dataCompany[0].logo;
       let id_company = session.user.id_company;
       let nit = session.user.nit;
-
       
       let url = `https://pedbox.co:8531/exportar_retenciones?nit=${nit}&tipo=${tipo+year}&id_company=${id_company}&type=${type}&url=${logo}`;
       window.open(url,'_blank');
     }
+
+    const handlePermissions = () => {
+      let permissions = session.user.permission;
+      let permissionIndex; 
+
+      permissionIndex = permissions.map(e => e.code).lastIndexOf("8026_VIEW_SHOPPING_CERTICATE")
+      if (permissionIndex  == -1 || permissions[permissionIndex].content == "N") {
+        $("#showOnPermission").remove();
+      };
+    };
       
     $(document).ready(function () {
+      handlePermissions();
+
       let year = new Date().getFullYear() 
       for (let i = 0; i < 4; i++) {
         let element = `
@@ -193,10 +202,6 @@
         searchEnabled: false,
         shouldSort: false,
       });
-
-      if (hasPermission) {
-        $("#showOnPermission").show();
-      }
 
       $("#menuCertificados").addClass("activeNav")
       $("#preloader").hide();

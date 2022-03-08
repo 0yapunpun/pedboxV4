@@ -117,6 +117,13 @@
     #productsContainer .card-text{
       text-align: center;
     }
+    .iconsCatalog {
+      animation: cssAnimation 0s 1s forwards;
+      visibility: hidden;
+    }
+    @keyframes cssAnimation {
+      to   { visibility: visible; }
+    }
   </style>
 </head>
 
@@ -159,7 +166,7 @@
                 <span style="position: absolute; top: 15%; left: 10%"><h6>Ver:</h6></span>
               </div>
 
-              <div class="col-md-3 d-flex justify-content-end gap-3" >
+              <div class="col-md-3 d-flex justify-content-end gap-3 iconsCatalog" >
                 <div class="d-flex justify-content-center align-items-center gap-5 mt-1" >
                   <div class=" icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg selectView" style="cursor: pointer; position: relative;">
                     <div id="iconSelectView">
@@ -720,12 +727,12 @@
       let permissions = session.user.permission;
       let permissionIndex; 
 
-      permissionIndex = permissions.findIndex(x => x.code === "8085_VIEW_CLASIC");
+      permissionIndex = permissions.map(e => e.code).lastIndexOf( "8085_VIEW_CLASIC")
       if (permissionIndex  == -1 || permissions[permissionIndex].content == "N") {
         $("#iconSelectView").parent().hide();
       };
 
-      permissionIndex = permissions.findIndex(x => x.code === "8005_CAN_PAY_INVOICES_EXTRANET");
+      permissionIndex = permissions.map(e => e.code).lastIndexOf( "8005_CAN_PAY_INVOICES_EXTRANET");
       if (permissionIndex  == -1 || permissions[permissionIndex].content == "N") {
         $("#iconCarritoFacturas").hide();
       };
