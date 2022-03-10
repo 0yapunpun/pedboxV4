@@ -58,7 +58,10 @@
     <%- include('./partials/header.ejs') %>
 
     <!-- Content -->
-    <div class="p-4">
+    <div class="p-4" style="position: relative">
+
+      <!-- Error -->
+      <%- include('./partials/error.ejs') %>
 
       <!-- Cartera -->
       <%- include('./partials/cartera.ejs') %>
@@ -210,8 +213,13 @@
 
 
     $( document ).ready(function() {
-      loadCartera(facturas.Table[0]);
-      loadTablePedidoRepetido(facturas.Table1);
+      try {
+        loadCartera(facturas.Table[0]);
+        loadTablePedidoRepetido(facturas.Table1);
+      } catch (error) {
+        console.error(error);
+        $("#error400").show();         
+      }
 
       $("#menuFacturas").addClass("activeNav")
       $("#preloader").hide();

@@ -1,5 +1,6 @@
 <!-- TODO:
   -Añadir preloarders
+  -Revisar pq no funciona
 -->
 
 <!DOCTYPE html>
@@ -9,7 +10,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" type="image/x-icon" href="https://app.pedbox.co/assets/logos/logo_blanco.png"/>
-  <title>Historial Pedidos</title>
+  <title>Cotizaciones</title>
 
   <!-- Fonts and icons -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
@@ -99,7 +100,7 @@
             <ul class="nav nav-pills nav-fill p-1" role="tablist" style="cursor: pointer;">
               <li class="nav-item">
                 <a class="nav-link mb-0 px-4 py-1 active" data-bs-toggle="tab"  role="tab" aria-controls="profile" aria-selected="true" href="#">
-                Historial de pedidos
+                Lista de cotizaciones
                 </a>
               </li>
             </ul>
@@ -331,14 +332,14 @@
   <script>
     let facturas = `<%- JSON.stringify(facturas) %>`;
         facturas = JSON.parse(facturas).result.extranet;
-    let pedidos = `<%- JSON.stringify(pedidos) %>`;
-        pedidos = JSON.parse(pedidos).result.extranet;
+    // let pedidos = `<%- JSON.stringify(pedidos) %>`;
+    //     pedidos = JSON.parse(pedidos).result.extranet;
     let session = `<%- JSON.stringify(session) %>`;
         session = JSON.parse(session);
     let vendedor = `<%- JSON.stringify(vendedor) %>`;
         vendedor = JSON.parse(vendedor).result;
     let cartName = "storeCart" + session.user.id;
-    let cartInvoiceName = "storeInvoice" + session.user.id;
+
 
     const canSeePdf = true;
     const canSeeEstadoPedido = true;
@@ -599,7 +600,7 @@
       let table = `<table id="${tableNombre}" class="table align-items-center mb-1 table-hover" style="overflow:scroll"></table>`;
       let tableHead;
 
-      $("#tableContainer").hide();
+      $("#tableContainer").hide("slide", { direction: "right" }, 300);
       $("#tableContainer").html("");
       $("#tableContainer").append(table)
 
@@ -619,8 +620,8 @@
         for(let i = 0; i < body.length; i++){
           tableContent+= `<tr>`;
           tableContent+= `<td class="text-center">${body[i].numero}</td>`;
-          tableContent+= `<td class="text-center">${nvFormatDate(body[i].fecha, "dddd DD de mmmm de YYYY")}</td>`;
-          tableContent+= `<td class="text-center">${nvFormatCash(body[i].valor_total)}</td>`; 
+          tableContent+= `<td class="text-center">${body[i].fecha}</td>`;
+          tableContent+= `<td class="text-center">${body[i].valor_total}</td>`;
           tableContent+= `<td class="text-center pedidoDetail" id="${body[i].numero}" style="cursor: pointer"><i class="fas fa-plus"></i></td>`;
           tableContent+= '</tr>';
         };
@@ -656,7 +657,7 @@
 
       $("#"+tableNombre).append(tableHead);
       $("#"+tableNombre).append(tableContent);
-      $("#tableContainer").show();
+      $("#tableContainer").show("slide", { direction: "left" }, 800);
 
       const tableObj = new simpleDatatables.DataTable("#"+tableNombre, {});
     }
@@ -699,7 +700,6 @@
 
   
     // TODO: Terminar armado pedido desde historial pedidos
-    // nv-order-component 
     const onPay = () => {
       // Prepare data
       let rows = $("#tableProductsBody tr");
@@ -829,7 +829,7 @@
 
       $('#inputDateModal').val(new Date().toDateInputValue());
 
-      $("#menuHistorialPedidos").addClass("activeNav");
+      $("#menuCotizaciones").addClass("activeNav");
       $("#preloader").hide();
     });
   </script>

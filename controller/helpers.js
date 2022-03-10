@@ -1,4 +1,3 @@
-
 const helpers = {};
 
 helpers.hasPermission = (permissions, permission) => {

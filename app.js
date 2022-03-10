@@ -13,7 +13,8 @@ app.use(session({secret: 'calidosos_session', saveUninitialized: true, resave: t
 
 // view engine setup
 app.set('views', [path.join(__dirname, 'views'),
-                  path.join(__dirname, 'views/elements'),]);
+                  path.join(__dirname, 'views/elements'),
+                  path.join(__dirname, 'views/b2b')]);
 app.set('view engine', 'ejs');
 
 //Midleware para  configurar el server para permitir cross domain

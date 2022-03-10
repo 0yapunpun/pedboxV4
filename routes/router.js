@@ -6,6 +6,8 @@ const b2bController = require('../controller/b2bController.js');
 router.get('/', viewController.index);
 router.get('/login', viewController.login);
 router.post('/login', viewController.loginValidate);
+router.get('/login/:token', viewController.login);
+router.post('/login/:token', viewController.loginValidate);
 router.get('/logout', viewController.logout);
 router.get('/no-permission', viewController.noPermission);
 
@@ -16,7 +18,7 @@ router.get('/historial-facturas', b2bController.historialFacturas);
 router.get('/historial-pedidos', b2bController.historialPedidos);
 router.post('/historial-pedidos', b2bController.historialPedidosPedido);
 router.get('/historial-pedidos/:numero', b2bController.historialPedidosDetalle);
-// router.get('/cotizaciones', b2bController.cotizaciones);
+router.get('/cotizaciones', b2bController.cotizaciones);
 router.get('/nuevo-pedido/:codigo', b2bController.nuevoPedido);
 router.get('/infoVendedor/:id', b2bController.getInfoVendedor);
 router.get('/catalogo', b2bController.catalogo);
@@ -39,6 +41,9 @@ router.post('/permisos', b2bController.updatePemiso);
 router.post('/permisos/nuevo-permiso', b2bController.createPermiso);
 router.get('/documentos-usuario', b2bController.documentosUsuario);
 router.post('/documentos-usuario/upload', b2bController.uploadDocumentoUsuario);
+
+// Tools
+router.get('/chat', viewController.chat);
 
 // Por integrar
 router.get('/helpdesk', viewController.helpdesk);

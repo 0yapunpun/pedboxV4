@@ -1,5 +1,4 @@
 const fetch = require('node-fetch');
-// const { sendCarritoCompras } = require('../controller/viewController');
 const { showLog } = require('./helpers');
 const service = {};
 const urlPedbox = 'http://api.pedbox.co:5037/';
@@ -16,6 +15,12 @@ const options = (method, body) => {
 service.login = async(body) => {
   const url = urlKakashi+'validater_user';
   return await makeRequest(url, options('post', body));
+}
+
+service.loginCompany = async(id_company) => {
+  const url = urlKakashi+"get_background?"+id_company;
+  const data =  await makeRequest(url);
+  return data;
 }
 
 // *** B2B
@@ -51,6 +56,7 @@ service.historialNotas = async(url_company, nit, id_company) => {
 
 service.historialPedidos = async(url_company, nit, id_company) => {
   const url = urlKakashi+'get_extranet?nit='+nit+'&tipo=2&url='+url_company+'&id_company='+id_company;
+  console.log(url)
   const data =  await makeRequest(url);
   return data;
 }

@@ -1,6 +1,5 @@
 <!-- TODO:
   -Añadir preloarders
-  -Revisar pq no funciona
 -->
 
 <!DOCTYPE html>
@@ -10,7 +9,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" type="image/x-icon" href="https://app.pedbox.co/assets/logos/logo_blanco.png"/>
-  <title>Cotizaciones</title>
+  <title>Historial Pedidos</title>
 
   <!-- Fonts and icons -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
@@ -88,7 +87,10 @@
     <%- include('./partials/header.ejs') %>
 
     <!-- Content -->
-    <div class="p-4">
+    <div class="p-4" style="position: relative">
+
+      <!-- Error -->
+      <%- include('./partials/error.ejs') %>
 
       <!-- Cartera -->
       <%- include('./partials/cartera.ejs') %>
@@ -100,7 +102,7 @@
             <ul class="nav nav-pills nav-fill p-1" role="tablist" style="cursor: pointer;">
               <li class="nav-item">
                 <a class="nav-link mb-0 px-4 py-1 active" data-bs-toggle="tab"  role="tab" aria-controls="profile" aria-selected="true" href="#">
-                Lista de cotizaciones
+                Historial de pedidos
                 </a>
               </li>
             </ul>
@@ -339,7 +341,9 @@
     let vendedor = `<%- JSON.stringify(vendedor) %>`;
         vendedor = JSON.parse(vendedor).result;
     let cartName = "storeCart" + session.user.id;
+    let cartInvoiceName = "storeInvoice" + session.user.id;
 
+    console.log(session)
 
     const canSeePdf = true;
     const canSeeEstadoPedido = true;
@@ -600,7 +604,7 @@
       let table = `<table id="${tableNombre}" class="table align-items-center mb-1 table-hover" style="overflow:scroll"></table>`;
       let tableHead;
 
-      $("#tableContainer").hide("slide", { direction: "right" }, 300);
+      $("#tableContainer").hide();
       $("#tableContainer").html("");
       $("#tableContainer").append(table)
 
@@ -620,8 +624,8 @@
         for(let i = 0; i < body.length; i++){
           tableContent+= `<tr>`;
           tableContent+= `<td class="text-center">${body[i].numero}</td>`;
-          tableContent+= `<td class="text-center">${body[i].fecha}</td>`;
-          tableContent+= `<td class="text-center">${body[i].valor_total}</td>`;
+          tableContent+= `<td class="text-center">${nvFormatDate(body[i].fecha, "dddd DD de mmmm de YYYY")}</td>`;
+          tableContent+= `<td class="text-center">${nvFormatCash(body[i].valor_total)}</td>`; 
           tableContent+= `<td class="text-center pedidoDetail" id="${body[i].numero}" style="cursor: pointer"><i class="fas fa-plus"></i></td>`;
           tableContent+= '</tr>';
         };
@@ -657,7 +661,7 @@
 
       $("#"+tableNombre).append(tableHead);
       $("#"+tableNombre).append(tableContent);
-      $("#tableContainer").show("slide", { direction: "left" }, 800);
+      $("#tableContainer").show();
 
       const tableObj = new simpleDatatables.DataTable("#"+tableNombre, {});
     }
@@ -825,12 +829,17 @@
 
     $( document ).ready(function() {
       $("#titleModalNuevoPedido").text(session.user.company + " - " + session.user.nit)
-      loadCartera(facturas.Table[0]);
-      handlePermissions(session.user.permission)
-
       $('#inputDateModal').val(new Date().toDateInputValue());
+      $("#menuHistorialPedidos").addClass("activeNav");
 
-      $("#menuCotizaciones").addClass("activeNav");
+      try {
+        handlePermissions(session.user.permission)
+        loadCartera(facturas.Table[0]);
+      } catch (error) {
+        console.error(error);
+        $("#error400").show();        
+      }
+
       $("#preloader").hide();
     });
   </script>

@@ -7,7 +7,15 @@ const moment = require('moment');
 const { response } = require('express');
 
 controller.login = async(req, res, next) => {
-  res.render('login');
+  let token = (req.params.token ? req.params.token : "");
+  if (token) {
+    let dataToken = token.split("cc").pop().split("ee");
+    if(dataToken[0] != "0") {
+      const resp = await userController.loginCompany(dataToken[0]);
+      return res.render('login', {"dataCompany": resp});
+    }
+  } 
+  res.render('login', {"dataCompany": {}});
 }
 
 controller.loginValidate = async(req, res, next) => {
@@ -42,6 +50,13 @@ controller.noPermission = async(req, res, next) => {
   if (!req.session.login) { return res.redirect('/login'); }
 
   res.render('elements/no-permission', {'session': req.session});
+}
+
+controller.chat = async(req, res, next) => {
+  // Validar login
+  if (!req.session.login) { return res.redirect('/login'); }
+  
+  res.render('chat', {'session': req.session});
 }
 
 //** Vistas no integradas
