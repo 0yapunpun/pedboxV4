@@ -47,9 +47,9 @@
     .btn-send i{font-weight: bold;font-size: 19px;}
     .avatar{position: relative;}
     .indicator{position: absolute; bottom: 0px; right: 0px;}
-    .preview {background-color: lightgrey; position: absolute; height: 75% !important; width: 100%; z-index: 999; border-top-right-radius: 1rem; border-top-left-radius: 1rem;}
+    .preview {background-color: lightgrey; position: absolute; height: 78% !important; width: 100%; z-index: 999; border-top-right-radius: 1rem; border-top-left-radius: 1rem;}
     .previewBorder{border: 3px dashed white; height: 85% !important;}
-    .deleteButton{border-radius: 50%; bottom: 30px; font-size: 1.25rem; z-index: 990; box-shadow: 0 2px 12px 0 rgb(0 0 0 / 16%); cursor: pointer;background: #ea0606;right: auto; left: 30px; display: none;}
+    .deleteButton{border-radius: 50%; bottom: 30px; font-size: 1.25rem; z-index: 990; box-shadow: 0 2px 12px 0 rgb(0 0 0 / 16%); cursor: pointer;background: #ea0606;right: auto; right: 5%; position: absolute;}
     .noTiene{display: none;}
     .evt-calendar{background: #fff; color: #525151; border: 1px solid #ccc; float: left; clear: both;height: 170px; border-radius: 5px; width: 415px;}
     .evt-calendar .c-date{float: left;width: 135px;background: #f6f6f6;height: 100%;border: 1px solid #e5e5e5;padding: 21px;}
@@ -81,6 +81,9 @@
     .status {color: #92959E; width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size:14px;}
     .hide-status {display: none;color: #92959E; width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; height: 25px;}
     ::-webkit-scrollbar{display: none;}
+    .shadowInput{box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);}
+    .massiveMesage .imgPreviewUpload {max-width: 100px !important; max-height: 100px !important;}
+    .massiveMesage img {max-width: 100%; width: auto;}
   </style>
 </head>
 
@@ -98,92 +101,122 @@
       <div class="p-4 ps-0 pt-0">
         <div class="">
 
-          <div class="container-fluid py-3 px-0 tab-pane show active tab-content" id="chats" role="tabpanel" aria-labelledby="chats-tab" style="height: 70vh;">
-            <div class="row" style="height: 100%">
-              <div class="col-12 col-md-5 col-xl-4 h-100">
-                <div class="card my-1 mx-3 shadow">
-                  <div class="d-flex align-items-center">
-                    <div class="input-group">
-                      <input type="text" class="form-control border-0" placeholder="Buscar..." id="search-msg">
-                      <span class="input-group-text text-body border-0"><i class="fas fa-search" aria-hidden="true"></i></span>
-                    </div>
-                  </div>
-                </div>
-                <ul class="list-group overflow-scroll" id="listSerch" style="height: 100%;display: none;"></ul>
-                <ul class="list-group overflow-scroll" id="lastChats" style="height: 100%;"></ul>
+          <div style="display: flex; justify-content: end; margin-right: 15px; margin-top: 15px">
+            <a id="btnMassiveTest" class="nav-link btn btn-danger mb-1 bg-danger tab m-0" style="border-radius: 8px; color: white; width: 150px" href="javascript:toggleViewChat();">
+              <i class="fa fa-bell"></i> Mensaje Masivo
+            </a>
+
+            <a  id="btnChats" class="nav-link btn btn-danger mb-1 bg-primary tab m-0" style="border-radius: 8px; color: white; width: 150px; display: none;" href="javascript:toggleViewChat();">
+              <i class="fa fa-envelope-open-text"></i> Chats
+            </a>
+
+          </div>
+
+          <div class="tab-content">
+
+            <div class="container-fluid py-3 tab-pane" id="users" style="position: relative">
+
+              <div class="d-flex"> 
+                <ul class="nav flex-column bg-white border-radius-lg p-3 listUsers shadowInput" style="height: -webkit-fill-available">
+                  <li class="nav-item" id="listgroups">
+                  </li>
+                </ul>
+                <div id="cards" class="flex-fill p-3 pt-0"> </div>
               </div>
-              <div class="col-12 col-md-7 col-xl-8 cont-chat-history" style="display: none;">
-                <div class="card my-1 mx-2" style="height: 90px">
-                  <div class="card-body px-4 py-1 ">
-                    <li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">
-                      <div class="avatar me-3 overflow-hidden">
-                        <img src="/img/profile.jpg" alt="kal" class="w-100 border-radius-lg shadow" id="e-user-avatar">
-                      </div>
-                      <div class="d-flex align-items-start flex-column justify-content-center">
-                        <h6 class="mb-0 text-sm" id="e-user-name"></h6>
-                        <p class="mb-0 text-xs" id="e-user-info"></p>
-                      </div>
-                    </li>
-                  </div>
-                </div>
-                <div class="card my-1 mx-2 cont-chat position-relative" style="height: calc(100vh - 250px);">
-                  <div id="preview" class="preview" style="display: none; opacity: 0.9;">
-                    <div class="previewBorder h-100 m-4">
-                      <div class="d-flex flex-column h-100">
-                        <div onclick="cancelPreview(0)" class="d-flex justify-content-end pt-2 pe-3" style="cursor: pointer;"><i class="fas fa-times" style="color: white; font-size: 25px;"></i></div>
-  
-                        <div id="dropContainer" class="h-100 w-100" style="opacity: 0.9;">
-                          <div class="h-100 w-100 d-flex justify-content-center align-items-center" style="position: relative;">
-                            <h6 style="color: white; font-size: 25px;">Arrastra tus archivos acá</h6>
-                            <input type="file" name="" id="imgInp2" style="width: 100%; height: 100%; position: absolute; opacity: 0;">
-                          </div>
-                        </div>
-                        <div style="display: none; overflow: scroll;" class="mb-3">
-                          <div id="imgContainer" class="h-100 d-flex justify-content-center align-items-center flex-wrap gap-3 p-5 pt-1"></div>
-                        </div>
-  
+
+              <a href="javascript:sendMessage()" id="sendMessage" class="deleteButton text-white position-fixed px-3 py-2 " title="Enviar mensaje masivo">
+                <i class="fa fa-paper-plane py-1"> </i>
+              </a>
+
+            </div>
+
+            <div class="container-fluid py-3 px-0 tab-pane show active tab-content pt-0" id="chats" style="height: 65vh;">
+              <div class="row" style="height: 100%">
+                <div class="col-12 col-md-5 col-xl-4 h-100 pe-1">
+                  <div class="card my-1 mx-3 shadow">
+                    <div class="d-flex align-items-center">
+                      <div class="input-group">
+                        <input type="text" class="form-control border-0" placeholder="Buscar..." id="search-msg">
+                        <span class="input-group-text text-body border-0"><i class="fas fa-search" aria-hidden="true"></i></span>
                       </div>
                     </div>
                   </div>
-                  <div class="card-body p-3 position-relative z-index-2 overflow-scroll" id="chat-content">
-                    <ul class="h-100" id="chat-history"></ul>
+                  <ul class="list-group overflow-scroll" id="listSerch" style="height: 100%;display: none;"></ul>
+                  <ul class="list-group overflow-scroll" id="lastChats" style="height: 100%;"></ul>
+                </div>
+                <div class="col-12 col-md-7 col-xl-8 cont-chat-history" style="display: none;">
+                  <div class="card my-1 mx-2" style="height: 90px">
+                    <div class="card-body px-4 py-1" style="display: flex; align-items: center">
+                      <li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">
+                        <div class="avatar me-3 overflow-hidden">
+                          <img src="/img/profile.jpg" alt="kal" class="w-100 border-radius-lg shadow" id="e-user-avatar">
+                        </div>
+                        <div class="d-flex align-items-start flex-column justify-content-center">
+                          <h6 class="mb-0 text-sm" id="e-user-name"></h6>
+                          <p class="mb-0 text-xs" id="e-user-info"></p>
+                        </div>
+                      </li>
+                    </div>
                   </div>
-                  <div class="card-footer p-3 position-relative z-index-2">
-                    <div class="card mx-2">
-                      <div class="card shadow p-3">
-                        <div class="audio-cont d-inline-flex justify-content-end">
-                          <a href="javascript:startAudio()" class="start-audio mx-2 hideOnImgPreview btn-send bg-gradient-chat" style="padding: 10px 18px;"><i class=" fa fa-microphone"></i></a>
-                          <div class="audio-controls" style="display: none;">
-                            <div class="d-inline-flex">
-                              <a href="javascript:sendAudio(false)" class="p-1 align-middle"><i class="fa fa-check-circle text-success"></i></a>
-                              <div class="timer-audio p-1 align-middle"><span>00:00</span></div>
-                              <a href="javascript:cancelAudio()" class="p-1 align-middle"><i class="fa fa-times-circle text-danger"></i></a>
+                  <div class="card my-1 mx-2 cont-chat position-relative" style="height: calc(100vh - 250px); margin-bottom: 15px !important;">
+                    <div id="preview" class="preview" style="display: none; opacity: 0.9;">
+                      <div class="previewBorder h-100 m-4">
+                        <div class="d-flex flex-column h-100">
+                          <div onclick="cancelPreview(0)" class="d-flex justify-content-end pt-2 pe-3" style="cursor: pointer;"><i class="fas fa-times" style="color: white; font-size: 25px;"></i></div>
+    
+                          <div id="dropContainer" class="h-100 w-100" style="opacity: 0.9;">
+                            <div class="h-100 w-100 d-flex justify-content-center align-items-center" style="position: relative;">
+                              <h6 style="color: white; font-size: 25px;">Arrastra tus archivos acá</h6>
+                              <input type="file" name="" id="imgInp2" style="width: 100%; height: 100%; position: absolute; opacity: 0;">
                             </div>
                           </div>
-                          <div id="emoticons" style="border-top-left-radius: 1rem; border-top-right-radius: 1rem; border: solid 1px lightgray"></div>
-                          <a class="btn-send bg-gradient-chat" style="cursor: pointer;">
-                            <i class="fa fa-smile-o" id="open-emoticons"></i>
-                            <i class="fa fa-keyboard-o" id="close-emoticons" style="margin-left: -2px;"></i>
-                          </a>
-                          <a href="javascript:openInputFile(0)" class="btn-send bg-gradient-chat mx-2 hideOnImgPreview">
-                            
-                            <label for="imgInp" class="m-0" style="cursor: pointer;">
-                              <span aria-hidden="true"  style="color : white">
-                                <i class="fas fa-paperclip"></i>
-                              </span>
-                              <input type="file" id="imgInp" multiple style="display:none">
-                            </label>
+                          <div style="display: none; overflow: scroll;" class="mb-3">
+                            <div id="imgContainer" class="h-100 d-flex justify-content-center align-items-center flex-wrap gap-3 p-5 pt-1"></div>
+                          </div>
+    
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-body p-3 position-relative z-index-2 overflow-scroll" id="chat-content">
+                      <ul class="h-100" id="chat-history"></ul>
+                    </div>
+                    <div class="card-footer p-3 position-relative z-index-2">
+                      <div class="card mx-2">
+                        <div class="card shadow p-3">
+                          <div class="audio-cont d-inline-flex justify-content-end">
+                            <a href="javascript:startAudio()" class="start-audio mx-2 hideOnImgPreview btn-send bg-gradient-chat" style="padding: 10px 18px;"><i class=" fa fa-microphone"></i></a>
+                            <div class="audio-controls" style="display: none; padding-top: 10px; margin-right: 5px">
+                              <div class="d-inline-flex">
+                                <a href="javascript:sendAudio(false)" class="p-1 align-middle"><i class="fa fa-check-circle text-success"></i></a>
+                                <div class="timer-audio p-1 align-middle"><span>00:00</span></div>
+                                <a href="javascript:cancelAudio()" class="p-1 align-middle"><i class="fa fa-times-circle text-danger"></i></a>
+                              </div>
+                            </div>
+                            <div id="emoticons" style="border-top-left-radius: 1rem; border-top-right-radius: 1rem; border: solid 1px lightgray"></div>
+                            <a class="btn-send bg-gradient-chat" style="cursor: pointer;">
+                              <i class="fa fa-smile-o" id="open-emoticons"></i>
+                              <i class="fa fa-keyboard-o" id="close-emoticons" style="margin-left: -2px;"></i>
+                            </a>
+                            <a href="javascript:openInputFile(0)" class="btn-send bg-gradient-chat mx-2 hideOnImgPreview">
                               
-                          </a>
-                          <textarea id="msg-text" class="form-control border-0 me-2 ms-2 hideOnImgPreview" placeholder="Escribe tu mensaje..." rows="1" style="resize: none;"></textarea>
-                          <a href="javascript:sendChat()" class="btn-send bg-gradient-chat"><i class="fa fa-paper-plane"></i></a>
+                              <label for="imgInp" class="m-0" style="cursor: pointer;">
+                                <span aria-hidden="true"  style="color : white">
+                                  <i class="fas fa-paperclip"></i>
+                                </span>
+                                <input type="file" id="imgInp" multiple style="display:none">
+                              </label>
+                                
+                            </a>
+                            <textarea id="msg-text" class="form-control border-0 me-2 ms-2 hideOnImgPreview" placeholder="Escribe tu mensaje..." rows="1" style="resize: none;"></textarea>
+                            <a href="javascript:sendChat()" class="btn-send bg-gradient-chat"><i class="fa fa-paper-plane"></i></a>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>  
+              </div>  
+            </div>
           </div>
 
         </div> 
@@ -198,36 +231,41 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <div class="card my-1 mx-2 position-relative" style="height: calc(100vh - 480px);">
-                <div id="previewModal" class="preview" style="display: none; opacity: 0.9; margin-top: calc(100vh - 700px);">
+              <div class=" my-1 mx-2 position-relative" style="height: auto;">
+
+                <textarea id="broadcast" style="border: none; width: 100%; margin-bottom: 15px; resize: none; height: 120px; border: solid 1px lightgray; border-radius: 1rem; padding: 5px; padding-left: 10px;" rows="10" placeholder="Escribe el mensaje..."></textarea>
+
+                <div id="previewModal" class="preview massiveMesage" style="display: none; opacity: 0.9; margin-top: 0; position: inherit !important; padding: 5px;">
                   <div class="previewBorder h-100 m-4">
                     <div class="d-flex flex-column h-100">
                       <div onclick="cancelPreview(1)" class="d-flex justify-content-end pt-2 pe-3" style="cursor: pointer;"><i class="fas fa-times" style="color: white; font-size: 25px;"></i></div>
-
-                        <div id="dropContainerModal" class="h-100 w-100" style="opacity: 0.9;">
-                          <div class="h-100 w-100 d-flex justify-content-center align-items-center" style="position: relative;">
-                            <h6 style="color: white; font-size: 25px;">Arrastra tus archivos acá</h6>
-                            <input type="file" name="" id="imgInp2Modal" style="width: 100%; height: 100%; position: absolute; opacity: 0;">
-                          </div>
+                      <div id="dropContainerModal" class="h-100 w-100" style="opacity: 0.9;">
+                        <div class="h-100 w-100 d-flex justify-content-center align-items-center" style="position: relative;">
+                          <h6 style="color: white; font-size: 25px;">Arrastra tus archivos acá</h6>
+                          <input type="file" name="" id="imgInp2Modal" style="width: 100%; height: 100%; position: absolute; opacity: 0;">
                         </div>
-                        <div style="display: none; overflow: scroll;" class="mb-3">
-                          <div id="imgContainerModal" class="h-100 d-flex justify-content-center align-items-center flex-wrap gap-3 p-5 pt-1"></div>
-                        </div>
-
+                      </div>
+                      <div style="display: none; overflow: scroll;" class="mb-3">
+                        <div id="imgContainerModal" class="h-100 d-flex justify-content-center align-items-center flex-wrap gap-3 p-5 pt-1"></div>
                       </div>
                     </div>
                   </div>
-                <textarea id="broadcast" style="border: none; width: 100%; margin-bottom: 15px; resize: none;" rows="10" placeholder="Escribe el mensaje..."></textarea>
-                <div style="margin-top: 5px;">
+                </div>
+
+                
+
+                <div style="margin-top: 5px; display: flex">
                   <a href="javascript:startAudio()" class="start-audio mx-2 hideOnImgPreviewModal btn-send bg-gradient-chat" style="padding: 13px 18px;"><i class=" fa fa-microphone"></i></a>
                   <div class="audio-controls" style="display: none;">
-                    <div class="d-inline-flex">
-                      <a href="javascript:sendAudio(true)" class="p-1 align-middle"><i class="fa fa-check-circle text-success"></i></a>
-                      <div class="timer-audio p-1 align-middle"><span>00:00</span></div>
-                      <a href="javascript:cancelAudio()" class="p-1 align-middle"><i class="fa fa-times-circle text-danger"></i></a>
+                    <div style="display: flex; align-items: center; height: 100%;">
+                      <div class="d-inline-flex">
+                        <a href="javascript:sendAudio(true)" class="p-1 align-middle"><i class="fa fa-check-circle text-success"></i></a>
+                        <div class="timer-audio p-1 align-middle"><span>00:00</span></div>
+                        <a href="javascript:cancelAudio()" class="p-1 align-middle"><i class="fa fa-times-circle text-danger"></i></a>
+                      </div>
                     </div>
                   </div>
-                  <div id="emoticonsModal"></div>
+                  <div id="emoticonsModal" style="border: solid 1px lightgray; border-radius: 1rem"></div>
                   <a class="btn-send bg-gradient-chat" id="emoModal" style="cursor: pointer; padding: 13px 13px !important;">
                     <i class="fa fa-smile-o" id="open-emoticonsModal" style="margin-left: 2px;"></i>
                     <i class="fa fa-keyboard-o" id="close-emoticonsModal" style="margin-left: 2px;"></i>
@@ -311,6 +349,8 @@
   <!-- Socket -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.js" integrity="sha512-MgkNs0gNdrnOM7k+0L+wgiRc5aLgl74sJQKbIWegVIMvVGPc1+gc1L2oK9Wf/D9pq58eqIJAxOonYPVE5UwUFA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="/js/plugins/moment.js"></script>
+  <script src="/js/plugins/RecordRTC.min.js"></script>
+  <script src="/js/sweetalert2.all.min.js"></script>
   <script src="/fonts/emoticons.js"></script>
     
   <script>
@@ -319,6 +359,7 @@
       
     var isUsers = false;
     var isModal = false;
+    var isFiltersLoaded = false;
     var isFirstTime = true;
     var last_key;
     var user = null;
@@ -451,7 +492,8 @@
             var fileName = fileTS.name;
 
             reader.onload = function(event) {
-              let element = `<div style="max-width: 300px; max-height: 300px; color: white" class="text-center">
+              let element = `
+                <div style="max-width: 300px; max-height: 300px; color: white" class="text-center imgPreviewUpload">
                   <img src="${event.target.result}" style="max-width: 90%; max-height: 90%; opacity: 1;" alt="">
                   <p class="m-0 mt-1">${fileName}</p> 
                 </div> 
@@ -661,7 +703,6 @@
 
       // Listener message incoming
       socket.on('new_message', (resp) => {
-        var win = new BrowserWindow 
         new Notification(resp.alias, {
           "body": resp.contenido.texto, 
           "data": {},
@@ -746,7 +787,7 @@
       let diff = (moment(m.creado_en, "DD-MM-YYYY")).diff(moment(), 'd'); 
 
       return `
-        <div class="my-1 mx-3 chat-cont" style="position: relative" data-id="${u._id}" data-order="${moment(m.creado_en, "DD-MM-YYYY, HH:mm:ss").unix()}">
+        <div class="my-1 mx-0 chat-cont" style="position: relative" data-id="${u._id}" data-order="${moment(m.creado_en, "DD-MM-YYYY, HH:mm:ss").unix()}">
           <div class="px-4 py-1">
             <li class="list-group-item border-0 d-flex align-items-center px-0 mb-2 bg-transparent" onclick="setChat('${u._id}')">
               <div class="avatar me-3 col-2 overflow-hidden">
@@ -1097,29 +1138,31 @@
           _.each(msgs, m => {
             let reg = new RegExp($('#search-msg').val().split(' ').join('|'));
             let u = m.usuario_emisor;
-            let img = (u.url_img) ? urlBase+u.url_img : '../assets/img/profile.jpg';
+            let img = (u.url_img) ? urlBase+u.url_img : '/img/profile.jpg';
             let alias = u.alias;
             let texto = chatMessage[m.contenido.tipo](m).replace(reg, s => `<b style="color: #ea0606 !important">${s}</b>`)
             let diff = (moment(m.creado_en, "DD-MM-YYYY")).diff(moment(), 'd'); 
 
-            var msgSearch = `<div class="my-1 mx-3 chat-cont" style="position: relative" data-id="${u._id}" data-order="${moment(m.creado_en, "DD-MM-YYYY, HH:mm:ss").unix()}">
-              <div class="px-4 py-1">
-                <li class="list-group-item border-0 d-flex align-items-center px-0 mb-2 bg-transparent" onclick="setChat('${u._id}')">
-                  <div class="avatar me-3 col-2 overflow-hidden">
-                    <img src="${img}" alt="kal" class="h-200 border-radius-lg shadow">
-                    <i class="indicator fa fa-circle conn" id="con-${u._id}" style="color:#4CAF50"></i>
-                  </div>
-                  <div class="d-flex align-items-start flex-column justify-content-center col-8">
-                    <h6 class="mb-0 col-11 text-truncate">${alias}</h6>
-                    <div class="mb-0 text-xs col-11 text-preview">${texto}</div>
-                  </div>
-                  <p style="font-size:10px" class="time-msg">${(diff == 0) ? moment(m.creado_en, "DD-MM-YYYY, hh:mm:ss").format("hh:mm a") : diff*-1+' día(s)'}</p>
-                  <div onclick='event.stopPropagation();'  class="form-check toggleCheckSelector" style="position: absolute; left: -5%; display: none">
-                      <input class="form-check-input inputCheckBoxDelete" type="checkbox" value="">
+            var msgSearch = `
+              <div class="my-1 mx-3 chat-cont" style="position: relative" data-id="${u._id}" data-order="${moment(m.creado_en, "DD-MM-YYYY, HH:mm:ss").unix()}">
+                <div class="px-4 py-1">
+                  <li class="list-group-item border-0 d-flex align-items-center px-0 mb-2 bg-transparent" onclick="setChat('${u._id}')">
+                    <div class="avatar me-3 col-2 overflow-hidden">
+                      <img src="${img}" alt="kal" class="h-200 border-radius-lg shadow">
+                      <i class="indicator fa fa-circle conn" id="con-${u._id}" style="color:#4CAF50"></i>
                     </div>
-                </li>
+                    <div class="d-flex align-items-start flex-column justify-content-center col-8">
+                      <h6 class="mb-0 col-11 text-truncate">${alias}</h6>
+                      <div class="mb-0 text-xs col-11 text-preview">${texto}</div>
+                    </div>
+                    <p style="font-size:10px" class="time-msg">${(diff == 0) ? moment(m.creado_en, "DD-MM-YYYY, hh:mm:ss").format("hh:mm a") : diff*-1+' día(s)'}</p>
+                    <div onclick='event.stopPropagation();'  class="form-check toggleCheckSelector" style="position: absolute; left: -5%; display: none">
+                        <input class="form-check-input inputCheckBoxDelete" type="checkbox" value="">
+                      </div>
+                  </li>
+                </div>
               </div>
-            </div>`;
+            `;
             
             $('#listSerch').append(msgSearch);
           })
@@ -1141,7 +1184,7 @@
             var reader = new FileReader();
             reader.onload = function (e) {
               let element = `
-                <div style="max-width: 300px; max-height: 300px; color: white" class="text-center">
+                <div style="max-width: 300px; max-height: 300px; color: white" class="text-center imgPreviewUpload">
                   <img src="${e.target.result}" style="max-width: 90%; max-height: 90%; opacity: 1;" alt="">
                   <p class="m-0 mt-1">${fileName}</p>   
                 </div> 
@@ -1199,7 +1242,7 @@
     // Funciones previsualización de archivos
     const loadPreviewFiles = function (fileType, fileName,isModal) {
       let element = `
-      <div style="max-width: 300px; max-height: 300px; color: white" class="text-center">
+      <div style="max-width: 300px; max-height: 300px; color: white" class="text-center imgPreviewUpload">
         ${icoPreview[fileType]}
         <p class="m-0 mt-1">${(fileName ? fileName : "")}</p> 
       </div>`; 
@@ -1240,6 +1283,408 @@
       if (isModal) return $("#imgInpModal").click();
       return $("#imgInp").click();
     };
+
+    const stopTimerAudio = () => {
+      clearInterval(timerAudio);
+    }
+
+    const startAudio = () => {
+      startTimerAudio();
+      $('.start-audio').fadeOut('fast', () => {
+        $('.audio-controls').fadeIn('fast', () => {
+          startRecordAudio();
+        });
+      });
+    }
+
+    // Iniciar contador de envío de audio
+    const startTimerAudio = () => {
+      $('.timer-audio>span').html('00:00');
+      var start = new Date;    
+      
+      clearInterval(timerAudio);
+      timerAudio = setInterval(() => {
+        var total_seconds = (new Date - start) / 1000;   
+      
+        var minutes = Math.floor(total_seconds / 60);
+        total_seconds = total_seconds % 60;
+      
+        var seconds = Math.floor(total_seconds);
+        minutes = pretty_time_string(minutes);
+        seconds = pretty_time_string(seconds);
+
+        var currentTimeString = minutes + ":" + seconds;
+      
+        $('.timer-audio>span').html(currentTimeString);
+      }, 1000);
+    }
+
+    // Iniciar grabación de audio
+    const startRecordAudio = () => {
+      if (!microphone) {
+        captureMicrophone(function(mic) {
+          microphone = mic;
+          startRecordAudio();
+        });
+        return;
+      }
+
+      var options = {
+        type: 'audio',
+        numberOfAudioChannels: isEdge ? 1 : 2,
+        checkForInactiveTracks: true,
+        bufferSize: 16384,
+        // recorderType: RecordRTC.StereoAudioRecorder, // force for all browsers
+        // numberOfAudioChannels: 2
+      };
+
+      if(navigator.platform && navigator.platform.toString().toLowerCase().indexOf('win') === -1) {
+        options.sampleRate = 48000; // or 44100 or remove this line for default
+      }
+
+      if(recorder) {
+        recorder.destroy();
+        recorder = null;
+      }
+
+      recorder = RecordRTC(microphone, options);
+      recorder.startRecording();
+    }
+
+    const pretty_time_string = (num) => {
+      return ( num < 10 ? "0" : "" ) + num;
+    }
+
+    const cancelAudio = () => {
+      stopTimerAudio();
+      $('.audio-controls').fadeOut('fast', () => {
+        $('.start-audio').fadeIn('fast', () => {
+          if(microphone) {
+            microphone.stop();
+            microphone = null;
+          }
+
+          if(recorder) {
+            recorder.destroy();
+            recorder = null;
+          }
+        });
+      })
+    }
+
+    /* Funciones para grabar Audio */
+    const captureMicrophone = (callback) => {
+      if(microphone) {
+        callback(microphone);
+        return;
+      }
+
+      if(typeof navigator.mediaDevices === 'undefined' || !navigator.mediaDevices.getUserMedia) {
+        alert('No es poisble grabar audio.');
+        if(!!navigator.getUserMedia) alert('No es posible grabar audio.');
+      }
+
+      navigator.mediaDevices.getUserMedia({
+        audio: isEdge ? true : {
+          echoCancellation: false
+        }
+      }).then(function(mic) {
+        callback(mic);
+      }).catch(function(error) {
+        alert('Unable to capture your microphone. Please check console logs.');
+        console.error(error);
+      });
+    };
+
+    const replaceAudio = (src) => {
+      var newAudio = document.createElement('audio');
+      newAudio.controls = true;
+
+      if(src) {
+        newAudio.src = src;
+      }
+    };
+
+    const sendAudio = (f) => {
+      isModal = f
+      stopTimerAudio();
+      $('.audio-controls').fadeOut('fast', () => {
+        $('.start-audio').fadeIn('fast', () => {
+          recorder.stopRecording(stopRecordingCallback);
+        });
+      })
+    };
+
+    const stopRecordingCallback = () => {
+      var newAud = recorder.getBlob();
+      replaceAudio(URL.createObjectURL(newAud));
+      
+      uploadFile(newAud, (result) => {
+        fileToSend.push({"file": newAud, "result": result});
+        (isModal) ? broadcastMessage() : sendChat();
+      })
+    };
+
+    const broadcastMessage = () => {
+      var texto = nl2br($('#broadcast').val().replace(/^\s+|\s+$/g, ""));
+      _.each(idsMessage, d => {
+        let emisor = user._id;
+        let receptor = d;
+        let tipoReceptor = "usuario";
+      
+        // Parámetros básicos de mensaje
+        var type_msg = "sos";
+        var has_files = false;
+        var files = [];
+
+        // Validar mensajes adjuntos
+        if (fileToSend.length > 0) {
+          type_msg = "attached";
+          has_files = true;
+          files = _.map(fileToSend, (f) => {
+              var ext = f.result.original_name.split('.').pop();
+              var n = {
+                  "url":f.result.url_file.replace('/public',''),
+                  "ext":ext,
+                  "typeFile":getTypeFile(ext),
+                  "name":f.result.original_name,
+              };
+              return n;
+          });
+        }
+
+        var msg_data = { 
+          "alias": user.alias,
+          "img": user.url_img,
+          "emisor": emisor, 
+          "receptor": receptor, 
+          "leido_por": [], 
+          "recibido_por": [], 
+          "empresa": user.empresa, 
+          "unread": {},
+          "creado_en": moment().format("DD-MM-YYYY, HH:mm:ss"),
+          "contenido": { 
+            "texto": texto, 
+            "tipo": type_msg, 
+            "url": files 
+          }, 
+          "tipo_receptor": tipoReceptor, 
+          "estado": {} 
+        };
+
+        // Objeto para lectura de mensajes
+        msg_data.unread[emisor] = 0;
+        msg_data.unread[receptor] = 0;
+
+        // Objeto de estado
+        msg_data.estado[receptor] = 1;
+        msg_data.estado[emisor] = 1;
+
+        if ($('.chat-cont[data-id="'+receptor+'"]').hasClass('card')) {
+          var nOrder = new Date().getTime();
+          $('.chat-cont[data-id="'+receptor+'"]')
+            .attr('data-order', new Date().getTime())
+            .data('order', nOrder)
+
+          var textoF = ' * Notificación ';
+          try{
+            textoF = lastMessageChat[type_msg](msg_data);
+          } catch {}
+          
+          $('.chat-cont[data-id="'+d+'"]').find('.text-preview').html(textoF);
+          $('.chat-cont[data-id="'+d+'"]').find('.time-msg').html(moment().format('h:mma'));
+          sortLastChats();
+
+          var msg = chatMessage[type_msg](msg_data);
+          var cMsg = "c-msg c-emi mb-1 card shadow py-2 px-3 float-end";
+          msg = `<div class="${cMsg}">${msg}<span class="hour-msg">${moment().format('h:mma')}</span></div>`;
+          $('#chat-history').append(msg);
+          scrollHistory();
+        }
+
+        socket.emit('new_message', msg_data, (result) => { });
+      });
+      
+      $('#broadcast').val('');
+      // $(".toggleCheckSend").fadeOut("fast");
+      // $("#sendMessage").fadeOut("fast")
+      $('#message').modal('hide');
+      cancelPreview(1);
+    }
+
+    const lastMessageChat = {
+      "attached": msg => {
+        if (['jpg','jpeg','gif','png'].indexOf(msg.contenido.url[0].ext) > -1) {
+          return `<span class="badge badge-lg bg-gradient-success"><i class="fa fa-file-image-o"></i> Imagen</span> ${msg.contenido.texto.toString().replace(/<[^>]*>?/g, '')}`;
+        }
+        if (['ogg','mp3','3gp','blob'].indexOf(msg.contenido.url[0].ext) > -1) {
+          return '<span class="badge badge-lg bg-success"><i class="fa fa-music"></i> Audio</span>';  
+        }
+        return '<span class="badge badge-lg bg-success"><i class="fa fa-file-o"></i> Archivo</span><br><br>';
+      },
+      "calendar": msg => ' <i class="fa fa-calendar-o"></i> Evento',
+      "formatRequest": msg => '<span class="badge badge-lg bg-gradient-dark"><i class="fa fa-bell"></i> Nueva Solicitud</span>',
+      "process": msg => '<i class="fa fa-bell"></i> Nueva Incidencia',
+      "sos": msg => `<span class="badge badge-lg bg-gradient-danger"><i class="fa fa-bell"></i> <b>SOS</b></span> - ${msg.contenido.texto.toString().replace(/<[^>]*>?/g, '')}`,
+      "text": msg => `${msg.contenido.texto.toString().replace(/<[^>]*>?/g, '')}`,
+      "task": msg => '<i class="fa fa-bell"></i> Helpdesk',
+      "to_do_list": msg => '<i class="fa fa-list-ol"></i> Tarea',
+    };
+
+    const showUsersLists = (user) => {
+      views = [];
+      socket.emit('users_list', user, (lUsers) => {
+        listUsers = _.groupBy(_.sortBy(lUsers, 'grupo'), 'grupo');
+        console.log(listUsers)
+        //var htmlUsers = '';
+        $('#cards').append(`
+          <div class="input-group">
+            <input type="text" class="form-control border-0 shadowInput" placeholder="Buscar..." id="buscar" onkeyup="buscar()">
+            <span class="input-group-text text-body border-0"><i class="fas fa-search" aria-hidden="true"></i></span>
+          </div><br>`
+        );
+        $('#cards').append(`
+          <div class="form-check toggleCheckSend" style="float: left; margin-left: 15px; display: none">
+              <input id="checkAll" class="form-check-input inputCheckBoxSend" type="checkbox" value="">
+          </div>
+          <h6 style= "float: left">Seleccionar todos</h6><br>
+        `) 
+        _.each(listUsers, (lu, i) => {  //href
+          i = (i.length>0) ? i : 'Grupo sin asignar'
+          var groups = `<a class="nav-link text-body" data-scroll="" data-bs-toggle="collapse" href="#${i.split(" ").join("").replace(/[&]/g,'y').replace(/[.]/g,'').replace(/["'\(\)]/g, "").replace(/[#]/g,'')}">
+            <span class="text-sm"><b><i class="fa fa-group" style="margin-right: 10px"></i>${i}</b></span>
+            </a>
+            <ul class="nav ms-4 ps-3 collapse" id="${i.split(" ").join("").replace(/[&]/g,'y').replace(/[.]/g,'').replace(/["'\(\)]/g, "").replace(/[#]/g,'')}" style="max-height: 450px; overflow: scroll;"></ul>`
+          $('#listgroups').append(groups);
+          _.each(_.groupBy(lu, 'subgrupo'), (u, j) => {
+            var subgroup = `<li class="nav-item" style="width: 100%">
+                <a class="nav-link text-sm" style="color: gray; cursor: pointer;" onClick="newFilter('${i.split(" ").join("").replace(/[&]/g,'y').replace(/[.]/g,'').replace(/["'\(\)]/g, "").replace(/[#]/g,'')}${j.split(" ").join("").replace(/[&]/g,'y').replace(/[.]/g,'').replace(/["'\(\)]/g, "").replace(/[#]/g,'')}')"> 
+                  <span class="sidenav-normal"><i class="fa fa-group" style="margin-right: 10px"></i>${j}</span>
+                </a>
+              </li>`
+            views.push(i.split(" ").join("").replace(/[&]/g,'y').replace(/[.]/g,'').replace(/["'\(\)]/g, "").replace(/[#]/g,'')+j.split(" ").join("").replace(/[&]/g,'y').replace(/[.]/g,'').replace(/["'\(\)]/g, "").replace(/[#]/g,''))
+            var idi = i.split(" ").join("").replace(/[&]/g,'y').replace(/[.]/g,'').replace(/["'\(\)]/g, "").replace(/[#]/g,'');
+            $(`#${idi}`).append(subgroup);
+            var subGroup = `<div class="card mt-4" id="${i.split(" ").join("").replace(/[&]/g,'y').replace(/[.]/g,'').replace(/["'\(\)]/g, "").replace(/[#]/g,'')}${j.split(" ").join("").replace(/[&]/g,'y').replace(/[.]/g,'').replace(/["'\(\)]/g, "").replace(/[#]/g,'')}View">
+              <div class="card-header" style="padding: 1rem 1.5rem !important;">
+                <div class="form-check toggleCheckSend" style="float: left; margin-left: 15px; display: none">
+                    <input class="form-check-input inputCheckBoxSend inputCheckBox" type="checkbox" value="">
+                  </div>
+                  <h5 style= "float: left">${i+" - "+j}</h5>                      
+              </div>
+            </div>`;
+              $('#cards').append(subGroup);
+              _.each(u, a =>{
+                let info = '';
+                if (a.grupo && a.subgrupo) {
+                  info = `${a.grupo} - ${a.subgrupo} `;
+                }
+
+                if(a.telefono) info += ` - <b>${a.telefono}</b>`;
+                if($('#list_group').attr('aria-selected') === 'true'){
+                  var card = `<div style="padding: 0rem !important;" class="card-body pt-0" id="u-${a._id}" style="cursor: pointer;" onClick="setChat(${a._id}, 1)">` 
+                }else{
+                  var card = `<div style="padding: 0rem !important;" class="card-body pt-0" id="u-${a._id}" style="cursor: pointer;">`
+                }
+                card += `<ul>
+                          <li style="padding: 0rem 1rem !important;" class="list-group-item border-0 d-flex align-items-center px-0 mb-2 bg-transparent">
+                            <div class="form-check toggleCheckSend" style="float: left; margin-left: 15px; display: none">
+                                    <input class="form-check-input inputCheckBoxSend" type="checkbox" value="">
+                                  </div>
+                            <div class="avatar me-3 col-2 overflow-hidden">
+                              <img src="${(a.url_img && a.url_img != null) ? urlBase+a.url_img : '/img/profile.jpg'}" alt="kal"
+                                class="h-200 border-radius-lg shadow" href="#chats">
+                            </div>
+                            <div class="d-flex align-items-start flex-column justify-content-center col-8 text-truncate">
+                              <h6 class="mb-0 text-sm col-11 text-truncate">${a.alias}</h6>
+                              <p class="mb-0 text-xs col-11 text-truncate text-preview">${info}</p>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>`
+                  var idj = i.split(" ").join("").replace(/[&]/g,'y').replace(/[.]/g,'').replace(/["'\(\)]/g, "").replace(/[#]/g,'')+j.split(" ").join("").replace(/[&]/g,'y').replace(/[.]/g,'').replace(/["'\(\)]/g, "").replace(/[#]/g,'');
+                $(`#${idj}View`).append(card); 
+              });
+          })            
+        })
+        if(isFirstTime){
+          toggleSendMessage();
+        }
+      })
+      console.log(views);
+    }
+
+    //enviar mensaje masivo
+    const toggleSendMessage = () => {
+      $(".toggleCheckSend").fadeIn("fast");
+      $("#sendMessage").fadeIn("fast");
+    }
+
+    const toggleViewChat = () => {
+      if ($("#chats").is(":visible") == true) {
+        $("#chats").hide();
+        $("#btnMassiveTest").hide();
+        $("#users").show();
+        $("#btnChats").show();
+
+        if (!isFiltersLoaded) {
+          isFiltersLoaded = true;
+          showUsersLists(user);
+        }
+      } else {
+        $("#users").hide();
+        $("#btnChats").hide();
+        $("#chats").show();
+        $("#btnMassiveTest").show();
+      }
+    }
+
+    //función para filtrar los grupos y subgrupos
+    const newFilter = (id) => {
+      for(i=0; i<views.length; i++){
+        $('html, body').scrollTop(0);
+        if(views[i] != id){
+          $('#'+views[i]+'View').addClass('noTiene');
+        }else{
+          $('#'+views[i]+'View').removeClass('noTiene');
+        }
+      }
+    }
+
+    const deleteFilter = () => {
+      for(i=0; i<views.length; i++){
+        $('#'+views[i]+'View').removeClass('noTiene');
+      }
+    }
+
+    const sendMessage = () => {
+      let checkBoxs = $(".inputCheckBoxSend");
+      idsMessage = [];
+      for (let i = 0; i < checkBoxs.length; i++) {
+        if (checkBoxs[i].checked) {
+          if($(checkBoxs[i].parentElement.parentElement.parentElement.parentElement).hasClass('card-body')){
+            dataId = $(checkBoxs[i].parentElement.parentElement.parentElement.parentElement).attr("id");
+            if(!idsMessage.includes(dataId.substr(2,dataId.length-1))){idsMessage.push(dataId.substr(2,dataId.length-1))} 
+          }else{
+            parentContainerCheckbox = checkBoxs[i].parentElement.parentElement.parentElement;
+            parentContainerCheckbox = $(parentContainerCheckbox).find('.card-body');
+            for(let j = 0; j < parentContainerCheckbox.length; j++){
+              dataId = $(parentContainerCheckbox[j]).attr("id");
+              if(!idsMessage.includes(dataId.substr(2,dataId.length-1))){idsMessage.push(dataId.substr(2,dataId.length-1))}
+            }
+          } 
+        }
+      }
+
+      if(idsMessage.length >= 1){
+        $('#message').modal('show');
+      }else{
+        Swal.fire({
+          title: 'Debes seleccionar algún destinatario',
+          icon: 'warning',
+        })
+      }
+    }
 
     $(document).ready(function () {
       $("#menuChat").addClass("activeNav")
