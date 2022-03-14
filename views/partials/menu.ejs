@@ -58,10 +58,10 @@
         </a>
         <div class="collapse show" id="collapseApp">
           <ul class="navbar-nav">
-            <li class="nav-item" >
+            <li class="nav-item" id="menuChat">
               <a class="nav-link" href="/chat" >
                 <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
-                  <i class="fas fa-th-large" style="color: #252f40; font-size: 12px"></i>
+                  <i class="fas fa-comments" style="color: #252f40; font-size: 12px"></i>
                 </div>
                 <span class="nav-link-text ms-1 font-weight-bold">Chat</span>
               </a>
@@ -102,182 +102,188 @@
         </div>
       </li>
 
-      <li class="nav-item" >
-        <a class="nav-link"  data-bs-toggle="collapse" href="#collapseBtoB" >
-          <span class="nav-link-text ms-1 font-weight-bold"> <h6 class="m-0 text-xs font-weight-bolder opacity-6">B2B</h6></span>
-        </a>
-        <div class="collapse show" id="collapseBtoB">
-          <ul class="navbar-nav ">
 
-            <%
-              permissionIndex = session.user.permission.map(e => e.code).lastIndexOf("8045_CAN_VIEW_SHOPPING_CAR");
-              if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
-            %>
-              <li class="nav-item" id="menuCatalogo">
-                <a class="nav-link" href="/catalogo" >
+      <%
+        permissionIndex = session.user.permission.map(e => e.code).lastIndexOf("8000_CAN_ACCESS_EXTRANET");
+        if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
+      %>
+        <li class="nav-item" >
+          <a class="nav-link"  data-bs-toggle="collapse" href="#collapseBtoB" >
+            <span class="nav-link-text ms-1 font-weight-bold"> <h6 class="m-0 text-xs font-weight-bolder opacity-6">B2B</h6></span>
+          </a>
+          <div class="collapse show" id="collapseBtoB">
+            <ul class="navbar-nav ">
+
+              <%
+                permissionIndex = session.user.permission.map(e => e.code).lastIndexOf("8045_CAN_VIEW_SHOPPING_CAR");
+                if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
+              %>
+                <li class="nav-item" id="menuCatalogo">
+                  <a class="nav-link" href="/catalogo" >
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
+                      <i class="fas fa-boxes" style="color: #252f40; font-size: 12px"></i>
+                    </div>
+                    <span class="nav-link-text ms-1 font-weight-bold">
+                      <%- (session.user.id_company == 15 || session.user.id_company == 37 ? "Catalogo de Productos" : "Consulta de Inventario") %>
+                    </span>
+                  </a>
+                </li>
+              <% } %>
+
+              <% 
+                permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8029_VIEW_TOP_50_PRODUCTS");
+                if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
+              %>
+                <li class="nav-item" id="menuCatalogoTop">
+                  <a class="nav-link" href="/catalogo/top" >
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
+                      <i class="fas fa-certificate" style="color: #252f40; font-size: 12px"></i>
+                    </div>
+                    <span class="nav-link-text ms-1 font-weight-bold">Top 50 Productos</span>
+                  </a>
+                </li>
+              <% } %>
+
+              <% 
+                permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8045_CAN_VIEW_SHOPPING_CAR");
+                if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
+              %>
+                <li class="nav-item" id="menuCarritoCompras">
+                  <a class="nav-link" href="/carrito-compras" >
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
+                      <i class="fas fa-shopping-cart" style="color: #252f40; font-size: 12px"></i>
+                    </div>
+                    <span class="nav-link-text ms-1 font-weight-bold">Carrito de compras</span>
+                  </a>
+                </li>
+              <% } %>
+
+              <% 
+                permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8028_CAN_ACCESS_TO_CALIDOSOS");
+                if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
+              %>
+                <li class="nav-item" id="menuCalidosos">
+                  <a class="nav-link" href="/calidosos" >
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
+                      <i class="fas fa-gift" style="color: #252f40; font-size: 12px"></i>
+                    </div>
+                    <span class="nav-link-text ms-1 font-weight-bold">Puntos Calidosos</span>
+                  </a>
+                </li>
+              <% } %>
+
+              <% 
+                permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8020_CAN_VIEW_ORDERS_EXTRANET");
+                if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
+              %>
+                <li class="nav-item" id="menuHistorialPedidos">
+                  <a class="nav-link" href="/historial-pedidos" >
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
+                      <i class="fas fa-truck-moving" style="color: #252f40; font-size: 12px"></i>
+                    </div>
+                    <span class="nav-link-text ms-1 font-weight-bold">Historial Pedidos</span>
+                  </a>
+                </li>
+              <% } %>
+
+              <% 
+                permissionIndex = session.user.permission.map(e => e.code).lastIndexOf("8010_CAN_VIEW_DOCUMENT_HISTORY_EXTRANET");
+                if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
+              %>
+                <li class="nav-item" id="menuHistorialDocumentos">
+                  <a class="nav-link" href="/historial-facturas" >
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
+                      <i class="far fa-file-alt" style="color: #252f40; font-size: 12px"></i>
+                    </div>
+                    <span class="nav-link-text ms-1 font-weight-bold">Historial Documentos</span>
+                  </a>
+                </li>
+              <% } %>
+
+              <% 
+                permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8065_VIEW_ECOMMERCE");
+                if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
+              %>
+                <li class="nav-item" id="menuHistorialTransacciones">
+                  <a class="nav-link" href="/historial-transacciones" >
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
+                      <i class="fas fa-history" style="color: #252f40; font-size: 12px"></i>
+                    </div>
+                    <span class="nav-link-text ms-1 font-weight-bold">Historial transacciones</span>
+                  </a>
+                </li>
+              <% } %>
+
+              <% 
+                permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8015_CAN_VIEW_QUOTATION_EXTRANET");
+                if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
+              %>
+                <li class="nav-item" id="menuHistorialPedidos">
+                  <a class="nav-link" href="/cotizaciones" >
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
+                      <i class="fas fa-receipt" style="color: #252f40; font-size: 12px"></i>
+                    </div>
+                    <span class="nav-link-text ms-1 font-weight-bold">Cotizaciones</span>
+                  </a>
+                </li>
+              <% } %>
+
+              <% 
+                permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8035_CAN_VIEW_PORTFOLIO_EXTRANET");
+                if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
+              %>
+                <li class="nav-item" id="menuFacturas">
+                  <a class="nav-link" href="/facturas" >
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
+                      <i class="fas fa-dollar-sign" style="color: #252f40; font-size: 12px"></i>
+                    </div>
+                    <span class="nav-link-text ms-1 font-weight-bold">Facturas</span>
+                  </a>
+                </li>
+              <% } %>
+
+              <% 
+                permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8005_CAN_PAY_INVOICES_EXTRANET");
+                if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
+              %>
+                <li class="nav-item" id="menuCarritoFacturas">
+                  <a class="nav-link" href="/carrito-facturas" >
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
+                      <i class="fas fa-cart-arrow-down" style="color: #252f40; font-size: 12px"></i>
+                    </div>
+                    <span class="nav-link-text ms-1 font-weight-bold">Carrito de faturas</span>
+                  </a>
+                </li>
+              <% } %>
+
+              <% 
+                permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8025_CAN_EXPORT_CERTIFICATES_EXTRANET");
+                if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
+              %>
+                <li class="nav-item" id="menuCertificados">
+                  <a class="nav-link" href="/certificados" >
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
+                      <i class="fas fa-stamp" style="color: #252f40; font-size: 12px"></i>
+                    </div>
+                    <span class="nav-link-text ms-1 font-weight-bold">Certificados</span>
+                  </a>
+                </li>
+              <% } %>
+
+              <!-- TODO: Integrar modulo -->
+              <li class="nav-item" id="menuDocumentosUsuario" style="display: none;">
+                <a class="nav-link" href="/documentos-usuario" >
                   <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
-                    <i class="fas fa-boxes" style="color: #252f40; font-size: 12px"></i>
+                    <i class="fas fa-file" style="color: #252f40; font-size: 12px"></i>
                   </div>
-                  <span class="nav-link-text ms-1 font-weight-bold">
-                    <%- (session.user.id_company == 15 || session.user.id_company == 37 ? "Catalogo de Productos" : "Consulta de Inventario") %>
-                  </span>
+                  <span class="nav-link-text ms-1 font-weight-bold">Documentos Usuario</span>
                 </a>
               </li>
-            <% } %>
 
-            <% 
-              permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8029_VIEW_TOP_50_PRODUCTS");
-              if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
-            %>
-              <li class="nav-item" id="menuCatalogoTop">
-                <a class="nav-link" href="/catalogo/top" >
-                  <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
-                    <i class="fas fa-certificate" style="color: #252f40; font-size: 12px"></i>
-                  </div>
-                  <span class="nav-link-text ms-1 font-weight-bold">Top 50 Productos</span>
-                </a>
-              </li>
-            <% } %>
-
-            <% 
-              permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8045_CAN_VIEW_SHOPPING_CAR");
-              if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
-            %>
-              <li class="nav-item" id="menuCarritoCompras">
-                <a class="nav-link" href="/carrito-compras" >
-                  <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
-                    <i class="fas fa-shopping-cart" style="color: #252f40; font-size: 12px"></i>
-                  </div>
-                  <span class="nav-link-text ms-1 font-weight-bold">Carrito de compras</span>
-                </a>
-              </li>
-            <% } %>
-
-            <% 
-              permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8028_CAN_ACCESS_TO_CALIDOSOS");
-              if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
-            %>
-              <li class="nav-item" id="menuCalidosos">
-                <a class="nav-link" href="/calidosos" >
-                  <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
-                    <i class="fas fa-gift" style="color: #252f40; font-size: 12px"></i>
-                  </div>
-                  <span class="nav-link-text ms-1 font-weight-bold">Puntos Calidosos</span>
-                </a>
-              </li>
-            <% } %>
-
-            <% 
-              permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8020_CAN_VIEW_ORDERS_EXTRANET");
-              if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
-            %>
-              <li class="nav-item" id="menuHistorialPedidos">
-                <a class="nav-link" href="/historial-pedidos" >
-                  <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
-                    <i class="fas fa-truck-moving" style="color: #252f40; font-size: 12px"></i>
-                  </div>
-                  <span class="nav-link-text ms-1 font-weight-bold">Historial Pedidos</span>
-                </a>
-              </li>
-            <% } %>
-
-            <% 
-              permissionIndex = session.user.permission.map(e => e.code).lastIndexOf("8010_CAN_VIEW_DOCUMENT_HISTORY_EXTRANET");
-              if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
-            %>
-              <li class="nav-item" id="menuHistorialDocumentos">
-                <a class="nav-link" href="/historial-facturas" >
-                  <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
-                    <i class="far fa-file-alt" style="color: #252f40; font-size: 12px"></i>
-                  </div>
-                  <span class="nav-link-text ms-1 font-weight-bold">Historial Documentos</span>
-                </a>
-              </li>
-            <% } %>
-
-            <% 
-              permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8065_VIEW_ECOMMERCE");
-              if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
-            %>
-              <li class="nav-item" id="menuHistorialTransacciones">
-                <a class="nav-link" href="/historial-transacciones" >
-                  <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
-                    <i class="fas fa-history" style="color: #252f40; font-size: 12px"></i>
-                  </div>
-                  <span class="nav-link-text ms-1 font-weight-bold">Historial transacciones</span>
-                </a>
-              </li>
-            <% } %>
-
-            <% 
-              permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8015_CAN_VIEW_QUOTATION_EXTRANET");
-              if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
-            %>
-              <li class="nav-item" id="menuHistorialPedidos">
-                <a class="nav-link" href="/cotizaciones" >
-                  <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
-                    <i class="fas fa-receipt" style="color: #252f40; font-size: 12px"></i>
-                  </div>
-                  <span class="nav-link-text ms-1 font-weight-bold">Cotizaciones</span>
-                </a>
-              </li>
-            <% } %>
-
-            <% 
-              permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8035_CAN_VIEW_PORTFOLIO_EXTRANET");
-              if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
-            %>
-              <li class="nav-item" id="menuFacturas">
-                <a class="nav-link" href="/facturas" >
-                  <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
-                    <i class="fas fa-dollar-sign" style="color: #252f40; font-size: 12px"></i>
-                  </div>
-                  <span class="nav-link-text ms-1 font-weight-bold">Facturas</span>
-                </a>
-              </li>
-            <% } %>
-
-            <% 
-              permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8005_CAN_PAY_INVOICES_EXTRANET");
-              if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
-            %>
-              <li class="nav-item" id="menuCarritoFacturas">
-                <a class="nav-link" href="/carrito-facturas" >
-                  <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
-                    <i class="fas fa-cart-arrow-down" style="color: #252f40; font-size: 12px"></i>
-                  </div>
-                  <span class="nav-link-text ms-1 font-weight-bold">Carrito de faturas</span>
-                </a>
-              </li>
-            <% } %>
-
-            <% 
-              permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8025_CAN_EXPORT_CERTIFICATES_EXTRANET");
-              if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
-            %>
-              <li class="nav-item" id="menuCertificados">
-                <a class="nav-link" href="/certificados" >
-                  <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
-                    <i class="fas fa-stamp" style="color: #252f40; font-size: 12px"></i>
-                  </div>
-                  <span class="nav-link-text ms-1 font-weight-bold">Certificados</span>
-                </a>
-              </li>
-            <% } %>
-
-            <!-- TODO: Integrar modulo -->
-            <li class="nav-item" id="menuDocumentosUsuario" style="display: none;">
-              <a class="nav-link" href="/documentos-usuario" >
-                <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
-                  <i class="fas fa-file" style="color: #252f40; font-size: 12px"></i>
-                </div>
-                <span class="nav-link-text ms-1 font-weight-bold">Documentos Usuario</span>
-              </a>
-            </li>
-
-          </ul>
-        </div>
-      </li>
+            </ul>
+          </div>
+        </li>
+      <% } %>
 
       <% 
         permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8030_CAN_CONFIGURE_EXTRANET");
