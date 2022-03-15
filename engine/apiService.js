@@ -165,9 +165,45 @@ service.updatePemiso = async(body) => {
 }
 
 service.createPermiso = async(body) => {
-  console.log(body)
   const url = urlKakashi+'create_role_permission';
   const data =  await makeRequest(url, options('post', body));
+  return data;
+}
+
+// ** Helpdesk
+service.getHelpdeskIndicators = async(id_company, id_user) => {
+  const url = urlKakashi+"get_helpdesk?id_company="+id_company+"&id_user="+id_user;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.getHelpdeskOcurrence = async(id_company, state, helpdesk) => {
+  const url = urlKakashi+"get_ocurrence_helpdesk?id_company="+id_company+"&state="+state+"&helpdesk="+helpdesk+"&offset=0&limit=20";
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.getMastersHelpdesk = async(id_company) => {
+  const url = urlKakashi+"get_master_helpdesk?id_company="+id_company;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.getAdminFormat = async(id_company) => {
+  const url = urlKakashi+"adminFormat?id_company="+id_company;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.getUsersHelpdesk = async(id_company) => {
+  const url = urlKakashi+"get_user_helpdesk?id_company="+id_company;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.getDetailformat = async(id, id_node, id_workflow_header, id_workflow) => {
+  const url = urlKakashi+"getDetailformat?id="+id+"&id_node="+id_node+"&id_workflow_header="+id_workflow_header+"&id_workflow="+id_workflow;
+  const data =  await makeRequest(url);
   return data;
 }
 

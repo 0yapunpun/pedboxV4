@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const viewController = require('../controller/viewController.js');
 const b2bController = require('../controller/b2bController.js');
+const helpdeskController = require('../controller/helpdeskController.js');
+
 
 router.get('/', viewController.index);
 router.get('/login', viewController.login);
@@ -44,9 +46,10 @@ router.post('/documentos-usuario/upload', b2bController.uploadDocumentoUsuario);
 
 // Tools
 router.get('/chat', viewController.chat);
+router.get('/helpdesk', helpdeskController.helpdesk);
+router.get('/helpdesk/ocurrence/:state/:ocurrence', helpdeskController.helpdeskOcurrence);
 
 // Por integrar
-router.get('/helpdesk', viewController.helpdesk);
 router.get('/crm', viewController.crm);
 
 
