@@ -207,6 +207,18 @@ service.getDetailformat = async(id, id_node, id_workflow_header, id_workflow) =>
   return data;
 }
 
+service.getManagement = async(id_activitie) => {
+  const url = urlKakashi+"management?id_activitie="+id_activitie;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.getSolicitudes = async(id_company, id_user) => {
+  const url = urlKakashi+"getFormatRequest?id_company="+id_company+"&id_user="+id_user
+  const data =  await makeRequest(url);
+  return data;
+}
+
 const makeRequest = async (url, options) => {
   try {
       var resp = await fetch(url, options || {});

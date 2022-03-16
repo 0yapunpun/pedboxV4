@@ -1097,7 +1097,7 @@
     
       let fieldReturn = `
         <div class="d-flex mb-3"> 
-          <div style="width: 50px" class="d-flex justify-content-center align-items-center"><i class="`+iconSelect+`"></i></div>
+          <div style="width: 50px" class="d-flex justify-content-center align-items-center"><i class="`+(iconSelect ? iconSelect : "far fa-check-square")+`"></i></div>
           <div type-field="13" class="d-flex flex-column w-100">
             <span class="fs-13 font-weight-bold">`+(question ? question : "")+`</span>
             <span style="border-bottom: 1px solid rgba(0,0,0,.12)">`+(content ? content : "")+`</span>
@@ -1217,7 +1217,7 @@
       .catch(error => console.log('Request failed', error));
     }
 
-    const loadTimeLineModal = function(data) {
+    const prepareDataIncidence = function(data) {
       data.workflow['dateBeatiful'] = nvFormatDate(data.workflow.date, "mmmm DD, YYYY, hhhh:mm ampm");
 
       data.workflow['percentage'] = 0;
@@ -1225,7 +1225,6 @@
         data.workflow['percentage'] = (data.workflow.actual / data.workflow.total) * 100;
         data.workflow['percentage'] = data.workflow['percentage'].toFixed(0);
       }
-
 
       if(data.workflow.id_format_request) {
         data.workflow['infoFormatRequest'] = getFilterFormat(data.workflow.id_format_request);
@@ -1248,6 +1247,11 @@
           node['resume'] = [];
         }
       }
+      return data
+    }
+
+    const loadTimeLineModal = function(data) {
+      data = prepareDataIncidence(data);
 
       let title = data.workflow.name+ "- REQ "+ data.workflow.number;
       $('#timeLineTitle').text(title);
@@ -1334,7 +1338,6 @@
     }
 
     const loadRequests = function (data) {
-      // https://app.pedbox.co/assets/images/avatars/profile.jpg direccion imagenes
       const consultaSolicitudModalMain = $("#consultaSolicitudModalMain");
       consultaSolicitudModalMain.html("")
       for (let i = 0; i < data.length; i++) {
@@ -1349,7 +1352,7 @@
                 <div><h6>Usuario:&nbsp;</h6> ${data[i].user}</div>       
                 <div><h6>Fecha:&nbsp;</h6> ${data[i].dateB}</div>       
                 <div><h6>Hora:&nbsp;</h6> ${data[i].hourB}</div>       
-                <div><h6>Estado:&nbsp;</h6> ${data[i].info_status.description}&nbsp <div style="background-color:${data[i].info_status.bg}; width: 10px; height: 10px; border-radius: 50%; align-self: center; margin-top: 3px; margin-left: 5px"></div></div>  
+                <div><h6>Estado:&nbsp;</h6> ${(data[i].info_status ? data[i].info_status.description : '')}&nbsp <div style="background-color:${(data[i].info_status ? data[i].info_status.bg : "")}; width: 10px; height: 10px; border-radius: 50%; align-self: center; margin-top: 3px; margin-left: 5px"></div></div>  
                 ${(data[i].comment ? "<div><h6>Notas:&nbsp;</h6>"+data[i].comment+"</div>" : "")} 
               </div>
               <div class="d-flex justify-content-center align-items-center">
@@ -1377,13 +1380,17 @@
     // consulta solicitud funcion
     let solicitudesListaCompleta = {};
     const loadConsultIncidencesModal= function () {
-      fetch("https://raw.githubusercontent.com/0yapunpun/tests/master/consultaSolicitudesComplete.json")
+      fetch("/helpdesk/solicitudes")
       .then(response => response.json())
       .then(data => { 
-        solicitudesListaCompleta = data;
-        let filtrados = _.groupBy(data.cards, o => { return o.info_status.description })['Abiertas'].concat(_.groupBy(data.cards, o => { return o.info_status.description })['En curso'])
+        data = data.res.result.data
+        console.log(data)
+        // solicitudesListaCompleta = data;
+        // let filtrados = _.groupBy(data.cards, o => { return o.info_status.description })['Abiertas'].concat(_.groupBy(data.cards, o => { return o.info_status.description })['En curso'])
         // Modal Cards
-        loadRequests(filtrados)
+        loadRequests(data)
+        $("#consultaSolicitudModal").modal('show')
+        return
 
         // Modal sidebar
         const consultaSolicitudModalSide = $("#consultaSolicitudModalSide");
@@ -1529,139 +1536,124 @@
       .catch(error => console.log('Request failed', error));
     }
 
-    const loadIncidenceFill = function (x) { //1-Ver 2-Editar
-      // Section 1
-      fetch("https://raw.githubusercontent.com/0yapunpun/tests/master/llenadoIncidencia1.json")
+    // TODO working here
+    const loadIncidenceFill = function (x, data) { //1-Ver 2-Editar
+      console.log(data)
+
+      //*** Section 1
+      $("#llenadoModalNumber").html(data.workflow.number);
+      $("#llenadoModalDate").html(data.workflow.due_date);
+      $("#llenadoModalTitle").html(data.subject);
+      $("#llenadoModalUserReport").html(data.user_report);
+      $("#llenadoModalStateComp").html(data.frequency);
+      $("#llenadoModalStateassigned").html("")
+      $("#llenadoModalButtons").find(".takeIncidence").remove();
+
+      if (userCanTakeTask) {
+        $("#llenadoModalButtons").append('<button type="button" class="btn bg-gradient-primary takeIncidence">Tomar Incidencia</button>')
+      }
+
+      if (data.user_take) {
+        let element =` 
+          <div class="d-flex align-items-center">
+            <h6 class="mb-0 small">Asinado a:&nbsp;</h6> 
+            <span class="text-xs font-weight-bolder">${data.user_take}</span>
+          </div>
+        `;
+        $("#llenadoModalStateassigned").append(element)
+      };
+      if (data.class) {
+        let element =` 
+          <div class="d-flex align-items-center">
+            <h6 class="mb-0 small">Asinado a:&nbsp;</h6> 
+            <span class="text-xs font-weight-bolder">${data.class}</span>
+          </div>
+        `;
+        $("#llenadoModalStateassigned").append(element)
+      };
+
+      let color;
+      if(data.id_priority == 8){color = "#F44336"}
+      if(data.id_priority == 9){color = "#FFEB3B"}
+      if(data.id_priority == 10){color = "#2196F3"}
+      $("#modalLlenadoColor").css("background-color", color)
+
+      //** Section 2 
+      let route = '/helpdesk/detail/'+data.id_format+'/'+data.id_node+'/'+data.id_workflow_header+'/'+data.id_workflow+'/'+data.id;
+      fetch(route)
       .then(response => response.json())
-      .then(data => { 
-        $("#llenadoModalNumber").html(data[0].workflow.number);
-        $("#llenadoModalDate").html(data[0].workflow.due_date);
-        $("#llenadoModalTitle").html(data[0].subject);
-        $("#llenadoModalUserReport").html(data[0].user_report);
-        $("#llenadoModalStateComp").html(data[0].frequency);
-        $("#llenadoModalStateassigned").html("")
-        $("#llenadoModalButtons").find(".takeIncidence").remove();
-
-        if (userCanTakeTask) {
-          $("#llenadoModalButtons").append('<button type="button" class="btn bg-gradient-primary takeIncidence">Tomar Incidencia</button>')
-        }
-
-        if (data[0].user_take) {
-          let element =` 
-            <div class="d-flex align-items-center">
-              <h6 class="mb-0 small">Asinado a:&nbsp;</h6> 
-              <span class="text-xs font-weight-bolder">${data[0].user_take}</span>
-            </div>
-          `;
-          $("#llenadoModalStateassigned").append(element)
-        };
-        if (data[0].class) {
-          let element =` 
-            <div class="d-flex align-items-center">
-              <h6 class="mb-0 small">Asinado a:&nbsp;</h6> 
-              <span class="text-xs font-weight-bolder">${data[0].class}</span>
-            </div>
-          `;
-          $("#llenadoModalStateassigned").append(element)
-        };
-
-        let color;
-        if(data[0].id_priority == 8){color = "#F44336"}
-        if(data[0].id_priority == 9){color = "#FFEB3B"}
-        if(data[0].id_priority == 10){color = "#2196F3"}
-        $("#modalLlenadoColor").css("background-color", color)
-      })
-      .catch(error => console.log('Request failed', error));
-
-      // Section2
-      let editOrView;
-      // https://raw.githubusercontent.com/0yapunpun/tests/master/llenadoIncidencia2-1-3.json
-      // https://raw.githubusercontent.com/0yapunpun/tests/master/llenadoIncidencia2-1-2.json Campos extras
-      // https://raw.githubusercontent.com/0yapunpun/tests/master/llenadoIncidencia2-1.json
-      if (x == 1){ editOrView = "https://raw.githubusercontent.com/0yapunpun/tests/master/llenadoIncidencia2-1-2.json"} 
-      if (x == 2){ editOrView = "https://raw.githubusercontent.com/0yapunpun/tests/master/llenadoIncidencia2-2.json"}
-      fetch(editOrView)
-      .then(response => response.json())
-      .then(data => { 
+      .then(response => { 
         $('#verFormatoLlenado').html(""); 
-        if (x == 1) {
-          // Solicitud Maestros
-          fetch("https://raw.githubusercontent.com/0yapunpun/tests/master/maestrosPruebas.json")
-          .then(response => response.json())
-          .then(dataMaestros => {
-            let fields = data.detail;
-            let sortedFields = _.sortBy(fields, 'order_f');
+        if (response.response.result.success) {
+          let data = response.response.result.detail_activity.detail
+
+          let ooo = true; //Si el formulario ya fue llenado set to false
+          if (ooo) {
+            let sortedFields = _.sortBy(data, 'order_f');
             let container = "verFormatoLlenado";
-            sortedFields.forEach(field => loadFormEdit(container, field, dataMaestros));
-           })
-          .catch(error => console.log('Request failed', error));
-        }    
-        if (x == 2) {
-          $("#sendDataFormularioDinamicoButton").css("display", "none")
-          let field = data.detail;
-          let containerID = "verFormatoLlenado"
-
-          $('#verFormatoLlenado').append('<div class="fieldLlenado p-3"></div>');
-          for (let i = 0; i < field.length; i++) {
-            let fieldDOM = getFormElementResponse(field[i].id_type_field, field[i].question, field[i].content, field[i].web_type);
-            $('#verFormatoLlenado>div').append(fieldDOM);
-          }   
-          console.log($('#verFormatoLlenado').find('input[type="date"]'))
-
-        };    
-      })
-      .catch(error => console.log('Request failed', error));
-
-      // Section3
-      fetch("https://raw.githubusercontent.com/0yapunpun/tests/master/llenadoIncidencia3.json")
-      .then(response => response.json())
-      .then(data => { 
-        if (data.length == 0){
-          $("#llenadoModalGestionesState").html("No hay gestiones creadas");
+            sortedFields.forEach(field => loadFormEdit(container, field)); //TODO revision maestros como ultimo parametro para los inpouts select
+          } else {
+            $("#sendDataFormularioDinamicoButton").css("display", "none")
+            let field = data;
+            let containerID = "verFormatoLlenado"
+    
+            $('#verFormatoLlenado').append('<div class="fieldLlenado p-3"></div>');
+            for (let i = 0; i < field.length; i++) {
+              let fieldDOM = getFormElementResponse(field[i].id_type_field, field[i].description, field[i].content, field[i].web_type); //TODO revision items faltantes para generar esta vista
+              $('#verFormatoLlenado>div').append(fieldDOM);
+            }   
+          }
         }
 
         const llenadoGestiones = $("#llenadoModalGestiones");
-        $(llenadoGestiones).html("")
-        for (let i = 0; i < data.length; i++) {
-          let state; 
-          if (data[i].state == 1) {state = "Pendiente"}
-          if (data[i].state == 2) {state = "En curso"}
-          if (data[i].state == 3) {state = "Completado"}
+        $(llenadoGestiones).html("");
 
-          let element = `
-            <div class="fieldLlenado p-3" >
-              <div class="d-flex justify-content-between">
-                <div class="d-flex align-items-center">
-                  <div class="mx-3" style="width: 50px; height: 50px; border-radius: 50%; background-color: gray;">
-                    <img src="${(data[i].photo ? "https://api.pedbox.co:8590/"+data[i].photo+"" : "https://app.pedbox.co/assets/images/avatars/profile.jpg")}" alt="" style="max-width: 100%; max-height: 100%; border-radius: 50%">  
-                  </div>
-                  <div>
-                    <h6>${data[i].user}</h6>
-                    <div class="d-flex align-items-center"> 
-                    <h6 class="my-0">Fecha Inicial:&nbsp; </h6> <span class="text-xs font-weight-bolder" style="position: relative; top: 1px">${data[i].date_begin}</span> &nbsp;&nbsp;
-                    <h6 class="my-0">Fecha Final:&nbsp; </h6> <span class="text-xs font-weight-bolder" style="position: relative; top: 1px">${data[i].date_end}</span>
+        let seguimiento = response.activitie.result;
+        if (seguimiento.success) {
+          seguimiento = seguimiento.management
+          
+          if (seguimiento.length == 0) {$("#llenadoModalGestionesState").html("No hay gestiones creadas")}
+          
+          for (let i = 0; i < seguimiento.length; i++) {
+            let state; 
+            if (seguimiento[i].state == 1) {state = "Pendiente"}
+            if (seguimiento[i].state == 2) {state = "En curso"}
+            if (seguimiento[i].state == 3) {state = "Completado"}
+
+            let element = `
+              <div class="fieldLlenado p-3" >
+                <div class="d-flex justify-content-between">
+                  <div class="d-flex align-items-center">
+                    <div class="mx-3" style="width: 50px; height: 50px; border-radius: 50%; background-color: gray;">
+                      <img src="${(seguimiento[i].photo ? "https://api.pedbox.co:8590/"+seguimiento[i].photo+"" : "https://app.pedbox.co/assets/images/avatars/profile.jpg")}" alt="" style="max-width: 100%; max-height: 100%; border-radius: 50%">  
+                    </div>
+                    <div>
+                      <h6>${seguimiento[i].user}</h6>
+                      <div class="d-flex align-items-center"> 
+                      <h6 class="my-0">Fecha Inicial:&nbsp; </h6> <span class="text-xs font-weight-bolder" style="position: relative; top: 1px">${seguimiento[i].date_begin}</span> &nbsp;&nbsp;
+                      <h6 class="my-0">Fecha Final:&nbsp; </h6> <span class="text-xs font-weight-bolder" style="position: relative; top: 1px">${seguimiento[i].date_end}</span>
+                      </div>
                     </div>
                   </div>
+                  <div style="cursor: pointer" class="activeTextarea" idGestion="gestion${seguimiento[i].id}">
+                    <i class="fas fa-pen" style="font-size:22px"></i>
+                  </div>
                 </div>
-                <div style="cursor: pointer" class="activeTextarea" idGestion="gestion${data[i].id}">
-                  <i class="fas fa-pen" style="font-size:22px"></i>
+                <div class="my-2">
+                  <textarea id="gestion${seguimiento[i].id}"class="my-0 px-1 textareaReadOnly activeTextareaX form-control" style="resize:none" ">${seguimiento[i].note}</textarea>
+                  <div class="d-flex mt-1">
+                    <h6 class="my-0 ps-1">horas:&nbsp; </h6> <span style="position: relative; top: 1px">${seguimiento[i].hour}</span> &nbsp;&nbsp;&nbsp;
+                    <h6 class="my-0">Estado:&nbsp; </h6> <span style="position: relative; top: 1px">${state}</span> &nbsp;&nbsp;&nbsp;
+                    <h6 class="my-0">trabajo:&nbsp; </h6> <span style="position: relative; top: 1px">${seguimiento[i].description}</span>
+                  </div>
                 </div>
               </div>
-              <div class="my-2">
-                <textarea id="gestion${data[i].id}"class="my-0 px-1 textareaReadOnly activeTextareaX form-control" style="resize:none" ">${data[i].note}</textarea>
-                <div class="d-flex mt-1">
-                  <h6 class="my-0 ps-1">horas:&nbsp; </h6> <span style="position: relative; top: 1px">${data[i].hour}</span> &nbsp;&nbsp;&nbsp;
-                  <h6 class="my-0">Estado:&nbsp; </h6> <span style="position: relative; top: 1px">${state}</span> &nbsp;&nbsp;&nbsp;
-                  <h6 class="my-0">trabajo:&nbsp; </h6> <span style="position: relative; top: 1px">${data[i].description}</span>
-                </div>
-              </div>
-            </div>
-          `;
-          llenadoGestiones.append(element)
+            `;
+            llenadoGestiones.append(element)
+          }
         }
       })
       .catch(error => console.log('Request failed', error));
-
       $("#llenadoModal").modal("show");
     }
 
@@ -2241,9 +2233,10 @@
 
     // Events Llenado de incidencia
     $(document).on("click", ".incidentMain", function (){
-      let id = $(this).attr("id");
+      let id = Number($(this).attr("id"));
+      let data = _.findWhere(dataIncidencesComplete, {id: id});
 
-      loadIncidenceFill(2)
+      loadIncidenceFill(2, data)
     })
 
     $(document).on( "click", ".closeLlenadoIncidencia", function(){
@@ -2428,772 +2421,775 @@
     // Objetos prueba
     // JSON plumb
     let plumbJSON = {
-	"workflow": {
-		"id": 25,
-		"name": "Llenado Aut.",
-		"due_days": 0,
-		"id_group": 11,
-		"nodes": [{
-				"id": 133,
-				"id_workflow": 25,
-				"identifier": "node71plumb1551191815997",
-				"id_node": 71,
-				"offsetleft": 268,
-				"offsettop": 43,
-				"order_n": 1,
-				"line": 1,
-				"areas": [],
-				"connections": [{
-					"id": 144,
-					"id_workflow_node": 133,
-					"identifier": "con_18",
-					"source": "node71plumb1551191815997",
-					"target": "node72plumb1551191818816",
-					"anchors": "\"[[],[]]\""
-				}],
-				"infoNode": {
-					"node": " - ",
-					"area": " - ",
-					"class": " - ",
-					"format": " - "
-				}
-			},
-			{
-				"id": 134,
-				"id_workflow": 25,
-				"identifier": "node72plumb1551191818816",
-				"id_node": 72,
-				"offsetleft": 261,
-				"offsettop": 241,
-				"order_n": 2,
-				"line": 1,
-				"areas": [],
-				"connections": [{
-					"id": 145,
-					"id_workflow_node": 134,
-					"identifier": "con_31",
-					"source": "node72plumb1551191818816",
-					"target": "node70plumb1551191820519",
-					"anchors": "\"[[],[]]\""
-				}],
-				"infoNode": {
-					"node": " - ",
-					"area": " - ",
-					"class": " - ",
-					"format": " - "
-				}
-			},
-			{
-				"id": 135,
-				"id_workflow": 25,
-				"identifier": "node70plumb1551191820519",
-				"id_node": 70,
-				"offsetleft": 269,
-				"offsettop": 461,
-				"order_n": 3,
-				"line": 1,
-				"areas": [],
-				"connections": [{
-					"id": 146,
-					"id_workflow_node": 135,
-					"identifier": "con_31",
-					"source": "node70plumb1551191820519",
-					"target": "",
-					"anchors": "\"[[],[]]\""
-				}],
-				"infoNode": {
-					"node": " - ",
-					"area": " - ",
-					"class": " - ",
-					"format": " - "
-				}
-			}
-		]
-	},
-	"actual": [
-		1
-	],
-	"before": [
-		71
-	],
-	"selected": {
-		"id": 8590,
-		"id_status": 7,
-		"action_status": "start",
-		"status": "En proceso",
-		"number": 303,
-		"id_workflow": 25,
-		"id_user": 12245,
-		"id_request": null,
-		"id_format_request": null,
-		"id_user_request": null,
-		"user_request": null,
-		"photo_user_request": null,
-		"date_request": null,
-		"bussiness_name": " ",
-		"first_name": "Sebastian",
-		"second_name": "",
-		"first_lastname": "Martinez",
-		"due_date": "2021-11-09",
-		"date": "2021-11-09 14:05:31",
-		"id_group": 11,
-		"name": "Llenado Aut.",
-		"code": "002",
-		"description": "PRUEBAS",
-		"user_id_subgroup": null,
-		"user_subgroup": null,
-		"user_id_group": null,
-		"user_group": null,
-		"nodes": [{
-			"id_header": 8590,
-			"id_format_answer": 58593,
-			"id_user": 12245,
-			"bussiness_name": " ",
-			"first_name": "Sebastian",
-			"second_name": "",
-			"first_lastname": "Martinez",
-			"photo": "/files/profile/cropWhatsAppImage20211020at100043AM_profileJwevirQ.jpeg",
-			"id_node": 71,
-			"description_node": "Llenado Aut 1",
-			"id_area": 84,
-			"id_class": null,
-			"id_format": 213,
-			"date": "2021-11-09 14:05:30",
-			"resume": [],
-			"dateBeatiful": "Noviembre 09, 2021, 02:05 p.m",
-			"infoArea": {
-				"id": 84,
-				"id_company": 1,
-				"code": "02",
-				"description": "Desarrollo ",
-				"id_group": 29,
-				"id_subgroup": 184,
-				"email_notifications": "",
-				"date_update": "2021-10-29",
-				"user_update": 743,
-				"users": "[{'id_user': 12245, 'name_user': 'Sebastian  Martinez Uribe', 'role': 3},{'id_user': 12214, 'name_user': 'Santiago  Berrio Agudelo', 'role': 3},{'id_user': 743, 'name_user': 'Juan Manuel Navarro Suarez', 'role': 1},{'id_user': 747, 'name_user': 'Santiago  Restrepo ', 'role': 1}]"
-			},
-			"infoClass": {},
-			"infoFormat": {
-				"id": 213,
-				"description": "Incidente Cliente",
-				"status": 1,
-				"group": 22,
-				"id_activity": 213,
-				"id_company": 1,
-				"modifiable": "false",
-				"type_activity": 1,
-				"is_request": 1,
-				"id_type_activity": 1,
-				"id_group_activity": 22,
-				"id_user": 0,
-				"changed": "false"
-			}
-		}],
-		"total": 3,
-		"actual": 1,
-		"dateBeatiful": "Noviembre 09, 2021, 02:05 p.m",
-		"percentage": "33"
-	},
-	"master": {
-		"nodes": [{
-				"id": 66,
-				"id_company": 1,
-				"description": "Nueva Incidencia",
-				"id_area": 83,
-				"id_class": null,
-				"id_format": 105,
-				"figure": 1,
-				"notify_email": 0,
-				"infoFormat": {},
-				"infoArea": {
-					"id": 83,
-					"id_company": 1,
-					"code": "01",
-					"description": "Soporte ",
-					"id_group": 12,
-					"id_subgroup": 141,
-					"email_notifications": "",
-					"date_update": "2019-08-21",
-					"user_update": 1318,
-					"users": "[{'id_user': 744, 'name_user': 'Juan Diego Rendon ', 'role': 1},{'id_user': 4312, 'name_user': 'Daniel  Londoño', 'role': 1},{'id_user': 1318, 'name_user': 'Santiago Gallego', 'role': 1}]"
-				},
-				"infoFigure": {
-					"id": 1,
-					"description": "Cuadrado",
-					"class": "item-square",
-					"name": "square"
-				}
-			},
-			{
-				"id": 67,
-				"id_company": 1,
-				"description": "Validación Novedad",
-				"id_area": 83,
-				"id_class": null,
-				"id_format": 107,
-				"figure": 1,
-				"notify_email": 0,
-				"infoFormat": {},
-				"infoArea": {
-					"id": 83,
-					"id_company": 1,
-					"code": "01",
-					"description": "Soporte ",
-					"id_group": 12,
-					"id_subgroup": 141,
-					"email_notifications": "",
-					"date_update": "2019-08-21",
-					"user_update": 1318,
-					"users": "[{'id_user': 744, 'name_user': 'Juan Diego Rendon ', 'role': 1},{'id_user': 4312, 'name_user': 'Daniel  Londoño', 'role': 1},{'id_user': 1318, 'name_user': 'Santiago Gallego', 'role': 1}]"
-				},
-				"infoFigure": {
-					"id": 1,
-					"description": "Cuadrado",
-					"class": "item-square",
-					"name": "square"
-				}
-			},
-			{
-				"id": 68,
-				"id_company": 1,
-				"description": "Novedad Desarrollo",
-				"id_area": 84,
-				"id_class": null,
-				"id_format": 108,
-				"figure": 2,
-				"notify_email": 0,
-				"infoFormat": {},
-				"infoArea": {
-					"id": 84,
-					"id_company": 1,
-					"code": "02",
-					"description": "Desarrollo ",
-					"id_group": 29,
-					"id_subgroup": 184,
-					"email_notifications": "",
-					"date_update": "2021-10-29",
-					"user_update": 743,
-					"users": "[{'id_user': 12245, 'name_user': 'Sebastian  Martinez Uribe', 'role': 3},{'id_user': 12214, 'name_user': 'Santiago  Berrio Agudelo', 'role': 3},{'id_user': 743, 'name_user': 'Juan Manuel Navarro Suarez', 'role': 1},{'id_user': 747, 'name_user': 'Santiago  Restrepo ', 'role': 1}]"
-				},
-				"infoFigure": {
-					"id": 2,
-					"description": "Circulo",
-					"class": "item-circle",
-					"name": "circle"
-				}
-			},
-			{
-				"id": 69,
-				"id_company": 1,
-				"description": "Prueba Calidad",
-				"id_area": 83,
-				"id_class": null,
-				"id_format": 111,
-				"figure": 3,
-				"notify_email": 0,
-				"infoFormat": {
-					"id": 111,
-					"description": "Pruebas finales",
-					"status": 1,
-					"group": 22,
-					"id_activity": 111,
-					"id_company": 1,
-					"modifiable": "false",
-					"type_activity": 1,
-					"is_request": 1,
-					"id_type_activity": 1,
-					"id_group_activity": 22,
-					"id_user": 0,
-					"changed": "false"
-				},
-				"infoArea": {
-					"id": 83,
-					"id_company": 1,
-					"code": "01",
-					"description": "Soporte ",
-					"id_group": 12,
-					"id_subgroup": 141,
-					"email_notifications": "",
-					"date_update": "2019-08-21",
-					"user_update": 1318,
-					"users": "[{'id_user': 744, 'name_user': 'Juan Diego Rendon ', 'role': 1},{'id_user': 4312, 'name_user': 'Daniel  Londoño', 'role': 1},{'id_user': 1318, 'name_user': 'Santiago Gallego', 'role': 1}]"
-				},
-				"infoFigure": {
-					"id": 3,
-					"description": "Rombo",
-					"class": "item-diamond-square",
-					"name": "diamond-square"
-				}
-			},
-			{
-				"id": 70,
-				"id_company": 1,
-				"description": "Cierre Novedad",
-				"id_area": 83,
-				"id_class": null,
-				"id_format": 112,
-				"figure": 3,
-				"notify_email": 0,
-				"infoFormat": {
-					"id": 112,
-					"description": "Cierre",
-					"status": 1,
-					"group": 29,
-					"id_activity": 112,
-					"id_company": 1,
-					"modifiable": "false",
-					"type_activity": 1,
-					"is_request": 1,
-					"id_type_activity": 1,
-					"id_group_activity": 29,
-					"id_user": 0,
-					"changed": "false"
-				},
-				"infoArea": {
-					"id": 83,
-					"id_company": 1,
-					"code": "01",
-					"description": "Soporte ",
-					"id_group": 12,
-					"id_subgroup": 141,
-					"email_notifications": "",
-					"date_update": "2019-08-21",
-					"user_update": 1318,
-					"users": "[{'id_user': 744, 'name_user': 'Juan Diego Rendon ', 'role': 1},{'id_user': 4312, 'name_user': 'Daniel  Londoño', 'role': 1},{'id_user': 1318, 'name_user': 'Santiago Gallego', 'role': 1}]"
-				},
-				"infoFigure": {
-					"id": 3,
-					"description": "Rombo",
-					"class": "item-diamond-square",
-					"name": "diamond-square"
-				}
-			},
-			{
-				"id": 71,
-				"id_company": 1,
-				"description": "Llenado Aut 1",
-				"id_area": 84,
-				"id_class": null,
-				"id_format": 213,
-				"figure": 3,
-				"notify_email": 0,
-				"infoFormat": {
-					"id": 213,
-					"description": "Incidente Cliente",
-					"status": 1,
-					"group": 22,
-					"id_activity": 213,
-					"id_company": 1,
-					"modifiable": "false",
-					"type_activity": 1,
-					"is_request": 1,
-					"id_type_activity": 1,
-					"id_group_activity": 22,
-					"id_user": 0,
-					"changed": "false"
-				},
-				"infoArea": {
-					"id": 84,
-					"id_company": 1,
-					"code": "02",
-					"description": "Desarrollo ",
-					"id_group": 29,
-					"id_subgroup": 184,
-					"email_notifications": "",
-					"date_update": "2021-10-29",
-					"user_update": 743,
-					"users": "[{'id_user': 12245, 'name_user': 'Sebastian  Martinez Uribe', 'role': 3},{'id_user': 12214, 'name_user': 'Santiago  Berrio Agudelo', 'role': 3},{'id_user': 743, 'name_user': 'Juan Manuel Navarro Suarez', 'role': 1},{'id_user': 747, 'name_user': 'Santiago  Restrepo ', 'role': 1}]"
-				},
-				"infoFigure": {
-					"id": 3,
-					"description": "Rombo",
-					"class": "item-diamond-square",
-					"name": "diamond-square"
-				}
-			},
-			{
-				"id": 72,
-				"id_company": 1,
-				"description": "Llenado Aut 2",
-				"id_area": 84,
-				"id_class": null,
-				"id_format": 136,
-				"figure": 1,
-				"notify_email": 0,
-				"infoFormat": {
-					"id": 136,
-					"description": "Formulario 2 Llenado Aut.",
-					"status": 1,
-					"group": 29,
-					"id_activity": 136,
-					"id_company": 1,
-					"modifiable": "false",
-					"type_activity": 1,
-					"is_request": 0,
-					"id_type_activity": 1,
-					"id_group_activity": 29,
-					"id_user": 0,
-					"changed": "false"
-				},
-				"infoArea": {
-					"id": 84,
-					"id_company": 1,
-					"code": "02",
-					"description": "Desarrollo ",
-					"id_group": 29,
-					"id_subgroup": 184,
-					"email_notifications": "",
-					"date_update": "2021-10-29",
-					"user_update": 743,
-					"users": "[{'id_user': 12245, 'name_user': 'Sebastian  Martinez Uribe', 'role': 3},{'id_user': 12214, 'name_user': 'Santiago  Berrio Agudelo', 'role': 3},{'id_user': 743, 'name_user': 'Juan Manuel Navarro Suarez', 'role': 1},{'id_user': 747, 'name_user': 'Santiago  Restrepo ', 'role': 1}]"
-				},
-				"infoFigure": {
-					"id": 1,
-					"description": "Cuadrado",
-					"class": "item-square",
-					"name": "square"
-				}
-			},
-			{
-				"id": 83,
-				"id_company": 1,
-				"description": "Reporte Incidencia",
-				"id_area": 83,
-				"id_class": null,
-				"id_format": 159,
-				"figure": 1,
-				"notify_email": 0,
-				"infoFormat": {
-					"id": 159,
-					"description": "Reporte Incidencia",
-					"status": 1,
-					"group": 20,
-					"id_activity": 159,
-					"id_company": 1,
-					"modifiable": "false",
-					"type_activity": 1,
-					"is_request": 1,
-					"id_type_activity": 1,
-					"id_group_activity": 20,
-					"id_user": 0,
-					"changed": "false"
-				},
-				"infoArea": {
-					"id": 83,
-					"id_company": 1,
-					"code": "01",
-					"description": "Soporte ",
-					"id_group": 12,
-					"id_subgroup": 141,
-					"email_notifications": "",
-					"date_update": "2019-08-21",
-					"user_update": 1318,
-					"users": "[{'id_user': 744, 'name_user': 'Juan Diego Rendon ', 'role': 1},{'id_user': 4312, 'name_user': 'Daniel  Londoño', 'role': 1},{'id_user': 1318, 'name_user': 'Santiago Gallego', 'role': 1}]"
-				},
-				"infoFigure": {
-					"id": 1,
-					"description": "Cuadrado",
-					"class": "item-square",
-					"name": "square"
-				}
-			},
-			{
-				"id": 84,
-				"id_company": 1,
-				"description": "Cierre Proceso",
-				"id_area": 83,
-				"id_class": null,
-				"id_format": 160,
-				"figure": 3,
-				"notify_email": 0,
-				"infoFormat": {
-					"id": 160,
-					"description": "Cierre Proceso",
-					"status": 1,
-					"group": 20,
-					"id_activity": 160,
-					"id_company": 1,
-					"modifiable": "false",
-					"type_activity": 1,
-					"is_request": 0,
-					"id_type_activity": 1,
-					"id_group_activity": 20,
-					"id_user": 0,
-					"changed": "false"
-				},
-				"infoArea": {
-					"id": 83,
-					"id_company": 1,
-					"code": "01",
-					"description": "Soporte ",
-					"id_group": 12,
-					"id_subgroup": 141,
-					"email_notifications": "",
-					"date_update": "2019-08-21",
-					"user_update": 1318,
-					"users": "[{'id_user': 744, 'name_user': 'Juan Diego Rendon ', 'role': 1},{'id_user': 4312, 'name_user': 'Daniel  Londoño', 'role': 1},{'id_user': 1318, 'name_user': 'Santiago Gallego', 'role': 1}]"
-				},
-				"infoFigure": {
-					"id": 3,
-					"description": "Rombo",
-					"class": "item-diamond-square",
-					"name": "diamond-square"
-				}
-			},
-			{
-				"id": 85,
-				"id_company": 1,
-				"description": "Seguimiento Novedad Soporte",
-				"id_area": 83,
-				"id_class": null,
-				"id_format": 161,
-				"figure": 2,
-				"notify_email": 0,
-				"infoFormat": {
-					"id": 161,
-					"description": "Seguimiento novedad",
-					"status": 1,
-					"group": 20,
-					"id_activity": 161,
-					"id_company": 1,
-					"modifiable": "false",
-					"type_activity": 1,
-					"is_request": 0,
-					"id_type_activity": 1,
-					"id_group_activity": 20,
-					"id_user": 0,
-					"changed": "false"
-				},
-				"infoArea": {
-					"id": 83,
-					"id_company": 1,
-					"code": "01",
-					"description": "Soporte ",
-					"id_group": 12,
-					"id_subgroup": 141,
-					"email_notifications": "",
-					"date_update": "2019-08-21",
-					"user_update": 1318,
-					"users": "[{'id_user': 744, 'name_user': 'Juan Diego Rendon ', 'role': 1},{'id_user': 4312, 'name_user': 'Daniel  Londoño', 'role': 1},{'id_user': 1318, 'name_user': 'Santiago Gallego', 'role': 1}]"
-				},
-				"infoFigure": {
-					"id": 2,
-					"description": "Circulo",
-					"class": "item-circle",
-					"name": "circle"
-				}
-			},
-			{
-				"id": 86,
-				"id_company": 1,
-				"description": "Seguimiento Novedad Desarrollo",
-				"id_area": 84,
-				"id_class": null,
-				"id_format": 161,
-				"figure": 1,
-				"notify_email": 0,
-				"infoFormat": {
-					"id": 161,
-					"description": "Seguimiento novedad",
-					"status": 1,
-					"group": 20,
-					"id_activity": 161,
-					"id_company": 1,
-					"modifiable": "false",
-					"type_activity": 1,
-					"is_request": 0,
-					"id_type_activity": 1,
-					"id_group_activity": 20,
-					"id_user": 0,
-					"changed": "false"
-				},
-				"infoArea": {
-					"id": 84,
-					"id_company": 1,
-					"code": "02",
-					"description": "Desarrollo ",
-					"id_group": 29,
-					"id_subgroup": 184,
-					"email_notifications": "",
-					"date_update": "2021-10-29",
-					"user_update": 743,
-					"users": "[{'id_user': 12245, 'name_user': 'Sebastian  Martinez Uribe', 'role': 3},{'id_user': 12214, 'name_user': 'Santiago  Berrio Agudelo', 'role': 3},{'id_user': 743, 'name_user': 'Juan Manuel Navarro Suarez', 'role': 1},{'id_user': 747, 'name_user': 'Santiago  Restrepo ', 'role': 1}]"
-				},
-				"infoFigure": {
-					"id": 1,
-					"description": "Cuadrado",
-					"class": "item-square",
-					"name": "square"
-				}
-			},
-			{
-				"id": 87,
-				"id_company": 1,
-				"description": "Seguimiento Novedad Calidad",
-				"id_area": 88,
-				"id_class": null,
-				"id_format": 161,
-				"figure": 1,
-				"notify_email": 0,
-				"infoFormat": {
-					"id": 161,
-					"description": "Seguimiento novedad",
-					"status": 1,
-					"group": 20,
-					"id_activity": 161,
-					"id_company": 1,
-					"modifiable": "false",
-					"type_activity": 1,
-					"is_request": 0,
-					"id_type_activity": 1,
-					"id_group_activity": 20,
-					"id_user": 0,
-					"changed": "false"
-				},
-				"infoArea": {
-					"id": 88,
-					"id_company": 1,
-					"code": "03",
-					"description": "Calidad",
-					"id_group": 12,
-					"id_subgroup": 141,
-					"email_notifications": "",
-					"date_update": "2019-06-10",
-					"user_update": 1318,
-					"users": "[{'id_user': 744, 'name_user': 'Juan Diego Rendon ', 'role': 1},{'id_user': 1318, 'name_user': 'Santiago Gallego', 'role': 1}]"
-				},
-				"infoFigure": {
-					"id": 1,
-					"description": "Cuadrado",
-					"class": "item-square",
-					"name": "square"
-				}
-			}
-		],
-		"format": [{
-				"id": 111,
-				"description": "Pruebas finales",
-				"status": 1,
-				"group": 22,
-				"id_activity": 111,
-				"id_company": 1,
-				"modifiable": "false",
-				"type_activity": 1,
-				"is_request": 1,
-				"id_type_activity": 1,
-				"id_group_activity": 22,
-				"id_user": 0,
-				"changed": "false"
-			},
-			{
-				"id": 112,
-				"description": "Cierre",
-				"status": 1,
-				"group": 29,
-				"id_activity": 112,
-				"id_company": 1,
-				"modifiable": "false",
-				"type_activity": 1,
-				"is_request": 1,
-				"id_type_activity": 1,
-				"id_group_activity": 29,
-				"id_user": 0,
-				"changed": "false"
-			},
-			{
-				"id": 135,
-				"description": "Formulario 1 llenado Aut.",
-				"status": 1,
-				"group": 29,
-				"id_activity": 135,
-				"id_company": 1,
-				"modifiable": "false",
-				"type_activity": 1,
-				"is_request": 1,
-				"id_type_activity": 1,
-				"id_group_activity": 29,
-				"id_user": 0,
-				"changed": "false"
-			},
-			{
-				"id": 136,
-				"description": "Formulario 2 Llenado Aut.",
-				"status": 1,
-				"group": 29,
-				"id_activity": 136,
-				"id_company": 1,
-				"modifiable": "false",
-				"type_activity": 1,
-				"is_request": 0,
-				"id_type_activity": 1,
-				"id_group_activity": 29,
-				"id_user": 0,
-				"changed": "false"
-			},
-			{
-				"id": 159,
-				"description": "Reporte Incidencia",
-				"status": 1,
-				"group": 20,
-				"id_activity": 159,
-				"id_company": 1,
-				"modifiable": "false",
-				"type_activity": 1,
-				"is_request": 1,
-				"id_type_activity": 1,
-				"id_group_activity": 20,
-				"id_user": 0,
-				"changed": "false"
-			},
-			{
-				"id": 160,
-				"description": "Cierre Proceso",
-				"status": 1,
-				"group": 20,
-				"id_activity": 160,
-				"id_company": 1,
-				"modifiable": "false",
-				"type_activity": 1,
-				"is_request": 0,
-				"id_type_activity": 1,
-				"id_group_activity": 20,
-				"id_user": 0,
-				"changed": "false"
-			},
-			{
-				"id": 161,
-				"description": "Seguimiento novedad",
-				"status": 1,
-				"group": 20,
-				"id_activity": 161,
-				"id_company": 1,
-				"modifiable": "false",
-				"type_activity": 1,
-				"is_request": 0,
-				"id_type_activity": 1,
-				"id_group_activity": 20,
-				"id_user": 0,
-				"changed": "false"
-			},
-			{
-				"id": 213,
-				"description": "Incidente Cliente",
-				"status": 1,
-				"group": 22,
-				"id_activity": 213,
-				"id_company": 1,
-				"modifiable": "false",
-				"type_activity": 1,
-				"is_request": 1,
-				"id_type_activity": 1,
-				"id_group_activity": 22,
-				"id_user": 0,
-				"changed": "false"
-			}
-		]
-	}
-}
+      "workflow": {
+        "id": 25,
+        "name": "Llenado Aut.",
+        "due_days": 0,
+        "id_group": 11,
+        "nodes": [
+          {
+            "id": 133,
+            "id_workflow": 25,
+            "identifier": "node71plumb1551191815997",
+            "id_node": 71,
+            "offsetleft": 268,
+            "offsettop": 43,
+            "order_n": 1,
+            "line": 1,
+            "areas": [],
+            "connections": [{
+              "id": 144,
+              "id_workflow_node": 133,
+              "identifier": "con_18",
+              "source": "node71plumb1551191815997",
+              "target": "node72plumb1551191818816",
+              "anchors": "\"[[],[]]\""
+            }],
+            "infoNode": {
+              "node": " - ",
+              "area": " - ",
+              "class": " - ",
+              "format": " - "
+            }
+          },
+          {
+            "id": 134,
+            "id_workflow": 25,
+            "identifier": "node72plumb1551191818816",
+            "id_node": 72,
+            "offsetleft": 261,
+            "offsettop": 241,
+            "order_n": 2,
+            "line": 1,
+            "areas": [],
+            "connections": [{
+              "id": 145,
+              "id_workflow_node": 134,
+              "identifier": "con_31",
+              "source": "node72plumb1551191818816",
+              "target": "node70plumb1551191820519",
+              "anchors": "\"[[],[]]\""
+            }],
+            "infoNode": {
+              "node": " - ",
+              "area": " - ",
+              "class": " - ",
+              "format": " - "
+            }
+          },
+          {
+            "id": 135,
+            "id_workflow": 25,
+            "identifier": "node70plumb1551191820519",
+            "id_node": 70,
+            "offsetleft": 269,
+            "offsettop": 461,
+            "order_n": 3,
+            "line": 1,
+            "areas": [],
+            "connections": [{
+              "id": 146,
+              "id_workflow_node": 135,
+              "identifier": "con_31",
+              "source": "node70plumb1551191820519",
+              "target": "",
+              "anchors": "\"[[],[]]\""
+            }],
+            "infoNode": {
+              "node": " - ",
+              "area": " - ",
+              "class": " - ",
+              "format": " - "
+            }
+          }
+        ]
+      },
+      "actual": [
+        1
+      ],
+      "before": [
+        71
+      ],
+      "selected": {
+        "id": 8590,
+        "id_status": 7,
+        "action_status": "start",
+        "status": "En proceso",
+        "number": 303,
+        "id_workflow": 25,
+        "id_user": 12245,
+        "id_request": null,
+        "id_format_request": null,
+        "id_user_request": null,
+        "user_request": null,
+        "photo_user_request": null,
+        "date_request": null,
+        "bussiness_name": " ",
+        "first_name": "Sebastian",
+        "second_name": "",
+        "first_lastname": "Martinez",
+        "due_date": "2021-11-09",
+        "date": "2021-11-09 14:05:31",
+        "id_group": 11,
+        "name": "Llenado Aut.",
+        "code": "002",
+        "description": "PRUEBAS",
+        "user_id_subgroup": null,
+        "user_subgroup": null,
+        "user_id_group": null,
+        "user_group": null,
+        "nodes": [{
+          "id_header": 8590,
+          "id_format_answer": 58593,
+          "id_user": 12245,
+          "bussiness_name": " ",
+          "first_name": "Sebastian",
+          "second_name": "",
+          "first_lastname": "Martinez",
+          "photo": "/files/profile/cropWhatsAppImage20211020at100043AM_profileJwevirQ.jpeg",
+          "id_node": 71,
+          "description_node": "Llenado Aut 1",
+          "id_area": 84,
+          "id_class": null,
+          "id_format": 213,
+          "date": "2021-11-09 14:05:30",
+          "resume": [],
+          "dateBeatiful": "Noviembre 09, 2021, 02:05 p.m",
+          "infoArea": {
+            "id": 84,
+            "id_company": 1,
+            "code": "02",
+            "description": "Desarrollo ",
+            "id_group": 29,
+            "id_subgroup": 184,
+            "email_notifications": "",
+            "date_update": "2021-10-29",
+            "user_update": 743,
+            "users": "[{'id_user': 12245, 'name_user': 'Sebastian  Martinez Uribe', 'role': 3},{'id_user': 12214, 'name_user': 'Santiago  Berrio Agudelo', 'role': 3},{'id_user': 743, 'name_user': 'Juan Manuel Navarro Suarez', 'role': 1},{'id_user': 747, 'name_user': 'Santiago  Restrepo ', 'role': 1}]"
+          },
+          "infoClass": {},
+          "infoFormat": {
+            "id": 213,
+            "description": "Incidente Cliente",
+            "status": 1,
+            "group": 22,
+            "id_activity": 213,
+            "id_company": 1,
+            "modifiable": "false",
+            "type_activity": 1,
+            "is_request": 1,
+            "id_type_activity": 1,
+            "id_group_activity": 22,
+            "id_user": 0,
+            "changed": "false"
+          }
+        }],
+        "total": 3,
+        "actual": 1,
+        "dateBeatiful": "Noviembre 09, 2021, 02:05 p.m",
+        "percentage": "33"
+      },
+      "master": {
+        "nodes": [
+          {
+            "id": 66,
+            "id_company": 1,
+            "description": "Nueva Incidencia",
+            "id_area": 83,
+            "id_class": null,
+            "id_format": 105,
+            "figure": 1,
+            "notify_email": 0,
+            "infoFormat": {},
+            "infoArea": {
+              "id": 83,
+              "id_company": 1,
+              "code": "01",
+              "description": "Soporte ",
+              "id_group": 12,
+              "id_subgroup": 141,
+              "email_notifications": "",
+              "date_update": "2019-08-21",
+              "user_update": 1318,
+              "users": "[{'id_user': 744, 'name_user': 'Juan Diego Rendon ', 'role': 1},{'id_user': 4312, 'name_user': 'Daniel  Londoño', 'role': 1},{'id_user': 1318, 'name_user': 'Santiago Gallego', 'role': 1}]"
+            },
+            "infoFigure": {
+              "id": 1,
+              "description": "Cuadrado",
+              "class": "item-square",
+              "name": "square"
+            }
+          },
+          {
+            "id": 67,
+            "id_company": 1,
+            "description": "Validación Novedad",
+            "id_area": 83,
+            "id_class": null,
+            "id_format": 107,
+            "figure": 1,
+            "notify_email": 0,
+            "infoFormat": {},
+            "infoArea": {
+              "id": 83,
+              "id_company": 1,
+              "code": "01",
+              "description": "Soporte ",
+              "id_group": 12,
+              "id_subgroup": 141,
+              "email_notifications": "",
+              "date_update": "2019-08-21",
+              "user_update": 1318,
+              "users": "[{'id_user': 744, 'name_user': 'Juan Diego Rendon ', 'role': 1},{'id_user': 4312, 'name_user': 'Daniel  Londoño', 'role': 1},{'id_user': 1318, 'name_user': 'Santiago Gallego', 'role': 1}]"
+            },
+            "infoFigure": {
+              "id": 1,
+              "description": "Cuadrado",
+              "class": "item-square",
+              "name": "square"
+            }
+          },
+          {
+            "id": 68,
+            "id_company": 1,
+            "description": "Novedad Desarrollo",
+            "id_area": 84,
+            "id_class": null,
+            "id_format": 108,
+            "figure": 2,
+            "notify_email": 0,
+            "infoFormat": {},
+            "infoArea": {
+              "id": 84,
+              "id_company": 1,
+              "code": "02",
+              "description": "Desarrollo ",
+              "id_group": 29,
+              "id_subgroup": 184,
+              "email_notifications": "",
+              "date_update": "2021-10-29",
+              "user_update": 743,
+              "users": "[{'id_user': 12245, 'name_user': 'Sebastian  Martinez Uribe', 'role': 3},{'id_user': 12214, 'name_user': 'Santiago  Berrio Agudelo', 'role': 3},{'id_user': 743, 'name_user': 'Juan Manuel Navarro Suarez', 'role': 1},{'id_user': 747, 'name_user': 'Santiago  Restrepo ', 'role': 1}]"
+            },
+            "infoFigure": {
+              "id": 2,
+              "description": "Circulo",
+              "class": "item-circle",
+              "name": "circle"
+            }
+          },
+          {
+            "id": 69,
+            "id_company": 1,
+            "description": "Prueba Calidad",
+            "id_area": 83,
+            "id_class": null,
+            "id_format": 111,
+            "figure": 3,
+            "notify_email": 0,
+            "infoFormat": {
+              "id": 111,
+              "description": "Pruebas finales",
+              "status": 1,
+              "group": 22,
+              "id_activity": 111,
+              "id_company": 1,
+              "modifiable": "false",
+              "type_activity": 1,
+              "is_request": 1,
+              "id_type_activity": 1,
+              "id_group_activity": 22,
+              "id_user": 0,
+              "changed": "false"
+            },
+            "infoArea": {
+              "id": 83,
+              "id_company": 1,
+              "code": "01",
+              "description": "Soporte ",
+              "id_group": 12,
+              "id_subgroup": 141,
+              "email_notifications": "",
+              "date_update": "2019-08-21",
+              "user_update": 1318,
+              "users": "[{'id_user': 744, 'name_user': 'Juan Diego Rendon ', 'role': 1},{'id_user': 4312, 'name_user': 'Daniel  Londoño', 'role': 1},{'id_user': 1318, 'name_user': 'Santiago Gallego', 'role': 1}]"
+            },
+            "infoFigure": {
+              "id": 3,
+              "description": "Rombo",
+              "class": "item-diamond-square",
+              "name": "diamond-square"
+            }
+          },
+          {
+            "id": 70,
+            "id_company": 1,
+            "description": "Cierre Novedad",
+            "id_area": 83,
+            "id_class": null,
+            "id_format": 112,
+            "figure": 3,
+            "notify_email": 0,
+            "infoFormat": {
+              "id": 112,
+              "description": "Cierre",
+              "status": 1,
+              "group": 29,
+              "id_activity": 112,
+              "id_company": 1,
+              "modifiable": "false",
+              "type_activity": 1,
+              "is_request": 1,
+              "id_type_activity": 1,
+              "id_group_activity": 29,
+              "id_user": 0,
+              "changed": "false"
+            },
+            "infoArea": {
+              "id": 83,
+              "id_company": 1,
+              "code": "01",
+              "description": "Soporte ",
+              "id_group": 12,
+              "id_subgroup": 141,
+              "email_notifications": "",
+              "date_update": "2019-08-21",
+              "user_update": 1318,
+              "users": "[{'id_user': 744, 'name_user': 'Juan Diego Rendon ', 'role': 1},{'id_user': 4312, 'name_user': 'Daniel  Londoño', 'role': 1},{'id_user': 1318, 'name_user': 'Santiago Gallego', 'role': 1}]"
+            },
+            "infoFigure": {
+              "id": 3,
+              "description": "Rombo",
+              "class": "item-diamond-square",
+              "name": "diamond-square"
+            }
+          },
+          {
+            "id": 71,
+            "id_company": 1,
+            "description": "Llenado Aut 1",
+            "id_area": 84,
+            "id_class": null,
+            "id_format": 213,
+            "figure": 3,
+            "notify_email": 0,
+            "infoFormat": {
+              "id": 213,
+              "description": "Incidente Cliente",
+              "status": 1,
+              "group": 22,
+              "id_activity": 213,
+              "id_company": 1,
+              "modifiable": "false",
+              "type_activity": 1,
+              "is_request": 1,
+              "id_type_activity": 1,
+              "id_group_activity": 22,
+              "id_user": 0,
+              "changed": "false"
+            },
+            "infoArea": {
+              "id": 84,
+              "id_company": 1,
+              "code": "02",
+              "description": "Desarrollo ",
+              "id_group": 29,
+              "id_subgroup": 184,
+              "email_notifications": "",
+              "date_update": "2021-10-29",
+              "user_update": 743,
+              "users": "[{'id_user': 12245, 'name_user': 'Sebastian  Martinez Uribe', 'role': 3},{'id_user': 12214, 'name_user': 'Santiago  Berrio Agudelo', 'role': 3},{'id_user': 743, 'name_user': 'Juan Manuel Navarro Suarez', 'role': 1},{'id_user': 747, 'name_user': 'Santiago  Restrepo ', 'role': 1}]"
+            },
+            "infoFigure": {
+              "id": 3,
+              "description": "Rombo",
+              "class": "item-diamond-square",
+              "name": "diamond-square"
+            }
+          },
+          {
+            "id": 72,
+            "id_company": 1,
+            "description": "Llenado Aut 2",
+            "id_area": 84,
+            "id_class": null,
+            "id_format": 136,
+            "figure": 1,
+            "notify_email": 0,
+            "infoFormat": {
+              "id": 136,
+              "description": "Formulario 2 Llenado Aut.",
+              "status": 1,
+              "group": 29,
+              "id_activity": 136,
+              "id_company": 1,
+              "modifiable": "false",
+              "type_activity": 1,
+              "is_request": 0,
+              "id_type_activity": 1,
+              "id_group_activity": 29,
+              "id_user": 0,
+              "changed": "false"
+            },
+            "infoArea": {
+              "id": 84,
+              "id_company": 1,
+              "code": "02",
+              "description": "Desarrollo ",
+              "id_group": 29,
+              "id_subgroup": 184,
+              "email_notifications": "",
+              "date_update": "2021-10-29",
+              "user_update": 743,
+              "users": "[{'id_user': 12245, 'name_user': 'Sebastian  Martinez Uribe', 'role': 3},{'id_user': 12214, 'name_user': 'Santiago  Berrio Agudelo', 'role': 3},{'id_user': 743, 'name_user': 'Juan Manuel Navarro Suarez', 'role': 1},{'id_user': 747, 'name_user': 'Santiago  Restrepo ', 'role': 1}]"
+            },
+            "infoFigure": {
+              "id": 1,
+              "description": "Cuadrado",
+              "class": "item-square",
+              "name": "square"
+            }
+          },
+          {
+            "id": 83,
+            "id_company": 1,
+            "description": "Reporte Incidencia",
+            "id_area": 83,
+            "id_class": null,
+            "id_format": 159,
+            "figure": 1,
+            "notify_email": 0,
+            "infoFormat": {
+              "id": 159,
+              "description": "Reporte Incidencia",
+              "status": 1,
+              "group": 20,
+              "id_activity": 159,
+              "id_company": 1,
+              "modifiable": "false",
+              "type_activity": 1,
+              "is_request": 1,
+              "id_type_activity": 1,
+              "id_group_activity": 20,
+              "id_user": 0,
+              "changed": "false"
+            },
+            "infoArea": {
+              "id": 83,
+              "id_company": 1,
+              "code": "01",
+              "description": "Soporte ",
+              "id_group": 12,
+              "id_subgroup": 141,
+              "email_notifications": "",
+              "date_update": "2019-08-21",
+              "user_update": 1318,
+              "users": "[{'id_user': 744, 'name_user': 'Juan Diego Rendon ', 'role': 1},{'id_user': 4312, 'name_user': 'Daniel  Londoño', 'role': 1},{'id_user': 1318, 'name_user': 'Santiago Gallego', 'role': 1}]"
+            },
+            "infoFigure": {
+              "id": 1,
+              "description": "Cuadrado",
+              "class": "item-square",
+              "name": "square"
+            }
+          },
+          {
+            "id": 84,
+            "id_company": 1,
+            "description": "Cierre Proceso",
+            "id_area": 83,
+            "id_class": null,
+            "id_format": 160,
+            "figure": 3,
+            "notify_email": 0,
+            "infoFormat": {
+              "id": 160,
+              "description": "Cierre Proceso",
+              "status": 1,
+              "group": 20,
+              "id_activity": 160,
+              "id_company": 1,
+              "modifiable": "false",
+              "type_activity": 1,
+              "is_request": 0,
+              "id_type_activity": 1,
+              "id_group_activity": 20,
+              "id_user": 0,
+              "changed": "false"
+            },
+            "infoArea": {
+              "id": 83,
+              "id_company": 1,
+              "code": "01",
+              "description": "Soporte ",
+              "id_group": 12,
+              "id_subgroup": 141,
+              "email_notifications": "",
+              "date_update": "2019-08-21",
+              "user_update": 1318,
+              "users": "[{'id_user': 744, 'name_user': 'Juan Diego Rendon ', 'role': 1},{'id_user': 4312, 'name_user': 'Daniel  Londoño', 'role': 1},{'id_user': 1318, 'name_user': 'Santiago Gallego', 'role': 1}]"
+            },
+            "infoFigure": {
+              "id": 3,
+              "description": "Rombo",
+              "class": "item-diamond-square",
+              "name": "diamond-square"
+            }
+          },
+          {
+            "id": 85,
+            "id_company": 1,
+            "description": "Seguimiento Novedad Soporte",
+            "id_area": 83,
+            "id_class": null,
+            "id_format": 161,
+            "figure": 2,
+            "notify_email": 0,
+            "infoFormat": {
+              "id": 161,
+              "description": "Seguimiento novedad",
+              "status": 1,
+              "group": 20,
+              "id_activity": 161,
+              "id_company": 1,
+              "modifiable": "false",
+              "type_activity": 1,
+              "is_request": 0,
+              "id_type_activity": 1,
+              "id_group_activity": 20,
+              "id_user": 0,
+              "changed": "false"
+            },
+            "infoArea": {
+              "id": 83,
+              "id_company": 1,
+              "code": "01",
+              "description": "Soporte ",
+              "id_group": 12,
+              "id_subgroup": 141,
+              "email_notifications": "",
+              "date_update": "2019-08-21",
+              "user_update": 1318,
+              "users": "[{'id_user': 744, 'name_user': 'Juan Diego Rendon ', 'role': 1},{'id_user': 4312, 'name_user': 'Daniel  Londoño', 'role': 1},{'id_user': 1318, 'name_user': 'Santiago Gallego', 'role': 1}]"
+            },
+            "infoFigure": {
+              "id": 2,
+              "description": "Circulo",
+              "class": "item-circle",
+              "name": "circle"
+            }
+          },
+          {
+            "id": 86,
+            "id_company": 1,
+            "description": "Seguimiento Novedad Desarrollo",
+            "id_area": 84,
+            "id_class": null,
+            "id_format": 161,
+            "figure": 1,
+            "notify_email": 0,
+            "infoFormat": {
+              "id": 161,
+              "description": "Seguimiento novedad",
+              "status": 1,
+              "group": 20,
+              "id_activity": 161,
+              "id_company": 1,
+              "modifiable": "false",
+              "type_activity": 1,
+              "is_request": 0,
+              "id_type_activity": 1,
+              "id_group_activity": 20,
+              "id_user": 0,
+              "changed": "false"
+            },
+            "infoArea": {
+              "id": 84,
+              "id_company": 1,
+              "code": "02",
+              "description": "Desarrollo ",
+              "id_group": 29,
+              "id_subgroup": 184,
+              "email_notifications": "",
+              "date_update": "2021-10-29",
+              "user_update": 743,
+              "users": "[{'id_user': 12245, 'name_user': 'Sebastian  Martinez Uribe', 'role': 3},{'id_user': 12214, 'name_user': 'Santiago  Berrio Agudelo', 'role': 3},{'id_user': 743, 'name_user': 'Juan Manuel Navarro Suarez', 'role': 1},{'id_user': 747, 'name_user': 'Santiago  Restrepo ', 'role': 1}]"
+            },
+            "infoFigure": {
+              "id": 1,
+              "description": "Cuadrado",
+              "class": "item-square",
+              "name": "square"
+            }
+          },
+          {
+            "id": 87,
+            "id_company": 1,
+            "description": "Seguimiento Novedad Calidad",
+            "id_area": 88,
+            "id_class": null,
+            "id_format": 161,
+            "figure": 1,
+            "notify_email": 0,
+            "infoFormat": {
+              "id": 161,
+              "description": "Seguimiento novedad",
+              "status": 1,
+              "group": 20,
+              "id_activity": 161,
+              "id_company": 1,
+              "modifiable": "false",
+              "type_activity": 1,
+              "is_request": 0,
+              "id_type_activity": 1,
+              "id_group_activity": 20,
+              "id_user": 0,
+              "changed": "false"
+            },
+            "infoArea": {
+              "id": 88,
+              "id_company": 1,
+              "code": "03",
+              "description": "Calidad",
+              "id_group": 12,
+              "id_subgroup": 141,
+              "email_notifications": "",
+              "date_update": "2019-06-10",
+              "user_update": 1318,
+              "users": "[{'id_user': 744, 'name_user': 'Juan Diego Rendon ', 'role': 1},{'id_user': 1318, 'name_user': 'Santiago Gallego', 'role': 1}]"
+            },
+            "infoFigure": {
+              "id": 1,
+              "description": "Cuadrado",
+              "class": "item-square",
+              "name": "square"
+            }
+          }
+        ],
+        "format": [
+          {
+            "id": 111,
+            "description": "Pruebas finales",
+            "status": 1,
+            "group": 22,
+            "id_activity": 111,
+            "id_company": 1,
+            "modifiable": "false",
+            "type_activity": 1,
+            "is_request": 1,
+            "id_type_activity": 1,
+            "id_group_activity": 22,
+            "id_user": 0,
+            "changed": "false"
+          },
+          {
+            "id": 112,
+            "description": "Cierre",
+            "status": 1,
+            "group": 29,
+            "id_activity": 112,
+            "id_company": 1,
+            "modifiable": "false",
+            "type_activity": 1,
+            "is_request": 1,
+            "id_type_activity": 1,
+            "id_group_activity": 29,
+            "id_user": 0,
+            "changed": "false"
+          },
+          {
+            "id": 135,
+            "description": "Formulario 1 llenado Aut.",
+            "status": 1,
+            "group": 29,
+            "id_activity": 135,
+            "id_company": 1,
+            "modifiable": "false",
+            "type_activity": 1,
+            "is_request": 1,
+            "id_type_activity": 1,
+            "id_group_activity": 29,
+            "id_user": 0,
+            "changed": "false"
+          },
+          {
+            "id": 136,
+            "description": "Formulario 2 Llenado Aut.",
+            "status": 1,
+            "group": 29,
+            "id_activity": 136,
+            "id_company": 1,
+            "modifiable": "false",
+            "type_activity": 1,
+            "is_request": 0,
+            "id_type_activity": 1,
+            "id_group_activity": 29,
+            "id_user": 0,
+            "changed": "false"
+          },
+          {
+            "id": 159,
+            "description": "Reporte Incidencia",
+            "status": 1,
+            "group": 20,
+            "id_activity": 159,
+            "id_company": 1,
+            "modifiable": "false",
+            "type_activity": 1,
+            "is_request": 1,
+            "id_type_activity": 1,
+            "id_group_activity": 20,
+            "id_user": 0,
+            "changed": "false"
+          },
+          {
+            "id": 160,
+            "description": "Cierre Proceso",
+            "status": 1,
+            "group": 20,
+            "id_activity": 160,
+            "id_company": 1,
+            "modifiable": "false",
+            "type_activity": 1,
+            "is_request": 0,
+            "id_type_activity": 1,
+            "id_group_activity": 20,
+            "id_user": 0,
+            "changed": "false"
+          },
+          {
+            "id": 161,
+            "description": "Seguimiento novedad",
+            "status": 1,
+            "group": 20,
+            "id_activity": 161,
+            "id_company": 1,
+            "modifiable": "false",
+            "type_activity": 1,
+            "is_request": 0,
+            "id_type_activity": 1,
+            "id_group_activity": 20,
+            "id_user": 0,
+            "changed": "false"
+          },
+          {
+            "id": 213,
+            "description": "Incidente Cliente",
+            "status": 1,
+            "group": 22,
+            "id_activity": 213,
+            "id_company": 1,
+            "modifiable": "false",
+            "type_activity": 1,
+            "is_request": 1,
+            "id_type_activity": 1,
+            "id_group_activity": 22,
+            "id_user": 0,
+            "changed": "false"
+          }
+        ]
+      }
+    }
 
     // JSON kanban test
     let arrayTestKanban = [

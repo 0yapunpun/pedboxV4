@@ -47,7 +47,9 @@ router.post('/documentos-usuario/upload', b2bController.uploadDocumentoUsuario);
 // Tools
 router.get('/chat', viewController.chat);
 router.get('/helpdesk', helpdeskController.helpdesk);
+router.get('/helpdesk/solicitudes', helpdeskController.helpdeskSolicitudes);
 router.get('/helpdesk/ocurrence/:state/:ocurrence', helpdeskController.helpdeskOcurrence);
+router.get('/helpdesk/detail/:id/:id_node/:id_workflow_header/:id_workflow/:id_activitie', helpdeskController.helpdeskDetail);
 
 // Por integrar
 router.get('/crm', viewController.crm);
