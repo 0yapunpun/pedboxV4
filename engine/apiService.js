@@ -219,6 +219,18 @@ service.getSolicitudes = async(id_company, id_user) => {
   return data;
 }
 
+service.getNodes = async(id_company) => {
+  const url = urlKakashi+"proc_node?id_company="+id_company;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.getDiagrams = async(id_company) => {
+  const url = urlKakashi+"proc_workflow?id_company="+id_company;
+  const data =  await makeRequest(url);
+  return data;
+}
+
 const makeRequest = async (url, options) => {
   try {
       var resp = await fetch(url, options || {});

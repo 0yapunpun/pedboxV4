@@ -63,4 +63,9 @@ helpers.nvFormatDate = (text, format) => {
   return result;
 }
 
+helpers.nvCapitalize = (text) => {
+  text = text.toLowerCase();
+  return text.replace(/\b\w/g, l => l.toUpperCase());
+}
+
 module.exports = helpers;

@@ -24,7 +24,7 @@
   <!-- Plumb -->
   <link href="/css/plumbClasses.css" type="text/css" rel="stylesheet" />
   <!-- Cutom -->
-  <link href="/css/kanban.css" type="text/css" rel="stylesheet" />
+  <link href="/css/helpdesk.css" type="text/css" rel="stylesheet" />
   <!-- Color Page -->
   <%- include('./partials/colors.ejs') %> 
 
@@ -291,7 +291,7 @@
                     </div>
                   </div>
                 </div>
-                <div id="timeLineHeadTags" class="d-flex my-3 gap-2"></div>
+                <div id="timeLineHeadTags" class="d-flex my-3 gap-2 flex-wrap" ></div>
               </div>
               <div>
                 <div class="card">
@@ -358,8 +358,8 @@
                 <button type="button" class="btn-close rounded-circle me-1 closeProcesoModal" style="background-color: gray"></button>
               </div>
             </div>
-            <div class="modal-body bg-gray-100" style="overflow: hidden; padding-bottom: 0;">
-              <div id="diagramVPD" class="diagram-vpd platform-vpd" style="position: relative; width: 100%; height: 100%; min-height: 70vh;">  </div>
+            <div class="modal-body bg-gray-100" style="overflow: hidden; padding: 0;">
+              <div id="diagramVPD" class="diagram-vpd platform-vpd" style="position: relative; width: 100%; height: 100%; min-height: 70vh; overflow-y: scroll;">  </div>
             </div>
           </div>
         </div>
@@ -370,18 +370,18 @@
         <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
           <div class="modal-content bg-gray-100">
             <div class="modal-header">
-              <h5 class="modal-title">Solicitudes</h5>
+              <h5 class="modal-title">Lista de Incidentes</h5>
               <button type="button" class="btn-close rounded-circle" style="background-color: gray; margin-right: 5px" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <div class="d-flex justify-content-end gap-2 w-100">
-                <div class="buttonsCircle iconsHover sortToggle">
-                  <i class="fas fa-sort-alpha-up sortToggle1"></i>
-                  <i class="fas fa-sort-alpha-down sortToggle2" style="display: none"></i>             
+                <div class="buttonsCircle iconsHover sortToggle m-0">
+                  <i class="fas fa-sort-alpha-up sortToggle1" style="font-size: 20px;"></i>
+                  <i class="fas fa-sort-alpha-down sortToggle2" style="display: none; font-size: 20px"></i>             
                 </div>
                 <div class="mx-1">
                   <div style="position: relative" class="buttonsCircle iconsHover" class="dropdown" data-bs-toggle="tooltip" data-bs-placement="top" title="Rango de fechas">
-                    <i class="fas fa-calendar dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"  ></i>
+                    <i class="fas fa-calendar dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"  style="font-size: 20px"></i>
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="left: -20px;">
                       <li onclick="dateFilter(0)"><a class="dropdown-item" href="#">Hoy</a></li>
                       <li onclick="dateFilter(-1)"><a class="dropdown-item" href="#">Ayer</a></li>
@@ -618,6 +618,7 @@
         users = JSON.parse(users);
 
     let dataIncidencesComplete;
+    let currentIncidence;
 
     const loadHelpdeskIncidents = function (data) {
       $("#helpDeskMain").html("")
@@ -1088,16 +1089,21 @@
       // Asociar iconos antiguos angular con iconos de fontAwesome
       let iconsFontAwesome = {
         "input-text":"fas fa-font",
-        "input-date":"far fa-calendar",
         "checkbox":"far fa-check-square",
+        "select" : "",
+        "input-date":"far fa-calendar",
+        "input-money" : "",
+        "input-datetime" : "",
+        "input-text" : "",
         "textarea":"fas fa-align-justify",
-        "image":"fas fa-images"
+        "image":"fas fa-images",
+        "slide-textarea" : ""
       }
       iconSelect = iconsFontAwesome[icon];
     
       let fieldReturn = `
         <div class="d-flex mb-3"> 
-          <div style="width: 50px" class="d-flex justify-content-center align-items-center"><i class="`+(iconSelect ? iconSelect : "far fa-check-square")+`"></i></div>
+          <div style="width: 50px" class="d-flex justify-content-center align-items-center"><i class="`+(iconSelect ? iconSelect : "fas fa-font")+`"></i></div>
           <div type-field="13" class="d-flex flex-column w-100">
             <span class="fs-13 font-weight-bold">`+(question ? question : "")+`</span>
             <span style="border-bottom: 1px solid rgba(0,0,0,.12)">`+(content ? content : "")+`</span>
@@ -1252,6 +1258,9 @@
 
     const loadTimeLineModal = function(data) {
       data = prepareDataIncidence(data);
+      currentIncidence = data;
+
+      console.log(data)
 
       let title = data.workflow.name+ "- REQ "+ data.workflow.number;
       $('#timeLineTitle').text(title);
@@ -1383,14 +1392,11 @@
       fetch("/helpdesk/solicitudes")
       .then(response => response.json())
       .then(data => { 
-        data = data.res.result.data
-        console.log(data)
-        // solicitudesListaCompleta = data;
-        // let filtrados = _.groupBy(data.cards, o => { return o.info_status.description })['Abiertas'].concat(_.groupBy(data.cards, o => { return o.info_status.description })['En curso'])
-        // Modal Cards
-        loadRequests(data)
-        $("#consultaSolicitudModal").modal('show')
-        return
+        data = data.res;
+        solicitudesListaCompleta = data;
+        
+        let filtrados = _.groupBy(data.cards, o => { return o.info_status.description })['Abiertas'].concat(_.groupBy(data.cards, o => { return o.info_status.description })['En curso'])
+        loadRequests(filtrados)
 
         // Modal sidebar
         const consultaSolicitudModalSide = $("#consultaSolicitudModalSide");
@@ -1399,16 +1405,16 @@
           let sideElement = `
             <div class="list-group-item" style="border: none;">
               <div class="d-flex justify-content-between" style="margin-bottom: 5px;">
-                <a class="" data-bs-toggle="collapse" href="#`+data.sideBar[i].uid+`" role="button" aria-expanded="false" aria-controls="`+data.sideBar[i].uid+`">
+                <a class="font-weight-bold" data-bs-toggle="collapse" href="#`+data.sideBar[i].uid+`" role="button" aria-expanded="false" aria-controls="`+data.sideBar[i].uid+`">
                   `+data.sideBar[i].description+`
                 </a>
-                <span class="badge badge-primary badge-pill" style="margin-right: 15px; font-size:17px; background-color: transparent">`+data.sideBar[i].count+`</span>
+                <span class="badge badge-primary badge-pill" style="margin-right: 15px; font-size:17px; background-color: transparent; color: #495057">`+data.sideBar[i].count+`</span>
               </div>
             </div>
           `;
           consultaSolicitudModalSide.append(sideElement)
 
-          // En caso de que sea un solo combobox
+          // En caso de que sea un solo collapse
           if (data.sideBar[i].subgroups.length == 1){
             let y =`
               <div class="collapse" id="`+data.sideBar[i].uid+`">
@@ -1420,14 +1426,14 @@
 
             for (let e = 0; e < data.sideBar[i].subgroups[0].users.length; e++) {
               let x = `
-                <a href="#" class="list-group-item d-flex justify-content-between align-items-center linkName" style="border: none; color: #a3017e; padding-top: 0; padding-bottom: 0" value="`+data.sideBar[i].subgroups[0].users[e].id_user+`">
+                <a href="#" class="list-group-item d-flex justify-content-between align-items-center linkName" style="border: none; color: #a3017e; padding-top: 0 !important; padding-bottom: 0 !important" value="`+data.sideBar[i].subgroups[0].users[e].id_user+`">
                   `+data.sideBar[i].subgroups[0].users[e].description+`
-                  <span class="badge badge-primary badge-pill" style="font-size:17px; background-color: transparent"">`+data.sideBar[i].subgroups[0].users[e].count+`</span>
+                  <span class="badge badge-primary badge-pill" style="font-size:17px; background-color: transparent; color: #495057">`+data.sideBar[i].subgroups[0].users[e].count+`</span>
                 </a>
               `;
               $("#consultaSolicitudModalSide>div:last ul").append(x)
             }
-          } else { //En caso de que sea un combobox anidado (combobox con otros combobox adentro)
+          } else { //En caso de que sea un collapse anidado 
             let y =`
               <div class="list-group"></div>
             `;
@@ -1435,7 +1441,7 @@
 
             for (let e = 0; e < data.sideBar[i].subgroups.length; e++) {
               let x = `
-              <div class="collapse list-group-item" id="`+data.sideBar[i].uid+`" style="border: none;">
+              <div class="collapse list-group-item ps-3" id="`+data.sideBar[i].uid+`" style="border: none; padding-top: 0 !important; padding-bottom: 0 !important">
                   <div class="" id="gg`+data.sideBar[i].uid+`">
 
                   </div>
@@ -1448,7 +1454,7 @@
                   <a class="" data-bs-toggle="collapse" href="#`+data.sideBar[i].subgroups[e].uid+`" role="button" aria-expanded="false" aria-controls="collapseExampleaa">
                     `+data.sideBar[i].subgroups[e].description+`
                   </a>
-                  <span class="badge badge-primary badge-pill" style="font-size:17px; background-color: transparent"">14</span>
+                  <span class="badge badge-primary badge-pill" style="font-size:17px; background-color: transparent; color: #495057">14</span>
                 </div>
                 <div class="collapse ps-3" id="`+data.sideBar[i].subgroups[e].uid+`"></div>
               `;
@@ -1458,7 +1464,7 @@
                 let o = `
                 <div class="d-flex justify-content-between" style="margin-bottom: 5px;">
                   <a href="#" class="linkName" style="color: #a3017e" value="`+data.sideBar[i].subgroups[e].users[w].id_user+`">`+data.sideBar[i].subgroups[e].users[w].description+`</a>
-                  <span class="badge badge-primary badge-pill" style="font-size:17px; background-color: transparent"">`+data.sideBar[i].subgroups[e].users[w].count+`</span>
+                  <span class="badge badge-primary badge-pill" style="font-size:17px; background-color: transparent; color: #495057">`+data.sideBar[i].subgroups[e].users[w].count+`</span>
                 </div>
                 `;
                 $("#"+data.sideBar[i].subgroups[e].uid).append(o)
@@ -1537,9 +1543,7 @@
     }
 
     // TODO working here
-    const loadIncidenceFill = function (x, data) { //1-Ver 2-Editar
-      console.log(data)
-
+    const loadIncidenceFill = function (data) { //1-Ver 2-Editar
       //*** Section 1
       $("#llenadoModalNumber").html(data.workflow.number);
       $("#llenadoModalDate").html(data.workflow.due_date);
@@ -1556,7 +1560,7 @@
       if (data.user_take) {
         let element =` 
           <div class="d-flex align-items-center">
-            <h6 class="mb-0 small">Asinado a:&nbsp;</h6> 
+            <h6 class="mb-0 small">Asignado a:&nbsp;</h6> 
             <span class="text-xs font-weight-bolder">${data.user_take}</span>
           </div>
         `;
@@ -1565,7 +1569,7 @@
       if (data.class) {
         let element =` 
           <div class="d-flex align-items-center">
-            <h6 class="mb-0 small">Asinado a:&nbsp;</h6> 
+            <h6 class="mb-0 small">Asignado a:&nbsp;</h6> 
             <span class="text-xs font-weight-bolder">${data.class}</span>
           </div>
         `;
@@ -1583,11 +1587,13 @@
       fetch(route)
       .then(response => response.json())
       .then(response => { 
+        console.log("ppp", response)
         $('#verFormatoLlenado').html(""); 
         if (response.response.result.success) {
           let data = response.response.result.detail_activity.detail
 
-          let ooo = true; //Si el formulario ya fue llenado set to false
+          let ooo = false; //Si el formulario ya fue llenado set to false
+          console.log("field", data)
           if (ooo) {
             let sortedFields = _.sortBy(data, 'order_f');
             let container = "verFormatoLlenado";
@@ -1661,7 +1667,27 @@
     const loadFlowDiagram = function () {
       $('#diagramVPD').html('');
       $('#procesoModal').modal('show');
-      setData(plumbJSON);
+
+      let dataGetDiagram = {
+        actual : currentIncidence.workflow.actual,
+        id_group : currentIncidence.workflow.id_group,
+        id_workflow : currentIncidence.workflow.id_workflow,
+        nodes : currentIncidence.workflow.nodes,
+      }
+
+      fetch('/helpdesk/proceso', {
+        method: 'POST',
+        headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+        body: JSON.stringify(dataGetDiagram)
+      })
+      .then(res => res.json())
+      .then(res =>{   
+        res.selected = currentIncidence.workflow;
+        // console.log("x", res)
+        // console.log("y", plumbJSON)
+        setData(res);
+      })
+      
     }
 
     var rows = {};
@@ -1758,13 +1784,14 @@
       });
 
       elementPrint = diagramVPD.elements.slice(-1)[0]
+      console.log(elementPrint)
       let flujoElement = `
         <div id="`+elementPrint.id+`" class="item itemPlumb `+elementPrint.class+`" >
             <div class="ep"></div>
             <div class="content">
-                <div>
+                <div >
                   <span class="description">`+elementPrint.info.description+`</span>
-                  <div class="description">`+elementPrint.info.infoArea.description+`</div>  
+                  <div class="description">`+(elementPrint.info.infoArea.description ? elementPrint.info.infoArea.description : "")+`</div>  
                   <i class="fas fa-eye formatModal" style="font-size: 22px, margin-top: 5px" title="Ver Formato" ></i>
                 </div>
             </div>
@@ -2235,8 +2262,9 @@
     $(document).on("click", ".incidentMain", function (){
       let id = Number($(this).attr("id"));
       let data = _.findWhere(dataIncidencesComplete, {id: id});
+      $("#showTimeLineFromDetail").attr("data-id", id)
 
-      loadIncidenceFill(2, data)
+      loadIncidenceFill(data)
     })
 
     $(document).on( "click", ".closeLlenadoIncidencia", function(){
@@ -2265,7 +2293,11 @@
     $(document).on("click", "#showTimeLineFromDetail", function (e) {
       $('#llenadoModal').modal('hide')
       $("#closeTimeLineModal").attr("onclick", "$('#timelineModal').modal('hide'); $('#llenadoModal').modal('show')")
-      loadTimeLineModal();
+
+      let id = Number($(this).attr("data-id"));
+      let data = _.findWhere(dataIncidencesComplete, {id: id});
+
+      loadTimeLineModal(data);
     })
 
     // Event Plumb JS
@@ -2418,1156 +2450,276 @@
       $("#menuHelpdesk").addClass("activeNav");
     }); 
 
-    // Objetos prueba
-    // JSON plumb
-    let plumbJSON = {
-      "workflow": {
-        "id": 25,
-        "name": "Llenado Aut.",
-        "due_days": 0,
-        "id_group": 11,
-        "nodes": [
-          {
-            "id": 133,
-            "id_workflow": 25,
-            "identifier": "node71plumb1551191815997",
-            "id_node": 71,
-            "offsetleft": 268,
-            "offsettop": 43,
-            "order_n": 1,
-            "line": 1,
-            "areas": [],
-            "connections": [{
-              "id": 144,
-              "id_workflow_node": 133,
-              "identifier": "con_18",
-              "source": "node71plumb1551191815997",
-              "target": "node72plumb1551191818816",
-              "anchors": "\"[[],[]]\""
-            }],
-            "infoNode": {
-              "node": " - ",
-              "area": " - ",
-              "class": " - ",
-              "format": " - "
-            }
-          },
-          {
-            "id": 134,
-            "id_workflow": 25,
-            "identifier": "node72plumb1551191818816",
-            "id_node": 72,
-            "offsetleft": 261,
-            "offsettop": 241,
-            "order_n": 2,
-            "line": 1,
-            "areas": [],
-            "connections": [{
-              "id": 145,
-              "id_workflow_node": 134,
-              "identifier": "con_31",
-              "source": "node72plumb1551191818816",
-              "target": "node70plumb1551191820519",
-              "anchors": "\"[[],[]]\""
-            }],
-            "infoNode": {
-              "node": " - ",
-              "area": " - ",
-              "class": " - ",
-              "format": " - "
-            }
-          },
-          {
-            "id": 135,
-            "id_workflow": 25,
-            "identifier": "node70plumb1551191820519",
-            "id_node": 70,
-            "offsetleft": 269,
-            "offsettop": 461,
-            "order_n": 3,
-            "line": 1,
-            "areas": [],
-            "connections": [{
-              "id": 146,
-              "id_workflow_node": 135,
-              "identifier": "con_31",
-              "source": "node70plumb1551191820519",
-              "target": "",
-              "anchors": "\"[[],[]]\""
-            }],
-            "infoNode": {
-              "node": " - ",
-              "area": " - ",
-              "class": " - ",
-              "format": " - "
-            }
-          }
-        ]
-      },
-      "actual": [
-        1
-      ],
-      "before": [
-        71
-      ],
-      "selected": {
-        "id": 8590,
-        "id_status": 7,
-        "action_status": "start",
-        "status": "En proceso",
-        "number": 303,
-        "id_workflow": 25,
-        "id_user": 12245,
-        "id_request": null,
-        "id_format_request": null,
-        "id_user_request": null,
-        "user_request": null,
-        "photo_user_request": null,
-        "date_request": null,
-        "bussiness_name": " ",
-        "first_name": "Sebastian",
-        "second_name": "",
-        "first_lastname": "Martinez",
-        "due_date": "2021-11-09",
-        "date": "2021-11-09 14:05:31",
-        "id_group": 11,
-        "name": "Llenado Aut.",
-        "code": "002",
-        "description": "PRUEBAS",
-        "user_id_subgroup": null,
-        "user_subgroup": null,
-        "user_id_group": null,
-        "user_group": null,
-        "nodes": [{
-          "id_header": 8590,
-          "id_format_answer": 58593,
-          "id_user": 12245,
-          "bussiness_name": " ",
-          "first_name": "Sebastian",
-          "second_name": "",
-          "first_lastname": "Martinez",
-          "photo": "/files/profile/cropWhatsAppImage20211020at100043AM_profileJwevirQ.jpeg",
-          "id_node": 71,
-          "description_node": "Llenado Aut 1",
-          "id_area": 84,
-          "id_class": null,
-          "id_format": 213,
-          "date": "2021-11-09 14:05:30",
-          "resume": [],
-          "dateBeatiful": "Noviembre 09, 2021, 02:05 p.m",
-          "infoArea": {
-            "id": 84,
-            "id_company": 1,
-            "code": "02",
-            "description": "Desarrollo ",
-            "id_group": 29,
-            "id_subgroup": 184,
-            "email_notifications": "",
-            "date_update": "2021-10-29",
-            "user_update": 743,
-            "users": "[{'id_user': 12245, 'name_user': 'Sebastian  Martinez Uribe', 'role': 3},{'id_user': 12214, 'name_user': 'Santiago  Berrio Agudelo', 'role': 3},{'id_user': 743, 'name_user': 'Juan Manuel Navarro Suarez', 'role': 1},{'id_user': 747, 'name_user': 'Santiago  Restrepo ', 'role': 1}]"
-          },
-          "infoClass": {},
-          "infoFormat": {
-            "id": 213,
-            "description": "Incidente Cliente",
-            "status": 1,
-            "group": 22,
-            "id_activity": 213,
-            "id_company": 1,
-            "modifiable": "false",
-            "type_activity": 1,
-            "is_request": 1,
-            "id_type_activity": 1,
-            "id_group_activity": 22,
-            "id_user": 0,
-            "changed": "false"
-          }
-        }],
-        "total": 3,
-        "actual": 1,
-        "dateBeatiful": "Noviembre 09, 2021, 02:05 p.m",
-        "percentage": "33"
-      },
-      "master": {
-        "nodes": [
-          {
-            "id": 66,
-            "id_company": 1,
-            "description": "Nueva Incidencia",
-            "id_area": 83,
-            "id_class": null,
-            "id_format": 105,
-            "figure": 1,
-            "notify_email": 0,
-            "infoFormat": {},
-            "infoArea": {
-              "id": 83,
-              "id_company": 1,
-              "code": "01",
-              "description": "Soporte ",
-              "id_group": 12,
-              "id_subgroup": 141,
-              "email_notifications": "",
-              "date_update": "2019-08-21",
-              "user_update": 1318,
-              "users": "[{'id_user': 744, 'name_user': 'Juan Diego Rendon ', 'role': 1},{'id_user': 4312, 'name_user': 'Daniel  Londoño', 'role': 1},{'id_user': 1318, 'name_user': 'Santiago Gallego', 'role': 1}]"
-            },
-            "infoFigure": {
-              "id": 1,
-              "description": "Cuadrado",
-              "class": "item-square",
-              "name": "square"
-            }
-          },
-          {
-            "id": 67,
-            "id_company": 1,
-            "description": "Validación Novedad",
-            "id_area": 83,
-            "id_class": null,
-            "id_format": 107,
-            "figure": 1,
-            "notify_email": 0,
-            "infoFormat": {},
-            "infoArea": {
-              "id": 83,
-              "id_company": 1,
-              "code": "01",
-              "description": "Soporte ",
-              "id_group": 12,
-              "id_subgroup": 141,
-              "email_notifications": "",
-              "date_update": "2019-08-21",
-              "user_update": 1318,
-              "users": "[{'id_user': 744, 'name_user': 'Juan Diego Rendon ', 'role': 1},{'id_user': 4312, 'name_user': 'Daniel  Londoño', 'role': 1},{'id_user': 1318, 'name_user': 'Santiago Gallego', 'role': 1}]"
-            },
-            "infoFigure": {
-              "id": 1,
-              "description": "Cuadrado",
-              "class": "item-square",
-              "name": "square"
-            }
-          },
-          {
-            "id": 68,
-            "id_company": 1,
-            "description": "Novedad Desarrollo",
-            "id_area": 84,
-            "id_class": null,
-            "id_format": 108,
-            "figure": 2,
-            "notify_email": 0,
-            "infoFormat": {},
-            "infoArea": {
-              "id": 84,
-              "id_company": 1,
-              "code": "02",
-              "description": "Desarrollo ",
-              "id_group": 29,
-              "id_subgroup": 184,
-              "email_notifications": "",
-              "date_update": "2021-10-29",
-              "user_update": 743,
-              "users": "[{'id_user': 12245, 'name_user': 'Sebastian  Martinez Uribe', 'role': 3},{'id_user': 12214, 'name_user': 'Santiago  Berrio Agudelo', 'role': 3},{'id_user': 743, 'name_user': 'Juan Manuel Navarro Suarez', 'role': 1},{'id_user': 747, 'name_user': 'Santiago  Restrepo ', 'role': 1}]"
-            },
-            "infoFigure": {
-              "id": 2,
-              "description": "Circulo",
-              "class": "item-circle",
-              "name": "circle"
-            }
-          },
-          {
-            "id": 69,
-            "id_company": 1,
-            "description": "Prueba Calidad",
-            "id_area": 83,
-            "id_class": null,
-            "id_format": 111,
-            "figure": 3,
-            "notify_email": 0,
-            "infoFormat": {
-              "id": 111,
-              "description": "Pruebas finales",
-              "status": 1,
-              "group": 22,
-              "id_activity": 111,
-              "id_company": 1,
-              "modifiable": "false",
-              "type_activity": 1,
-              "is_request": 1,
-              "id_type_activity": 1,
-              "id_group_activity": 22,
-              "id_user": 0,
-              "changed": "false"
-            },
-            "infoArea": {
-              "id": 83,
-              "id_company": 1,
-              "code": "01",
-              "description": "Soporte ",
-              "id_group": 12,
-              "id_subgroup": 141,
-              "email_notifications": "",
-              "date_update": "2019-08-21",
-              "user_update": 1318,
-              "users": "[{'id_user': 744, 'name_user': 'Juan Diego Rendon ', 'role': 1},{'id_user': 4312, 'name_user': 'Daniel  Londoño', 'role': 1},{'id_user': 1318, 'name_user': 'Santiago Gallego', 'role': 1}]"
-            },
-            "infoFigure": {
-              "id": 3,
-              "description": "Rombo",
-              "class": "item-diamond-square",
-              "name": "diamond-square"
-            }
-          },
-          {
-            "id": 70,
-            "id_company": 1,
-            "description": "Cierre Novedad",
-            "id_area": 83,
-            "id_class": null,
-            "id_format": 112,
-            "figure": 3,
-            "notify_email": 0,
-            "infoFormat": {
-              "id": 112,
-              "description": "Cierre",
-              "status": 1,
-              "group": 29,
-              "id_activity": 112,
-              "id_company": 1,
-              "modifiable": "false",
-              "type_activity": 1,
-              "is_request": 1,
-              "id_type_activity": 1,
-              "id_group_activity": 29,
-              "id_user": 0,
-              "changed": "false"
-            },
-            "infoArea": {
-              "id": 83,
-              "id_company": 1,
-              "code": "01",
-              "description": "Soporte ",
-              "id_group": 12,
-              "id_subgroup": 141,
-              "email_notifications": "",
-              "date_update": "2019-08-21",
-              "user_update": 1318,
-              "users": "[{'id_user': 744, 'name_user': 'Juan Diego Rendon ', 'role': 1},{'id_user': 4312, 'name_user': 'Daniel  Londoño', 'role': 1},{'id_user': 1318, 'name_user': 'Santiago Gallego', 'role': 1}]"
-            },
-            "infoFigure": {
-              "id": 3,
-              "description": "Rombo",
-              "class": "item-diamond-square",
-              "name": "diamond-square"
-            }
-          },
-          {
-            "id": 71,
-            "id_company": 1,
-            "description": "Llenado Aut 1",
-            "id_area": 84,
-            "id_class": null,
-            "id_format": 213,
-            "figure": 3,
-            "notify_email": 0,
-            "infoFormat": {
-              "id": 213,
-              "description": "Incidente Cliente",
-              "status": 1,
-              "group": 22,
-              "id_activity": 213,
-              "id_company": 1,
-              "modifiable": "false",
-              "type_activity": 1,
-              "is_request": 1,
-              "id_type_activity": 1,
-              "id_group_activity": 22,
-              "id_user": 0,
-              "changed": "false"
-            },
-            "infoArea": {
-              "id": 84,
-              "id_company": 1,
-              "code": "02",
-              "description": "Desarrollo ",
-              "id_group": 29,
-              "id_subgroup": 184,
-              "email_notifications": "",
-              "date_update": "2021-10-29",
-              "user_update": 743,
-              "users": "[{'id_user': 12245, 'name_user': 'Sebastian  Martinez Uribe', 'role': 3},{'id_user': 12214, 'name_user': 'Santiago  Berrio Agudelo', 'role': 3},{'id_user': 743, 'name_user': 'Juan Manuel Navarro Suarez', 'role': 1},{'id_user': 747, 'name_user': 'Santiago  Restrepo ', 'role': 1}]"
-            },
-            "infoFigure": {
-              "id": 3,
-              "description": "Rombo",
-              "class": "item-diamond-square",
-              "name": "diamond-square"
-            }
-          },
-          {
-            "id": 72,
-            "id_company": 1,
-            "description": "Llenado Aut 2",
-            "id_area": 84,
-            "id_class": null,
-            "id_format": 136,
-            "figure": 1,
-            "notify_email": 0,
-            "infoFormat": {
-              "id": 136,
-              "description": "Formulario 2 Llenado Aut.",
-              "status": 1,
-              "group": 29,
-              "id_activity": 136,
-              "id_company": 1,
-              "modifiable": "false",
-              "type_activity": 1,
-              "is_request": 0,
-              "id_type_activity": 1,
-              "id_group_activity": 29,
-              "id_user": 0,
-              "changed": "false"
-            },
-            "infoArea": {
-              "id": 84,
-              "id_company": 1,
-              "code": "02",
-              "description": "Desarrollo ",
-              "id_group": 29,
-              "id_subgroup": 184,
-              "email_notifications": "",
-              "date_update": "2021-10-29",
-              "user_update": 743,
-              "users": "[{'id_user': 12245, 'name_user': 'Sebastian  Martinez Uribe', 'role': 3},{'id_user': 12214, 'name_user': 'Santiago  Berrio Agudelo', 'role': 3},{'id_user': 743, 'name_user': 'Juan Manuel Navarro Suarez', 'role': 1},{'id_user': 747, 'name_user': 'Santiago  Restrepo ', 'role': 1}]"
-            },
-            "infoFigure": {
-              "id": 1,
-              "description": "Cuadrado",
-              "class": "item-square",
-              "name": "square"
-            }
-          },
-          {
-            "id": 83,
-            "id_company": 1,
-            "description": "Reporte Incidencia",
-            "id_area": 83,
-            "id_class": null,
-            "id_format": 159,
-            "figure": 1,
-            "notify_email": 0,
-            "infoFormat": {
-              "id": 159,
-              "description": "Reporte Incidencia",
-              "status": 1,
-              "group": 20,
-              "id_activity": 159,
-              "id_company": 1,
-              "modifiable": "false",
-              "type_activity": 1,
-              "is_request": 1,
-              "id_type_activity": 1,
-              "id_group_activity": 20,
-              "id_user": 0,
-              "changed": "false"
-            },
-            "infoArea": {
-              "id": 83,
-              "id_company": 1,
-              "code": "01",
-              "description": "Soporte ",
-              "id_group": 12,
-              "id_subgroup": 141,
-              "email_notifications": "",
-              "date_update": "2019-08-21",
-              "user_update": 1318,
-              "users": "[{'id_user': 744, 'name_user': 'Juan Diego Rendon ', 'role': 1},{'id_user': 4312, 'name_user': 'Daniel  Londoño', 'role': 1},{'id_user': 1318, 'name_user': 'Santiago Gallego', 'role': 1}]"
-            },
-            "infoFigure": {
-              "id": 1,
-              "description": "Cuadrado",
-              "class": "item-square",
-              "name": "square"
-            }
-          },
-          {
-            "id": 84,
-            "id_company": 1,
-            "description": "Cierre Proceso",
-            "id_area": 83,
-            "id_class": null,
-            "id_format": 160,
-            "figure": 3,
-            "notify_email": 0,
-            "infoFormat": {
-              "id": 160,
-              "description": "Cierre Proceso",
-              "status": 1,
-              "group": 20,
-              "id_activity": 160,
-              "id_company": 1,
-              "modifiable": "false",
-              "type_activity": 1,
-              "is_request": 0,
-              "id_type_activity": 1,
-              "id_group_activity": 20,
-              "id_user": 0,
-              "changed": "false"
-            },
-            "infoArea": {
-              "id": 83,
-              "id_company": 1,
-              "code": "01",
-              "description": "Soporte ",
-              "id_group": 12,
-              "id_subgroup": 141,
-              "email_notifications": "",
-              "date_update": "2019-08-21",
-              "user_update": 1318,
-              "users": "[{'id_user': 744, 'name_user': 'Juan Diego Rendon ', 'role': 1},{'id_user': 4312, 'name_user': 'Daniel  Londoño', 'role': 1},{'id_user': 1318, 'name_user': 'Santiago Gallego', 'role': 1}]"
-            },
-            "infoFigure": {
-              "id": 3,
-              "description": "Rombo",
-              "class": "item-diamond-square",
-              "name": "diamond-square"
-            }
-          },
-          {
-            "id": 85,
-            "id_company": 1,
-            "description": "Seguimiento Novedad Soporte",
-            "id_area": 83,
-            "id_class": null,
-            "id_format": 161,
-            "figure": 2,
-            "notify_email": 0,
-            "infoFormat": {
-              "id": 161,
-              "description": "Seguimiento novedad",
-              "status": 1,
-              "group": 20,
-              "id_activity": 161,
-              "id_company": 1,
-              "modifiable": "false",
-              "type_activity": 1,
-              "is_request": 0,
-              "id_type_activity": 1,
-              "id_group_activity": 20,
-              "id_user": 0,
-              "changed": "false"
-            },
-            "infoArea": {
-              "id": 83,
-              "id_company": 1,
-              "code": "01",
-              "description": "Soporte ",
-              "id_group": 12,
-              "id_subgroup": 141,
-              "email_notifications": "",
-              "date_update": "2019-08-21",
-              "user_update": 1318,
-              "users": "[{'id_user': 744, 'name_user': 'Juan Diego Rendon ', 'role': 1},{'id_user': 4312, 'name_user': 'Daniel  Londoño', 'role': 1},{'id_user': 1318, 'name_user': 'Santiago Gallego', 'role': 1}]"
-            },
-            "infoFigure": {
-              "id": 2,
-              "description": "Circulo",
-              "class": "item-circle",
-              "name": "circle"
-            }
-          },
-          {
-            "id": 86,
-            "id_company": 1,
-            "description": "Seguimiento Novedad Desarrollo",
-            "id_area": 84,
-            "id_class": null,
-            "id_format": 161,
-            "figure": 1,
-            "notify_email": 0,
-            "infoFormat": {
-              "id": 161,
-              "description": "Seguimiento novedad",
-              "status": 1,
-              "group": 20,
-              "id_activity": 161,
-              "id_company": 1,
-              "modifiable": "false",
-              "type_activity": 1,
-              "is_request": 0,
-              "id_type_activity": 1,
-              "id_group_activity": 20,
-              "id_user": 0,
-              "changed": "false"
-            },
-            "infoArea": {
-              "id": 84,
-              "id_company": 1,
-              "code": "02",
-              "description": "Desarrollo ",
-              "id_group": 29,
-              "id_subgroup": 184,
-              "email_notifications": "",
-              "date_update": "2021-10-29",
-              "user_update": 743,
-              "users": "[{'id_user': 12245, 'name_user': 'Sebastian  Martinez Uribe', 'role': 3},{'id_user': 12214, 'name_user': 'Santiago  Berrio Agudelo', 'role': 3},{'id_user': 743, 'name_user': 'Juan Manuel Navarro Suarez', 'role': 1},{'id_user': 747, 'name_user': 'Santiago  Restrepo ', 'role': 1}]"
-            },
-            "infoFigure": {
-              "id": 1,
-              "description": "Cuadrado",
-              "class": "item-square",
-              "name": "square"
-            }
-          },
-          {
-            "id": 87,
-            "id_company": 1,
-            "description": "Seguimiento Novedad Calidad",
-            "id_area": 88,
-            "id_class": null,
-            "id_format": 161,
-            "figure": 1,
-            "notify_email": 0,
-            "infoFormat": {
-              "id": 161,
-              "description": "Seguimiento novedad",
-              "status": 1,
-              "group": 20,
-              "id_activity": 161,
-              "id_company": 1,
-              "modifiable": "false",
-              "type_activity": 1,
-              "is_request": 0,
-              "id_type_activity": 1,
-              "id_group_activity": 20,
-              "id_user": 0,
-              "changed": "false"
-            },
-            "infoArea": {
-              "id": 88,
-              "id_company": 1,
-              "code": "03",
-              "description": "Calidad",
-              "id_group": 12,
-              "id_subgroup": 141,
-              "email_notifications": "",
-              "date_update": "2019-06-10",
-              "user_update": 1318,
-              "users": "[{'id_user': 744, 'name_user': 'Juan Diego Rendon ', 'role': 1},{'id_user': 1318, 'name_user': 'Santiago Gallego', 'role': 1}]"
-            },
-            "infoFigure": {
-              "id": 1,
-              "description": "Cuadrado",
-              "class": "item-square",
-              "name": "square"
-            }
-          }
-        ],
-        "format": [
-          {
-            "id": 111,
-            "description": "Pruebas finales",
-            "status": 1,
-            "group": 22,
-            "id_activity": 111,
-            "id_company": 1,
-            "modifiable": "false",
-            "type_activity": 1,
-            "is_request": 1,
-            "id_type_activity": 1,
-            "id_group_activity": 22,
-            "id_user": 0,
-            "changed": "false"
-          },
-          {
-            "id": 112,
-            "description": "Cierre",
-            "status": 1,
-            "group": 29,
-            "id_activity": 112,
-            "id_company": 1,
-            "modifiable": "false",
-            "type_activity": 1,
-            "is_request": 1,
-            "id_type_activity": 1,
-            "id_group_activity": 29,
-            "id_user": 0,
-            "changed": "false"
-          },
-          {
-            "id": 135,
-            "description": "Formulario 1 llenado Aut.",
-            "status": 1,
-            "group": 29,
-            "id_activity": 135,
-            "id_company": 1,
-            "modifiable": "false",
-            "type_activity": 1,
-            "is_request": 1,
-            "id_type_activity": 1,
-            "id_group_activity": 29,
-            "id_user": 0,
-            "changed": "false"
-          },
-          {
-            "id": 136,
-            "description": "Formulario 2 Llenado Aut.",
-            "status": 1,
-            "group": 29,
-            "id_activity": 136,
-            "id_company": 1,
-            "modifiable": "false",
-            "type_activity": 1,
-            "is_request": 0,
-            "id_type_activity": 1,
-            "id_group_activity": 29,
-            "id_user": 0,
-            "changed": "false"
-          },
-          {
-            "id": 159,
-            "description": "Reporte Incidencia",
-            "status": 1,
-            "group": 20,
-            "id_activity": 159,
-            "id_company": 1,
-            "modifiable": "false",
-            "type_activity": 1,
-            "is_request": 1,
-            "id_type_activity": 1,
-            "id_group_activity": 20,
-            "id_user": 0,
-            "changed": "false"
-          },
-          {
-            "id": 160,
-            "description": "Cierre Proceso",
-            "status": 1,
-            "group": 20,
-            "id_activity": 160,
-            "id_company": 1,
-            "modifiable": "false",
-            "type_activity": 1,
-            "is_request": 0,
-            "id_type_activity": 1,
-            "id_group_activity": 20,
-            "id_user": 0,
-            "changed": "false"
-          },
-          {
-            "id": 161,
-            "description": "Seguimiento novedad",
-            "status": 1,
-            "group": 20,
-            "id_activity": 161,
-            "id_company": 1,
-            "modifiable": "false",
-            "type_activity": 1,
-            "is_request": 0,
-            "id_type_activity": 1,
-            "id_group_activity": 20,
-            "id_user": 0,
-            "changed": "false"
-          },
-          {
-            "id": 213,
-            "description": "Incidente Cliente",
-            "status": 1,
-            "group": 22,
-            "id_activity": 213,
-            "id_company": 1,
-            "modifiable": "false",
-            "type_activity": 1,
-            "is_request": 1,
-            "id_type_activity": 1,
-            "id_group_activity": 22,
-            "id_user": 0,
-            "changed": "false"
-          }
-        ]
-      }
-    }
-
-    // JSON kanban test
-    let arrayTestKanban = [
-      {
-        "board": "pendientes",
-        "items": [
-          {
-            "id": "board1Task1",
-            "title": "1First element",
-            "class": ["border-radius-md"],
-            "assignee": "Done Joe",
-            "description": "This task's description is for something, but not for anything",
-          },
-          {
-            "id": "board1Task2",
-            "title": "<p>Second element</p>",
-            "class": ["border-radius-md"],
-            "assignee": "Done Joe",
-            "description": "This task's description is for something, but not for anything",
-          },
-          {
-            "id": "board1Task3",
-            "title":  "<p>third element</p>",
-            "class": ["border-radius-md"],
-            "assignee": "Done Joe",
-            "description": "This task's description is for something, but not for anything",
-          }
-        ]
-      },
-      {
-      "board": "curso",
-      "items": [
-          {
-            "id": "board2Task1",
-            "title": "<p>First element</p>",
-            "class": ["border-radius-md"],
-            "assignee": "Done Joe",
-            "description": "This task's description is for something, but not for anything",
-          },
-          {
-            "id": "board2Task2",
-            "title": "<p>Second element</p>",
-            "class": ["border-radius-md"],
-            "assignee": "Done Joe",
-            "description": "This task's description is for something, but not for anything",
-          },
-          {
-            "id": "board2Task3",
-            "title": "<p>third element</p>",
-            "class": ["border-radius-md"],
-            "assignee": "Done Joe",
-            "description": "This task's description is for something, but not for anything",
-          }
-        ]
-      },
-      {
-      "board": "pruebas",
-      "items": [
-          {
-            "id": "board3Task1",
-            "title": "<p>First element</p>",
-            "class": ["border-radius-md"],
-            "assignee": "Done Joe",
-            "description": "This task's description is for something, but not for anything",  
-          },
-          {
-            "id": "board3Task2",
-            "title": "<p>Second element</p>",
-            "class": ["border-radius-md"],
-            "assignee": "Done Joe",
-            "description": "This task's description is for something, but not for anything",
-          },
-          {
-            "id": "board3Task3",
-            "title": "<p>third element</p>",
-            "class": ["border-radius-md"],
-            "assignee": "Done Joe",
-            "description": "This task's description is for something, but not for anything",
-          }
-        ]
-      },
-      {
-      "board": "cerradas",
-      "items": [
-          {
-            "id": "board4Task1",
-            "title": "<p>First element</p>",
-            "class": ["border-radius-md"],
-            "assignee": "Done Joe",
-            "description": "This task's description is for something, but not for anything",
-          },
-          {
-            "id": "board4Task2",
-            "title": "<p>Second element</p>",
-            "class": ["border-radius-md"],
-            "assignee": "Done Joe",
-            "description": "This task's description is for something, but not for anything",
-          },
-          {
-            "id": "board4Task3",
-            "title": "<p>third element</p>",
-            "class": ["border-radius-md"],
-            "assignee": "Done Joe",
-            "description": "This task's description is for something, but not for anything",
-          }
-        ]
-      } 
-    ]
-
+    // ***Objetos prueba
     let objSession = {
-    "success": true,
-    "message": "",
-    "error": "",
-    "url_socket": "https://chat.pedbox.co:6306",
-    "user": [
-        {
-            "id": 7504,
-            "user": "16741568",
-            "nit_client": null,
-            "id_type_user": 5,
-            "type_user": "CL",
-            "id_role": 275,
-            "id_company": 36,
-            "company": "IGB MOTORCYCLE PARTS S.A.S",
-            "code": "36",
-            "url_client": "wali.igbcolombia.com:1342/wsigb/wsGenesis.asmx",
-            "url_pedbox": "http://api.pedbox.co:4590/",
-            "url_reports": null,
-            "url_logo": "http://api.pedbox.co/images/logoigb.png",
-            "url_logo_perfil": "",
-            "seller": null,
-            "warehouse": "0",
-            "list_price": 0,
-            "id_country": 1,
-            "change_password": 0,
-            "photo": null,
-            "name": "16741568-9 - ALMACEN CLINIC RING Y/O ANIBAL DUQUE",
-            "nit": "C16741568",
-            "id_person": 960424,
-            "id_subgroup": 708,
-            "email": "CLINICRING@HOTMAIL.COM",
-            "email_alert": "soporte@navacom.com.co",
-            "permission": [
-                {
-                    "id": 21,
-                    "code": "1500_ENVIAR_UBICACION",
-                    "content": "15"
-                },
-                {
-                    "id": 26,
-                    "code": "1500_ENVIAR_UBICACION_HORA",
-                    "content": "0700-1900"
-                },
-                {
-                    "id": 165,
-                    "code": "8000_CAN_ACCESS_EXTRANET",
-                    "content": "S"
-                },
-                {
-                    "id": 197,
-                    "code": "8005_CAN_PAY_INVOICES_EXTRANET",
-                    "content": "S"
-                },
-                {
-                    "id": 198,
-                    "code": "8010_CAN_VIEW_DOCUMENT_HISTORY_EXTRANET",
-                    "content": "S"
-                },
-                {
-                    "id": 199,
-                    "code": "8015_CAN_VIEW_QUOTATION_EXTRANET",
-                    "content": "N"
-                },
-                {
-                    "id": 200,
-                    "code": "8020_CAN_VIEW_ORDERS_EXTRANET",
-                    "content": "S"
-                },
-                {
-                    "id": 201,
-                    "code": "8025_CAN_EXPORT_CERTIFICATES_EXTRANET",
-                    "content": "S"
-                },
-                {
-                    "id": 202,
-                    "code": "8030_CAN_CONFIGURE_EXTRANET",
-                    "content": "S"
-                },
-                {
-                    "id": 203,
-                    "code": "8035_CAN_VIEW_PORTFOLIO_EXTRANET",
-                    "content": "S"
-                },
-                {
-                    "id": 204,
-                    "code": "8040_CAN_ASSING_CUSTOMER_TO_EXTRANET",
-                    "content": "S"
-                },
-                {
-                    "id": 213,
-                    "code": "8045_CAN_VIEW_SHOPPING_CAR",
-                    "content": "N"
-                },
-                {
-                    "id": 213,
-                    "code": "8045_CAN_VIEW_SHOPPING_CAR",
-                    "content": "S"
-                },
-                {
-                    "id": 214,
-                    "code": "8045_CAN_VIEW_STOCK",
-                    "content": "S"
-                },
-                {
-                    "id": 215,
-                    "code": "8045_CAN_VIEW_TOTAL_STOCK",
-                    "content": "10"
-                },
-                {
-                    "id": 219,
-                    "code": "8020_CREATE_ORDER_OF_ITEMS",
-                    "content": "S"
-                },
-                {
-                    "id": 223,
-                    "code": "8045_CAN_VIEW_PRODUCT_IMAGE",
-                    "content": "S"
-                },
-                {
-                    "id": 242,
-                    "code": "5700_AVOID_LOCK_SCREEN",
-                    "content": "S"
-                },
-                {
-                    "id": 252,
-                    "code": "8045_SHOW_OTHER_RELATED_FILTERS",
-                    "content": "N"
-                },
-                {
-                    "id": 253,
-                    "code": "8045_SEND_HOW_TO_ORDER",
-                    "content": "S"
-                },
-                {
-                    "id": 255,
-                    "code": "8050_SPECIAL_MOD_WITH_SPECIFIC_CHANGES",
-                    "content": "N"
-                },
-                {
-                    "id": 258,
-                    "code": "5025_CAN_EDIT_YOUR_PROFILE_IMAGE",
-                    "content": "S"
-                },
-                {
-                    "id": 291,
-                    "code": "8050_SELLER_ORDER",
-                    "content": "888888"
-                },
-                {
-                    "id": 292,
-                    "code": "8055_MIN_VALUE",
-                    "content": "500000"
-                },
-                {
-                    "id": 302,
-                    "code": "8050_MANEJA_FILTROS_DINAMICOS",
-                    "content": "marca,grupo,sub_grupo,viscosidad,modelo_moto,tipo_llanta,anchollanta,perfil_llanta,rin_llanta,talla,base"
-                },
-                {
-                    "id": 305,
-                    "code": "8060_SEND_ORDER_SELLER",
-                    "content": "S"
-                },
-                {
-                    "id": 306,
-                    "code": "8065_VIEW_ECOMMERCE",
-                    "content": "S"
-                },
-                {
-                    "id": 309,
-                    "code": "1000_ENVIAR_TIPO_EXTRANET_PEDIDO",
-                    "content": "S"
-                },
-                {
-                    "id": 310,
-                    "code": "1000_DESACTIVAR_ENVIO_PEDIDO_GUARDADO",
-                    "content": "S"
-                },
-                {
-                    "id": 312,
-                    "code": "8085_VIEW_CLASIC",
-                    "content": "S"
-                },
-                {
-                    "id": 325,
-                    "code": "8027_GET_PRICE_STOCK_TO_SEND",
-                    "content": "N"
-                },
-                {
-                    "id": 326,
-                    "code": "8028_CAN_ACCESS_TO_CALIDOSOS",
-                    "content": "S"
-                },
-                {
-                    "id": 6,
-                    "code": "4000_CAN_ACCESS_HELPDESK",
-                    "content": "S"
-                },
-                {
-                    "id": 66,
-                    "code": "4010_IS_ADMIN_HELPDESK",
-                    "content": "S"
-                },
-                {
-                    "id": 666,
-                    "code": "4015_CAN_CREATE_INCIDENCE_HELPDESK",
-                    "content": "S"
-                },
-                {
-                    "id": 6666,
-                    "code": "4000_CAN_TAKE_TASK",
-                    "content": "S"
-                },
-                {
-                    "id": 66666,
-                    "code": "4000_CAN_EDIT_FORMAT_INCIDENCE",
-                    "content": "S"
-                },
-                {
-                    "id": 666666,
-                    "code": "4000_CAN_CREATE_MANAGEMENT_HELPDESK",
-                    "content": "S"
-                },
-                {
-                    "id": 6666666,
-                    "code": "5000_FILTRO_TIPO_DE_REPORTE_PROCESOS",
-                    "content": "S"
-                },
-                {
-                    "id": 666666666,
-                    "code": "6060_CAN_VIEW_REPORTS_FORMATS",
-                    "content": "S"
-                },
+        "success": true,
+        "message": "",
+        "error": "",
+        "url_socket": "https://chat.pedbox.co:6306",
+        "user": [
+            {
+                "id": 7504,
+                "user": "16741568",
+                "nit_client": null,
+                "id_type_user": 5,
+                "type_user": "CL",
+                "id_role": 275,
+                "id_company": 36,
+                "company": "IGB MOTORCYCLE PARTS S.A.S",
+                "code": "36",
+                "url_client": "wali.igbcolombia.com:1342/wsigb/wsGenesis.asmx",
+                "url_pedbox": "http://api.pedbox.co:4590/",
+                "url_reports": null,
+                "url_logo": "http://api.pedbox.co/images/logoigb.png",
+                "url_logo_perfil": "",
+                "seller": null,
+                "warehouse": "0",
+                "list_price": 0,
+                "id_country": 1,
+                "change_password": 0,
+                "photo": null,
+                "name": "16741568-9 - ALMACEN CLINIC RING Y/O ANIBAL DUQUE",
+                "nit": "C16741568",
+                "id_person": 960424,
+                "id_subgroup": 708,
+                "email": "CLINICRING@HOTMAIL.COM",
+                "email_alert": "soporte@navacom.com.co",
+                "permission": [
+                    {
+                        "id": 21,
+                        "code": "1500_ENVIAR_UBICACION",
+                        "content": "15"
+                    },
+                    {
+                        "id": 26,
+                        "code": "1500_ENVIAR_UBICACION_HORA",
+                        "content": "0700-1900"
+                    },
+                    {
+                        "id": 165,
+                        "code": "8000_CAN_ACCESS_EXTRANET",
+                        "content": "S"
+                    },
+                    {
+                        "id": 197,
+                        "code": "8005_CAN_PAY_INVOICES_EXTRANET",
+                        "content": "S"
+                    },
+                    {
+                        "id": 198,
+                        "code": "8010_CAN_VIEW_DOCUMENT_HISTORY_EXTRANET",
+                        "content": "S"
+                    },
+                    {
+                        "id": 199,
+                        "code": "8015_CAN_VIEW_QUOTATION_EXTRANET",
+                        "content": "N"
+                    },
+                    {
+                        "id": 200,
+                        "code": "8020_CAN_VIEW_ORDERS_EXTRANET",
+                        "content": "S"
+                    },
+                    {
+                        "id": 201,
+                        "code": "8025_CAN_EXPORT_CERTIFICATES_EXTRANET",
+                        "content": "S"
+                    },
+                    {
+                        "id": 202,
+                        "code": "8030_CAN_CONFIGURE_EXTRANET",
+                        "content": "S"
+                    },
+                    {
+                        "id": 203,
+                        "code": "8035_CAN_VIEW_PORTFOLIO_EXTRANET",
+                        "content": "S"
+                    },
+                    {
+                        "id": 204,
+                        "code": "8040_CAN_ASSING_CUSTOMER_TO_EXTRANET",
+                        "content": "S"
+                    },
+                    {
+                        "id": 213,
+                        "code": "8045_CAN_VIEW_SHOPPING_CAR",
+                        "content": "N"
+                    },
+                    {
+                        "id": 213,
+                        "code": "8045_CAN_VIEW_SHOPPING_CAR",
+                        "content": "S"
+                    },
+                    {
+                        "id": 214,
+                        "code": "8045_CAN_VIEW_STOCK",
+                        "content": "S"
+                    },
+                    {
+                        "id": 215,
+                        "code": "8045_CAN_VIEW_TOTAL_STOCK",
+                        "content": "10"
+                    },
+                    {
+                        "id": 219,
+                        "code": "8020_CREATE_ORDER_OF_ITEMS",
+                        "content": "S"
+                    },
+                    {
+                        "id": 223,
+                        "code": "8045_CAN_VIEW_PRODUCT_IMAGE",
+                        "content": "S"
+                    },
+                    {
+                        "id": 242,
+                        "code": "5700_AVOID_LOCK_SCREEN",
+                        "content": "S"
+                    },
+                    {
+                        "id": 252,
+                        "code": "8045_SHOW_OTHER_RELATED_FILTERS",
+                        "content": "N"
+                    },
+                    {
+                        "id": 253,
+                        "code": "8045_SEND_HOW_TO_ORDER",
+                        "content": "S"
+                    },
+                    {
+                        "id": 255,
+                        "code": "8050_SPECIAL_MOD_WITH_SPECIFIC_CHANGES",
+                        "content": "N"
+                    },
+                    {
+                        "id": 258,
+                        "code": "5025_CAN_EDIT_YOUR_PROFILE_IMAGE",
+                        "content": "S"
+                    },
+                    {
+                        "id": 291,
+                        "code": "8050_SELLER_ORDER",
+                        "content": "888888"
+                    },
+                    {
+                        "id": 292,
+                        "code": "8055_MIN_VALUE",
+                        "content": "500000"
+                    },
+                    {
+                        "id": 302,
+                        "code": "8050_MANEJA_FILTROS_DINAMICOS",
+                        "content": "marca,grupo,sub_grupo,viscosidad,modelo_moto,tipo_llanta,anchollanta,perfil_llanta,rin_llanta,talla,base"
+                    },
+                    {
+                        "id": 305,
+                        "code": "8060_SEND_ORDER_SELLER",
+                        "content": "S"
+                    },
+                    {
+                        "id": 306,
+                        "code": "8065_VIEW_ECOMMERCE",
+                        "content": "S"
+                    },
+                    {
+                        "id": 309,
+                        "code": "1000_ENVIAR_TIPO_EXTRANET_PEDIDO",
+                        "content": "S"
+                    },
+                    {
+                        "id": 310,
+                        "code": "1000_DESACTIVAR_ENVIO_PEDIDO_GUARDADO",
+                        "content": "S"
+                    },
+                    {
+                        "id": 312,
+                        "code": "8085_VIEW_CLASIC",
+                        "content": "S"
+                    },
+                    {
+                        "id": 325,
+                        "code": "8027_GET_PRICE_STOCK_TO_SEND",
+                        "content": "N"
+                    },
+                    {
+                        "id": 326,
+                        "code": "8028_CAN_ACCESS_TO_CALIDOSOS",
+                        "content": "S"
+                    },
+                    {
+                        "id": 6,
+                        "code": "4000_CAN_ACCESS_HELPDESK",
+                        "content": "S"
+                    },
+                    {
+                        "id": 66,
+                        "code": "4010_IS_ADMIN_HELPDESK",
+                        "content": "S"
+                    },
+                    {
+                        "id": 666,
+                        "code": "4015_CAN_CREATE_INCIDENCE_HELPDESK",
+                        "content": "S"
+                    },
+                    {
+                        "id": 6666,
+                        "code": "4000_CAN_TAKE_TASK",
+                        "content": "S"
+                    },
+                    {
+                        "id": 66666,
+                        "code": "4000_CAN_EDIT_FORMAT_INCIDENCE",
+                        "content": "S"
+                    },
+                    {
+                        "id": 666666,
+                        "code": "4000_CAN_CREATE_MANAGEMENT_HELPDESK",
+                        "content": "S"
+                    },
+                    {
+                        "id": 6666666,
+                        "code": "5000_FILTRO_TIPO_DE_REPORTE_PROCESOS",
+                        "content": "S"
+                    },
+                    {
+                        "id": 666666666,
+                        "code": "6060_CAN_VIEW_REPORTS_FORMATS",
+                        "content": "S"
+                    },
 
-            ],
-            "methodsSync": [],
-            "dataCompany": [
-                {
-                    "nit": "811011900",
-                    "nombre": "IGB MOTORCYCLE PARTS S.A.S",
-                    "Url": "wali.igbcolombia.com:1342/wsigb/wsGenesis.asmx",
-                    "Tipo_url": "XML",
-                    "direccion": null,
-                    "telefono": "",
-                    "ciudad": "MEDELLIN",
-                    "departamento": "ANTIOQUIA",
-                    "pais": "Colombia",
-                    "id": 36,
-                    "url_pedbox": "http://ventadirecta.co/genesis2/wsdata.asmx",
-                    "url_server": "http://api.pedbox.co:4590/",
-                    "logo": "http://api.pedbox.co/images/logoigb.png",
-                    "url_factura": "",
-                    "descripcion_mail": "IGB",
-                    "host": "smtp.gmail.com",
-                    "puerto": 587,
-                    "usuario": "pedboxmobile@gmail.com",
-                    "clave": "PEDBOX20121111",
-                    "aut_ssl": 1,
-                    "url_json": "NO"
-                }
-            ],
-            "query_database": "",
-            "extranet": null,
-            "address": "CL 21    11 D    09"
-        }
-    ],
-    "token": ""
-}
+                ],
+                "methodsSync": [],
+                "dataCompany": [
+                    {
+                        "nit": "811011900",
+                        "nombre": "IGB MOTORCYCLE PARTS S.A.S",
+                        "Url": "wali.igbcolombia.com:1342/wsigb/wsGenesis.asmx",
+                        "Tipo_url": "XML",
+                        "direccion": null,
+                        "telefono": "",
+                        "ciudad": "MEDELLIN",
+                        "departamento": "ANTIOQUIA",
+                        "pais": "Colombia",
+                        "id": 36,
+                        "url_pedbox": "http://ventadirecta.co/genesis2/wsdata.asmx",
+                        "url_server": "http://api.pedbox.co:4590/",
+                        "logo": "http://api.pedbox.co/images/logoigb.png",
+                        "url_factura": "",
+                        "descripcion_mail": "IGB",
+                        "host": "smtp.gmail.com",
+                        "puerto": 587,
+                        "usuario": "pedboxmobile@gmail.com",
+                        "clave": "PEDBOX20121111",
+                        "aut_ssl": 1,
+                        "url_json": "NO"
+                    }
+                ],
+                "query_database": "",
+                "extranet": null,
+                "address": "CL 21    11 D    09"
+            }
+        ],
+        "token": ""
+    }
   </script>
 
 </body>

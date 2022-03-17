@@ -2,11 +2,61 @@ const controller = {};
 const userController = require('../controller/usersController.js');
 const service = require('../engine/apiService.js');
 const config = require('../engine/config.js');
-const { nvFormatCash, hasPermission } = require('./helpers.js');
+const { nvFormatDate, hasPermission, nvCapitalize } = require('./helpers.js');
 const _ = require('underscore');
 const multer  = require('multer');
 const moment = require('moment');
 const { response } = require('express');
+
+var statusRequest = [
+  {id: "1", description: "Abiertas", "bg": "blue", "active": true},
+  {id: "2", description: "En curso", "bg": "#ff9800", "active": true},
+  {id: "3", description: "Completadas", "bg": "green", "active": false},
+  {id: "0", description: "Cerradas", "bg": "red", "active": false}
+];
+var toggleRequestBy = {
+  'group': {},
+  'subgroup': {}
+};
+var figures = [
+  {
+      "id": 1,
+      "description": "Cuadrado",
+      "class": "item-square",
+      "name": "square"
+  },
+  {
+      "id": 2,
+      "description": "Circulo",
+      "class": "item-circle",
+      "name": "circle"
+  },
+  {
+      "id": 3,
+      "description": "Rombo",
+      "class": "item-diamond-square",
+      "name": "diamond-square"
+  }
+];
+
+function getFilterArea(areas, input) {
+  let filterArea = areas.filter((a) => {
+      return (""+a.id == ""+input)? true: false;
+  })[0];
+  return ((filterArea)? filterArea: {});
+}
+function getFilterClass(input) {
+  let filterClass = this.masters.clases.datos.filter((a) => {
+      return (""+a.id == ""+input)? true: false;
+  })[0];
+  return ((filterClass)? filterClass: {});
+}
+function getFilterFormat(formats, input) {
+  let filterFormat = formats.filter((a) => {
+      return (""+a.id == ""+input)? true: false;
+  })[0];
+  return ((filterFormat) ? filterFormat: {});
+}
 
 controller.helpdesk = async (req, res, next) => {
   // Validar login
@@ -97,14 +147,39 @@ controller.helpdeskOcurrence = async (req, res, next) => {
 controller.helpdeskSolicitudes = async (req, res, next) => {
   let id_company = req.session.user.id_company;
   let id_user = req.session.user.id;
-  let formats = [];
   
   let response = await service.getSolicitudes(id_company, id_user);
+  let masterFormats = await service.getAdminFormat(id_company);
 
-  console.log(response)
+  let result = [];
+  let groupRequest = {};
+  var formats = [];
+  let formatRequestBy = [];
+
+  // console.log("aa", masterFormats.result.activities)
+
+  if (masterFormats.result.success) {
+    for (let value of masterFormats.result.activities) {
+      formats.push({
+        "id": value.id,
+        "description": value.description,
+        "status": value.status,
+        "group": value.id_group_activity,
+        "id_activity": value.id,
+        "id_company": value.id_company,
+        "modifiable": value.changed,
+        "type_activity": value.id_type_activity,
+        "is_request": value.is_request,
+        "id_type_activity": value.id_type_activity,
+        "id_group_activity": value.id_group_activity,
+        "id_user": value.id_user,
+        "changed": value.changed
+      });
+    }
+  }
+
   if (response.result.success) {
     response = response.result.data;
-    
     for (let valInput of response) {
       let filterFormat = formats.filter((a) => {
         return (""+a.id == ""+valInput.id_format)? true: false;
@@ -139,43 +214,43 @@ controller.helpdeskSolicitudes = async (req, res, next) => {
 
         let uidUser = 'u'+valInput.id_user;
         if(valInput.id_group) {
-            let uidGroup = 'g'+valInput.id_group;
-            let uidSubgroup = 'sg'+valInput.id_subgroup;
+          let uidGroup = 'g'+valInput.id_group;
+          let uidSubgroup = 'sg'+valInput.id_subgroup;
 
-            if(!groupRequest[uidGroup]) {
-                groupRequest[uidGroup] = {
-                  'id': valInput.id_group,
-                  'count': 0,
-                  'description': nvCapitalize(valInput.group_desc),
-                  'subgroups': {},
-                  'uid': uidGroup
-                }
-                toggleRequestBy.group[uidGroup] = false;
+          if(!groupRequest[uidGroup]) {
+            groupRequest[uidGroup] = {
+              'id': valInput.id_group,
+              'count': 0,
+              'description': nvCapitalize(valInput.group_desc),
+              'subgroups': {},
+              'uid': uidGroup
             }
-            if(!groupRequest[uidGroup]['subgroups'][uidSubgroup]) {
-                groupRequest[uidGroup]['subgroups'][uidSubgroup] = {
-                  'id': valInput.id_subgroup,
-                  'count': 0,
-                  'description': nvCapitalize(valInput.subgroup),
-                  'users': [],
-                  'uid': uidSubgroup
-                }
-                toggleRequestBy.subgroup[uidGroup+uidSubgroup] = false;
+            toggleRequestBy.group[uidGroup] = false;
+          }
+          if(!groupRequest[uidGroup]['subgroups'][uidSubgroup]) {
+            groupRequest[uidGroup]['subgroups'][uidSubgroup] = {
+              'id': valInput.id_subgroup,
+              'count': 0,
+              'description': nvCapitalize(valInput.subgroup),
+              'users': [],
+              'uid': uidSubgroup
             }
-            if(!groupRequest[uidGroup]['subgroups'][uidSubgroup]['users'][uidUser]) {
-                groupRequest[uidGroup]['subgroups'][uidSubgroup]['users'][uidUser] = {
-                  'count': 0,
-                  'description': nvCapitalize(valInput.user),
-                  'id_user': valInput.id_user,
-                  'id_group': valInput.id_group,
-                  'id_subgroup': valInput.id_subgroup
-                }
+            toggleRequestBy.subgroup[uidGroup+uidSubgroup] = false;
+          }
+          if(!groupRequest[uidGroup]['subgroups'][uidSubgroup]['users'][uidUser]) {
+            groupRequest[uidGroup]['subgroups'][uidSubgroup]['users'][uidUser] = {
+              'count': 0,
+              'description': nvCapitalize(valInput.user),
+              'id_user': valInput.id_user,
+              'id_group': valInput.id_group,
+              'id_subgroup': valInput.id_subgroup
             }
-            if(''+valInput.info_status.id == '1') {
-              groupRequest[uidGroup]['count']++;
-              groupRequest[uidGroup]['subgroups'][uidSubgroup]['count']++;
-              groupRequest[uidGroup]['subgroups'][uidSubgroup]['users'][uidUser]['count']++;
-            }
+          }
+          if(''+valInput.info_status.id == '1') {
+            groupRequest[uidGroup]['count']++;
+            groupRequest[uidGroup]['subgroups'][uidSubgroup]['count']++;
+            groupRequest[uidGroup]['subgroups'][uidSubgroup]['users'][uidUser]['count']++;
+          }
         }else {
           let uidGroup = 'g-1';
           let uidSubgroup = 'sg-1';
@@ -211,15 +286,155 @@ controller.helpdeskSolicitudes = async (req, res, next) => {
               groupRequest[uidGroup]['subgroups'][uidSubgroup]['users'][uidUser]['count']++;
           }
         }
-      } else {
-        console.log("?")
-      }
+      } 
     }
 
+    for (let iGroup in groupRequest) {
+        let subgroups = [];
+        for (let iSubgroup in groupRequest[iGroup].subgroups) {
+            let users = [];
+            for (let iUser in groupRequest[iGroup].subgroups[iSubgroup].users) {
+                users.push(groupRequest[iGroup].subgroups[iSubgroup].users[iUser]);
+            }
+            groupRequest[iGroup].subgroups[iSubgroup].users = users;
+            subgroups.push(groupRequest[iGroup].subgroups[iSubgroup]);
+        }
+        groupRequest[iGroup].subgroups = subgroups;
+        formatRequestBy.push(groupRequest[iGroup]);
+    }
+
+    allFormatRequestBy = formatRequestBy;
+    formatRequestBy = formatRequestBy; //arreglo con la información del sideBar
+    formatRequest = result; //arreglo con todas las solicitudes
+    tmpFormatRequest = result;
+    // filterStatusRequest(null, filterStatusProcessSelected);
+
+    var resultTotal = {
+      cards: formatRequest,
+      sideBar: formatRequestBy,
+    }
+    return res.send({'res': resultTotal})
   }
 
-
-  res.send({'res': response})
+  res.send({'res': false})
 }
+
+controller.helpdeskProceso = async (req, res, next) => {
+  let formats = [];
+  let nodes = [];
+  let diagrams;
+
+  let id_company = req.session.user.id_company;
+
+  let masterFormats = await service.getAdminFormat(id_company);
+  let masterNodes = await service.getNodes(id_company);
+  let mastersData = await service.getMastersHelpdesk(id_company);
+  let diagrama = await service.getDiagrams(id_company);
+
+
+  if (masterFormats.result.success) {
+    for (let value of masterFormats.result.activities) {
+      formats.push({
+        "id": value.id,
+        "description": value.description,
+        "status": value.status,
+        "group": value.id_group_activity,
+        "id_activity": value.id,
+        "id_company": value.id_company,
+        "modifiable": value.changed,
+        "type_activity": value.id_type_activity,
+        "is_request": value.is_request,
+        "id_type_activity": value.id_type_activity,
+        "id_group_activity": value.id_group_activity,
+        "id_user": value.id_user,
+        "changed": value.changed
+      });
+    }
+  }
+
+  if (masterNodes.result.success) {
+    for (let value of masterNodes.result.items) {
+      value.infoFormat = getFilterFormat(masterFormats.result.activities, value.id_format);
+      value.infoArea = getFilterArea(mastersData.result['helpdesk']['area'], value.id_area);
+      let filterFigure = figures.filter((a) => {
+        return (""+a.id == ""+value.figure)? true: false;
+      });
+      value.infoFigure = {};
+      if(filterFigure.length) {
+        value.infoFigure = filterFigure[0];
+      }
+      nodes.push(value);
+    }
+  }
+
+  if (diagrama.result.success) {
+    diagrams = diagrama.result.groups;
+    for (let group of diagrams) {
+      for (let workflow of group.workflow) {
+        for (let node of workflow.nodes) {
+          node['infoNode'] = {
+            'node': ' - ',
+            'area': ' - ',
+            'class': ' - ',
+            'format': ' - '
+          }
+          let filterNode = nodes.filter((a) => {
+            return (a.id == node.id)? true: false;
+          })[0];
+          if(filterNode) {
+            node['infoNode']['node'] = filterNode.description;
+            let filterArea = mastersData.result['helpdesk']['area'].filter((a) => {
+              return (""+a.id == ""+filterNode.id_area)? true: false;
+            })[0];
+            if(filterArea) {
+              node['infoNode']['area'] = filterArea.description;
+            }
+            let filterClass = mastersData.result['helpdesk']['class'].filter((a) => {
+              return (""+a.id == ""+filterNode.id_class)? true: false;
+            })[0];
+            if(filterClass) {
+              node['infoNode']['class'] = filterClass.description;
+            }
+            let filterFormat = getFilterFormat(masterFormats.result.activities, value.id_format);
+            if(filterFormat) {
+              node['infoNode']['format'] = filterFormat.description;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  var filterViewGroup = diagrams.filter((a) => {
+    return (""+a.id == ""+req.body.id_group)? true: false;
+  })[0];
+
+  if(!filterViewGroup) { return }
+
+  var filterWorkflow = filterViewGroup.workflow.filter((a) => {
+      return (""+a.id == ""+req.body.id_workflow)? true: false;
+  })[0];
+
+  if(!filterViewGroup) { return }
+
+  var nodesBefore = [];
+  for (let valNode of req.body.nodes) {
+      nodesBefore.push(valNode.id_node);
+  }
+
+  let data = {
+    "workflow": filterWorkflow,
+    "actual": [req.body.actual],
+    "before": nodesBefore,
+    "selected": "", // Propieda seteada en el front
+    "master": {
+        "nodes": nodes,
+        "format": formats
+    }
+  }
+  res.send(data)
+}
+
+// Hacer los armados de esta vista fue un infierno
 
 module.exports = controller

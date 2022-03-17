@@ -50,6 +50,7 @@ router.get('/helpdesk', helpdeskController.helpdesk);
 router.get('/helpdesk/solicitudes', helpdeskController.helpdeskSolicitudes);
 router.get('/helpdesk/ocurrence/:state/:ocurrence', helpdeskController.helpdeskOcurrence);
 router.get('/helpdesk/detail/:id/:id_node/:id_workflow_header/:id_workflow/:id_activitie', helpdeskController.helpdeskDetail);
+router.post('/helpdesk/proceso', helpdeskController.helpdeskProceso);
 
 // Por integrar
 router.get('/crm', viewController.crm);
