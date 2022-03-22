@@ -224,19 +224,19 @@
                         <div style="width: 15px; height: 15px; margin-right: 5px;">
                           <div style="width: 15px; height: 15px; clip-path: circle(50%); background-color: #d63b2f;"></div>
                         </div>
-                        <a class="dropdown-item fw-bolder" href="javascript:;">Muy Urgente</a>
+                        <a class="dropdown-item fw-bolder" data-value="8" href="javascript:;">Muy Urgente</a>
                       </div>  
                       <div class="d-flex justify-content-center align-items-center">
                         <div style="width: 15px; height: 15px; margin-right: 5px;">
                           <div style="width: 15px; height: 15px; clip-path: circle(50%); background-color: #e0ce33;"></div>
                         </div>
-                        <a class="dropdown-item fw-bolder" href="javascript:;">Urgente</a>
+                        <a class="dropdown-item fw-bolder" data-value="9" href="javascript:;">Urgente</a>
                       </div>
                       <div class="d-flex justify-content-center align-items-center">
                         <div style="width: 15px; height: 15px; margin-right: 5px;">
                           <div style="width: 15px; height: 15px; clip-path: circle(50%); background-color: #1d84d5;"></div>
                         </div>
-                        <a class="dropdown-item fw-bolder" href="javascript:;">Poco Urgente</a>
+                        <a class="dropdown-item fw-bolder" data-value="10" href="javascript:;">Poco Urgente</a>
                       </div>
                     </div>
                   </div>
@@ -244,11 +244,11 @@
                     <label for="">Comportamiento</label> <br>
                     <button class="btn bg-gradient-default dropdown-toggle" id="navbarDropdownMenuComportamiento" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width: 200px; height: 50px;"></button>
                     <div id="dropMenuComportamiento" class="dropdown-menu dropdown-menu-end me-sm-n4 me-n3 " aria-labelledby="navbarDropdownMenuComportamiento">
-                      <a class="dropdown-item fw-bolder" href="javascript:;">Muy frecuente</a>
-                      <a class="dropdown-item fw-bolder" href="javascript:;">Frecuente</a>
-                      <a class="dropdown-item fw-bolder" href="javascript:;">Poco Frecuente</a>
-                      <a class="dropdown-item fw-bolder" href="javascript:;">Nuevo</a>
-                      <a class="dropdown-item fw-bolder" href="javascript:;" selected="selected">Ajuste</a>
+                      <a class="dropdown-item fw-bolder" data-value="4" href="javascript:;">Muy frecuente</a>
+                      <a class="dropdown-item fw-bolder" data-value="5" href="javascript:;">Frecuente</a>
+                      <a class="dropdown-item fw-bolder" data-value="6" href="javascript:;">Poco Frecuente</a>
+                      <a class="dropdown-item fw-bolder" data-value="7" href="javascript:;">Nuevo</a>
+                      <a class="dropdown-item fw-bolder" data-value="8" href="javascript:;">Ajuste</a>
                     </div>
                   </div>
                   <div>
@@ -484,7 +484,7 @@
                 </div>
                 <div id="llenadoModalStateassigned"></div>
               </div>
-              <hr class="horizontal dark my-3">
+              <hr class="horizontal dark my-3" id="horizontalSendButton">
               <div class="w-80 text-center" style="margin: 0 auto;"> 
                 <div id="verFormatoLlenado"> 
                 </div>
@@ -603,6 +603,8 @@
   <script src="/js/jsplumb.js"></script>
   <script src="/js/plugins/countup.min.js"></script>
   <script src="/js/plugins/choices.min.js"></script>
+  <script src="/js/dropzone_attached.js"></script>
+  <script src="/js/sweetalert2.all.min.js"></script>
   <script src="/js/menu.js"></script>
 
   <script>
@@ -617,6 +619,22 @@
     let users = `<%- JSON.stringify(users) %>`;
         users = JSON.parse(users);
 
+    // const choices = new Choices($('#selectPrioridad')[0], {
+    //   searchEnabled: false,
+    //   shouldSort: false,
+    // });
+
+    Dropzone.prototype.defaultOptions.dictDefaultMessage = "";
+    Dropzone.prototype.defaultOptions.dictFallbackMessage = "";
+    Dropzone.prototype.defaultOptions.dictInvalidFileType = "";
+    Dropzone.prototype.defaultOptions.dictFileTooBig = "Archivo demasiado grande";
+    Dropzone.prototype.defaultOptions.dictResponseError = "Error";
+    Dropzone.prototype.defaultOptions.dictCancelUpload = "Cancelar";
+    Dropzone.prototype.defaultOptions.dictCancelUploadConfirmation = "";
+    Dropzone.prototype.defaultOptions.dictRemoveFile = "Quitar Archivo";
+    Dropzone.prototype.defaultOptions.dictMaxFilesExceeded = "Cantidad máxima de imagenes exedida";
+
+    let adminMasters;
     let dataIncidencesComplete;
     let currentIncidence;
 
@@ -675,7 +693,7 @@
           $("#helpDeskMain").append(incidenciaMain)
         }
       } else {
-        $("#helpDeskMain").append('<h6 class="text-center mb-0">No Hay Incidentes Para Ver</h6>')
+        $("#helpDeskMain").append('<h6 class="text-center mb-0">No Hay Incidencias</h6>')
       }
     }
 
@@ -774,7 +792,6 @@
     }
 
     const loadHelpdeskUsers = function (data) {
-      console.log(data)
       const userBar = $("#usersBar");
       if (data.success) {
         data = data.user_helpdesk;
@@ -795,7 +812,7 @@
       }
     }
 
-    const loadFormEdit = function(container, field, maestros) {
+    const loadFormEdit = function(container, field) {
       let containerID = "#"+container;
       let description = (field.description ? field.description : field.question)
       let idField = (field.id ? field.id : field.id_field)
@@ -822,20 +839,18 @@
         }
       };
 
-      // TODO cargar respuesta almacenada en field.content para los input select
+
       if (field.id_type_field == 4){
-        let button ="dropButton"+field.id;
-        if (maestros) {
-          maestros = maestros.maestros;
+        let maestroInput = _.findWhere(adminMasters, {id : field.id_master})
+        if (maestroInput) {
+          let maestros = maestroInput.detail;
           for (let i = 0; i < maestros.length; i++) {
-            if (maestros[i].id == field.id_master) {
-              loadCombobox(button, maestros[i].detail)
-            };
+            let element = `
+              <option value="${maestros[i].id}" data-code="${maestros[i].code}">${maestros[i].description}</option>
+            `;
+            $("#dropButton"+field.id).append(element)
           }
-          if (document.getElementById(button)) {
-            var comboBoxSelector = document.getElementById(button);
-            const combo = new Choices(comboBoxSelector);
-          }
+          $("#dropButton"+field.id).append(` <option value="-1" selected disabled hidden>Seleccione Aquí</option>`)
         }
       }
 
@@ -862,7 +877,6 @@
       };
 
       // TODO cargar respuesta almacenada en field.content para los input radio
-
       if (field.id_type_field == 9){
         let currentHour = new Date();
         currentHour = currentHour.toLocaleTimeString(navigator.language, {hour: '2-digit', minute:'2-digit'});
@@ -908,34 +922,16 @@
       };
 
       // Plugin Dropzone JS
+      // TODO: añadir limitador de tamaño de imagenes
+      // TODO: añadir limite de imagenes
+      // TODO: añadir respuesta para el limite de imagenes
       if (field.id_type_field == 2){
         let input = $(containerID).find('.typeField2');
-        for (let i = 0; i < input.length; i++) {
-          // $(input[i]).val(now.toISOString().slice(0,16));
-          var myDropzone = new Dropzone(input[i]);
-              myDropzone.options.autoProcessQueue = false;
-              myDropzone.options.clickable = true;
-              myDropzone.options.addRemoveLinks = true;
-          //Petición para guardar imagenes 
-          // myDropzone.on("addedfile", (file) => {
-          //     var objDataForm = new FormData();
-          //     objDataForm.append('attachment', file);
-          //     objDataForm.append('typeAttached', 'attached');
-          //     $.ajax({
-          //         url: server+'/upload',
-          //         data: objDataForm,
-          //         cache: false,
-          //         contentType: false,
-          //         processData: false,
-          //         method: 'POST',
-          //         type: 'POST'
-          //     })
-          //     .done((result) => {
-          //         files_to_send.push({"file": file, "result": result});
-          //         myDropzone.emit("complete", file);
-          //     })
-          // });
-        }
+        var myDropzone = new Dropzone(input[0]);
+            myDropzone.options.autoProcessQueue = false;
+            myDropzone.options.clickable = true;
+            myDropzone.options.addRemoveLinks = true;
+            myDropzone.options.maxFiles = 4;
       }
     };
 
@@ -945,7 +941,7 @@
           <div type-field="1" class="typeField1">
             <label for="inputTextDinamico">`+(description ? description : "")+`</label>
             <div class="d-flex w-100" style="" >
-              <input fieldID="${id}" type="text" class="form-control mb-1 w-90 infoHarvest" id="inputTextDinamico">
+              <input fieldID="${id}" data-kind="1" isMultiple="${multiple ? 'true' : 'false'}" type="text" class="form-control mb-1 w-90 infoHarvest" id="inputTextDinamico">
               ${(multiple ? '<div onclick="addCopyField(this)" style="cursor: pointer" class="w-10 d-flex align-items-center justify-content-center classRemove"><i class="fas fa-plus" style="font-size: 20px"></i></div>' : '')}
             </div>
           </div>
@@ -953,18 +949,15 @@
       };
       if (field == 2) {
         var fieldReturn =`
-          <div  id="${id}">
-            <div class="d-flex w-100">
+          <div id="${id}">
+            <div class="d-flex w-100" fieldID="${id}" data-kind="2" isMultiple="${multiple ? 'true' : 'false'}" >
               <div class="w-90">
                 <form class="typeField2" action="https://api.pedbox.co:8590/file-upload" id="drop_file" >
                   <div class="dz-message">`+(description ? description : "")+`<br><i class="fa fa-upload" style="font-size: 30px;padding-top: 10px;"></i></div>
                   <div class="fallback">
-                    <input name="file" type="file" multiple="">
+                    <input name="file" type="file" multiple="" >
                   </div>
                 </form>
-              </div>
-              <div class="w-10 pt-7 text-center" style="cursor: pointer" title="Añadir Campo" onclick="addFileField(${id})">
-                <i class="fas fa-plus" style="font-size: 20px"></i>
               </div>
             </div>
           </div>
@@ -976,7 +969,7 @@
             <label for="checkBoxDinamico">`+(description ? description : "")+`</label>
             <div ${(multiple) ? 'onclick="addCopyField(this)"' : ''} class="d-flex w-100" style="">
               <div class="w-90">
-                <input fieldID="${id}" type="checkbox" class="infoHarvest " name="" id="checkBoxDinamico">
+                <input fieldID="${id}" data-kind="3" isMultiple="${multiple ? 'true' : 'false'}"  type="checkbox" class="infoHarvest " name="" id="checkBoxDinamico">
               </div>
               ${(multiple ? '<div style="cursor: pointer" class="w-10 d-flex align-items-center justify-content-center classRemove"><i class="fas fa-plus" style="font-size: 20px"></i></div>' : '')}
             </div>
@@ -987,7 +980,7 @@
         var fieldReturn = `
           <div type-field="4" class="typeField4 w-90" >
             <label for="">`+(description ? description : "")+`</label> <br/>
-            <select fieldID="${id}" class="form-control infoHarvest " id="dropButton${id}" name="dropButton${id}"></select>
+            <select fieldID="${id}" data-kind="4" isMultiple="${multiple ? 'true' : 'false'}"  class="form-control infoHarvest" id="dropButton${id}" name="dropButton${id}"></select>
           </div>
         `;
       };
@@ -996,7 +989,7 @@
           <div>
             <label for="dateDinamico">`+(description ? description : "")+`</label>
             <div ${(multiple) ? 'onclick="addCopyField(this)"' : ''}class="d-flex w-100" style="">
-              <input fieldID="${id}" type="date" id="dateDinamico" class="form-control infoHarvest w-90 mb-1">
+              <input fieldID="${id}" data-kind="5" isMultiple="${multiple ? 'true' : 'false'}"  type="date" id="dateDinamico" class="form-control infoHarvest w-90 mb-1">
               ${(multiple ? '<div style="cursor: pointer" class="w-10 d-flex align-items-center justify-content-center classRemove"><i class="fas fa-plus" style="font-size: 20px"></i></div>' : '')}
             </div>
           </div>
@@ -1007,7 +1000,7 @@
         <div type-field="6" class="typeField6">
           <label for="numberDinamico">`+(description ? description : "")+`</label>
           <div ${(multiple) ? 'onclick="addCopyField(this)"' : ''}class="d-flex w-100" style="">
-            <input fieldID="${id}" type="text" class="form-control mb-1 infoHarvest w-90 mb-1" id="numberDinamico"></input>
+            <input fieldID="${id}" data-kind="6" isMultiple="${multiple ? 'true' : 'false'}"  type="text" class="form-control mb-1 infoHarvest w-90 mb-1" id="numberDinamico"></input>
             ${(multiple ? '<div style="cursor: pointer" class="w-10 d-flex align-items-center justify-content-center classRemove"><i class="fas fa-plus" style="font-size: 20px"></i></div>' : '')}
           </div>
         </div>
@@ -1015,7 +1008,7 @@
       };
       if (field == 7) {
         var fieldReturn =`
-          <div type-field="7" class="typeField7" fieldID="${id}">
+          <div type-field="7" class="typeField7" fieldID="${id}" data-kind="7" isMultiple="${multiple ? 'true' : 'false'}" >
             <label for="yes_no_radio">`+(description ? description : "")+`</label>
             <div ${(multiple) ? 'onclick="addCopyField(this)"' : ''} class="d-flex w-100" style="">
               <div class="w-90">
@@ -1029,7 +1022,7 @@
       };
       if (field == 8) {
         var fieldReturn =`
-          <div type-field="8" class="typeField8" id="${id}" fieldID="${id}">
+          <div type-field="8" class="typeField8" id="${id}" fieldID="${id}" data-kind="8">
             <h6>`+(description ? description : "")+`</h6>
           </div>
         `;
@@ -1039,7 +1032,7 @@
           <div class="typeField9" type-field="9">
             <label for="timeDinamico">`+(description ? description : "")+`</label>
             <div ${(multiple) ? 'onclick="addCopyField(this)"' : ''} class="d-flex w-100" style="">
-              <input fieldID="${id}" type="time" id="timeDinamico" name="appt" class="form-control infoHarvest w-90 mb-1">
+              <input fieldID="${id}" data-kind="9" isMultiple="${multiple ? 'true' : 'false'}"  type="time" id="timeDinamico" name="appt" class="form-control infoHarvest w-90 mb-1">
               ${(multiple ? '<div style="cursor: pointer" class="w-10 d-flex align-items-center justify-content-center classRemove"><i class="fas fa-plus" style="font-size: 20px"></i></div>' : '')}
             </div>
           </div>
@@ -1050,7 +1043,7 @@
           <div class="typeField11" type-field="11">
             <label for="dateTimeDinamico">`+(description ? description : "")+`</label>
             <div ${(multiple) ? 'onclick="addCopyField(this)"' : ''} class="d-flex w-100" style="">
-              <input fieldID="${id}" type="datetime-local" id="dateTimeDinamico" class="form-control infoHarvest w-90 mb-1" onload="getDate(this)"> 
+              <input fieldID="${id}" data-kind="11" isMultiple="${multiple ? 'true' : 'false'}"  type="datetime-local" id="dateTimeDinamico" class="form-control infoHarvest w-90 mb-1" onload="getDate(this)"> 
               ${(multiple ? '<div style="cursor: pointer" class="w-10 d-flex align-items-center justify-content-center classRemove"><i class="fas fa-plus" style="font-size: 20px"></i></div>' : '')}
             </div>
           </div>
@@ -1061,7 +1054,7 @@
           <div class="typeField12" type-field="12">
             <label for="moneyInput">`+(description ? description : "")+`</label>
             <div ${(multiple) ? 'onclick="addCopyField(this)"' : ''} class="d-flex w-100" style="">
-              <input fieldID="${id}" type="number" min="1" step="any" id="moneyInput" class="form-control infoHarvest w-90 mb-1"/>
+              <input fieldID="${id}" data-kind="12" isMultiple="${multiple ? 'true' : 'false'}"  type="number" min="1" step="any" id="moneyInput" class="form-control infoHarvest w-90 mb-1"/>
               ${(multiple ? '<div style="cursor: pointer" class="w-10 d-flex align-items-center justify-content-center classRemove"><i class="fas fa-plus" style="font-size: 20px"></i></div>' : '')}
             </div>
           </div>
@@ -1072,7 +1065,7 @@
           <div type-field="13" class="typeField13">
             <label for="textAreaDinamico">`+(description ? description : "")+`</label>
             <div ${(multiple) ? 'onclick="addCopyField(this)"' : ''} class="d-flex w-100" style="">
-              <textarea fieldID="${id}" id="textAreaDinamico" class="form-control mb-3 infoHarvest w-90 mb-1" name="" id="" cols="30" rows="10"></textarea>
+              <textarea fieldID="${id}" data-kind="13" isMultiple="${multiple ? 'true' : 'false'}"  id="textAreaDinamico" class="form-control mb-3 infoHarvest w-90 mb-1" name="" id="" cols="30" rows="10"></textarea>
               ${(multiple ? '<div style="cursor: pointer" class="w-10 d-flex align-items-center justify-content-center classRemove"><i class="fas fa-plus" style="font-size: 20px"></i></div>' : '')}
             </div>
           </div>
@@ -1110,6 +1103,8 @@
           </div>
         </div>
       `;
+
+      if (!question && !content) {fieldReturn = ""}
       return fieldReturn;
     }
 
@@ -1120,79 +1115,85 @@
       $(element).parent().parent().append(elementClone);
     }
 
-    const addFileField = function (id) {
-      element = `
-        <div class="d-flex">
-          <div class="w-90">
-            <form class="typeField2" action="https://api.pedbox.co:8590/file-upload" id="drop_file" fieldID="${id}">
-              <div class="dz-message"><br><i class="fa fa-upload" style="font-size: 30px;padding-top: 10px;"></i></div>
-              <div class="fallback">
-                <input name="file" type="file" multiple="">
-              </div>
-            </form>
-          </div>
-          <div class="w-10 pt-7 text-center" style="cursor: pointer" title="Eliminar Campo" onclick="this.parentElement.remove()">
-            <i class="fas fa-minus" style="font-size: 20px"></i>
-          </div>
-        </div>
-      `;
-      $("#"+id).append(element)
+    // TODO: eliminar
+    // const addFileField = function (id) {
+    //   element = `
+    //     <div class="d-flex">
+    //       <div class="w-90">
+    //         <form class="typeField2" action="https://api.pedbox.co:8590/file-upload" id="drop_file" fieldID="${id}">
+    //           <div class="dz-message"><br><i class="fa fa-upload" style="font-size: 30px;padding-top: 10px;"></i></div>
+    //           <div class="fallback">
+    //             <input name="file" type="file" multiple="">
+    //           </div>
+    //         </form>
+    //       </div>
+    //       <div class="w-10 pt-7 text-center" style="cursor: pointer" title="Eliminar Campo" onclick="this.parentElement.remove()">
+    //         <i class="fas fa-minus" style="font-size: 20px"></i>
+    //       </div>
+    //     </div>
+    //   `;
+    //   $("#"+id).append(element)
 
-      let fieldArray = $("[fieldID="+id+"]");
+    //   let fieldArray = $("[fieldID="+id+"]");
 
-      let myDropzone = new Dropzone(fieldArray[fieldArray.length - 1]);
-      myDropzone.options.autoProcessQueue = false;
-      myDropzone.options.clickable = true;
-      myDropzone.options.addRemoveLinks = true;
+    //   let myDropzone = new Dropzone(fieldArray[fieldArray.length - 1]);
+    //   myDropzone.options.autoProcessQueue = false;
+    //   myDropzone.options.clickable = true;
+    //   myDropzone.options.addRemoveLinks = true;
 
-        //Petición para guardar imagenes 
-        // myDropzone.on("addedfile", (file) => {
-        //     var objDataForm = new FormData();
-        //     objDataForm.append('attachment', file);
-        //     objDataForm.append('typeAttached', 'attached');
-        //     $.ajax({
-        //         url: server+'/upload',
-        //         data: objDataForm,
-        //         cache: false,
-        //         contentType: false,
-        //         processData: false,
-        //         method: 'POST',
-        //         type: 'POST'
-        //     })
-        //     .done((result) => {
-        //         files_to_send.push({"file": file, "result": result});
-        //         myDropzone.emit("complete", file);
-        //     })
-        // });
-    }
+    //     //Petición para guardar imagenes 
+    //     // myDropzone.on("addedfile", (file) => {
+    //     //     var objDataForm = new FormData();
+    //     //     objDataForm.append('attachment', file);
+    //     //     objDataForm.append('typeAttached', 'attached');
+    //     //     $.ajax({
+    //     //         url: server+'/upload',
+    //     //         data: objDataForm,
+    //     //         cache: false,
+    //     //         contentType: false,
+    //     //         processData: false,
+    //     //         method: 'POST',
+    //     //         type: 'POST'
+    //     //     })
+    //     //     .done((result) => {
+    //     //         files_to_send.push({"file": file, "result": result});
+    //     //         myDropzone.emit("complete", file);
+    //     //     })
+    //     // });
+    // }
 
-    const loadCombobox = function (button, data) {
-      for (let i = 0; i < data.length; i++) {
-        element =`
-          <option value="${data[i].description}">${data[i].description}</option>
-        `;
-        $("#"+button).append(element)
-      }
-      $("#"+button).append("<option style='cursor: default' value='' selected disabled hidden>Seleccione</option>")
-    }
+    // TODO funcion dberia ser eliminada
+    // const loadCombobox = function (button, data) {
+    //   for (let i = 0; i < data.length; i++) {
+    //     element =`
+    //       <option value="${data[i].description}">${data[i].description}</option>
+    //     `;
+    //     $("#"+button).append(element)
+    //   }
+    //   $("#"+button).append("<option style='cursor: default' value='' selected disabled hidden>Seleccione</option>")
+    // }
 
-    const loadNewFormatModal = function () { //Funcion de prueba
-      // https://raw.githubusercontent.com/0yapunpun/testJSON/master/formulariodinamico.json
-      // https://raw.githubusercontent.com/0yapunpun/tests/master/testMultipleForm.json
-      fetch("https://raw.githubusercontent.com/0yapunpun/testJSON/master/formulariodinamico.json")
+    const loadNewFormatModal = function (id, id_node, id_workflow_header) { //Funcion de prueba
+      fetch("/helpdesk/newFormat/"+id+"/"+id_node+"/"+id_workflow_header)
       .then(response => response.json())
       .then(data => {
         $('#nuevaIncidenciaModal').modal('hide');
         $('#nuevaTareaModal').modal("show");
-        let fields = data.detail_activity.detail;
+        $('#nuevaTareaModal').attr("data-activity", id);
+        $('#nuevaTareaModal').attr("data-idNode", id_node);
+        $('#nuevaTareaModal').attr("data-idWorkflow", id_workflow_header);
+        $("#nuevaTareaModalContent").html("");
+
+        adminMasters = data[1].result.maestros;   
+        let fields = data[0].result.detail_activity.detail;
         let sortedFields = _.sortBy(fields, 'order_f');
         let container = "nuevaTareaModalContent";
-        $("#nuevaTareaModalContent").html("");
         sortedFields.forEach(field => loadFormEdit(container,field));
       })
       .catch(error => console.log('Request failed', error));
     }
 
+    // TODO esta funcion deberia desaprecer 
     const loadFormatModal = function (operation) { // 1-ver, 2-editar
       fetch("https://raw.githubusercontent.com/0yapunpun/tests/master/ver-editarFormato.json")
       .then(response => response.json())
@@ -1216,9 +1217,27 @@
         if (operation == 2) {
           $('#editarFormatoModal').modal('show');
           let container = "editarFormatoBody"
-          console.log(field)
           field.forEach(field => loadFormEdit(container, field));
         } 
+      }) 
+      .catch(error => console.log('Request failed', error));
+    }
+
+    const loadFormatRead = function(id_answer_format, title) {
+      $("#verFormatoTitle").html("")
+      fetch("/helpdesk/formatRead/"+id_answer_format)
+      .then(response => response.json())
+      .then(data => {
+        $("#verFormatoTitle").html(title)
+        let field = data.result.attendFormat.detail;
+
+        $('#verFormatoBody').html('<div class=" p-3"></div>');
+        for (let i = 0; i < field.length; i++) {
+          let fieldDOM = getFormElementResponse(field[i].id_type_field, field[i].question, field[i].content, field[i].web_type);
+          $('#verFormatoBody>div').append(fieldDOM);
+        }
+        $('#verFormatoModal').modal('show');
+
       }) 
       .catch(error => console.log('Request failed', error));
     }
@@ -1259,8 +1278,6 @@
     const loadTimeLineModal = function(data) {
       data = prepareDataIncidence(data);
       currentIncidence = data;
-
-      console.log(data)
 
       let title = data.workflow.name+ "- REQ "+ data.workflow.number;
       $('#timeLineTitle').text(title);
@@ -1309,15 +1326,17 @@
                 <span class="font-weight-bold">Subgrupo:</span> `+data.workflow.user_subgroup+` <br>
                 <span class="font-weight-bold">fecha:</span> `+data.workflow.dateBeatiful+`
               </p>
-              <div class="d-flex justify-content-center mt-3"><button type="button" class="btn btn-secondary m-0 verSolicitudTimeline">Ver Solicitud</button></div>
+              <div class="d-flex justify-content-center mt-3"><button type="button" class="btn btn-secondary m-0 verSolicitudTimeline" data-format="${data.workflow.id_request}" data-title="${data.workflow.infoFormatRequest.description}">Ver Solicitud</button></div>
             </div>
           </div>
         `;
+        console.log(data)
         timeLineMain.append(timeLineElement)
       }
 
       for (let i = 0; i < data.workflow.nodes.length; i++) {
         x = data.workflow.nodes;
+
         let timeLineElement = ` 
           <div class="timeline-block mb-3" id="${data.workflow.id}" idWorkflow="${data.workflow.id_workflow}" idNode="${x[i].id_node}" idWorkflowHeader="?" idFormat="${x[i].id_format}">
             <span class="timeline-step">
@@ -1336,7 +1355,7 @@
                 `+(x[i].infoClass.description ? "<span class='font-weight-bold'>Formato: </span> "+x[i].infoClass.description+"<br>" : "")+` 
                 <span class="font-weight-bold">Formato:</span>  `+x[i].infoFormat.description+`
               </p>
-              <button type="button" class="btn btn-secondary formatModal">Ver formato</button>
+              <button type="button" class="btn btn-secondary formatModal" data-format="${x[i].id_format_answer}" data-title="${x[i].description_node + " - " + x[i].first_name + " " + x[i].first_lastname}">Ver formato</button>
               <button type="button" class="btn btn-primary editarFormatoModal">Editar</button>
             </div>
           </div>
@@ -1372,7 +1391,7 @@
               <hr class="horizontal dark">
               <div class="d-flex justify-content-center align-items-center gap-2">
                 ${(!data[i].id_workflow_header && !data[i].comment ? "<button class='btn btn-danger solicitudesCerrarBtn'>Cerrar</button>" : "")}
-                <button class="btn btn-info solicitudesVerBtn">Ver</button>
+                <button class="btn btn-info solicitudesVerBtn" data-format="${data[i].id_answer_format}" data-title="${data[i].format_name + " - " +data[i].user}">Ver</button>
                 ${(!data[i].id_workflow_header && !data[i].comment ? "<button class='btn btn-success solicitudesIniciarBtn'>Iniciar</button>" : "")}
                 ${(data[i].comment ? "<button class='btn btn-success solicitudesReabrirBtn'>Reabrir</button>" : "")}
               </div>
@@ -1394,7 +1413,7 @@
       .then(data => { 
         data = data.res;
         solicitudesListaCompleta = data;
-        
+
         let filtrados = _.groupBy(data.cards, o => { return o.info_status.description })['Abiertas'].concat(_.groupBy(data.cards, o => { return o.info_status.description })['En curso'])
         loadRequests(filtrados)
 
@@ -1478,15 +1497,21 @@
     }
 
     const loadNewIncidenceModal = function() {
-      fetch("https://raw.githubusercontent.com/0yapunpun/tests/master/nuevaIncidenciaSidebar.json")
+      let id_company = session.user.id_company;
+      let id_area = content.result.helpdesk[0].id;
+
+      fetch('/helpdesk/worflow/'+id_company+'/'+id_area)
       .then(response => response.json())
       .then(data => { 
+
+        data = data.result.groups;
+
         $("#workFlowContainer").html("");
         $("#slidesSelector").html("")
 
         const slidesSelector = $("#slidesSelector");
         const workFlowContainer = $("#workFlowContainer");
-
+        
         for (let i = 0; i < data.length; i++) {
           slideIndicator = `
             <li class="selectSlide nav-item flex-fill text-center" name="slide`+(i+1)+`">
@@ -1503,14 +1528,17 @@
           workFlowContainer.append(slidesContainer)
 
           for (let e = 0; e < data[i].workflow.length; e++) {
+            let id = data[i].workflow[e].first_node[0].node.id_format;
+            let id_node = data[i].workflow[e].first_node[0].node.id;
+            let id_workflow_header = data[i].workflow[e].first_node[0].id_workflow;
+
+            console.log(data)
+
             let slideContainerItem = `
               <div class="col-lg-4 col-md-6 mb-4">
                 <div class="card" style="min-height: 150px">
                   <div class="card-body p-3">
                     <div class="d-flex">
-                      <div class="avatar avatar-xl bg-gradient-dark border-radius-md p-2">
-                        <img src="../../../assets/img/small-logos/logo-slack.svg" alt="slack_logo">
-                      </div>
                       <div class="m-3 my-auto">
                         <h5>`+data[i].workflow[e].name+`</h5>
                         <div>
@@ -1519,8 +1547,8 @@
                       </div>
                       <div class="ms-auto">
                         <div>
-                          <button onclick="loadNewFormatModal()" id="nuevaTarea" type="button" class="btn btn-link text-secondary ps-0 pe-2 closeNuevaIncidenciaModal" >
-                            <i class="fa fa-plus text-secondary mb-3"></i>
+                          <button onclick="loadNewFormatModal(${id}, ${id_node}, ${id_workflow_header})" id="nuevaTarea" type="button" class="btn btn-link text-secondary ps-0 pe-2 closeNuevaIncidenciaModal" >
+                            <i class="fa fa-plus text-secondary mb-3" style="font-size: 21px"></i>
                           </button>
                         </div>
                       </div>
@@ -1542,8 +1570,10 @@
       .catch(error => console.log('Request failed', error));
     }
 
-    // TODO working here
     const loadIncidenceFill = function (data) { //1-Ver 2-Editar
+      $('#verFormatoLlenado').html(""); // Clean previus content
+      $("#llenadoModalGestiones").html("");
+
       //*** Section 1
       $("#llenadoModalNumber").html(data.workflow.number);
       $("#llenadoModalDate").html(data.workflow.due_date);
@@ -1553,8 +1583,16 @@
       $("#llenadoModalStateassigned").html("")
       $("#llenadoModalButtons").find(".takeIncidence").remove();
 
-      if (userCanTakeTask) {
+      if (userCanTakeTask && data.status != 3 && data.status != 1) {
         $("#llenadoModalButtons").append('<button type="button" class="btn bg-gradient-primary takeIncidence">Tomar Incidencia</button>')
+      }
+
+      if (data.status == 4) {
+        $("#horizontalSendButton").hide()
+        $("#sendDataFormularioDinamicoButton").hide()
+      } else {
+        $("#horizontalSendButton").show()
+        $("#sendDataFormularioDinamicoButton").show()
       }
 
       if (data.user_take) {
@@ -1583,37 +1621,35 @@
       $("#modalLlenadoColor").css("background-color", color)
 
       //** Section 2 
-      let route = '/helpdesk/detail/'+data.id_format+'/'+data.id_node+'/'+data.id_workflow_header+'/'+data.id_workflow+'/'+data.id;
+      let idFormatAnswer = data.workflow.nodes[data.workflow.nodes.length - 1].id_format_answer || false;
+      let route = '/helpdesk/detail/'+data.id_format+'/'+data.id_node+'/'+data.id_workflow_header+'/'+data.id_workflow+'/'+data.id+'/'+idFormatAnswer;
       fetch(route)
       .then(response => response.json())
       .then(response => { 
-        console.log("ppp", response)
-        $('#verFormatoLlenado').html(""); 
-        if (response.response.result.success) {
-          let data = response.response.result.detail_activity.detail
+        console.log(response)
 
-          let ooo = false; //Si el formulario ya fue llenado set to false
-          console.log("field", data)
-          if (ooo) {
-            let sortedFields = _.sortBy(data, 'order_f');
-            let container = "verFormatoLlenado";
-            sortedFields.forEach(field => loadFormEdit(container, field)); //TODO revision maestros como ultimo parametro para los inpouts select
-          } else {
-            $("#sendDataFormularioDinamicoButton").css("display", "none")
-            let field = data;
-            let containerID = "verFormatoLlenado"
-    
-            $('#verFormatoLlenado').append('<div class="fieldLlenado p-3"></div>');
-            for (let i = 0; i < field.length; i++) {
-              let fieldDOM = getFormElementResponse(field[i].id_type_field, field[i].description, field[i].content, field[i].web_type); //TODO revision items faltantes para generar esta vista
-              $('#verFormatoLlenado>div').append(fieldDOM);
-            }   
+        if (response.response.result.success) {
+          if (data.status != 4) { //Incidente cerrado
+            if (data.status == 3 ) { // Incidente completados
+              $("#sendDataFormularioDinamicoButton").css("display", "none")
+              let field = response.attendFormat.result.attendFormat.detail;
+              let containerID = "verFormatoLlenado"
+      
+              $('#verFormatoLlenado').append('<div class="fieldLlenado p-3"></div>');
+              for (let i = 0; i < field.length; i++) {
+                let fieldDOM = getFormElementResponse(field[i].id_type_field, field[i].question, field[i].content, field[i].web_type); 
+                $('#verFormatoLlenado>div').append(fieldDOM);
+              }  
+            } else {
+              let data = response.response.result.detail_activity.detail
+              let sortedFields = _.sortBy(data, 'order_f');
+              let container = "verFormatoLlenado";
+              sortedFields.forEach(field => loadFormEdit(container, field)); //TODO revision maestros como ultimo parametro para los inpouts select
+            }
           }
         }
 
         const llenadoGestiones = $("#llenadoModalGestiones");
-        $(llenadoGestiones).html("");
-
         let seguimiento = response.activitie.result;
         if (seguimiento.success) {
           seguimiento = seguimiento.management
@@ -1622,7 +1658,7 @@
           
           for (let i = 0; i < seguimiento.length; i++) {
             let state; 
-            if (seguimiento[i].state == 1) {state = "Pendiente"}
+            if (seguimiento[i].state == 1 || seguimiento[i].state == 0) {state = "Pendiente"}
             if (seguimiento[i].state == 2) {state = "En curso"}
             if (seguimiento[i].state == 3) {state = "Completado"}
 
@@ -1648,9 +1684,9 @@
                 <div class="my-2">
                   <textarea id="gestion${seguimiento[i].id}"class="my-0 px-1 textareaReadOnly activeTextareaX form-control" style="resize:none" ">${seguimiento[i].note}</textarea>
                   <div class="d-flex mt-1">
-                    <h6 class="my-0 ps-1">horas:&nbsp; </h6> <span style="position: relative; top: 1px">${seguimiento[i].hour}</span> &nbsp;&nbsp;&nbsp;
+                    <h6 class="my-0 ps-1">horas:&nbsp; </h6> <span style="position: relative; top: 1px">${seguimiento[i].hour ? seguimiento[i].hour : "0"}</span> &nbsp;&nbsp;&nbsp;
                     <h6 class="my-0">Estado:&nbsp; </h6> <span style="position: relative; top: 1px">${state}</span> &nbsp;&nbsp;&nbsp;
-                    <h6 class="my-0">trabajo:&nbsp; </h6> <span style="position: relative; top: 1px">${seguimiento[i].description}</span>
+                    ${seguimiento[i].description ? '<h6 class="my-0">Trabajo:&nbsp; </h6> <span style="position: relative; top: 1px">'+seguimiento[i].description+'</span>' : ''}
                   </div>
                 </div>
               </div>
@@ -1683,11 +1719,8 @@
       .then(res => res.json())
       .then(res =>{   
         res.selected = currentIncidence.workflow;
-        // console.log("x", res)
-        // console.log("y", plumbJSON)
         setData(res);
       })
-      
     }
 
     var rows = {};
@@ -1784,7 +1817,6 @@
       });
 
       elementPrint = diagramVPD.elements.slice(-1)[0]
-      console.log(elementPrint)
       let flujoElement = `
         <div id="`+elementPrint.id+`" class="item itemPlumb `+elementPrint.class+`" >
             <div class="ep"></div>
@@ -1943,41 +1975,120 @@
     }
 
     const sendFormNewIncidence = function () { 
-      let dataToSend = {
-          "id_company": 1,
-          "id_activity": 213,
-          "id_person": "",
-          "date": new Date(),
-          "id_user": 12214,
-          "longitude": "",
-          "latitude": "",
-          "version": "",
-          "detail_format": [],
-          "matrix": [],
-          "id_user_take": 12214,
-          "prioridad": $("#navbarDropdownMenuPrioridad").find("a").text(),
-          "comportamiento": $("#navbarDropdownMenuComportamiento").text(),
-          "fecha_limite": $("#dateIncidencia").val()
-        
+      let data = {
+        "date": new Date(),
+        "detail_format": [],
+        "id_activity": Number($('#nuevaTareaModal').attr("data-activity")),
+        "id_company": session.user.id_company,
+        "id_person": "",
+        "id_user": session.user.id,
+        "id_user_take": session.user.id,
+        "longitude": "",
+        "latitude": "",
+        "matrix": [],
+        "version": "",
       };
       
       let inputs = $("#nuevaTareaModalContent").find("[fieldID]");
       for (let i = 0; i < inputs.length; i++) {
+        let type = $(inputs[i]).attr("data-kind");
+        if (type == "8") {continue} // Contenedor seccion no es enviado
+
         let id = $(inputs[i]).attr("fieldID");
+        let isMultiple = ($(inputs[i]).attr("isMultiple") == "true") ? 1 : 0;
         let content = $(inputs[i]).val();
+        let code = "";
+        let id_master = 0;
+
+        if (type == 2) {
+          console.log("coming here?")
+          let formData = new FormData(document.querySelector('.typeField2'))
+          console.log(...formData)
+        }
+
+        if (type == 3) {
+          let checkboxVal = $(inputs[i]).is(":checked");
+          if (checkboxVal) {content = "1"}
+          else {content = ""}
+        }
+
+        if (type == 4) {
+          let idSelect = "#"+$(inputs[i]).attr("id");
+          content = $(idSelect).find(":selected").text()
+          code = $(idSelect).find(":selected").attr("data-code")
+          id_master = $(idSelect).find(":selected").val()
+        }
+        
         let objt = {
           "id_field": id,
-          "multiple": 0,
+          "multiple": isMultiple,
           "content": content,
-          "id_option": 0,
-          "seq": 0,
-          "code": "",
-          "id_master": 0
+          "id_option": id_master,
+          "code": code,
+          "id_master": id_master,
+          "seq": 0
         };
-        dataToSend.detail_format.push(objt)
+        data.detail_format.push(objt)
       }
-      console.log(dataToSend)
-    }
+
+
+      fetch('/helpdesk/formatPost', {
+        method: 'POST',
+        headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(res =>{  
+
+        if (!res.result.success) {
+          return Swal.fire({
+              icon: 'error',
+              title: 'No fue posible crear el radicado',
+              confirmButtonText: 'Continuar',
+            })
+        }
+
+        let dataWorkflow = {
+          "id_company": session.user.id_company,
+          "id_user": session.user.id,
+          "id_workflow": $("#nuevaTareaModal").attr("data-idWorkflow"),
+          "id_node": $("#nuevaTareaModal").attr("data-idNode"),
+          "id_format": res.result.format.id,
+          "id_priority": Number($("#navbarDropdownMenuPrioridad a").attr("data-value")),
+          "id_behavior": $("#navbarDropdownMenuComportamiento").text(),
+          "due_date": $("#dateIncidencia").val()
+        };
+
+        let masterPriority = _.findWhere(masters.comportamientos.datos, {description: dataWorkflow.id_behavior});
+        dataWorkflow.id_behavior = masterPriority.id || 8 // Ajuste por default
+
+        fetch('/helpdesk/startWorkflow', {
+          method: 'POST',
+          headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+          body: JSON.stringify(dataWorkflow)
+        })
+        .then(res => res.json())
+        .then(res2 =>{  
+          if (res2.result.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Radicado creado con éxito',
+              text: "Número de radicado: REQ - "+ res2.result.data.number,
+              confirmButtonText: 'Continuar',
+            })
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'No fue posible crear el radicado',
+              confirmButtonText: 'Continuar',
+            })
+          }
+
+          // TODO enviar mensaje de gestion creada
+          $('#nuevaTareaModal').modal("hide");
+        })
+      })
+    };
 
     const sendFormEditIncidence = function () {
       let dataToSend = {
@@ -2065,22 +2176,20 @@
     $(document).on("click", ".solicitudesCerrarBtn", function () {
       // id_company
       let userId = $(this).parents(".cardParent").attr("userID");
-      console.log(userId);
       $("#closeIncidence").modal("show")
     });
 
     $(document).on("click", ".solicitudesVerBtn", function () {
-      let id = $(this).parents(".cardParent").attr("id");
-      console.log(id);
+      let id_answer_format = $(this).attr("data-format");
+      let title = $(this).attr("data-title");
       $("#closeModalVerFormato").attr("onclick", "$('#verFormatoModal').modal('hide'); $('#consultaSolicitudModal').modal('show')")
-
       $('#consultaSolicitudModal').modal('hide');
-      loadFormatModal(1);
+
+      console.log(title)
+      loadFormatRead(id_answer_format, title)
     });
 
     $(document).on("click", ".solicitudesIniciarBtn", function () {
-      // id_company
-      // id_area
       $('#consultaSolicitudModal').modal('hide');
       loadNewIncidenceModal()
     });
@@ -2088,7 +2197,6 @@
     $(document).on("click", ".solicitudesReabrirBtn", function () {
       // id_company
       let userId = $(this).parents(".cardParent").attr("userID");
-      console.log(userId);
     });
 
     $('#searchFieldIncidents').keyup(function(e) {
@@ -2213,16 +2321,13 @@
     })
 
     $(document).on( "click", "#timeLineMain .formatModal", function(){
-      let id = $(this).parents(".timeline-block").attr("id");
-      let idWorkflow = $(this).parents(".timeline-block").attr("idWorkflow");
-      let idNode = $(this).parents(".timeline-block").attr("idNode");
-      let idworkflowheader = $(this).parents(".timeline-block").attr("idworkflowheader");
-      console.log(id, idWorkflow, idNode, idworkflowheader)
+      let id_answer_format = $(this).attr("data-format");
+      let title = $(this).attr("data-title");
 
       $("#closeModalVerFormato").attr("onclick", "$('#verFormatoModal').modal('hide'); $('#timelineModal').modal('show')")
       $('#procesoModal').modal('hide');
       $('#timelineModal').modal('hide');
-      loadFormatModal(1);
+      loadFormatRead(id_answer_format, title)
     });
 
     $(document).on( "click", "#timeLineMain .editarFormatoModal", function(){
@@ -2234,12 +2339,14 @@
       loadFormatModal(2);
     });
 
+    // TODO TODO
     $(document).on( "click", "#timeLineMain .verSolicitudTimeline", function(){
-      let id = $(this).parents(".timeline-block").attr("id");
-      console.log(id)
+      let id = $(this).attr("data-format")
+      let title = $(this).attr("data-title")
 
+      $("#closeModalVerFormato").attr("onclick", "$('#verFormatoModal').modal('hide'); $('#timelineModal').modal('show')")
       $('#timelineModal').modal('hide');
-      loadFormatModal(2);
+      loadFormatRead(id, title)
     });
 
     $(document).on("click", ".procesoModal", function(){
@@ -2376,46 +2483,46 @@
     // Permissions
     let userCanTakeTask = true;
     const handlePermissions = function (data) {
-      let permissions = data.user[0].permission;
+      let permissions = data;
       let permissionIndex; 
-
-      permissionIndex = permissions.findIndex(x => x.code ==="4000_CAN_ACCESS_HELPDESK");
+      
+      permissionIndex = permissions.map(e => e.code).lastIndexOf("4000_CAN_ACCESS_HELPDESK");
       if (permissionIndex  != -1 && permissions[permissionIndex].content == "N") {
         // Nothing by moment
       };
 
-      permissionIndex = permissions.findIndex(x => x.code ==="4010_IS_ADMIN_HELPDESK");
+      permissionIndex = permissions.map(e => e.code).lastIndexOf("4010_IS_ADMIN_HELPDESK");
       if (permissionIndex  != -1 && permissions[permissionIndex].content == "N") {
         // Nothing by moment
       };
 
-      permissionIndex = permissions.findIndex(x => x.code ==="4015_CAN_CREATE_INCIDENCE_HELPDESK");
+      permissionIndex = permissions.map(e => e.code).lastIndexOf("4015_CAN_CREATE_INCIDENCE_HELPDESK");
       if (permissionIndex  != -1 && permissions[permissionIndex].content == "N") {
         $("#newIncidenceButton").hide() // Botón nueva incidencia y ver usuarios solo se muestra si el usuario tiene este permiso
         $("#usersContainer").hide();
       };
 
-      permissionIndex = permissions.findIndex(x => x.code ==="4000_CAN_TAKE_TASK");
+      permissionIndex = permissions.map(e => e.code).lastIndexOf("4000_CAN_TAKE_TASK");
       if (permissionIndex  != -1 && permissions[permissionIndex].content == "N") {
         userCanTakeTask = false;
       };
 
-      permissionIndex = permissions.findIndex(x => x.code ==="4000_CAN_EDIT_FORMAT_INCIDENCE");
+      permissionIndex = permissions.map(e => e.code).lastIndexOf("4000_CAN_EDIT_FORMAT_INCIDENCE");
       if (permissionIndex  != -1 && permissions[permissionIndex].content == "N") {
         // Nothing by moment
       };
 
-      permissionIndex = permissions.findIndex(x => x.code ==="4000_CAN_CREATE_MANAGEMENT_HELPDESK");
+      permissionIndex = permissions.map(e => e.code).lastIndexOf("4000_CAN_CREATE_MANAGEMENT_HELPDESK");
       if (permissionIndex  != -1 && permissions[permissionIndex].content == "N") {
         $("#hideFormGestion").hide();
       };
 
-      permissionIndex = permissions.findIndex(x => x.code ==="5000_FILTRO_TIPO_DE_REPORTE_PROCESOS");
+      permissionIndex = permissions.map(e => e.code).lastIndexOf("5000_FILTRO_TIPO_DE_REPORTE_PROCESOS");
       if (permissionIndex  != -1 && permissions[permissionIndex].content == "N") {
         // Nothing by moment
       };
 
-      permissionIndex = permissions.findIndex(x => x.code ==="6060_CAN_VIEW_REPORTS_FORMATS");
+      permissionIndex = permissions.map(e => e.code).lastIndexOf("6060_CAN_VIEW_REPORTS_FORMATS");
       if (permissionIndex  != -1 && permissions[permissionIndex].content == "N") {
         // Nothing by moment
       };
@@ -2445,281 +2552,14 @@
       // loadHelpdeskIncidents();
       loadHelpdeskCharts(content.result.helpdesk);
       loadHelpdeskUsers(users.result);
-      handlePermissions(objSession);
+      handlePermissions(session.user.permission);
 
+      $("#dropMenuPrioridad .dropdown-item")[$("#dropMenuPrioridad .dropdown-item").length -1].click();
+      $("#dropMenuComportamiento .dropdown-item")[$("#dropMenuComportamiento .dropdown-item").length -1].click();
+      $('#dateIncidencia').val(new Date().toDateInputValue());
+      
       $("#menuHelpdesk").addClass("activeNav");
     }); 
-
-    // ***Objetos prueba
-    let objSession = {
-        "success": true,
-        "message": "",
-        "error": "",
-        "url_socket": "https://chat.pedbox.co:6306",
-        "user": [
-            {
-                "id": 7504,
-                "user": "16741568",
-                "nit_client": null,
-                "id_type_user": 5,
-                "type_user": "CL",
-                "id_role": 275,
-                "id_company": 36,
-                "company": "IGB MOTORCYCLE PARTS S.A.S",
-                "code": "36",
-                "url_client": "wali.igbcolombia.com:1342/wsigb/wsGenesis.asmx",
-                "url_pedbox": "http://api.pedbox.co:4590/",
-                "url_reports": null,
-                "url_logo": "http://api.pedbox.co/images/logoigb.png",
-                "url_logo_perfil": "",
-                "seller": null,
-                "warehouse": "0",
-                "list_price": 0,
-                "id_country": 1,
-                "change_password": 0,
-                "photo": null,
-                "name": "16741568-9 - ALMACEN CLINIC RING Y/O ANIBAL DUQUE",
-                "nit": "C16741568",
-                "id_person": 960424,
-                "id_subgroup": 708,
-                "email": "CLINICRING@HOTMAIL.COM",
-                "email_alert": "soporte@navacom.com.co",
-                "permission": [
-                    {
-                        "id": 21,
-                        "code": "1500_ENVIAR_UBICACION",
-                        "content": "15"
-                    },
-                    {
-                        "id": 26,
-                        "code": "1500_ENVIAR_UBICACION_HORA",
-                        "content": "0700-1900"
-                    },
-                    {
-                        "id": 165,
-                        "code": "8000_CAN_ACCESS_EXTRANET",
-                        "content": "S"
-                    },
-                    {
-                        "id": 197,
-                        "code": "8005_CAN_PAY_INVOICES_EXTRANET",
-                        "content": "S"
-                    },
-                    {
-                        "id": 198,
-                        "code": "8010_CAN_VIEW_DOCUMENT_HISTORY_EXTRANET",
-                        "content": "S"
-                    },
-                    {
-                        "id": 199,
-                        "code": "8015_CAN_VIEW_QUOTATION_EXTRANET",
-                        "content": "N"
-                    },
-                    {
-                        "id": 200,
-                        "code": "8020_CAN_VIEW_ORDERS_EXTRANET",
-                        "content": "S"
-                    },
-                    {
-                        "id": 201,
-                        "code": "8025_CAN_EXPORT_CERTIFICATES_EXTRANET",
-                        "content": "S"
-                    },
-                    {
-                        "id": 202,
-                        "code": "8030_CAN_CONFIGURE_EXTRANET",
-                        "content": "S"
-                    },
-                    {
-                        "id": 203,
-                        "code": "8035_CAN_VIEW_PORTFOLIO_EXTRANET",
-                        "content": "S"
-                    },
-                    {
-                        "id": 204,
-                        "code": "8040_CAN_ASSING_CUSTOMER_TO_EXTRANET",
-                        "content": "S"
-                    },
-                    {
-                        "id": 213,
-                        "code": "8045_CAN_VIEW_SHOPPING_CAR",
-                        "content": "N"
-                    },
-                    {
-                        "id": 213,
-                        "code": "8045_CAN_VIEW_SHOPPING_CAR",
-                        "content": "S"
-                    },
-                    {
-                        "id": 214,
-                        "code": "8045_CAN_VIEW_STOCK",
-                        "content": "S"
-                    },
-                    {
-                        "id": 215,
-                        "code": "8045_CAN_VIEW_TOTAL_STOCK",
-                        "content": "10"
-                    },
-                    {
-                        "id": 219,
-                        "code": "8020_CREATE_ORDER_OF_ITEMS",
-                        "content": "S"
-                    },
-                    {
-                        "id": 223,
-                        "code": "8045_CAN_VIEW_PRODUCT_IMAGE",
-                        "content": "S"
-                    },
-                    {
-                        "id": 242,
-                        "code": "5700_AVOID_LOCK_SCREEN",
-                        "content": "S"
-                    },
-                    {
-                        "id": 252,
-                        "code": "8045_SHOW_OTHER_RELATED_FILTERS",
-                        "content": "N"
-                    },
-                    {
-                        "id": 253,
-                        "code": "8045_SEND_HOW_TO_ORDER",
-                        "content": "S"
-                    },
-                    {
-                        "id": 255,
-                        "code": "8050_SPECIAL_MOD_WITH_SPECIFIC_CHANGES",
-                        "content": "N"
-                    },
-                    {
-                        "id": 258,
-                        "code": "5025_CAN_EDIT_YOUR_PROFILE_IMAGE",
-                        "content": "S"
-                    },
-                    {
-                        "id": 291,
-                        "code": "8050_SELLER_ORDER",
-                        "content": "888888"
-                    },
-                    {
-                        "id": 292,
-                        "code": "8055_MIN_VALUE",
-                        "content": "500000"
-                    },
-                    {
-                        "id": 302,
-                        "code": "8050_MANEJA_FILTROS_DINAMICOS",
-                        "content": "marca,grupo,sub_grupo,viscosidad,modelo_moto,tipo_llanta,anchollanta,perfil_llanta,rin_llanta,talla,base"
-                    },
-                    {
-                        "id": 305,
-                        "code": "8060_SEND_ORDER_SELLER",
-                        "content": "S"
-                    },
-                    {
-                        "id": 306,
-                        "code": "8065_VIEW_ECOMMERCE",
-                        "content": "S"
-                    },
-                    {
-                        "id": 309,
-                        "code": "1000_ENVIAR_TIPO_EXTRANET_PEDIDO",
-                        "content": "S"
-                    },
-                    {
-                        "id": 310,
-                        "code": "1000_DESACTIVAR_ENVIO_PEDIDO_GUARDADO",
-                        "content": "S"
-                    },
-                    {
-                        "id": 312,
-                        "code": "8085_VIEW_CLASIC",
-                        "content": "S"
-                    },
-                    {
-                        "id": 325,
-                        "code": "8027_GET_PRICE_STOCK_TO_SEND",
-                        "content": "N"
-                    },
-                    {
-                        "id": 326,
-                        "code": "8028_CAN_ACCESS_TO_CALIDOSOS",
-                        "content": "S"
-                    },
-                    {
-                        "id": 6,
-                        "code": "4000_CAN_ACCESS_HELPDESK",
-                        "content": "S"
-                    },
-                    {
-                        "id": 66,
-                        "code": "4010_IS_ADMIN_HELPDESK",
-                        "content": "S"
-                    },
-                    {
-                        "id": 666,
-                        "code": "4015_CAN_CREATE_INCIDENCE_HELPDESK",
-                        "content": "S"
-                    },
-                    {
-                        "id": 6666,
-                        "code": "4000_CAN_TAKE_TASK",
-                        "content": "S"
-                    },
-                    {
-                        "id": 66666,
-                        "code": "4000_CAN_EDIT_FORMAT_INCIDENCE",
-                        "content": "S"
-                    },
-                    {
-                        "id": 666666,
-                        "code": "4000_CAN_CREATE_MANAGEMENT_HELPDESK",
-                        "content": "S"
-                    },
-                    {
-                        "id": 6666666,
-                        "code": "5000_FILTRO_TIPO_DE_REPORTE_PROCESOS",
-                        "content": "S"
-                    },
-                    {
-                        "id": 666666666,
-                        "code": "6060_CAN_VIEW_REPORTS_FORMATS",
-                        "content": "S"
-                    },
-
-                ],
-                "methodsSync": [],
-                "dataCompany": [
-                    {
-                        "nit": "811011900",
-                        "nombre": "IGB MOTORCYCLE PARTS S.A.S",
-                        "Url": "wali.igbcolombia.com:1342/wsigb/wsGenesis.asmx",
-                        "Tipo_url": "XML",
-                        "direccion": null,
-                        "telefono": "",
-                        "ciudad": "MEDELLIN",
-                        "departamento": "ANTIOQUIA",
-                        "pais": "Colombia",
-                        "id": 36,
-                        "url_pedbox": "http://ventadirecta.co/genesis2/wsdata.asmx",
-                        "url_server": "http://api.pedbox.co:4590/",
-                        "logo": "http://api.pedbox.co/images/logoigb.png",
-                        "url_factura": "",
-                        "descripcion_mail": "IGB",
-                        "host": "smtp.gmail.com",
-                        "puerto": 587,
-                        "usuario": "pedboxmobile@gmail.com",
-                        "clave": "PEDBOX20121111",
-                        "aut_ssl": 1,
-                        "url_json": "NO"
-                    }
-                ],
-                "query_database": "",
-                "extranet": null,
-                "address": "CL 21    11 D    09"
-            }
-        ],
-        "token": ""
-    }
   </script>
 
 </body>

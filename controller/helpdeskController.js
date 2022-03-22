@@ -86,6 +86,8 @@ controller.helpdesk = async (req, res, next) => {
   let mastersData = await service.getMastersHelpdesk(id_company);
   let masterFormats = await service.getAdminFormat(id_company);
 
+  console.log(mastersData.result.helpdesk)
+
   if (mastersData.result.success){
     masters['tipos']['datos'] = mastersData.result['helpdesk']['type'];
     masters['categorias']['datos']  = mastersData.result['helpdesk']['area'];
@@ -127,11 +129,14 @@ controller.helpdeskDetail = async(req, res, next) => {
   let id_workflow_header = req.params.id_workflow_header;
   let id_workflow = req.params.id_workflow;
   let id_activitie = req.params.id_activitie;
+  let id_format_answer = req.params.id_format_answer;
 
+  
   let activitie = await service.getManagement(id_activitie); 
   let response = await service.getDetailformat(id, id_node, id_workflow_header, id_workflow);
-
-  res.send({'response': response, 'activitie': activitie})
+  let attendFormat = await service.getAttendFormat(id_format_answer);
+  
+  res.send({'response': response, 'activitie': activitie, 'attendFormat': attendFormat})
 }
 
 controller.helpdeskOcurrence = async (req, res, next) => {
@@ -142,6 +147,51 @@ controller.helpdeskOcurrence = async (req, res, next) => {
   let response = await service.getHelpdeskOcurrence(id_company, state, ocurrence);
 
   res.send({'res': response})
+}
+
+controller.helpdeskWorkflow = async (req, res, next) => {
+  let id_company = req.params.id_company;
+  let id_area = req.params.id_area;
+  
+  let response = await service.getWorkflow(id_company, id_area);
+
+  res.send(response)
+}
+
+controller.helpdeskFormatRead = async (req, res, next) => {
+  let id_answer_format = req.params.id_answer_format;
+  
+  let response = await service.getAttendFormat(id_answer_format);
+
+  res.send(response)
+}
+
+controller.helpdeskNewFormat = async (req, res, next) => {
+  let id = req.params.id;
+  let id_node = req.params.id_node;
+  let id_company = req.session.user.id_company;
+  let id_workflow_header = req.params.id_workflow_header;
+  
+  let response = await service.getNewDetailformat(id, id_node, id_workflow_header);
+  let masters = await service.adminMasters(id_company)
+
+  res.send([response, masters])
+}
+
+controller.helpdeskPostFormat = async (req, res, next) => {
+  let data = req.body;
+
+  let response = await service.postAttendFormat(data);
+
+  res.send(response)
+}
+
+controller.helpdeskStartWorkflow = async (req, res, next) => {
+  let data = req.body;
+
+  let response = await service.startWorkflow(data);
+
+  res.send(response)
 }
 
 controller.helpdeskSolicitudes = async (req, res, next) => {

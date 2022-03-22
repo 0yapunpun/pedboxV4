@@ -44,13 +44,18 @@ router.post('/permisos/nuevo-permiso', b2bController.createPermiso);
 router.get('/documentos-usuario', b2bController.documentosUsuario);
 router.post('/documentos-usuario/upload', b2bController.uploadDocumentoUsuario);
 
-// Tools
+// Helpdesk
 router.get('/chat', viewController.chat);
 router.get('/helpdesk', helpdeskController.helpdesk);
 router.get('/helpdesk/solicitudes', helpdeskController.helpdeskSolicitudes);
 router.get('/helpdesk/ocurrence/:state/:ocurrence', helpdeskController.helpdeskOcurrence);
-router.get('/helpdesk/detail/:id/:id_node/:id_workflow_header/:id_workflow/:id_activitie', helpdeskController.helpdeskDetail);
+router.get('/helpdesk/formatRead/:id_answer_format', helpdeskController.helpdeskFormatRead);
+router.get('/helpdesk/detail/:id/:id_node/:id_workflow_header/:id_workflow/:id_activitie/:id_format_answer', helpdeskController.helpdeskDetail);
+router.get('/helpdesk/newFormat/:id/:id_node/:id_workflow_header', helpdeskController.helpdeskNewFormat);
 router.post('/helpdesk/proceso', helpdeskController.helpdeskProceso);
+router.post('/helpdesk/formatPost', helpdeskController.helpdeskPostFormat);
+router.post('/helpdesk/startWorkflow', helpdeskController.helpdeskStartWorkflow);
+router.get('/helpdesk/worflow/:id_company/:id_area', helpdeskController.helpdeskWorkflow);
 
 // Por integrar
 router.get('/crm', viewController.crm);

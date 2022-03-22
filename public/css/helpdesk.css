@@ -5,6 +5,9 @@
   padding: 10px;
   margin-bottom: 10px;
 }
+.typeField8 h6{
+  text-transform: capitalize;
+}
 .typeField2{
   margin-top: 10px;
 }
@@ -13,6 +16,7 @@
 }
 .typeField13 textarea{
   resize: none;
+  height: 120px;
 }
 .typeField5 input{
   width: 200px; 
@@ -91,7 +95,7 @@ a.linkTachado::after{
 
 .navWrapper a{
   text-decoration: none;
-  color: #252f40;
+  color: #252f40 !important;
 }
 
 .indicatorPhotos{
@@ -197,4 +201,7 @@ a.linkTachado::after{
 .choices__list--dropdown .choices__item--selectable:after { display: none !important; } 
 .choices__list--dropdown .choices__item--selectable { padding-right: 0 !important; }
 
-
+/* Libreria Dropzone.js */
+.dz-progress {
+  display: none !important;
+}

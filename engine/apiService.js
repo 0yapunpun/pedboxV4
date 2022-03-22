@@ -207,6 +207,12 @@ service.getDetailformat = async(id, id_node, id_workflow_header, id_workflow) =>
   return data;
 }
 
+service.getNewDetailformat = async(id, id_node, id_workflow_header) => {
+  const url = urlKakashi+"getDetailformat?id="+id+"&id_node="+id_node+"&id_workflow_header="+id_workflow_header;
+  const data =  await makeRequest(url);
+  return data;
+}
+
 service.getManagement = async(id_activitie) => {
   const url = urlKakashi+"management?id_activitie="+id_activitie;
   const data =  await makeRequest(url);
@@ -230,6 +236,45 @@ service.getDiagrams = async(id_company) => {
   const data =  await makeRequest(url);
   return data;
 }
+
+service.getAttendFormat = async(id_format_answer) => {
+  const url = urlKakashi+"attendFormat?id_header="+id_format_answer;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.postAttendFormat = async(body) => {
+  const url = urlKakashi+"attendFormat";
+  const data =  await makeRequest(url, options('post', body));
+  return data;
+}
+
+service.getWorkflow = async(id_company, id_area) => {
+  const url = urlKakashi+"proc_get_workflow?id_company="+id_company+"&id_area="+id_area;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.startWorkflow = async(body) => {
+  const url = urlKakashi+"start_workflow";
+  const data =  await makeRequest(url, options('post', body));
+  return data;
+}
+
+service.adminMasters = async(id_company) => {
+  const url = urlKakashi+"admindMaster?id_company="+id_company;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.getPersonsCompany = async(id_company, type_person) => { //TODO para sacar las personas a las que le va a lelgar la notificación
+  const url = urlKakashi+"get_personsmallcompanyid_company="+id_company+"&type_person="+type_person;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+// validateRequestTaken // TODO donde se aplica estavilación
+// get_userscompany
 
 const makeRequest = async (url, options) => {
   try {
