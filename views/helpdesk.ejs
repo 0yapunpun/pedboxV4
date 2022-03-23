@@ -244,7 +244,7 @@
                     <label for="">Comportamiento</label> <br>
                     <button class="btn bg-gradient-default dropdown-toggle" id="navbarDropdownMenuComportamiento" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width: 200px; height: 50px;"></button>
                     <div id="dropMenuComportamiento" class="dropdown-menu dropdown-menu-end me-sm-n4 me-n3 " aria-labelledby="navbarDropdownMenuComportamiento">
-                      <a class="dropdown-item fw-bolder" data-value="4" href="javascript:;">Muy frecuente</a>
+                      <a class="dropdown-item fw-bolder" data-value="4" href="javascript:;">Muy Frecuente</a>
                       <a class="dropdown-item fw-bolder" data-value="5" href="javascript:;">Frecuente</a>
                       <a class="dropdown-item fw-bolder" data-value="6" href="javascript:;">Poco Frecuente</a>
                       <a class="dropdown-item fw-bolder" data-value="7" href="javascript:;">Nuevo</a>
@@ -577,7 +577,6 @@
             <div class="modal-footer d-flex justify-content-center ">
               <button onclick="" type="button" class="btn bg-gradient-primary " >Aceptar</button>
             </div>
-
           </div>
         </div>
       </div>
@@ -619,11 +618,8 @@
     let users = `<%- JSON.stringify(users) %>`;
         users = JSON.parse(users);
 
-    // const choices = new Choices($('#selectPrioridad')[0], {
-    //   searchEnabled: false,
-    //   shouldSort: false,
-    // });
-
+    // Dropzone js configuration
+    var myDropzone
     Dropzone.prototype.defaultOptions.dictDefaultMessage = "";
     Dropzone.prototype.defaultOptions.dictFallbackMessage = "";
     Dropzone.prototype.defaultOptions.dictInvalidFileType = "";
@@ -633,7 +629,7 @@
     Dropzone.prototype.defaultOptions.dictCancelUploadConfirmation = "";
     Dropzone.prototype.defaultOptions.dictRemoveFile = "Quitar Archivo";
     Dropzone.prototype.defaultOptions.dictMaxFilesExceeded = "Cantidad máxima de imagenes exedida";
-
+    
     let adminMasters;
     let dataIncidencesComplete;
     let currentIncidence;
@@ -699,6 +695,7 @@
 
     const loadHelpdeskCharts = function (data) {
       const helpDeskIndicators = $("#helpDeskIndicators");
+      $(helpDeskIndicators).html("");
       for (let i = 0; i < data.length; i++) {
         const indicator = `              
           <div class="card overflow-hidden my-1 cardSidebarIndicator tablesHover" style="cursor: pointer" data-id="${data[i].id}" unassigned="${data[i].pending_task}" assigned="${data[i].task_taken}" progress="${data[i].in_progress}" completed="${data[i].completed}" closed="${data[i].closed}">
@@ -921,17 +918,17 @@
         }
       };
 
-      // Plugin Dropzone JS
-      // TODO: añadir limitador de tamaño de imagenes
-      // TODO: añadir limite de imagenes
-      // TODO: añadir respuesta para el limite de imagenes
+      // Init plugin Dropzone JS
       if (field.id_type_field == 2){
+        let maxFiles = 1;
+        if (field.multiple) {maxFiles = 4;}
+
         let input = $(containerID).find('.typeField2');
-        var myDropzone = new Dropzone(input[0]);
-            myDropzone.options.autoProcessQueue = false;
-            myDropzone.options.clickable = true;
-            myDropzone.options.addRemoveLinks = true;
-            myDropzone.options.maxFiles = 4;
+        myDropzone = new Dropzone(input[0]);
+        myDropzone.options.autoProcessQueue = false;
+        myDropzone.options.clickable = true;
+        myDropzone.options.addRemoveLinks = true;
+        myDropzone.options.maxFiles = maxFiles;
       }
     };
 
@@ -941,7 +938,7 @@
           <div type-field="1" class="typeField1">
             <label for="inputTextDinamico">`+(description ? description : "")+`</label>
             <div class="d-flex w-100" style="" >
-              <input fieldID="${id}" data-kind="1" isMultiple="${multiple ? 'true' : 'false'}" type="text" class="form-control mb-1 w-90 infoHarvest" id="inputTextDinamico">
+              <input fieldID="${id}" data-kind="1" isMultiple="${multiple ? 'true' : 'false'}" type="text" class="form-control mb-1 ${multiple ? 'w-90' : 'w-100'}" id="inputTextDinamico">
               ${(multiple ? '<div onclick="addCopyField(this)" style="cursor: pointer" class="w-10 d-flex align-items-center justify-content-center classRemove"><i class="fas fa-plus" style="font-size: 20px"></i></div>' : '')}
             </div>
           </div>
@@ -951,7 +948,7 @@
         var fieldReturn =`
           <div id="${id}">
             <div class="d-flex w-100" fieldID="${id}" data-kind="2" isMultiple="${multiple ? 'true' : 'false'}" >
-              <div class="w-90">
+              <div class="w-100">
                 <form class="typeField2" action="https://api.pedbox.co:8590/file-upload" id="drop_file" >
                   <div class="dz-message">`+(description ? description : "")+`<br><i class="fa fa-upload" style="font-size: 30px;padding-top: 10px;"></i></div>
                   <div class="fallback">
@@ -967,9 +964,9 @@
         var fieldReturn = `
           <div type-field="3" class="typeField3" >
             <label for="checkBoxDinamico">`+(description ? description : "")+`</label>
-            <div ${(multiple) ? 'onclick="addCopyField(this)"' : ''} class="d-flex w-100" style="">
-              <div class="w-90">
-                <input fieldID="${id}" data-kind="3" isMultiple="${multiple ? 'true' : 'false'}"  type="checkbox" class="infoHarvest " name="" id="checkBoxDinamico">
+            <div ${(multiple) ? 'onclick="addCopyField(this)"' : ''} class="d-flex w-100" style="padding-left: 20px">
+              <div class="${multiple ? 'w-90' : 'w-100'}" ">
+                <input fieldID="${id}" data-kind="3" isMultiple="${multiple ? 'true' : 'false'}"  type="checkbox" name="" id="checkBoxDinamico">
               </div>
               ${(multiple ? '<div style="cursor: pointer" class="w-10 d-flex align-items-center justify-content-center classRemove"><i class="fas fa-plus" style="font-size: 20px"></i></div>' : '')}
             </div>
@@ -978,9 +975,9 @@
       };
       if (field == 4) { 
         var fieldReturn = `
-          <div type-field="4" class="typeField4 w-90" >
+          <div type-field="4" class="typeField4 ${multiple ? 'w-90' : 'w-100'}" " >
             <label for="">`+(description ? description : "")+`</label> <br/>
-            <select fieldID="${id}" data-kind="4" isMultiple="${multiple ? 'true' : 'false'}"  class="form-control infoHarvest" id="dropButton${id}" name="dropButton${id}"></select>
+            <select fieldID="${id}" data-kind="4" isMultiple="${multiple ? 'true' : 'false'}"  class="form-control" id="dropButton${id}" name="dropButton${id}"></select>
           </div>
         `;
       };
@@ -989,7 +986,7 @@
           <div>
             <label for="dateDinamico">`+(description ? description : "")+`</label>
             <div ${(multiple) ? 'onclick="addCopyField(this)"' : ''}class="d-flex w-100" style="">
-              <input fieldID="${id}" data-kind="5" isMultiple="${multiple ? 'true' : 'false'}"  type="date" id="dateDinamico" class="form-control infoHarvest w-90 mb-1">
+              <input fieldID="${id}" data-kind="5" isMultiple="${multiple ? 'true' : 'false'}"  type="date" id="dateDinamico" class="form-control ${multiple ? 'w-90' : 'w-100'}"  mb-1">
               ${(multiple ? '<div style="cursor: pointer" class="w-10 d-flex align-items-center justify-content-center classRemove"><i class="fas fa-plus" style="font-size: 20px"></i></div>' : '')}
             </div>
           </div>
@@ -1000,7 +997,7 @@
         <div type-field="6" class="typeField6">
           <label for="numberDinamico">`+(description ? description : "")+`</label>
           <div ${(multiple) ? 'onclick="addCopyField(this)"' : ''}class="d-flex w-100" style="">
-            <input fieldID="${id}" data-kind="6" isMultiple="${multiple ? 'true' : 'false'}"  type="text" class="form-control mb-1 infoHarvest w-90 mb-1" id="numberDinamico"></input>
+            <input fieldID="${id}" data-kind="6" isMultiple="${multiple ? 'true' : 'false'}"  type="text" class="form-control mb-1 ${multiple ? 'w-90' : 'w-100'}"  mb-1" id="numberDinamico"></input>
             ${(multiple ? '<div style="cursor: pointer" class="w-10 d-flex align-items-center justify-content-center classRemove"><i class="fas fa-plus" style="font-size: 20px"></i></div>' : '')}
           </div>
         </div>
@@ -1011,7 +1008,7 @@
           <div type-field="7" class="typeField7" fieldID="${id}" data-kind="7" isMultiple="${multiple ? 'true' : 'false'}" >
             <label for="yes_no_radio">`+(description ? description : "")+`</label>
             <div ${(multiple) ? 'onclick="addCopyField(this)"' : ''} class="d-flex w-100" style="">
-              <div class="w-90">
+              <div class="${multiple ? 'w-90' : 'w-100'}" ">
                 <input type="radio" name="yes_no" checked>Sí</input> <br>
                 <input type="radio" name="yes_no">No</input>
               </div>
@@ -1032,7 +1029,7 @@
           <div class="typeField9" type-field="9">
             <label for="timeDinamico">`+(description ? description : "")+`</label>
             <div ${(multiple) ? 'onclick="addCopyField(this)"' : ''} class="d-flex w-100" style="">
-              <input fieldID="${id}" data-kind="9" isMultiple="${multiple ? 'true' : 'false'}"  type="time" id="timeDinamico" name="appt" class="form-control infoHarvest w-90 mb-1">
+              <input fieldID="${id}" data-kind="9" isMultiple="${multiple ? 'true' : 'false'}"  type="time" id="timeDinamico" name="appt" class="form-control ${multiple ? 'w-90' : 'w-100'}"  mb-1">
               ${(multiple ? '<div style="cursor: pointer" class="w-10 d-flex align-items-center justify-content-center classRemove"><i class="fas fa-plus" style="font-size: 20px"></i></div>' : '')}
             </div>
           </div>
@@ -1043,7 +1040,7 @@
           <div class="typeField11" type-field="11">
             <label for="dateTimeDinamico">`+(description ? description : "")+`</label>
             <div ${(multiple) ? 'onclick="addCopyField(this)"' : ''} class="d-flex w-100" style="">
-              <input fieldID="${id}" data-kind="11" isMultiple="${multiple ? 'true' : 'false'}"  type="datetime-local" id="dateTimeDinamico" class="form-control infoHarvest w-90 mb-1" onload="getDate(this)"> 
+              <input fieldID="${id}" data-kind="11" isMultiple="${multiple ? 'true' : 'false'}"  type="datetime-local" id="dateTimeDinamico" class="form-control ${multiple ? 'w-90' : 'w-100'}"  mb-1" onload="getDate(this)"> 
               ${(multiple ? '<div style="cursor: pointer" class="w-10 d-flex align-items-center justify-content-center classRemove"><i class="fas fa-plus" style="font-size: 20px"></i></div>' : '')}
             </div>
           </div>
@@ -1054,7 +1051,7 @@
           <div class="typeField12" type-field="12">
             <label for="moneyInput">`+(description ? description : "")+`</label>
             <div ${(multiple) ? 'onclick="addCopyField(this)"' : ''} class="d-flex w-100" style="">
-              <input fieldID="${id}" data-kind="12" isMultiple="${multiple ? 'true' : 'false'}"  type="number" min="1" step="any" id="moneyInput" class="form-control infoHarvest w-90 mb-1"/>
+              <input fieldID="${id}" data-kind="12" isMultiple="${multiple ? 'true' : 'false'}"  type="number" min="1" step="any" id="moneyInput" class="form-control ${multiple ? 'w-90' : 'w-100'}"  mb-1"/>
               ${(multiple ? '<div style="cursor: pointer" class="w-10 d-flex align-items-center justify-content-center classRemove"><i class="fas fa-plus" style="font-size: 20px"></i></div>' : '')}
             </div>
           </div>
@@ -1065,7 +1062,7 @@
           <div type-field="13" class="typeField13">
             <label for="textAreaDinamico">`+(description ? description : "")+`</label>
             <div ${(multiple) ? 'onclick="addCopyField(this)"' : ''} class="d-flex w-100" style="">
-              <textarea fieldID="${id}" data-kind="13" isMultiple="${multiple ? 'true' : 'false'}"  id="textAreaDinamico" class="form-control mb-3 infoHarvest w-90 mb-1" name="" id="" cols="30" rows="10"></textarea>
+              <textarea fieldID="${id}" data-kind="13" isMultiple="${multiple ? 'true' : 'false'}"  id="textAreaDinamico" class="form-control mb-3 ${multiple ? 'w-90' : 'w-100'}"  mb-1" name="" id="" cols="30" rows="10"></textarea>
               ${(multiple ? '<div style="cursor: pointer" class="w-10 d-flex align-items-center justify-content-center classRemove"><i class="fas fa-plus" style="font-size: 20px"></i></div>' : '')}
             </div>
           </div>
@@ -1075,10 +1072,6 @@
     }
 
     const getFormElementResponse = function (type, question, content, icon) {
-      // Remover contenido no deseado en el campo checkbox
-      if (type == 3) {
-        content = "";
-      }
       // Asociar iconos antiguos angular con iconos de fontAwesome
       let iconsFontAwesome = {
         "input-text":"fas fa-font",
@@ -1093,6 +1086,19 @@
         "slide-textarea" : ""
       }
       iconSelect = iconsFontAwesome[icon];
+
+      // Remover contenido no deseado en el campo checkbox
+      if (type == 3) {
+        content = "";
+      }
+
+      if (type == 2 && content != "") {
+        content = `
+          <div class="d-flex justify-content-center">
+            <img src="https://api.pedbox.co:8590/media/formats?strarchivo=${content}" alt="" class="imgFormView">
+          </div> 
+        `;
+      }
     
       let fieldReturn = `
         <div class="d-flex mb-3"> 
@@ -1330,7 +1336,6 @@
             </div>
           </div>
         `;
-        console.log(data)
         timeLineMain.append(timeLineElement)
       }
 
@@ -1532,8 +1537,6 @@
             let id_node = data[i].workflow[e].first_node[0].node.id;
             let id_workflow_header = data[i].workflow[e].first_node[0].id_workflow;
 
-            console.log(data)
-
             let slideContainerItem = `
               <div class="col-lg-4 col-md-6 mb-4">
                 <div class="card" style="min-height: 150px">
@@ -1584,7 +1587,7 @@
       $("#llenadoModalButtons").find(".takeIncidence").remove();
 
       if (userCanTakeTask && data.status != 3 && data.status != 1) {
-        $("#llenadoModalButtons").append('<button type="button" class="btn bg-gradient-primary takeIncidence">Tomar Incidencia</button>')
+        $("#llenadoModalButtons").append(`<button data-activitie="${data.id}" data-user="${session.user.id}" type="button" class="btn bg-gradient-primary takeIncidence">Tomar Incidencia</button>`)
       }
 
       if (data.status == 4) {
@@ -1626,7 +1629,6 @@
       fetch(route)
       .then(response => response.json())
       .then(response => { 
-        console.log(response)
 
         if (response.response.result.success) {
           if (data.status != 4) { //Incidente cerrado
@@ -1883,24 +1885,24 @@
       }
     };
 
-    const sendDataDinamicForm = function () {
-      let formList = document.getElementsByClassName("infoHarvest");
+    // const sendDataDinamicForm = function () {
+    //   let formList = document.getElementsByClassName("infoHarvest");
       
-      // Los campos 2 (adjuntos) y 7 (radio button) aún no recolectan la informaciíon
-      let formlarioDinamicoData = [];
-      for (let i = 0; i < formList.length; i++) {
-        formlarioDinamicoData.push({
-          "id_field": formList[i].getAttribute("fieldID"),
-          "multiple": 0,
-          "content": formList[i].value, 
-          "id_option": 0,
-          "seq": 0,
-          "code": "",
-          "id_master": 0
-        })  
-      }
-      console.log(formlarioDinamicoData);
-    };
+    //   // Los campos 2 (adjuntos) y 7 (radio button) aún no recolectan la informaciíon
+    //   let formlarioDinamicoData = [];
+    //   for (let i = 0; i < formList.length; i++) {
+    //     formlarioDinamicoData.push({
+    //       "id_field": formList[i].getAttribute("fieldID"),
+    //       "multiple": 0,
+    //       "content": formList[i].value, 
+    //       "id_option": 0,
+    //       "seq": 0,
+    //       "code": "",
+    //       "id_master": 0
+    //     })  
+    //   }
+    //   console.log(formlarioDinamicoData);
+    // };
 
     const sendDataSeguimiento = function () {
       let dataSeguimienti = {
@@ -1974,7 +1976,7 @@
       }
     }
 
-    const sendFormNewIncidence = function () { 
+    const sendFormNewIncidence = async function () { 
       let data = {
         "date": new Date(),
         "detail_format": [],
@@ -1992,19 +1994,15 @@
       let inputs = $("#nuevaTareaModalContent").find("[fieldID]");
       for (let i = 0; i < inputs.length; i++) {
         let type = $(inputs[i]).attr("data-kind");
-        if (type == "8") {continue} // Contenedor seccion no es enviado
+        if (type == "8") {continue} // Contenedor secciones no es tenido en cuenta
 
         let id = $(inputs[i]).attr("fieldID");
+        console.log(id)
+
         let isMultiple = ($(inputs[i]).attr("isMultiple") == "true") ? 1 : 0;
         let content = $(inputs[i]).val();
         let code = "";
         let id_master = 0;
-
-        if (type == 2) {
-          console.log("coming here?")
-          let formData = new FormData(document.querySelector('.typeField2'))
-          console.log(...formData)
-        }
 
         if (type == 3) {
           let checkboxVal = $(inputs[i]).is(":checked");
@@ -2018,7 +2016,25 @@
           code = $(idSelect).find(":selected").attr("data-code")
           id_master = $(idSelect).find(":selected").val()
         }
-        
+
+        if (type == 2) {
+          // myDropzone.processQueue();  
+          let dataImages = await uploadDropzoneImages();
+
+          for (let e = 0; e < dataImages.length; e++) {
+            let objt = {
+              "id_field": id,
+              "multiple": isMultiple,
+              "content": dataImages[e].ruta_archivo,
+              "id_option": id_master,
+              "code": code,
+              "id_master": id_master,
+              "seq": 0
+            };
+            data.detail_format.push(objt)
+          }
+          continue
+        }
         let objt = {
           "id_field": id,
           "multiple": isMultiple,
@@ -2031,7 +2047,6 @@
         data.detail_format.push(objt)
       }
 
-
       fetch('/helpdesk/formatPost', {
         method: 'POST',
         headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
@@ -2039,20 +2054,18 @@
       })
       .then(res => res.json())
       .then(res =>{  
-
         if (!res.result.success) {
           return Swal.fire({
-              icon: 'error',
-              title: 'No fue posible crear el radicado',
-              confirmButtonText: 'Continuar',
-            })
+            icon: 'error',
+            title: 'No fue posible crear el radicado',
+            confirmButtonText: 'Continuar',
+          })
         }
-
         let dataWorkflow = {
           "id_company": session.user.id_company,
           "id_user": session.user.id,
-          "id_workflow": $("#nuevaTareaModal").attr("data-idWorkflow"),
-          "id_node": $("#nuevaTareaModal").attr("data-idNode"),
+          "id_workflow": Number($("#nuevaTareaModal").attr("data-idWorkflow")),
+          "id_node": Number($("#nuevaTareaModal").attr("data-idNode")),
           "id_format": res.result.format.id,
           "id_priority": Number($("#navbarDropdownMenuPrioridad a").attr("data-value")),
           "id_behavior": $("#navbarDropdownMenuComportamiento").text(),
@@ -2083,12 +2096,39 @@
               confirmButtonText: 'Continuar',
             })
           }
-
-          // TODO enviar mensaje de gestion creada
           $('#nuevaTareaModal').modal("hide");
         })
       })
     };
+
+    const uploadDropzoneImages = async function () {
+      let files = myDropzone.getAcceptedFiles();
+      let data = [];
+      for (let i = 0; i < files.length; i++) {
+        let formData = new FormData();
+            formData.append('idFoto', randomIndetifier());
+            formData.append('typeAttached', "format");
+            formData.append('attachment', files[i]);
+        
+        let response = await fetch('https://api.pedbox.co:8590/uploadFormat', {
+          method: 'POST',
+          body: formData,
+          contentType: false,
+          processData: false,
+        })
+        .then(response => response.json())
+        .then(data => {
+          
+          return data
+        })
+        .catch(error => {
+          console.log('Request failed', error);
+          return {}
+        });
+        data.push(response)
+      }
+      return data
+    }
 
     const sendFormEditIncidence = function () {
       let dataToSend = {
@@ -2338,6 +2378,47 @@
       $('#timelineModal').modal('hide');
       loadFormatModal(2);
     });
+
+    $(document).on( "click", ".takeIncidence", function(){
+      let activitie = $(this).attr("data-activitie");
+      let user = $(this).attr("data-user");
+
+      fetch('/helpdesk/takeOcurrence/'+activitie+'/'+user)
+      .then(res => res.json())
+      .then(res =>{   
+        if (res.result.success) {
+          fetch('/helpdesk/indicators')
+          .then(res => res.json())
+          .then(res => {
+            if (res.result.success) {
+              loadHelpdeskCharts(res.result.helpdesk);
+              content = res
+            }
+            $("#llenadoModalButtons").find(".takeIncidence").remove();
+            let element =` 
+              <div class="d-flex align-items-center">
+                <h6 class="mb-0 small">Asignado a:&nbsp;</h6> 
+                <span class="text-xs font-weight-bolder">${session.user.name}</span>
+              </div>
+            `;
+            $("#llenadoModalStateassigned").append(element)
+  
+            Swal.fire({
+              icon: 'success',
+              title: 'Incidencia asginada con éxito',
+              confirmButtonText: 'Continuar',
+            })
+          })
+        } else {
+          return Swal.fire({
+            icon: 'error',
+            title: 'No fue posible asignar la incidencia',
+            confirmButtonText: 'Continuar',
+          })
+        }
+      })
+    });
+
 
     // TODO TODO
     $(document).on( "click", "#timeLineMain .verSolicitudTimeline", function(){

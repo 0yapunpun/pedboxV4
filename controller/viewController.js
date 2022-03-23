@@ -59,6 +59,13 @@ controller.chat = async(req, res, next) => {
   res.render('chat', {'session': req.session});
 }
 
+controller.agenda = async(req, res, next) => {
+  // Validar login
+  if (!req.session.login) { return res.redirect('/login'); }
+  
+  res.render('agenda', {'session': req.session});
+}
+
 //** Vistas no integradas
 controller.crm = async(req, res, next) => {
   // Validar login

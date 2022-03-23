@@ -2,10 +2,12 @@ const controller = {};
 const userController = require('../controller/usersController.js');
 const service = require('../engine/apiService.js');
 const config = require('../engine/config.js');
-const { nvFormatDate, hasPermission, nvCapitalize } = require('./helpers.js');
+const { nvFormatDate, hasPermission, nvCapitalize, randomIndetifier } = require('./helpers.js');
 const _ = require('underscore');
 const multer  = require('multer');
 const moment = require('moment');
+const FormData = require('form-data');
+const fs = require('fs');
 const { response } = require('express');
 
 var statusRequest = [
@@ -86,8 +88,6 @@ controller.helpdesk = async (req, res, next) => {
   let mastersData = await service.getMastersHelpdesk(id_company);
   let masterFormats = await service.getAdminFormat(id_company);
 
-  console.log(mastersData.result.helpdesk)
-
   if (mastersData.result.success){
     masters['tipos']['datos'] = mastersData.result['helpdesk']['type'];
     masters['categorias']['datos']  = mastersData.result['helpdesk']['area'];
@@ -122,6 +122,15 @@ controller.helpdesk = async (req, res, next) => {
 
   res.render('helpdesk', {'session': req.session, 'content': helpdeskContent, 'masters':masters, 'formats': formats, "users": users})
 } 
+
+controller.helpdeskIndicators = async(req, res, next) => {
+  let id_company = req.session.user.id_company;
+  let id_user = req.session.user.id;
+
+  let helpdeskContent = await service.getHelpdeskIndicators(id_company, id_user);
+  
+  res.send(helpdeskContent)
+}
 
 controller.helpdeskDetail = async(req, res, next) => {
   let id = req.params.id;
@@ -194,6 +203,17 @@ controller.helpdeskStartWorkflow = async (req, res, next) => {
   res.send(response)
 }
 
+controller.helpdeskTakeOcurrence = async (req, res, next) => {
+  let body = {
+    id_activitie: req.params.id_activitie,
+    id_user_take: req.params.id_user_take
+  }
+
+  let response = await service.takeOcurrence(body);
+
+  res.send(response)
+}
+
 controller.helpdeskSolicitudes = async (req, res, next) => {
   let id_company = req.session.user.id_company;
   let id_user = req.session.user.id;
@@ -205,8 +225,6 @@ controller.helpdeskSolicitudes = async (req, res, next) => {
   let groupRequest = {};
   var formats = [];
   let formatRequestBy = [];
-
-  // console.log("aa", masterFormats.result.activities)
 
   if (masterFormats.result.success) {
     for (let value of masterFormats.result.activities) {

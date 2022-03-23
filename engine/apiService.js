@@ -56,7 +56,6 @@ service.historialNotas = async(url_company, nit, id_company) => {
 
 service.historialPedidos = async(url_company, nit, id_company) => {
   const url = urlKakashi+'get_extranet?nit='+nit+'&tipo=2&url='+url_company+'&id_company='+id_company;
-  console.log(url)
   const data =  await makeRequest(url);
   return data;
 }
@@ -264,6 +263,12 @@ service.startWorkflow = async(body) => {
 service.adminMasters = async(id_company) => {
   const url = urlKakashi+"admindMaster?id_company="+id_company;
   const data =  await makeRequest(url);
+  return data;
+}
+
+service.takeOcurrence = async(body) => {
+  const url = urlKakashi+"take_occurrence";
+  const data =  await makeRequest(url, options('post', body));
   return data;
 }
 

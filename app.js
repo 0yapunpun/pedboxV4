@@ -3,13 +3,16 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 const session = require('express-session');
-
+const formData = require('express-form-data');
 var router = require('./routes/router');
 
 var app = express();
 
+
 //Session
 app.use(session({secret: 'calidosos_session', saveUninitialized: true, resave: true}));
+// Parse form data
+app.use(formData.parse());
 
 // view engine setup
 app.set('views', [path.join(__dirname, 'views'),
