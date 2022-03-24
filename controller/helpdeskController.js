@@ -128,7 +128,7 @@ controller.helpdeskIndicators = async(req, res, next) => {
   let id_user = req.session.user.id;
 
   let helpdeskContent = await service.getHelpdeskIndicators(id_company, id_user);
-  
+
   res.send(helpdeskContent)
 }
 
@@ -187,10 +187,27 @@ controller.helpdeskNewFormat = async (req, res, next) => {
   res.send([response, masters])
 }
 
+controller.helpdeskEditFormat = async (req, res, next) => {
+  let id = req.params.id;
+  let id_header = req.params.id_header; 
+
+  let response = await service.getEditDetailFormat(id, id_header);
+
+  res.send(response)
+}
+
 controller.helpdeskPostFormat = async (req, res, next) => {
   let data = req.body;
 
   let response = await service.postAttendFormat(data);
+
+  res.send(response)
+}
+
+controller.helpdeskUpdateFormat = async (req, res, next) => {
+  let data = req.body;
+
+  let response = await service.putAttendFormat(data);
 
   res.send(response)
 }

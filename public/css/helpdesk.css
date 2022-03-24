@@ -146,10 +146,18 @@ a.linkTachado::after{
   background-color: #e9ecef;
   transform: translateY(-10px);
 }
-.tablesHover{
+.indicatorsActive{
+  background-color: #e9ecef;
+  transform: translateY(-10px);
+}
+.chartActive{
+  background-color: #e9ecef;
+  transform: translateX(10px);
+}
+.chartHover{
   transition: all 0.3s;
 }
-.tablesHover:hover{
+.chartHover:hover{
   /* background-color: #e9ecef; */
   transform: translateX(10px);
   /* transform: scale(1.02) */

@@ -67,8 +67,8 @@
 
       <!-- Indicadores Incidencias -->
       <div>
-        <div class="d-flex justify-content-center gap-2">
-          <div class="card indicatorsHover cardsState" data-state="0" style="cursor: pointer;">
+        <div class="d-flex justify-content-center gap-2" id="helpdeskHeaderIndicators">
+          <div class="card indicatorsHover cardsState indicatorsActive" data-state="0" style="cursor: pointer;">
             <div class="card-body p-3">
               <div class="d-flex">
                 <div>
@@ -156,7 +156,7 @@
         </div> 
         <div class="row mt-4">
           <div class="col-lg-3 d-flex flex-column" id>
-            <div id="helpDeskIndicators">
+            <div >
               <div class="d-flex justify-content-center align-items-center gap-1 mb-2" style="height: 40px;">
                 <div onclick="loadConsultIncidencesModal()"  class="icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg h-100 d-flex justify-content-center align-items-center" style="cursor: pointer; padding: 20px"> <i class="fas fa-search" style="font-size: 16px; top: 0"> </i></div>
                 <button type="button" class="btn bg-gradient-primary px-1 m-0 h-100 w-100" onclick="loadNewIncidenceModal()" id="newIncidenceButton">
@@ -164,6 +164,7 @@
                   Nueva Incidencia
                 </button>
               </div>
+              <div id="helpdeskCharts"></div>
             </div>
           </div>
           <div class="col-lg-7 col-12">
@@ -580,8 +581,10 @@
           </div>
         </div>
       </div>
-
     </div>
+
+    <!-- preloader -->
+    <%- include('./partials/preloader.ejs') %> 
   </main>
 
   <!-- Scripts -->
@@ -620,6 +623,7 @@
 
     // Dropzone js configuration
     var myDropzone
+    Dropzone.autoDiscover = false;
     Dropzone.prototype.defaultOptions.dictDefaultMessage = "";
     Dropzone.prototype.defaultOptions.dictFallbackMessage = "";
     Dropzone.prototype.defaultOptions.dictInvalidFileType = "";
@@ -638,6 +642,10 @@
       $("#helpDeskMain").html("")
       if (data.length) {
         for (let i = 0; i < data.length; i++) {
+          if (i == 1) {
+            console.log(data)
+          }
+
           // Format date
           let date = data[i].date_create;
               date = date.replace(' ', ', ');
@@ -649,6 +657,11 @@
           if (data[i].status == 2){color = "#1fb7de"}
           if (data[i].status == 3){color = "#009688"}
           if (data[i].status == 4){color = "#50c14e"}
+
+          let colorPriority;
+          if (data[i].priority == "Muy Urgente"){colorPriority = "#F44336"}
+          if (data[i].priority == "Urgente"){colorPriority = "#FFEB3B"}
+          if (data[i].priority == "Poco Urgente"){colorPriority = "#2196F3"}
 
           let incidenciaMain = `
             <li class="list-group-item border-0 flex-column align-items-start ps-0 py-0 mb-3 incidentMain" style="cursor: pointer" id="${data[i].id}">
@@ -669,6 +682,12 @@
                       <h6 class="mb-0 small">Solicitado:&nbsp</h6> 
                       <span class="text-xs font-weight-bolder">${data[i].workflow.nodes[0].first_name +" "+ data[i].workflow.nodes[0].second_name}</span>
                     </div>
+                    <div class="d-flex align-items-center">
+                        <div style="width: 15px; height: 15px; margin-right: 5px;">
+                          <div style="width: 15px; height: 15px; clip-path: circle(50%); background-color:${colorPriority}"></div>
+                        </div>
+                        <h6 class="mb-0 small">${data[i].priority}</h6> 
+                      </div>
                   </div>
                   <div class="h-100" >
                     <div class="d-flex align-items-center justify-content-end">
@@ -694,11 +713,10 @@
     }
 
     const loadHelpdeskCharts = function (data) {
-      const helpDeskIndicators = $("#helpDeskIndicators");
-      $(helpDeskIndicators).html("");
+      $("#helpdeskCharts").html("");
       for (let i = 0; i < data.length; i++) {
         const indicator = `              
-          <div class="card overflow-hidden my-1 cardSidebarIndicator tablesHover" style="cursor: pointer" data-id="${data[i].id}" unassigned="${data[i].pending_task}" assigned="${data[i].task_taken}" progress="${data[i].in_progress}" completed="${data[i].completed}" closed="${data[i].closed}">
+          <div class="card overflow-hidden my-1 chartSidebar chartHover ${i == 0 ? "chartActive" : ""}" style="cursor: pointer" data-id="${data[i].id}" unassigned="${data[i].pending_task}" assigned="${data[i].task_taken}" progress="${data[i].in_progress}" completed="${data[i].completed}" closed="${data[i].closed}">
             <div class="card-body p-0 py-1">
               <div class="d-flex flex-column align-items-center">
                 <div class="col-lg-5" style="width: 100%">
@@ -716,7 +734,7 @@
             </div>
           </div>
         `;  
-        helpDeskIndicators.append(indicator);
+        $("#helpdeskCharts").append(indicator);
 
         let porcentajePending = data[i].pending_task ;
         let porcentajeassigned = data[i].task_taken ; 
@@ -792,7 +810,8 @@
       const userBar = $("#usersBar");
       if (data.success) {
         data = data.user_helpdesk;
-        for (let i = 0; i < data.length; i++) {
+        let amount = (data.length > 24 ? 25 : data.length)
+        for (let i = 0; i < amount; i++) {
           let userDiv = `
             <div style="position: relative; width: 100%"> 
               <div class="badge badge-sm badge-circle badge-floating badge-primary border-white" style="position: absolute; top: -10%; right: 20%; border: solid; color: white; padding: 10px !important; z-index: 30">1</div>
@@ -813,7 +832,7 @@
       let containerID = "#"+container;
       let description = (field.description ? field.description : field.question)
       let idField = (field.id ? field.id : field.id_field)
-      let fieldDOM = getFormElement(field.id_type_field, description, idField, field.multiple);
+      let fieldDOM = getFormElement(field.id_type_field, description, idField, field.multiple, field.id_activity_detail);
 
       // Append element
       if (field.parent) {
@@ -924,21 +943,23 @@
         if (field.multiple) {maxFiles = 4;}
 
         let input = $(containerID).find('.typeField2');
-        myDropzone = new Dropzone(input[0]);
-        myDropzone.options.autoProcessQueue = false;
-        myDropzone.options.clickable = true;
-        myDropzone.options.addRemoveLinks = true;
-        myDropzone.options.maxFiles = maxFiles;
+        try {
+          myDropzone = new Dropzone(input[0]);
+          myDropzone.options.autoProcessQueue = false;
+          myDropzone.options.clickable = true;
+          myDropzone.options.addRemoveLinks = true;
+          myDropzone.options.maxFiles = maxFiles;
+        } catch (error) { }
       }
     };
 
-    const getFormElement = function(field, description, id, multiple) {
+    const getFormElement = function(field, description, id, multiple, activity_detail) {
       if (field == 1) {
         var fieldReturn =` 
           <div type-field="1" class="typeField1">
             <label for="inputTextDinamico">`+(description ? description : "")+`</label>
             <div class="d-flex w-100" style="" >
-              <input fieldID="${id}" data-kind="1" isMultiple="${multiple ? 'true' : 'false'}" type="text" class="form-control mb-1 ${multiple ? 'w-90' : 'w-100'}" id="inputTextDinamico">
+              <input fieldID="${id}" data_activity_detail="${activity_detail}" data-kind="1" isMultiple="${multiple ? 'true' : 'false'}" type="text" class="form-control mb-1 ${multiple ? 'w-90' : 'w-100'}" id="inputTextDinamico">
               ${(multiple ? '<div onclick="addCopyField(this)" style="cursor: pointer" class="w-10 d-flex align-items-center justify-content-center classRemove"><i class="fas fa-plus" style="font-size: 20px"></i></div>' : '')}
             </div>
           </div>
@@ -947,7 +968,7 @@
       if (field == 2) {
         var fieldReturn =`
           <div id="${id}">
-            <div class="d-flex w-100" fieldID="${id}" data-kind="2" isMultiple="${multiple ? 'true' : 'false'}" >
+            <div class="d-flex w-100" fieldID="${id}" data-kind="2" isMultiple="${multiple ? 'true' : 'false'}" data_activity_detail="${activity_detail}">
               <div class="w-100">
                 <form class="typeField2" action="https://api.pedbox.co:8590/file-upload" id="drop_file" >
                   <div class="dz-message">`+(description ? description : "")+`<br><i class="fa fa-upload" style="font-size: 30px;padding-top: 10px;"></i></div>
@@ -966,7 +987,7 @@
             <label for="checkBoxDinamico">`+(description ? description : "")+`</label>
             <div ${(multiple) ? 'onclick="addCopyField(this)"' : ''} class="d-flex w-100" style="padding-left: 20px">
               <div class="${multiple ? 'w-90' : 'w-100'}" ">
-                <input fieldID="${id}" data-kind="3" isMultiple="${multiple ? 'true' : 'false'}"  type="checkbox" name="" id="checkBoxDinamico">
+                <input fieldID="${id}" data-kind="3" isMultiple="${multiple ? 'true' : 'false'}"  data_activity_detail="${activity_detail}" type="checkbox" name="" id="checkBoxDinamico">
               </div>
               ${(multiple ? '<div style="cursor: pointer" class="w-10 d-flex align-items-center justify-content-center classRemove"><i class="fas fa-plus" style="font-size: 20px"></i></div>' : '')}
             </div>
@@ -977,7 +998,7 @@
         var fieldReturn = `
           <div type-field="4" class="typeField4 ${multiple ? 'w-90' : 'w-100'}" " >
             <label for="">`+(description ? description : "")+`</label> <br/>
-            <select fieldID="${id}" data-kind="4" isMultiple="${multiple ? 'true' : 'false'}"  class="form-control" id="dropButton${id}" name="dropButton${id}"></select>
+            <select fieldID="${id}" data-kind="4" isMultiple="${multiple ? 'true' : 'false'}"  data_activity_detail="${activity_detail}" class="form-control" id="dropButton${id}" name="dropButton${id}"></select>
           </div>
         `;
       };
@@ -986,7 +1007,7 @@
           <div>
             <label for="dateDinamico">`+(description ? description : "")+`</label>
             <div ${(multiple) ? 'onclick="addCopyField(this)"' : ''}class="d-flex w-100" style="">
-              <input fieldID="${id}" data-kind="5" isMultiple="${multiple ? 'true' : 'false'}"  type="date" id="dateDinamico" class="form-control ${multiple ? 'w-90' : 'w-100'}"  mb-1">
+              <input fieldID="${id}" data-kind="5" isMultiple="${multiple ? 'true' : 'false'}" data_activity_detail="${activity_detail}" type="date" id="dateDinamico" class="form-control ${multiple ? 'w-90' : 'w-100'}"  mb-1">
               ${(multiple ? '<div style="cursor: pointer" class="w-10 d-flex align-items-center justify-content-center classRemove"><i class="fas fa-plus" style="font-size: 20px"></i></div>' : '')}
             </div>
           </div>
@@ -997,7 +1018,7 @@
         <div type-field="6" class="typeField6">
           <label for="numberDinamico">`+(description ? description : "")+`</label>
           <div ${(multiple) ? 'onclick="addCopyField(this)"' : ''}class="d-flex w-100" style="">
-            <input fieldID="${id}" data-kind="6" isMultiple="${multiple ? 'true' : 'false'}"  type="text" class="form-control mb-1 ${multiple ? 'w-90' : 'w-100'}"  mb-1" id="numberDinamico"></input>
+            <input fieldID="${id}" data-kind="6" isMultiple="${multiple ? 'true' : 'false'}" data_activity_detail="${activity_detail}" type="text" class="form-control mb-1 ${multiple ? 'w-90' : 'w-100'}"  mb-1" id="numberDinamico"></input>
             ${(multiple ? '<div style="cursor: pointer" class="w-10 d-flex align-items-center justify-content-center classRemove"><i class="fas fa-plus" style="font-size: 20px"></i></div>' : '')}
           </div>
         </div>
@@ -1005,7 +1026,7 @@
       };
       if (field == 7) {
         var fieldReturn =`
-          <div type-field="7" class="typeField7" fieldID="${id}" data-kind="7" isMultiple="${multiple ? 'true' : 'false'}" >
+          <div type-field="7" class="typeField7" fieldID="${id}" data-kind="7" isMultiple="${multiple ? 'true' : 'false'}" data_activity_detail="${activity_detail}">
             <label for="yes_no_radio">`+(description ? description : "")+`</label>
             <div ${(multiple) ? 'onclick="addCopyField(this)"' : ''} class="d-flex w-100" style="">
               <div class="${multiple ? 'w-90' : 'w-100'}" ">
@@ -1029,7 +1050,7 @@
           <div class="typeField9" type-field="9">
             <label for="timeDinamico">`+(description ? description : "")+`</label>
             <div ${(multiple) ? 'onclick="addCopyField(this)"' : ''} class="d-flex w-100" style="">
-              <input fieldID="${id}" data-kind="9" isMultiple="${multiple ? 'true' : 'false'}"  type="time" id="timeDinamico" name="appt" class="form-control ${multiple ? 'w-90' : 'w-100'}"  mb-1">
+              <input fieldID="${id}" data-kind="9" isMultiple="${multiple ? 'true' : 'false'}" data_activity_detail="${activity_detail}" type="time" id="timeDinamico" name="appt" class="form-control ${multiple ? 'w-90' : 'w-100'}"  mb-1">
               ${(multiple ? '<div style="cursor: pointer" class="w-10 d-flex align-items-center justify-content-center classRemove"><i class="fas fa-plus" style="font-size: 20px"></i></div>' : '')}
             </div>
           </div>
@@ -1040,7 +1061,7 @@
           <div class="typeField11" type-field="11">
             <label for="dateTimeDinamico">`+(description ? description : "")+`</label>
             <div ${(multiple) ? 'onclick="addCopyField(this)"' : ''} class="d-flex w-100" style="">
-              <input fieldID="${id}" data-kind="11" isMultiple="${multiple ? 'true' : 'false'}"  type="datetime-local" id="dateTimeDinamico" class="form-control ${multiple ? 'w-90' : 'w-100'}"  mb-1" onload="getDate(this)"> 
+              <input fieldID="${id}" data-kind="11" isMultiple="${multiple ? 'true' : 'false'}"  data_activity_detail="${activity_detail}" type="datetime-local" id="dateTimeDinamico" class="form-control ${multiple ? 'w-90' : 'w-100'}"  mb-1" onload="getDate(this)"> 
               ${(multiple ? '<div style="cursor: pointer" class="w-10 d-flex align-items-center justify-content-center classRemove"><i class="fas fa-plus" style="font-size: 20px"></i></div>' : '')}
             </div>
           </div>
@@ -1051,7 +1072,7 @@
           <div class="typeField12" type-field="12">
             <label for="moneyInput">`+(description ? description : "")+`</label>
             <div ${(multiple) ? 'onclick="addCopyField(this)"' : ''} class="d-flex w-100" style="">
-              <input fieldID="${id}" data-kind="12" isMultiple="${multiple ? 'true' : 'false'}"  type="number" min="1" step="any" id="moneyInput" class="form-control ${multiple ? 'w-90' : 'w-100'}"  mb-1"/>
+              <input fieldID="${id}" data-kind="12" isMultiple="${multiple ? 'true' : 'false'}"  data_activity_detail="${activity_detail}" type="number" min="1" step="any" id="moneyInput" class="form-control ${multiple ? 'w-90' : 'w-100'}"  mb-1"/>
               ${(multiple ? '<div style="cursor: pointer" class="w-10 d-flex align-items-center justify-content-center classRemove"><i class="fas fa-plus" style="font-size: 20px"></i></div>' : '')}
             </div>
           </div>
@@ -1062,7 +1083,7 @@
           <div type-field="13" class="typeField13">
             <label for="textAreaDinamico">`+(description ? description : "")+`</label>
             <div ${(multiple) ? 'onclick="addCopyField(this)"' : ''} class="d-flex w-100" style="">
-              <textarea fieldID="${id}" data-kind="13" isMultiple="${multiple ? 'true' : 'false'}"  id="textAreaDinamico" class="form-control mb-3 ${multiple ? 'w-90' : 'w-100'}"  mb-1" name="" id="" cols="30" rows="10"></textarea>
+              <textarea fieldID="${id}" data-kind="13" isMultiple="${multiple ? 'true' : 'false'}" data_activity_detail="${activity_detail}"  id="textAreaDinamico" class="form-control mb-3 ${multiple ? 'w-90' : 'w-100'}"  mb-1" name="" id="" cols="30" rows="10"></textarea>
               ${(multiple ? '<div style="cursor: pointer" class="w-10 d-flex align-items-center justify-content-center classRemove"><i class="fas fa-plus" style="font-size: 20px"></i></div>' : '')}
             </div>
           </div>
@@ -1200,32 +1221,54 @@
     }
 
     // TODO esta funcion deberia desaprecer 
-    const loadFormatModal = function (operation) { // 1-ver, 2-editar
-      fetch("https://raw.githubusercontent.com/0yapunpun/tests/master/ver-editarFormato.json")
-      .then(response => response.json())
-      .then(data => {
-        field = data.attendFormat.detail;
+    // const loadFormatModal = function (operation) { // 1-ver, 2-editar
+    //   fetch("https://raw.githubusercontent.com/0yapunpun/tests/master/ver-editarFormato.json")
+    //   .then(response => response.json())
+    //   .then(data => {
+    //     field = data.attendFormat.detail;
 
-        $('#verFormatoBody').html(""); 
-        $('#editarFormatoBody').html("");
+    //     $('#verFormatoBody').html(""); 
+    //     $('#editarFormatoBody').html("");
 
-        $("#verFormatoTitle").html(data.attendFormat.message)
-        $("#editarFormatoModaltitle").html(data.attendFormat.message)
+    //     $("#verFormatoTitle").html(data.attendFormat.message)
+    //     $("#editarFormatoModaltitle").html(data.attendFormat.message)
         
-        if (operation == 1) {
-          $('#verFormatoBody').append('<div class=" p-3"></div>');
-          for (let i = 0; i < field.length; i++) {
-            let fieldDOM = getFormElementResponse(field[i].id_type_field, field[i].question, field[i].content, field[i].web_type);
-            $('#verFormatoBody>div').append(fieldDOM);
-          }
-          $('#verFormatoModal').modal('show');
-        } 
-        if (operation == 2) {
-          $('#editarFormatoModal').modal('show');
-          let container = "editarFormatoBody"
-          field.forEach(field => loadFormEdit(container, field));
-        } 
-      }) 
+    //     if (operation == 1) {
+    //       $('#verFormatoBody').append('<div class=" p-3"></div>');
+    //       for (let i = 0; i < field.length; i++) {
+    //         let fieldDOM = getFormElementResponse(field[i].id_type_field, field[i].question, field[i].content, field[i].web_type);
+    //         $('#verFormatoBody>div').append(fieldDOM);
+    //       }
+    //       $('#verFormatoModal').modal('show');
+    //     } 
+    //     if (operation == 2) {
+    //       $('#editarFormatoModal').modal('show');
+    //       let container = "editarFormatoBody"
+    //       field.forEach(field => loadFormEdit(container, field));
+    //     } 
+    //   }) 
+    //   .catch(error => console.log('Request failed', error));
+    // }
+
+    const loadFormatEdit = function (id, id_header, title, idWorkflowHeader) {
+      fetch("/helpdesk/editFormat/"+id+"/"+id_header)
+      .then(response => response.json())
+      .then(data => {    
+        console.log(data)
+        field = data.result.detail_activity;
+
+        $('#editarFormatoBody').html("");
+        $("#editarFormatoModaltitle").html(title)
+
+        $("#editarFormatoModal").attr("data_activity", id);
+        $("#editarFormatoModal").attr("data_header", id_header);
+        $("#editarFormatoModal").attr("data_workflowHeader", idWorkflowHeader);
+
+        let container = "editarFormatoBody"
+        console.log("xxx", field)
+        field.forEach(field => loadFormEdit(container, field));
+        $('#editarFormatoModal').modal('show');
+       }) 
       .catch(error => console.log('Request failed', error));
     }
 
@@ -1341,9 +1384,10 @@
 
       for (let i = 0; i < data.workflow.nodes.length; i++) {
         x = data.workflow.nodes;
+        console.log(data)
 
         let timeLineElement = ` 
-          <div class="timeline-block mb-3" id="${data.workflow.id}" idWorkflow="${data.workflow.id_workflow}" idNode="${x[i].id_node}" idWorkflowHeader="?" idFormat="${x[i].id_format}">
+          <div class="timeline-block mb-3" id="${data.workflow.id}" idWorkflow="${data.workflow.id_workflow}" idNode="${x[i].id_node}" idFormat="${x[i].id_format}" idFormatAnswer="${x[i].id_format_answer}" data-title="${x[i].infoFormat.description}">
             <span class="timeline-step">
               <div style="width: 50px; height: 50px; background-color: gray; border-radius: 50%;">
                 <img src="${(x[i].photo ? "https://api.pedbox.co:8590/"+x[i].photo+"" : "https://app.pedbox.co/assets/images/avatars/profile.jpg")}" alt="" style="max-width: 100%; max-height: 100%; border-radius: 50%">
@@ -1373,7 +1417,8 @@
     const loadRequests = function (data) {
       const consultaSolicitudModalMain = $("#consultaSolicitudModalMain");
       consultaSolicitudModalMain.html("")
-      for (let i = 0; i < data.length; i++) {
+      let amount = (data.length > 99 ? 100 : data.length)
+      for (let i = 0; i < amount; i++) { // limitada a 100 por problemas de optimización
         let consultaSolicitudElement = `
           <div class="col-6 my-2 px-2 cardParent" id="${data[i].id_answer_format}" userId="${data[i].id_user}">
             <div class="card" style="height: 100%">
@@ -1629,7 +1674,6 @@
       fetch(route)
       .then(response => response.json())
       .then(response => { 
-
         if (response.response.result.success) {
           if (data.status != 4) { //Incidente cerrado
             if (data.status == 3 ) { // Incidente completados
@@ -1792,6 +1836,8 @@
     }
 
     const addNodeToPlumb = function(input, options) {
+      console.log(input, options)
+
       let newId = ((options.identifier)? options.identifier: "node"+input.id+"plumb"+(new Date().getTime()));
       let newIdEndpoint = newId.replace("node", "endpoint");
 
@@ -1976,9 +2022,26 @@
       }
     }
 
+    const sendFormContinueIncidence = function () {
+      // TODO para enviar la informacipon del formulario dentro del incidente 
+      // let data = {
+      //   "date": new Date(),
+      //   "detail_format": [],
+      //   "id_activity": Number($('#nuevaTareaModal').attr("data-activity")),
+      //   "id_company": session.user.id_company,
+      //   "id_person": "",
+      //   "id_user": session.user.id,
+      //   "id_user_take": session.user.id,
+      //   "longitude": "",
+      //   "latitude": "",
+      //   "matrix": [],
+      //   "version": "",
+      // };
+    }
+
     const sendFormNewIncidence = async function () { 
       let data = {
-        "date": new Date(),
+        "date": nvFormatDate(new Date(), "YYYY-MM-DD HH:mm:ss"),
         "detail_format": [],
         "id_activity": Number($('#nuevaTareaModal').attr("data-activity")),
         "id_company": session.user.id_company,
@@ -1997,8 +2060,6 @@
         if (type == "8") {continue} // Contenedor secciones no es tenido en cuenta
 
         let id = $(inputs[i]).attr("fieldID");
-        console.log(id)
-
         let isMultiple = ($(inputs[i]).attr("isMultiple") == "true") ? 1 : 0;
         let content = $(inputs[i]).val();
         let code = "";
@@ -2018,9 +2079,7 @@
         }
 
         if (type == 2) {
-          // myDropzone.processQueue();  
           let dataImages = await uploadDropzoneImages();
-
           for (let e = 0; e < dataImages.length; e++) {
             let objt = {
               "id_field": id,
@@ -2130,37 +2189,112 @@
       return data
     }
 
-    const sendFormEditIncidence = function () {
-      let dataToSend = {
-          "id_company": 1,
-          "id_activity": 213,
-          "id_person": "",
-          "date": new Date(),
-          "id_user": 12214,
-          "longitude": "",
-          "latitude": "",
-          "version": "",
-          "detail_format": [],
-          "matrix": [],
-          "id_user_take": 12214
+    const sendFormEditIncidence = async function () {
+      let data = {
+        "date": nvFormatDate(new Date(), "YYYY-MM-DD HH:mm:ss"),
+        "detail_format": [],
+        "id_activity": Number($('#editarFormatoModal').attr("data_activity")),
+        "id_header": Number($('#editarFormatoModal').attr("data_header")),
+        "id_company": session.user.id_company,
+        "id_person": "",
+        "id_user": session.user.id,
+        "id_user_take": session.user.id,
+        "longitude": "",
+        "latitude": "",
+        "matrix": [],
+        "version": "",
+        "workflow_log" : {
+          "id_workflow_header": Number($('#editarFormatoModal').attr("data_workflowHeader")),
+          "id_user": session.user.id,
+          "id_format": Number($('#editarFormatoModal').attr("data_activity")),
+          "add": [],
+          "update": [],
+          "delete": []
+        }
       };
       
       let inputs = $("#editarFormatoBody").find("[fieldID]");
       for (let i = 0; i < inputs.length; i++) {
+        let type = $(inputs[i]).attr("data-kind");
+        if (type == "8") {continue} // Contenedor secciones no es tenido en cuenta
+
         let id = $(inputs[i]).attr("fieldID");
+        let isMultiple = ($(inputs[i]).attr("isMultiple") == "true") ? 1 : 0;
+        let activitieDetail = $(inputs[i]).attr("data_activity_detail");
         let content = $(inputs[i]).val();
+        let code = "";
+        let id_master = 0;
+
+        if (type == 3) {
+          let checkboxVal = $(inputs[i]).is(":checked");
+          if (checkboxVal) {content = "1"}
+          else {content = ""}
+        }
+
+        if (type == 4) {
+          let idSelect = "#"+$(inputs[i]).attr("id");
+          content = $(idSelect).find(":selected").text()
+          code = $(idSelect).find(":selected").attr("data-code")
+          id_master = $(idSelect).find(":selected").val()
+        }
+
+        if (type == 2) {
+          let dataImages = await uploadDropzoneImages();
+          for (let e = 0; e < dataImages.length; e++) {
+            let objt = {
+              "id_field": id,
+              "id_activity_detail": Number(activitieDetail),
+              "multiple": isMultiple,
+              "content": dataImages[e].ruta_archivo,
+              "id_option": id_master,
+              "code": code,
+              "id_master": id_master,
+              "seq": 0
+            };
+            data.detail_format.push(objt)
+          }
+          continue
+        }
         let objt = {
           "id_field": id,
-          "multiple": 0,
+          "id_activity_detail": Number(activitieDetail),
+          "multiple": isMultiple,
           "content": content,
-          "id_option": 0,
-          "seq": 0,
-          "code": "",
-          "id_master": 0
+          "id_option": id_master,
+          "code": code,
+          "id_master": id_master,
+          "seq": 0
         };
-        dataToSend.detail_format.push(objt)
+        data.detail_format.push(objt)
       }
-      console.log(dataToSend)
+
+
+
+      fetch('/helpdesk/formatPut', {
+        method: 'POST',
+        headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(res =>{  
+        console.log(res)
+        if (res.result.success) {
+          return Swal.fire({
+            icon: 'success',
+            title: 'Radicado actualizado con éxito',
+            confirmButtonText: 'Continuar',
+          }).then((result) => {
+            $("#editarFormatoModal").modal("hide")
+            $("#timelineModal").modal("show")
+          });
+        } else {
+          return Swal.fire({
+            icon: 'error',
+            title: 'No fue posible actualizar el radicado',
+            confirmButtonText: 'Continuar',
+          })
+        }
+      })
     };
 
     const sendFormDetailIncidence = function () {
@@ -2372,11 +2506,12 @@
 
     $(document).on( "click", "#timeLineMain .editarFormatoModal", function(){
       let idFormat = $(this).parents(".timeline-block").attr("idFormat");
-      let idHeader = $(this).parents(".timeline-block").attr("id");
-      console.log(idFormat, idHeader)
+      let idHeader = $(this).parents(".timeline-block").attr("idFormatAnswer");
+      let title = $(this).parents(".timeline-block").attr("data-title");
+      let idWorkflowHeader = $(this).parents(".timeline-block").attr("id");
 
       $('#timelineModal').modal('hide');
-      loadFormatModal(2);
+      loadFormatEdit(idFormat, idHeader, title, idWorkflowHeader);
     });
 
     $(document).on( "click", ".takeIncidence", function(){
@@ -2402,10 +2537,15 @@
               </div>
             `;
             $("#llenadoModalStateassigned").append(element)
-  
+
+            $("#helpdeskCharts>div")[0].click();
+            setTimeout(() => {
+              $("#helpdeskHeaderIndicators>div")[0].click();
+            }, 300);
+
             Swal.fire({
               icon: 'success',
-              title: 'Incidencia asginada con éxito',
+              title: 'Incidencia asignada con éxito',
               confirmButtonText: 'Continuar',
             })
           })
@@ -2492,7 +2632,12 @@
     $(document).on( "click", ".itemPlumb .formatModal", function(){
       $("#procesoModal").modal("hide");
       $("#closeModalVerFormato").attr("onclick", "$('#verFormatoModal').modal('hide'); $('#procesoModal').modal('show')")
-      loadFormatModal(1);
+
+      let id;
+      let title; 
+
+      console.log(id, title)
+      // loadFormatRead(id, tittle)
     });
 
     // ChoicesJS
@@ -2514,7 +2659,10 @@
     }
 
     // HelpDesk Indicators events
-    $(document).on( "click", ".cardSidebarIndicator", function(){
+    $(document).on( "click", ".chartSidebar", function(){
+      $(".chartSidebar").removeClass("chartActive")
+      $(this).addClass("chartActive")
+
       let idOcurrence = $(this).attr("data-id");
 
       let unassigned = $(this).attr("unassigned");
@@ -2546,6 +2694,9 @@
     });
 
     $(".cardsState").on("click", function () {
+      $(".cardsState").removeClass("indicatorsActive")
+      $(this).addClass("indicatorsActive")
+
       let state = $(this).attr("data-state");
       let ocurrence = $(this).attr("data-ocurrence");
 
@@ -2630,7 +2781,6 @@
     }
 
     $( document ).ready(function() {
-      // loadHelpdeskIncidents();
       loadHelpdeskCharts(content.result.helpdesk);
       loadHelpdeskUsers(users.result);
       handlePermissions(session.user.permission);
@@ -2639,7 +2789,13 @@
       $("#dropMenuComportamiento .dropdown-item")[$("#dropMenuComportamiento .dropdown-item").length -1].click();
       $('#dateIncidencia').val(new Date().toDateInputValue());
       
+      $("#helpdeskCharts>div:first").click();
+      setTimeout(() => {
+        $("#helpdeskHeaderIndicators>div:first").click()
+      }, 300);
+
       $("#menuHelpdesk").addClass("activeNav");
+      $("#preloader").hide();
     }); 
   </script>
 

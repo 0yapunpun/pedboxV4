@@ -212,6 +212,12 @@ service.getNewDetailformat = async(id, id_node, id_workflow_header) => {
   return data;
 }
 
+service.getEditDetailFormat = async(id, id_header) => {
+  const url = urlKakashi+"getDetailformat?id="+id+"&id_header="+id_header;
+  const data =  await makeRequest(url);
+  return data;
+}
+
 service.getManagement = async(id_activitie) => {
   const url = urlKakashi+"management?id_activitie="+id_activitie;
   const data =  await makeRequest(url);
@@ -245,6 +251,12 @@ service.getAttendFormat = async(id_format_answer) => {
 service.postAttendFormat = async(body) => {
   const url = urlKakashi+"attendFormat";
   const data =  await makeRequest(url, options('post', body));
+  return data;
+}
+
+service.putAttendFormat = async(body) => {
+  const url = urlKakashi+"attendFormat";
+  const data =  await makeRequest(url, options('put', body));
   return data;
 }
 

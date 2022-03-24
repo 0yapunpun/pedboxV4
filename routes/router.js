@@ -55,10 +55,12 @@ router.get('/helpdesk/ocurrence/:state/:ocurrence', helpdeskController.helpdeskO
 router.get('/helpdesk/formatRead/:id_answer_format', helpdeskController.helpdeskFormatRead);
 router.get('/helpdesk/detail/:id/:id_node/:id_workflow_header/:id_workflow/:id_activitie/:id_format_answer', helpdeskController.helpdeskDetail);
 router.get('/helpdesk/newFormat/:id/:id_node/:id_workflow_header', helpdeskController.helpdeskNewFormat);
+router.get('/helpdesk/editFormat/:id/:id_header', helpdeskController.helpdeskEditFormat);
 router.get('/helpdesk/worflow/:id_company/:id_area', helpdeskController.helpdeskWorkflow);
 router.get('/helpdesk/takeOcurrence/:id_activitie/:id_user_take', helpdeskController.helpdeskTakeOcurrence);
 router.post('/helpdesk/proceso', helpdeskController.helpdeskProceso);
 router.post('/helpdesk/formatPost', helpdeskController.helpdeskPostFormat);
+router.post('/helpdesk/formatPut', helpdeskController.helpdeskUpdateFormat);
 router.post('/helpdesk/startWorkflow', helpdeskController.helpdeskStartWorkflow);
 
 // Por integrar
