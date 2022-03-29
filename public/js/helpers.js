@@ -133,7 +133,7 @@ const handleJSON = (s) => {
         .replace(/\\f/g, "\\f")
         .replace(/\r\n/g, "''")
         .replace(/\r/g, "' '")
-        .replace(/\r?\n|\r/g, '');
+        .replace(/[\u{0080}-\u{FFFF}]/gu,"");
         
   return JSON.parse(s)
 }

@@ -23,8 +23,39 @@
   <%- include('./partials/colors.ejs') %> 
 
   <style>
-    
-</style>
+    .modalPersons{
+      position: absolute; 
+      left: 0;
+      height: 60vh; 
+      bottom: 0; 
+      z-index: 10000; 
+      display: none; 
+      box-shadow: 0 20px 27px 60px rgb(0 0 0 / 5%); 
+      overflow: auto;
+    }  
+    .imgUserContainer{
+      position: relative;
+      cursor: pointer;
+    }
+    .imgUser{
+      width: 50px; 
+      height: 50px; 
+      border-radius: 50%; 
+      overflow: hidden;
+    }
+    .removeUserIcon{
+      position: absolute; 
+      top: 60%; 
+      right: -20%; 
+      border: solid; 
+      color: white; 
+      z-index: 30;
+      padding: 10px !important; 
+    }
+    .badField{
+      border: solid 1px red;
+    }
+  </style>
 </head>
 
 <body class="g-sidenav-show bg-gray-100">
@@ -38,12 +69,337 @@
     <%- include('./partials/header.ejs') %>
   
       <!-- Cotent -->
-      <div class="p-4">
-        <div class="card p-3">
+      <div class="p-4 pt-1">
 
-          <div id="agenda"></div>
+        <div class="w-100 text-end">
+          <button id="createEventBtn" class="btn btn-icon btn-outline-dark ms-2" type="button">
+            <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
+            <span class="btn-inner--text">Agregar Evento</span>
+          </button>
+        </div>
+
+        <div class="card p-3" style="height: auto;">
+          <div id="agenda"  ></div>
 
         </div> 
+      </div>
+
+      <!-- *** Modales -->
+      <!-- Modal Proceso Flujo de trabajo-->
+      <div id="createEventModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" >
+          <div class="modal-content" style="width: 50vw !important">
+            <div class="modal-header">
+              <h5 class="modal-title">Agregar Evento</h5>
+              <div class="d-flex justify-content-center align-items-center gap-2">
+                <button onclick="$('#createEventModal').modal('hide')" type="button" class="btn-close rounded-circle me-1" style="background-color: gray"></button>
+              </div>
+            </div>
+            <div class="modal-body bg-gray-100" > 
+              <div class="col-12">
+                <div class="d-flex gap-3 justify-content-center">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="checkboxCrm">
+                    <label class="custom-control-label" for="customCheck1">Evento CRM</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="checkboxDayComplete" checked>
+                    <label class="custom-control-label" for="customCheck1">Evento Día Completo</label>
+                  </div>
+                </div>
+
+                <label>Titulo Evento *</label>
+                <input id="dataTitle" class="multisteps-form__input form-control fieldInput" type="text" placeholder="ej. Reunion" onfocus="focused(this)" onfocusout="defocused(this)">
+                <label>Ubicación *</label>
+                <input id="dataPlace" class="multisteps-form__input form-control fieldInput" type="text" placeholder="ej. Sala de Juntas" onfocus="focused(this)" onfocusout="defocused(this)">
+
+                <div id="dataCrmSection" style="display: none; transition: 0.3s;">
+                  <hr class="horizontal dark my-3">
+                  <h6 class="text-center">Datos Evento CRM</h6>
+                  <label for="">Tipo de tarea</label>
+                  <select id="dataTipoTarea" name="" class="form-control">
+                    <option value="0" selected>Seleccionar</option>
+                    <option value="1">Envío de correo</option>
+                    <option value="2">Llamada</option>
+                    <option value="3">Visita</option>
+                    <option value="4">Recordatorio</option>
+                    <option value="5">Cotización</option>
+                  </select>
+                  <label for="">Motivo</label>
+                  <select id="dataMotivo" name="" class="form-control">
+                    <!-- Contenido Dinamico -->
+                  </select>
+                  <label for="">Vendedor</label>
+                  <select id="dataVendedor" name="" class="form-control">
+                    <option value="0">Seleccionar</option>
+                  </select>
+                  <div class="d-flex flex-column mt-2" style="justify-content: space-between;">
+                    <label for="">Vincular Persona</label>
+                    <div class="d-flex align-items-center">
+                      <div onclick="openUsersCrmModal()">
+                        <i class="fas fa-user-plus ms-2" style="font-size: 30px; cursor: pointer;"></i>
+                      </div>
+                      <div id="selectedUsersCrm" class="d-flex ms-4 gap-1">
+                        <!-- Contenido dinamico -->
+                      </div>
+                    </div>
+                  </div>
+                  <hr class="horizontal dark my-3">
+                </div>
+
+                <div class="d-flex gap-1">
+                  <div class="w-50">
+                    <label for="meeting-time">Fecha Inicio *</label>
+                    <input id="dataDateS" type="date" class="form-control fieldInput">
+                  </div>
+                  <div class="w-50">
+                    <label for="meeting-time">Fecha Fin *</label>
+                    <input id="dataDateE" type="date" class="form-control fieldInput">
+                  </div>
+                </div>
+
+                <div class="d-flex gap-1">
+                  <div class="w-50">
+                    <label for="">Notificarme</label>
+                    <select id="dataNotificate" name="" class="form-control">
+                      <option value="0" selected>No notificarme</option>
+                      <option value="5-b">5 Minutos Antes</option>
+                      <option value="10-b">10 Minutos Antes</option>
+                      <option value="15-b">15 Minutos Antes</option>
+                      <option value="30-b">30 Minutos Antes</option>
+                      <option value="45-b">45 Minutos Antes</option>
+                      <option value="60-b">60 Minutos Antes</option>
+                    </select>
+                  </div>
+                  <div class="w-50">
+                    <label for="">Repetir</label>
+                    <select id="dataRepeat" name="" class="form-control">
+                      <option value="0">No Repetir</option>
+                      <option value="1">Cada Día</option>
+                      <option value="2">Cada Semana</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div id="selectDaysRepeat" style="display: none;">
+                  <label for="">Hasta</label>
+                  <select id="dataDaysRepeat" name="" class="form-control">
+                    <option value="1">1 Días</option>
+                    <option value="2">2 Días</option>
+                    <option value="3">3 Días</option>
+                    <option value="4">4 Días</option>
+                    <option value="5">5 Días</option>
+                    <option value="6">6 Días</option>
+                    <option value="7">7 Días</option>
+                    <option value="8">8 Días</option>
+                    <option value="9">9 Días</option>
+                    <option value="10">10 Días</option>
+                    <option value="11">11 Días</option>
+                    <option value="12">12 Días</option>
+                    <option value="13">13 Días</option>
+                    <option value="14">15 Días</option>
+                    <option value="16">16 Días</option>
+                    <option value="17">17 Días</option>
+                    <option value="18">18 Días</option>
+                    <option value="19">19 Días</option>
+                    <option value="20">20 Días</option>
+                    <option value="21">21 Días</option>
+                    <option value="22">22 Días</option>
+                    <option value="23">23 Días</option>
+                    <option value="24">24 Días</option>
+                    <option value="25">25 Días</option>
+                    <option value="26">26 Días</option>
+                    <option value="27">27 Días</option>
+                    <option value="28">28 Días</option>
+                    <option value="29">29 Días</option>
+                    <option value="30">30 Días</option>
+                  </select>
+                </div>
+              
+                <div id="selectWeekDays" style="display: none;">
+                  <label for="">Días de la semana</label>
+                  <div class="d-flex gap-1 flex-wrap justify-content-around">
+                    <div class="form-check">
+                      <input class="form-check-input inputDayWeek" data-day="0" type="checkbox" value="" id="checkboxDayComplete">
+                      <label class="custom-control-label" for="customCheck1">Domingo</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input inputDayWeek" data-day="1" type="checkbox" value="" id="checkboxDayComplete">
+                      <label class="custom-control-label" for="customCheck1">Lunes</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input inputDayWeek" data-day="2" type="checkbox" value="" id="checkboxDayComplete">
+                      <label class="custom-control-label" for="customCheck1">Martes</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input inputDayWeek" data-day="3" type="checkbox" value="" id="checkboxDayComplete">
+                      <label class="custom-control-label" for="customCheck1">Miércoles</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input inputDayWeek" data-day="4" type="checkbox" value="" id="checkboxDayComplete">
+                      <label class="custom-control-label" for="customCheck1">Jueves</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input inputDayWeek" data-day="5" type="checkbox" value="" id="checkboxDayComplete">
+                      <label class="custom-control-label" for="customCheck1">Viernes</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input inputDayWeek" data-day="6" type="checkbox" value="" id="checkboxDayComplete">
+                      <label class="custom-control-label" for="customCheck1">Sábado</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div id="dateUntilContainer" style="display: none;">
+                  <label for="meeting-time">Hasta</label>
+                  <input id="dateUntil" type="date"  class="form-control">
+                </div>
+
+                <label for="">Notas</label>
+                <textarea id="dataNote" class="form-control" placeholder="ej. Reunión con el nuevo cliente" cols="30" rows="10" style="resize: none; height: 100px;"></textarea>
+
+                <div class="d-flex flex-column mt-2" style="justify-content: space-between;">
+                  <label for="">Invitar Usuarios</label>
+                  <div class="d-flex align-items-center">
+                    <div onclick="openUsersModal()">
+                      <i class="fas fa-user-plus ms-2" style="font-size: 30px; cursor: pointer;"></i>
+                    </div>
+                    <div id="selectedUsers" class="d-flex ms-4 gap-1">
+                      <!-- Contenido dinamico -->
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+              <div class="text-center mt-3">
+                <button id="btnCreateEvent" type="button" class="btn btn-primary">Crear</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal selección de usuarios -->
+      <div id="thirdsWindow" class="modalPersons bg-gray-100">
+        <div class="d-flex justify-content-between align-items-center p-5 pb-1">
+          <h4>Añadir tercero</h4>
+          <div class="d-flex gap-4">
+            <div onclick='getSelectedUsers()' style="cursor: pointer;">
+              <i class="fas fa-check" style="font-size: 30px"></i>
+            </div>
+            <div onclick='$("#thirdsWindow").hide( "slow" )' style="cursor: pointer;">
+              <i class="fas fa-times" style="font-size: 30px"></i>
+            </div>
+          </div>
+        </div>
+        <div id="thirdsWindowTable" class="p-5">
+          <table id="tableThirds" class="table align-items-center mb-1 table-hover" style="table-layout: fixed;">
+            <thead>
+              <tr id="tableHeadThirds" >
+                <th id="selectAllTable" data-state="0" width="5%" onclick="$('.chkboxUser').prop('checked', true)" class="text-left text-uppercase text-secondary font-weight-bolder opacity-7" style="cursor: pointer;">
+                  <i class="fas fa-check-double" style="position: relative; right: -10px;"></i>
+                </th>
+                <th  class="text-left text-uppercase text-secondary text-xs font-weight-bolder opacity-7">Usuario</th>
+                <th  width="60%" class="text-left text-uppercase text-xs text-secondary font-weight-bolder opacity-7">Nombre</th>
+                <th  class="text-left text-uppercase text-secondary text-xs font-weight-bolder opacity-7">Rol</th>
+              </tr> 
+            </thead>  
+            <tbody id="tableBodyThirds" class="mb-2">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Modal selección de usuarios CRM-->
+      <div id="thirdsCrmWindow" class="modalPersons bg-gray-100">
+        <div class="d-flex justify-content-between align-items-center p-5 pb-1">
+          <h4>Añadir tercero</h4>
+          <div class="d-flex gap-4">
+            <div onclick='getSelectedUsersCrm()' style="cursor: pointer;">
+              <i class="fas fa-check" style="font-size: 30px"></i>
+            </div>
+            <div onclick='$("#thirdsCrmWindow").hide( "slow" )' style="cursor: pointer;">
+              <i class="fas fa-times" style="font-size: 30px"></i>
+            </div>
+          </div>
+        </div>
+        <div id="thirdsCrmTable" class="p-5">
+          <table id="tableThirdsCrm" class="table align-items-center mb-1 table-hover" style="table-layout: fixed;">
+            <thead>
+              <tr id="tableHeadThirdsCrm" >
+                <th></th>
+                <th  class="text-left text-uppercase text-secondary text-xs font-weight-bolder opacity-7">Identificación</th>
+                <th  width="60%" class="text-left text-uppercase text-xs text-secondary font-weight-bolder opacity-7">Nombre</th>
+                <th  class="text-left text-uppercase text-secondary text-xs font-weight-bolder opacity-7">Tipo</th>
+              </tr> 
+            </thead>  
+            <tbody id="tableBodyThirdsCrm" class="mb-2">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Modal Detalle -->
+      <div id="modalDetalle" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Detalle</h5>
+              <div class="d-flex justify-content-center align-items-center gap-2">
+                <button onclick="$('#modalDetalle').modal('hide')" type="button" class="btn-close rounded-circle me-1" style="background-color: gray"></button>
+              </div>
+            </div>
+            <div class="modal-body">
+              <div class="text-center mb-3">
+                <h5 id="titleDetail">EscapeRoom - Enigma</h5>
+              </div>
+              <div class="my-1 d-flex gap-2 align-items-center"> 
+                <div style="width: 20px;" class="text-center">
+                  <i class="fas fa-user"></i>
+                </div>
+                <h6 id="detailName" class="m-0 ms-2 text-secondary"></h6>
+              </div>
+              <div class="my-1 d-flex gap-2 align-items-center"> 
+                <div style="width: 20px" class="text-center">
+                  <i class="far fa-clock"></i>
+                </div>
+                <h6 id="detailDate" class="m-0 ms-2 text-secondary"></h6>
+              </div>
+              <div class="my-1 d-flex gap-2 align-items-center"> 
+                <div style="width: 20px;" class="text-center">
+                  <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <h6 id="detailPlace" class="m-0 ms-2 text-secondary"></h6>
+              </div>
+              <div class="my-1 d-flex gap-2 align-items-center"> 
+                <div style="width: 20px;" class="text-center">
+                  <i class="fas fa-info-circle"></i>
+                </div>
+                <h6 id="detailDetail" class="m-0 ms-2 text-secondary"></h6>
+              </div>
+
+
+              <div>
+                <hr class="horizontal dark my-3">
+                <h6>Asistirán</h6>
+                <div id="confirmedContainer" class="d-flex gap-2">
+                  <!-- <div class="imgUser">
+                    <img src="https://app.pedbox.co/assets/images/avatars/profile.jpg" alt="" style="max-width: 100%; max-height: 100%;">
+                  </div> -->
+                </div>
+              </div>
+              <div>
+                <hr class="horizontal dark my-3">
+                <h6>Sin Confirmar</h6>
+                <div id="unconformedContainer" class="d-flex gap-2">
+                  <!-- <div class="imgUser">
+                    <img src="https://app.pedbox.co/assets/images/avatars/profile.jpg" alt="" style="max-width: 100%; max-height: 100%;">
+                  </div> -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- preloader -->
@@ -67,21 +423,571 @@
   <script src="/js/plugins/datatables.js"></script>
   <script src="/js/plugins/chartjs.min.js"></script>
   <script src="/js/underscore-min.js"></script>
+  <script src="/js/moment.js"></script>
   <script src="/js/helpers.js"></script>
+  <script src="/js/sweetalert2.all.min.js"></script>
   <script src="/js/menu.js"></script>
+
+  <!-- TODO descargar -->
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/tooltip.js/1.3.1/tooltip.min.js" integrity="sha512-ZAFwin0nQNXMJRo329TcU4ZyC+ZgKbnaopq/LH/6j7n9zT7ZVLK5BiSmnqgx7jNiewVLgc04geoE62cNN1D8VQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
     
   <script>
     let session = `<%- JSON.stringify(session) %>`;
         session = JSON.parse(session);
+    let persons = `<%- JSON.stringify(persons) %>`;
+        persons = handleJSON(persons);
+    let personsCrm = `<%- JSON.stringify(personsCrm) %>`;
+        personsCrm = handleJSON(personsCrm);
+    let mastersCrm = `<%- JSON.stringify(mastersCrm) %>`;
+        mastersCrm = handleJSON(mastersCrm);
 
+    let dataComplete;
+        
+    
+    var calendarEl = document.getElementById('agenda');
+    var agenda = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      locale: "esLocale",
+      firstDay: 1,
+      height: "auto",
+      windowResize: "true",
+      headerToolbar: {
+        left: 'dayGridMonth,timeGridWeek,timeGridDay',
+        center: 'title',
+        right:  'prev,next',
+        month: 'Mes',
+      },
+      buttonText: {
+        month: 'Mes', 
+        day: 'Día', 
+        week: 'Semana', 
+        today: 'Hoy'
+      },
+      eventClick: function(event){
+        detailEvent(event.event._def.publicId)
+      }
+
+    });
+    agenda.render();
+
+    let detailEvent = (id) => {
+      let data = _.findWhere(dataComplete, {id: Number(id)});
+      let date = data.date_begin + "/" + data.date_end;
+      let user = _.findWhere(persons.result.datas.users, {id: data.id_user_register});
       
-    $(document).ready(function () {
-      var calendarEl = document.getElementById('agenda');
-      var calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth'
-      });
-      calendar.render();
+      $("#titleDetail").text(data.subject)
+      $("#detailName").text(user.description)
+      $("#detailDate").text(date)
+      $("#detailPlace").text(data.place)
+      $("#detailDetail").text(data.detail)
 
+      for (let i = 0; i < data.activitie_user.length; i++) {
+        let id = data.activitie_user[i].id_user;
+        let dataUser = _.findWhere(persons.result.datas.users, {id: id});
+
+        let element = `
+          <div class="imgUser" title="${dataUser.description}" data-toggle="tooltip">
+            <img src="https://api.pedbox.co:8590${dataUser.photo}" alt="" style="max-width: 100%; max-height: 100%;">
+          </div>
+        `;
+        
+        if (data.activitie_user[i].status == 2) {
+          $("#confirmedContainer").append(element)
+        } else {
+          $("#unconformedContainer").append(element)
+        }
+      }
+
+      $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+      })
+
+      $("#modalDetalle").modal("show")
+      console.log(data)
+    }
+    
+    let getDataCells = () => {
+      agenda.removeAllEvents();
+      var cells = $("#agenda td.fc-daygrid-day");
+      let firstDate = cells.first().data("date");
+      let lastDate = cells.last().data("date");
+
+      fetch(`/agenda/getData/${firstDate}/${lastDate}`)
+      .then(response => response.json())
+      .then(data => {
+        let dataFormated = data[0];
+            dataComplete = data[1].result.data_user;
+        for (let i = 0; i < dataFormated.length; i++) {
+          addEvent(dataFormated[i])
+        }
+      })
+      .catch(error => console.log('Request failed', error));
+    }
+
+    let createEvent = () => {
+      cleanForm();
+      $("#createEventModal").modal("show");
+    }
+
+    let cleanForm = () => {
+      $('input:checkbox').prop('checked', false);
+      $('#checkboxDayComplete').prop('checked', true);
+      
+      $('input:text').val('');
+      $('#dataNote').val('');
+
+      $("#dataNotificate").val("0");
+      $("#dataRepeat").val("0");
+      $("#dataDaysRepeat").val("1"); 
+      $("#dataTipoTarea").val("0");
+      $("#dataMotivo").val("0")
+      $("#dataVendedor").val("0")
+
+      $('#dataDateS').val(moment().format('YYYY-MM-DD'));
+      $('#dataDateE').val(moment().format('YYYY-MM-DD'));
+      $('#dateUntil').val(moment().format('YYYY-MM-DD'));
+
+      $("#selectedUsersCrm").html("");
+      $("#selectedUsers").html("");
+    }
+
+    let getDataNewEvent = () => {
+      if (!checkFields()) {
+          return Swal.fire({
+          icon: 'warning',
+          title: 'Llena los campos necesarios marcados con (*) antes de enviar',
+          confirmButtonText: 'Continuar',
+        })
+      }
+
+      let data = {
+        "place": $("#dataPlace").val().trim(),
+        "detail": $("#dataNote").val().trim(),
+        "subject": $("#dataTitle").val().trim(),
+        "id_user_register": session.user.id,
+        "id_company": session.user.id_company,
+        "activitie_user": [
+          {
+            "id_user": session.user.id,
+            "id_person": null,
+            "nit_customer": null,
+            "status": 2, // ?
+            "id_contact": [],
+            "is_user": 1 // ?
+          }
+        ],
+        "notification": "",
+        "type_task": 4, // ?
+        "status": 2, // ?
+        "is_crm": "",
+        "id_reason": null,
+        "id_type": null
+      }
+
+      if ($("#checkboxDayComplete").is(':checked')) {
+        data.date_begin = $("#dataDateS").val();
+        data.date_end =  $("#dataDateE").val();
+      } else {
+        let s = $("#dataDateS").val().split("T")
+        let e = $("#dataDateE").val().split("T")
+
+        data.date_begin = s[0];
+        data.hour_begin = s[1];
+        
+        data.date_end =  e[0];
+        data.hour_end =  e[1];
+      }
+
+      if ($("#selectedUsers>div").length) {
+        let users = $("#selectedUsers>div");
+        for (let i = 0; i < users.length; i++) {
+          if (Number($(users[i]).attr("data-user")) == session.user.id) { continue }
+
+          data.activitie_user.push({
+            "id_user": Number($(users[i]).attr("data-user")),
+            "id_person": null,
+            "nit_customer": null,
+            "status": 2, // ?
+            "id_contact": [],
+            "is_user": 1 // ?
+          })
+        }
+      }
+
+      if ($("#dataNotificate").val() != "0") {
+        data.notification = $("#dataNotificate").val()
+      }
+
+      if ($("#dataRepeat").val() != "0") {
+        let days = Number($("#dataDaysRepeat").val());
+        let daysRepeat = [];
+
+        if ($("#dataRepeat").val() == "1") {
+          data.daysRepeat = [{"day":"0"}, {"day":"1"}, {"day":"2"}, {"day":"3"}, {"day":"4"}, {"day":"5"}, {"day":"6"}];
+          let amount = Number($("#dataDaysRepeat").val())
+          let repeat_activities = []
+
+          for (let i = 0; i < amount; i++) {
+            if (i == 0) {
+              repeat_activities.push($("#dataDateS").val())
+              continue
+            }
+            let day = moment($("#dataDateS").val()).add(i, 'days')._d;
+            repeat_activities.push(moment(day).format("YYYY-MM-DD"))
+          }
+          data.repeat_activitie = repeat_activities;
+        }
+
+        if ($("#dataRepeat").val() == "2") {
+          let fields = $(".inputDayWeek");
+          for (let i = 0; i < fields.length; i++) {
+            if ($(fields[i]).is(":checked")) {
+              daysRepeat.push({
+                day : $(fields[i]).attr("data-day")
+              })
+            }
+          }
+          data.daysRepeat = daysRepeat;
+          data.repeat_activitie = datesInRangeOfDates({
+            "dateIni": $("#dataDateS").val(),
+            "dateFin": $("#dateUntil").val(),
+            "daysRepeat": data.daysRepeat
+          });
+        } 
+      }
+
+      // console.log(data)
+      // return
+
+      createEventPetition(data)
+    }
+    
+    let checkFields = () => {
+      $(".fieldInput").removeClass("badField");
+      let isOkay = true;
+
+      if ($("#dataTitle").val() == "") {
+        $("#dataTitle").addClass("badField");
+        isOkay = false;
+      }
+
+      if ($("#dataPlace").val() == "") {
+        $("#dataPlace").addClass("badField");
+        isOkay = false;
+      }
+
+      if ($("#dataDateS").val() == "") {
+        $("#dataDateS").addClass("badField");
+        isOkay = false;
+      }
+
+      if ($("#dataDateE").val() == "") {
+        $("#dataDateE").addClass("badField");
+        isOkay = false;
+      }
+      return isOkay
+    }
+
+    let datesInRangeOfDates = (params) => {
+      let dateIni = Date.parse(params.dateIni);
+      let dateFin = Date.parse(params.dateFin);
+      let daysToRepeat = [];
+      for (let i = dateIni; i < dateFin; i += 86400000) {
+        let date = new Date(i);
+        let dia = date.getDay();
+        for (let index in params.daysRepeat) {
+          if(dia == params.daysRepeat[index].day) {
+            daysToRepeat.push(date.toISOString());
+            break;
+          }
+        }
+      }
+      if(dateIni == dateFin) {
+        let date = new Date(dateIni);
+        daysToRepeat = [date];
+      }
+      return daysToRepeat;
+    }
+
+    let createEventPetition = (data) => {
+      let route;
+      if ($("#dataRepeat").val() != "0") {
+        route = "/agenda/createEventRepeat"
+      } else {
+        route = "/agenda/createEvent"
+      }
+
+      fetch(route, {
+        method: 'POST',
+        headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(res =>{   
+        console.log(res)
+        if (res.result.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Evento creado con éxito',
+            confirmButtonText: 'Continuar',
+          }).then(() => {
+            let data = {
+              id: res.result.quote.id,
+              title: res.result.quote.subject,
+              start: res.result.quote.date_begin,
+              end: res.result.quote.date_end
+            }
+            addEvent(data)
+            $("#createEventModal").modal("hide")
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'No fue posible crear el evento',
+            confirmButtonText: 'Continuar',
+          }).then(() => {
+            $("#createEventModal").modal("hide")
+          });
+        }
+      })
+    }
+
+    let addEvent = (data) => {
+      agenda.addEvent( data )
+    }
+
+    let openUsersModal = () => {
+      $('.chkboxUser').prop('checked', false);
+      $("#thirdsWindow").show("slow");
+    }
+    let openUsersCrmModal = () => {
+      $('.chkboxUser').prop('checked', false);
+      $("#thirdsCrmWindow").show("slow");
+    }
+    
+    let loadUsersModal = () => {
+      let data = persons.result.datas.users || [];
+      for (let i = 0; i < data.length; i++) {
+        let element = `
+          <tr>
+            <td> 
+              <div class="form-check">
+                <input type="checkbox" class="chkboxUser form-check-input" id="${data[i].id}">
+              </div>
+            </td>
+            <td>${data[i].user}</td>
+            <td>${data[i].description}</td>
+            <td>${data[i].role}</td>
+          </tr>
+        `;
+        $("#tableBodyThirds").append(element)
+      }
+      const tableObj = new simpleDatatables.DataTable("#tableThirds", {
+        perPageSelect: false,
+        sortable: false
+      });
+    }
+
+    let loadUsersCrmModal = () => {
+      let data = personsCrm.result.persons || [];
+      for (let i = 0; i < data.length; i++) {
+        let role;
+        switch (data[i].type_user) {
+          case "U":
+            role = "Cliente"
+            break;
+          default:
+            role = "-"
+            break;
+        }
+
+        let element = `
+          <tr>
+            <td class="d-flex justify-content-center">  
+              <div class="form-check">
+                <input type="checkbox" class="chkboxUserCrm form-check-input" id="${data[i].id}" data-name="${data[i].name_person}">
+              </div>
+            </td>
+            <td>${data[i].num_identification}</td>
+            <td>${data[i].name_person}</td>
+            <td>${role}</td>
+          </tr>
+        `;
+        $("#tableBodyThirdsCrm").append(element)
+      }
+      const tableObj = new simpleDatatables.DataTable("#tableThirdsCrm", {
+        perPageSelect: false,
+        sortable: false
+      });
+    }
+
+    let getSelectedUsers = () => {
+      let chckBoxes = $(".chkboxUser")
+      let selectedUsers = [];
+      for (let i = 0; i < chckBoxes.length; i++) {
+        if ($(chckBoxes[i]).is(':checked')) {
+          selectedUsers.push($(chckBoxes[i]).attr("id"))
+        }        
+      }
+      $("#thirdsWindow").hide("fast")
+      printUsersSelected(selectedUsers)
+    }
+
+    let getSelectedUsersCrm = () => {
+      let id = $('.chkboxUserCrm:checked').attr("id");
+      let name = $('.chkboxUserCrm:checked').attr("data-name");
+
+      $("#selectedUsersCrm").html("")
+      let element = `
+        <div class="imgUserContainer" data-user="${id}">
+          <div class="imgUser" data-toggle="tooltip" title="${name}">
+            <img src="https://app.pedbox.co/assets/images/avatars/profile.jpg" alt="" style="max-width: 100%; max-height: 100%;">
+          </div>
+          <div class="badge badge-sm badge-circle badge-floating badge-primary border-white removeUserIcon" style="display: none; transition: 0.3s;">X</div>
+        </div>
+      `;
+      $("#selectedUsersCrm").append(element)
+      
+      $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+      })
+      
+      $(".chkboxUserCrm").prop('checked', false);
+      $("#thirdsCrmWindow").hide("fast")
+    }
+
+    let printUsersSelected = (data) => {
+      let users = [];
+      for (let i = 0; i < data.length; i++) {
+        users.push(_.where(persons.result.datas.users, {id: Number(data[i])}))
+      }
+
+      $("#selectedUsers").html("")
+      for (let i = 0; i < users.length; i++) {
+        let element = `
+          <div class="imgUserContainer" data-user="${users[i][0].id}">
+            <div class="imgUser" title="${users[i][0].description}" data-toggle="tooltip">
+              <img src="https://api.pedbox.co:8590${users[i][0].photo}" alt="" style="max-width: 100%; max-height: 100%;">
+            </div>
+            <div class="badge badge-sm badge-circle badge-floating badge-primary border-white removeUserIcon" style="display: none; transition: 0.3s;">X</div>
+          </div>
+        `;
+        $("#selectedUsers").append(element)
+      };
+
+      $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+      })
+    }
+
+    let loadCrmMasters = () => {
+      let master = mastersCrm.result.master[0].master || []
+      for (let i = 0; i < master.length; i++) {
+        if (master[i].type_concept == 3) {
+          let element = `
+            <option value="${master[i].id}">${master[i].description}</option>
+          `;
+          $("#dataMotivo").append(element)
+        }
+      }
+      $("#dataMotivo").append(`<option value="0" selected>Seleccionar</option>`)
+    }
+
+    $(document).ready(function () {
+      $(".btn-sidenav").on("click", function () {
+        setTimeout(() => {
+          agenda.render();
+        },300);
+      })
+
+      $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+      })
+
+      $("#createEventBtn").on("click", function () {
+        createEvent()
+      })
+
+      $("#btnCreateEvent").on("click", function () {
+        getDataNewEvent()
+      })
+
+      $('#checkboxCrm').click(function(){
+        if($(this).is(':checked')){
+          $("#dataCrmSection").show(500)
+        } else {
+          $("#dataCrmSection").hide()
+        }
+      });
+
+      $('#checkboxDayComplete').click(function(){
+        if($(this).is(':checked')){
+          $("#dataDateS").attr("type", "date")
+          $("#dataDateE").attr("type", "date")
+        } else {
+          $("#dataDateS").attr("type", "datetime-local")
+          $("#dataDateE").attr("type", "datetime-local")
+        }
+      });
+
+      $('#selectAllTable').click(function(){
+        if($(this).attr("data-state") == "0"){
+          $('.chkboxUser').prop('checked', true);
+          $(this).attr("data-state", 1)
+        } else {
+          $('.chkboxUser').prop('checked', false);
+          $(this).attr("data-state", 0)
+        }
+      });
+
+      $("#dataRepeat").on("change", function () {
+        if ($(this).val() == "1") {
+          $("#selectWeekDays").hide()
+          $("#dateUntilContainer").hide()
+          $("#selectDaysRepeat").show()
+        }
+        if ($(this).val() == "2") {
+          $("#selectDaysRepeat").hide()
+          $("#selectWeekDays").show()
+          $("#dateUntilContainer").show()
+        }
+        if ($(this).val() == "0") {
+          $("#selectDaysRepeat").hide()
+          $("#selectWeekDays").hide()
+          $("#dateUntilContainer").hide()
+        }
+      })
+
+      $(document).on("click", ".fc-next-button", function () {
+        getDataCells()
+      })
+
+      $(document).on("click", ".fc-prev-button", function () {
+        getDataCells()
+      })
+
+      $(document).on("click", ".chkboxUserCrm", function () {
+        $(".chkboxUserCrm").prop('checked', false);
+        $(this).prop('checked', true);
+      })
+
+      $(document).on("click", ".imgUserContainer", function () {
+        $('.tooltip').tooltip('hide');
+        $(this).remove();
+      })
+
+      $(document).on("mouseover", ".imgUserContainer", function () {
+        $(this).find(".badge").show()
+      })
+      
+      $(document).on("mouseout", ".imgUserContainer", function () {
+        $(this).find(".badge").hide()
+      })
+      
+      getDataCells();
+      loadCrmMasters();
+      loadUsersModal();
+      loadUsersCrmModal();
 
       $("#menuAgenda").addClass("activeNav")
       $("#preloader").hide();

@@ -3,6 +3,7 @@ const router = express.Router();
 const viewController = require('../controller/viewController.js');
 const b2bController = require('../controller/b2bController.js');
 const helpdeskController = require('../controller/helpdeskController.js');
+const agendaController = require('../controller/agendaController.js');
 
 
 router.get('/', viewController.index);
@@ -44,10 +45,11 @@ router.post('/permisos/nuevo-permiso', b2bController.createPermiso);
 router.get('/documentos-usuario', b2bController.documentosUsuario);
 router.post('/documentos-usuario/upload', b2bController.uploadDocumentoUsuario);
 
-// Helpdesk
+// Herramientas
 router.get('/chat', viewController.chat);
-router.get('/agenda', viewController.agenda);
 
+
+// Helpdesk
 router.get('/helpdesk', helpdeskController.helpdesk);
 router.get('/helpdesk/indicators', helpdeskController.helpdeskIndicators);
 router.get('/helpdesk/solicitudes', helpdeskController.helpdeskSolicitudes);
@@ -62,6 +64,14 @@ router.post('/helpdesk/proceso', helpdeskController.helpdeskProceso);
 router.post('/helpdesk/formatPost', helpdeskController.helpdeskPostFormat);
 router.post('/helpdesk/formatPut', helpdeskController.helpdeskUpdateFormat);
 router.post('/helpdesk/startWorkflow', helpdeskController.helpdeskStartWorkflow);
+
+// Agenda
+router.get('/agenda', agendaController.agenda);
+router.post('/agenda/createEvent', agendaController.agendaCreateEvent);
+router.post('/agenda/createEventRepeat', agendaController.agendaCreateEventRepeat);
+// router.post('/agenda/deleteEvent', agendaController.agendaDeleteEvent);
+router.get('/agenda/getData/:date_begin/:date_end', agendaController.agendaGetData);
+
 
 // Por integrar
 router.get('/crm', viewController.crm);

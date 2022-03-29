@@ -8,7 +8,7 @@ const urlCalidosos = 'https://loscalidosos.com/';
 
 const options = (method, body) => { 
   var opt = {method: method, headers: {'Content-Type': 'application/json'}}; 
-  if (method == 'post' || method == 'put') opt['body'] = JSON.stringify(body);
+  if (method == 'post' || method == 'put' || method == 'delete') opt['body'] = JSON.stringify(body);
   return opt;
 }
 
@@ -284,14 +284,50 @@ service.takeOcurrence = async(body) => {
   return data;
 }
 
-service.getPersonsCompany = async(id_company, type_person) => { //TODO para sacar las personas a las que le va a lelgar la notificación
-  const url = urlKakashi+"get_personsmallcompanyid_company="+id_company+"&type_person="+type_person;
+service.getPersonsCompany = async(id_company, type_person) => { 
+  const url = urlKakashi+"get_personsmallcompany?id_company="+id_company+"&type_person="+type_person;
   const data =  await makeRequest(url);
   return data;
 }
 
-// validateRequestTaken // TODO donde se aplica estavilación
-// get_userscompany
+service.getUsersCompany = async(id_company, Status) => { 
+  const url = urlKakashi+"get_userscompany?id_company="+id_company+"&status="+Status;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+// Agenda
+service.agendaGetDateUser = async(id_user, date_begin, date_end) => { 
+  const url = urlKakashi+"get_date_user?id_user="+id_user+"&date_begin="+date_begin+"&date_end="+date_end;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.agendaCreateEvent = async(body) => {
+  const url = urlKakashi+"create_quote";
+  const data =  await makeRequest(url, options('post', body));
+  return data;
+}
+
+service.agendaCreateEventRepeat = async(body) => {
+  const url = urlKakashi+"create_quote_repeat";
+  const data =  await makeRequest(url, options('post', body));
+  return data;
+}
+
+service.agendaDeleteEvent = async(id) => {
+  const url = urlKakashi+"delete_quote";
+  const data =  await makeRequest(url, options('delete', body));
+  return data;
+}
+
+// CRM
+service.getMastersCrm = async(id_company) => { 
+  const url = urlKakashi+"get_master_crm?id_company="+id_company;
+  const data =  await makeRequest(url);
+  return data;
+}
+
 
 const makeRequest = async (url, options) => {
   try {

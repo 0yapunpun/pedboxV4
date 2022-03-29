@@ -25,7 +25,7 @@ controller.loginValidate = async(req, res, next) => {
     req.session.login = true;
     req.session.urlSocket = resp.urlSocket;
     req.session.user = resp.user;
-    delete resp.user;
+    // delete resp.user;
     delete resp.urlSocket;
   }
   return res.send(resp);
