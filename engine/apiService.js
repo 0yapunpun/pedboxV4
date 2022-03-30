@@ -315,7 +315,7 @@ service.agendaCreateEventRepeat = async(body) => {
   return data;
 }
 
-service.agendaDeleteEvent = async(id) => {
+service.agendaDeleteEvent = async(body) => {
   const url = urlKakashi+"delete_quote";
   const data =  await makeRequest(url, options('delete', body));
   return data;

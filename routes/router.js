@@ -69,7 +69,7 @@ router.post('/helpdesk/startWorkflow', helpdeskController.helpdeskStartWorkflow)
 router.get('/agenda', agendaController.agenda);
 router.post('/agenda/createEvent', agendaController.agendaCreateEvent);
 router.post('/agenda/createEventRepeat', agendaController.agendaCreateEventRepeat);
-// router.post('/agenda/deleteEvent', agendaController.agendaDeleteEvent);
+router.get('/agenda/deleteEvent/:id', agendaController.agendaDeleteEvent);
 router.get('/agenda/getData/:date_begin/:date_end', agendaController.agendaGetData);
 
 

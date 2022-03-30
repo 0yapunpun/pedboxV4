@@ -55,6 +55,18 @@
     .badField{
       border: solid 1px red;
     }
+    .eventCalendar{
+      overflow: hidden; 
+      font-weight: 600; 
+      font-size: 11px
+    }
+    .fc-daygrid-day{
+      padding: 5px !important;
+    }
+    .fc-scrollgrid-section-header>td, .fc-scrollgrid-section-body>td{
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
   </style>
 </head>
 
@@ -86,7 +98,7 @@
 
       <!-- *** Modales -->
       <!-- Modal Proceso Flujo de trabajo-->
-      <div id="createEventModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+      <div id="createEventModal" class="modal fade" tabindex="" role="dialog" aria-hidden="true">
         <div class="modal-dialog" >
           <div class="modal-content" style="width: 50vw !important">
             <div class="modal-header">
@@ -340,7 +352,7 @@
       </div>
 
       <!-- Modal Detalle -->
-      <div id="modalDetalle" class="modal" tabindex="-1" role="dialog">
+      <div id="modalDetalle" class="modal fade" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
@@ -378,25 +390,33 @@
                 <h6 id="detailDetail" class="m-0 ms-2 text-secondary"></h6>
               </div>
 
+              
 
               <div>
                 <hr class="horizontal dark my-3">
                 <h6>Asistirán</h6>
                 <div id="confirmedContainer" class="d-flex gap-2">
-                  <!-- <div class="imgUser">
-                    <img src="https://app.pedbox.co/assets/images/avatars/profile.jpg" alt="" style="max-width: 100%; max-height: 100%;">
-                  </div> -->
+                  <!-- Contenido dinamico -->
                 </div>
               </div>
               <div>
                 <hr class="horizontal dark my-3">
                 <h6>Sin Confirmar</h6>
                 <div id="unconformedContainer" class="d-flex gap-2">
-                  <!-- <div class="imgUser">
-                    <img src="https://app.pedbox.co/assets/images/avatars/profile.jpg" alt="" style="max-width: 100%; max-height: 100%;">
-                  </div> -->
+                  <!-- Contenido dinamico -->
                 </div>
               </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+              <button onclick="deleteEvent()" type="button" class="btn btn-secondary">
+                Eliminar
+                <i class="fas fa-trash ms-1"></i>
+              </button>
+              <button type="button" class="btn btn-secondary">
+                Editar
+                <i class="fas fa-edit ms-1"></i>
+              </button>
+              <button onclick="$('#modalDetalle').modal('hide')" type="button" class="btn btn-primary" data-dismiss="modal">Continuar</button>
             </div>
           </div>
         </div>
@@ -427,9 +447,6 @@
   <script src="/js/helpers.js"></script>
   <script src="/js/sweetalert2.all.min.js"></script>
   <script src="/js/menu.js"></script>
-
-  <!-- TODO descargar -->
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/tooltip.js/1.3.1/tooltip.min.js" integrity="sha512-ZAFwin0nQNXMJRo329TcU4ZyC+ZgKbnaopq/LH/6j7n9zT7ZVLK5BiSmnqgx7jNiewVLgc04geoE62cNN1D8VQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
     
   <script>
     let session = `<%- JSON.stringify(session) %>`;
@@ -463,6 +480,26 @@
         week: 'Semana', 
         today: 'Hoy'
       },
+      eventContent: function (arg) {
+        let time = ""
+        if (arg.timeText) {
+          let s = formatAMPM(arg.event._def.extendedProps.dataS);
+          let e = formatAMPM(arg.event._def.extendedProps.dataE);
+          time = s + " - " + e;
+        }
+            
+        let customHtml = `
+          <span class='r10 eventCalendar d-flex'>
+            <img src='https://api.pedbox.co:8590${arg.event._def.extendedProps.imgUrl}' width='30' height='30' style="border-radius: 50%; margin: 5px">
+            <div class="d-flex flex-column align-items-center justify-content-center">
+              ${time ? time + "<br>" : ""}
+              ${arg.event._def.title} 
+            </div>
+          </span>
+        `;
+
+        return { html: customHtml }
+      },
       eventClick: function(event){
         detailEvent(event.event._def.publicId)
       }
@@ -472,15 +509,30 @@
 
     let detailEvent = (id) => {
       let data = _.findWhere(dataComplete, {id: Number(id)});
-      let date = data.date_begin + "/" + data.date_end;
       let user = _.findWhere(persons.result.datas.users, {id: data.id_user_register});
       
+      let date;
+      if (data.date_begin == data.date_end) {
+        date = nvFormatDate(data.date_begin, "mmmm DD, YYYY");
+      } else {
+        date = nvFormatDate(data.date_begin, "mmmm DD, YYYY") + " - " + nvFormatDate(data.date_end, "mmmm DD, YYYY")
+      }
+
+      $("#titleDetail").attr("data-id", id)
       $("#titleDetail").text(data.subject)
       $("#detailName").text(user.description)
       $("#detailDate").text(date)
       $("#detailPlace").text(data.place)
-      $("#detailDetail").text(data.detail)
 
+      if (data.detail) {
+        $("#detailDetail").parent().css("visibility", "visible")
+        $("#detailDetail").text(data.detail)
+      } else {
+        $("#detailDetail").parent().css("visibility", "hidden")
+      }
+
+      $("#unconformedContainer").html("")
+      $("#confirmedContainer").html("")
       for (let i = 0; i < data.activitie_user.length; i++) {
         let id = data.activitie_user[i].id_user;
         let dataUser = _.findWhere(persons.result.datas.users, {id: id});
@@ -496,6 +548,15 @@
         } else {
           $("#unconformedContainer").append(element)
         }
+      }
+
+      $("#confirmedContainer").parent().show();
+      if ($("#confirmedContainer>div").length == 0) {
+        $("#confirmedContainer").parent().hide();
+      }
+      $("#unconformedContainer").parent().show();
+      if ($("#unconformedContainer>div").length == 0) {
+        $("#unconformedContainer").parent().hide();
       }
 
       $(function () {
@@ -526,7 +587,52 @@
 
     let createEvent = () => {
       cleanForm();
+      $(".fieldInput").removeClass("badField");
       $("#createEventModal").modal("show");
+    }
+
+    let deleteEvent = () => {
+      let id = $("#titleDetail").attr("data-id")
+      Swal.fire({
+        title: '¿Estás seguro de eliminar este evento?',
+        showConfirmButton:false,
+        showDenyButton: true,
+        showCancelButton: true,
+        cancelButtonText: "Cancelar",
+        denyButtonText: `Eliminar`,
+      }).then((result) => {
+        if (result.isDenied) {
+          fetch(`/agenda/deleteEvent/${id}`)
+          .then(response => response.json())
+          .then(data => {
+            if (data.result.success) {
+              let event = agenda.getEventById(id);
+              event.remove();
+              $("#modalDetalle").modal("hide");
+              Swal.fire({
+                icon: 'success',
+                title: 'Evento eliminado exitosamente',
+                showConfirmButton: false,
+                timer: 1500
+              })
+            } else {
+              Swal.fire('No fue posible eliminar el evento')
+            }
+          })
+          .catch(error => console.log('Request failed', error));
+        }
+      })
+    }
+
+    let formatAMPM = (date) => {
+      var hours = date.substring(0,2);
+      var minutes = date.substring(3,5);
+
+      var ampm = hours >= 12 ? 'pm' : 'am';
+      hours = hours % 12;
+      hours = hours ? hours : 12; 
+      var strTime = hours + ':' + minutes + ' ' + ampm;
+      return strTime;
     }
 
     let cleanForm = () => {
@@ -555,7 +661,7 @@
       if (!checkFields()) {
           return Swal.fire({
           icon: 'warning',
-          title: 'Llena los campos necesarios marcados con (*) antes de enviar',
+          title: 'Llena los campos marcados con (*) antes de enviar',
           confirmButtonText: 'Continuar',
         })
       }
@@ -784,7 +890,7 @@
       }
       const tableObj = new simpleDatatables.DataTable("#tableThirds", {
         perPageSelect: false,
-        sortable: false
+        sortable: false,
       });
     }
 
@@ -957,6 +1063,12 @@
           $("#dateUntilContainer").hide()
         }
       })
+
+      // Cerrar modal de selección de usuarios al cerrar modal de formulario
+      $('#createEventModal').on('hidden.bs.modal', function () {
+        $("#thirdsWindow").hide( "slow" )
+        $("#thirdsCrmWindow").hide( "slow" )
+      });
 
       $(document).on("click", ".fc-next-button", function () {
         getDataCells()

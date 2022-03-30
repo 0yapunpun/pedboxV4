@@ -27,14 +27,21 @@ controller.agendaGetData = async(req, res, next) => {
   let id_user = req.session.user.id;
   let date_begin = req.params.date_begin;
   let date_end = req.params.date_end;
+  let id_company = req.session.user.id_company;
+  let Status = 1; // Usuarios activos
 
-  let dataFormated = [];
-
+  
   let data = await service.agendaGetDateUser(id_user, date_begin, date_end);
+  let persons = await service.getUsersCompany(id_company, Status);
+  
+  let dataFormated = [];
+  let users = persons.result.datas.users;
   
   if (data.result.success) {
     for (let i = 0; i < data.result.data_user.length; i++) {
       if(data.result.data_user[i].status == 0) {continue} // No enviar eventos ya cerrados
+
+      let userImg = _.findWhere(users, {id: data.result.data_user[i].id_user_register});
 
       let dateS = data.result.data_user[i].date_begin;
       if (data.result.data_user[i].hour_begin && data.result.data_user[i].hour_begin != "00:00:00" ) {
@@ -46,24 +53,38 @@ controller.agendaGetData = async(req, res, next) => {
         dateE = dateE + "T" + data.result.data_user[i].hour_end
       }
 
+      // console.log(data.result.data_user[i])
+
       dataFormated.push({
         id: data.result.data_user[i].id,
         title: data.result.data_user[i].subject, 
         start: dateS , 
         end: dateE, 
+        dataS: data.result.data_user[i].hour_begin,
+        dataE: data.result.data_user[i].hour_end, 
+        imgUrl: userImg.photo || ""
       })
     }
   }
   
-  console.log(data.result)
-  console.log(dataFormated)
-
   res.send([dataFormated, data]);
 }
 
 controller.agendaCreateEvent = async(req, res, next) => {
   let body = req.body;
   let response = await service.agendaCreateEvent(body);
+
+  res.send(response);
+}
+
+controller.agendaDeleteEvent = async(req, res, next) => {
+  let id = req.params.id;
+  let body = {
+    id_activitie: id,
+    stauts: 0
+  }
+
+  let response = await service.agendaDeleteEvent(body);
 
   res.send(response);
 }
