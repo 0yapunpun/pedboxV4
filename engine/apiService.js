@@ -2,6 +2,7 @@ const fetch = require('node-fetch');
 const { showLog } = require('./helpers');
 const service = {};
 const urlPedbox = 'http://api.pedbox.co:5037/';
+const urlServicePedbox4 = 'http://localhost:7777/'; //TODO cambiar
 const urlPedbox1 = 'https://pedbox.co:8531/';
 const urlKakashi = 'https://api.pedbox.co:8590/';
 const urlCalidosos = 'https://loscalidosos.com/';
@@ -169,6 +170,30 @@ service.createPermiso = async(body) => {
   return data;
 }
 
+service.getDocumentos = async(id_company) => {
+  const url = urlServicePedbox4+'documentos/'+id_company;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.getMastersDocumentos = async() => {
+  const url = urlServicePedbox4+'documentos/masters';
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.uploadDocumentoUsuario = async(body) => {
+  const url = urlServicePedbox4+'documentos/saveRegister';
+  const data =  await makeRequest(url, options('post', body));
+  return data;
+}
+
+service.deleteDocumentoUsuario = async(body) => {
+  const url = urlServicePedbox4+'documentos/deleteRegister';
+  const data =  await makeRequest(url, options('post', body));
+  return data;
+}
+
 // ** Helpdesk
 service.getHelpdeskIndicators = async(id_company, id_user) => {
   const url = urlKakashi+"get_helpdesk?id_company="+id_company+"&id_user="+id_user;
@@ -214,6 +239,12 @@ service.getNewDetailformat = async(id, id_node, id_workflow_header) => {
 
 service.getEditDetailFormat = async(id, id_header) => {
   const url = urlKakashi+"getDetailformat?id="+id+"&id_header="+id_header;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.getEditDetailFormatById = async(id) => {
+  const url = urlKakashi+"getDetailformat?id="+id;
   const data =  await makeRequest(url);
   return data;
 }
@@ -272,6 +303,12 @@ service.startWorkflow = async(body) => {
   return data;
 }
 
+service.continueWorkflow = async(body) => {
+  const url = urlKakashi+"continue_workflow";
+  const data =  await makeRequest(url, options('post', body));
+  return data;
+}
+
 service.adminMasters = async(id_company) => {
   const url = urlKakashi+"admindMaster?id_company="+id_company;
   const data =  await makeRequest(url);
@@ -303,9 +340,27 @@ service.agendaGetDateUser = async(id_user, date_begin, date_end) => {
   return data;
 }
 
+service.agendaCumpleaños = async(id_company) => { 
+  const url = urlServicePedbox4+"birthdays/"+id_company;
+  const data =  await makeRequest(url);
+  return data;
+}
+
 service.agendaCreateEvent = async(body) => {
   const url = urlKakashi+"create_quote";
   const data =  await makeRequest(url, options('post', body));
+  return data;
+}
+
+service.agendaUpdateEvent = async(body) => {
+  const url = urlKakashi+"create_quote";
+  const data =  await makeRequest(url, options('put', body));
+  return data;
+}
+
+service.agendaReportSeller = async(id_company, dateS, dateE) => {
+  const url = urlKakashi+"sellersCalendarCrmReport?id_company="+id_company+"&date_begin="+dateS+"&date_end="+dateE;
+  const data =  await makeRequest(url);
   return data;
 }
 
@@ -324,6 +379,18 @@ service.agendaDeleteEvent = async(body) => {
 // CRM
 service.getMastersCrm = async(id_company) => { 
   const url = urlKakashi+"get_master_crm?id_company="+id_company;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.getSellersReportsCrm = async(id_company, date) => { 
+  const url = urlKakashi+"sellersCalendarCrmReport?id_company="+id_company+"&date_begin="+date+"&date_end="+date
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.getQuoteReportCrm = async(id_company) => { 
+  const url = urlKakashi+"get_datereport_quotecrm?export=false&id_company="+id_company
   const data =  await makeRequest(url);
   return data;
 }

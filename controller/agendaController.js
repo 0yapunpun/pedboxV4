@@ -11,16 +11,25 @@ const { response } = require('express');
 controller.agenda = async(req, res, next) => {
   // Validar login
   if (!req.session.login) { return res.redirect('/login'); }
-  
+
+  res.render('agenda', {'session': req.session});
+}
+
+controller.agendaData = async(req, res, next) => {
   let id_company = req.session.user.id_company;
   let Status = 1; // Usuarios activos
   let usersCrm = 3; // Usuarios CRM
+  let currentDate = req.params.date;
+
 
   let persons = await service.getUsersCompany(id_company, Status);
   let personsCRM = await service.getPersonsCompany(id_company, usersCrm);
   let mastersCrm = await service.getMastersCrm(id_company);
+  let cumpleaños = await service.agendaCumpleaños(id_company);
+  let informes = await service.getQuoteReportCrm(id_company);
+  let reportes = await service.getSellersReportsCrm(id_company, currentDate);
 
-  res.render('agenda', {'session': req.session, 'persons': persons, 'personsCrm': personsCRM, 'mastersCrm': mastersCrm});
+  res.send({'persons': persons, 'personsCrm': personsCRM, 'mastersCrm': mastersCrm, "cumpleaños": cumpleaños, "informes": informes, "reportes": reportes});
 }
 
 controller.agendaGetData = async(req, res, next) => {
@@ -53,16 +62,18 @@ controller.agendaGetData = async(req, res, next) => {
         dateE = dateE + "T" + data.result.data_user[i].hour_end
       }
 
-      // console.log(data.result.data_user[i])
-
       dataFormated.push({
         id: data.result.data_user[i].id,
         title: data.result.data_user[i].subject, 
+        detail: data.result.data_user[i].detail, 
+        place: data.result.data_user[i].place, 
         start: dateS , 
         end: dateE, 
         dataS: data.result.data_user[i].hour_begin,
         dataE: data.result.data_user[i].hour_end, 
-        imgUrl: userImg.photo || ""
+        imgUrl: userImg.photo || "",
+        userName: userImg.description || "",
+        editable: true
       })
     }
   }
@@ -73,6 +84,13 @@ controller.agendaGetData = async(req, res, next) => {
 controller.agendaCreateEvent = async(req, res, next) => {
   let body = req.body;
   let response = await service.agendaCreateEvent(body);
+
+  res.send(response);
+}
+
+controller.agendaUpdateEvent = async(req, res, next) => {
+  let body = req.body;
+  let response = await service.agendaUpdateEvent(body);
 
   res.send(response);
 }

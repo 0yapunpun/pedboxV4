@@ -67,6 +67,20 @@
       padding-top: 0 !important;
       padding-bottom: 0 !important;
     }
+    .bntHeader{
+      cursor: pointer; 
+      position: relative
+    }
+    .bntHeader>div{
+      position: absolute; 
+      bottom: -25%; 
+      border: solid; 
+      color: white; 
+      padding: 10px !important
+    }
+    #tBodyReports>tr{
+      font-size: 12px !important;
+    }
   </style>
 </head>
 
@@ -82,13 +96,33 @@
   
       <!-- Cotent -->
       <div class="p-4 pt-1">
+        
+        <div class="d-flex align-items-center">
+          <div class="text-start d-flex gap-2" >
+            <div id="btnModalReports" onclick='$("#modalReportes").modal("show")' class="icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg bntHeader" title="Reporte Vendedores" data-toggle="tooltip">
+              <i class="fas fa-chalkboard-teacher" style="font-size: 15px" ></i>
+              <div id="cartIndicator" class="badge badge-sm badge-circle badge-floating badge-primary border-white" ></div>
+            </div>
 
-        <div class="w-100 text-end">
-          <button id="createEventBtn" class="btn btn-icon btn-outline-dark ms-2" type="button">
-            <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
-            <span class="btn-inner--text">Agregar Evento</span>
-          </button>
+            <div id="btnModalInform" onclick='$("#modalInforme").modal("show")' class="icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg bntHeader" title="Informes" data-toggle="tooltip">
+              <i class="fas fa-chart-bar" style="font-size: 15px" ></i>
+              <div id="cartIndicator" class="badge badge-sm badge-circle badge-floating badge-primary border-white"></div>
+            </div>
+
+            <div id="btnModalInform" onclick="showSidebar(1)" class="icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg bntHeader" title="Ver Resumen" data-toggle="tooltip">
+              <i class="fas fa-list" style="font-size: 15px" ></i>
+              <div id="cartIndicator" class="badge badge-sm badge-circle badge-floating badge-primary border-white"></div>
+            </div>
+          </div>
+
+          <div class="w-100 text-end">
+            <button id="createEventBtn" class="btn btn-icon btn-outline-dark ms-2" type="button">
+              <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
+              <span class="btn-inner--text">Agregar Evento</span>
+            </button>
+          </div>
         </div>
+
 
         <div class="card p-3" style="height: auto;">
           <div id="agenda"  ></div>
@@ -102,7 +136,8 @@
         <div class="modal-dialog" >
           <div class="modal-content" style="width: 50vw !important">
             <div class="modal-header">
-              <h5 class="modal-title">Agregar Evento</h5>
+              <h5 class="modal-title" id="titleCreateEvent">Agregar Evento</h5>
+              <h5 class="modal-title" id="titleEditEvent">Editar Evento</h5>
               <div class="d-flex justify-content-center align-items-center gap-2">
                 <button onclick="$('#createEventModal').modal('hide')" type="button" class="btn-close rounded-circle me-1" style="background-color: gray"></button>
               </div>
@@ -110,13 +145,13 @@
             <div class="modal-body bg-gray-100" > 
               <div class="col-12">
                 <div class="d-flex gap-3 justify-content-center">
-                  <div class="form-check">
+                  <div class="form-check editEvent">
                     <input class="form-check-input" type="checkbox" value="" id="checkboxCrm">
                     <label class="custom-control-label" for="customCheck1">Evento CRM</label>
                   </div>
-                  <div class="form-check">
+                  <div class="form-check editEvent">
                     <input class="form-check-input" type="checkbox" value="" id="checkboxDayComplete" checked>
-                    <label class="custom-control-label" for="customCheck1">Evento Día Completo</label>
+                    <label class="custom-control-label " for="customCheck1">Evento Día Completo</label>
                   </div>
                 </div>
 
@@ -160,18 +195,18 @@
                 </div>
 
                 <div class="d-flex gap-1">
-                  <div class="w-50">
+                  <div class="w-50 editEvent">
                     <label for="meeting-time">Fecha Inicio *</label>
                     <input id="dataDateS" type="date" class="form-control fieldInput">
                   </div>
-                  <div class="w-50">
+                  <div class="w-50 editEvent">
                     <label for="meeting-time">Fecha Fin *</label>
                     <input id="dataDateE" type="date" class="form-control fieldInput">
                   </div>
                 </div>
 
                 <div class="d-flex gap-1">
-                  <div class="w-50">
+                  <div class="w-50 editEvent">
                     <label for="">Notificarme</label>
                     <select id="dataNotificate" name="" class="form-control">
                       <option value="0" selected>No notificarme</option>
@@ -183,7 +218,7 @@
                       <option value="60-b">60 Minutos Antes</option>
                     </select>
                   </div>
-                  <div class="w-50">
+                  <div class="w-50 editEvent">
                     <label for="">Repetir</label>
                     <select id="dataRepeat" name="" class="form-control">
                       <option value="0">No Repetir</option>
@@ -270,21 +305,24 @@
                 <label for="">Notas</label>
                 <textarea id="dataNote" class="form-control" placeholder="ej. Reunión con el nuevo cliente" cols="30" rows="10" style="resize: none; height: 100px;"></textarea>
 
-                <div class="d-flex flex-column mt-2" style="justify-content: space-between;">
-                  <label for="">Invitar Usuarios</label>
-                  <div class="d-flex align-items-center">
-                    <div onclick="openUsersModal()">
-                      <i class="fas fa-user-plus ms-2" style="font-size: 30px; cursor: pointer;"></i>
-                    </div>
-                    <div id="selectedUsers" class="d-flex ms-4 gap-1">
-                      <!-- Contenido dinamico -->
+                <div class="editEvent">
+                  <div class="d-flex flex-column mt-2" style="justify-content: space-between;">
+                    <label for="">Invitar Usuarios</label>
+                    <div class="d-flex align-items-center">
+                      <div onclick="openUsersModal()">
+                        <i class="fas fa-user-plus ms-2" style="font-size: 30px; cursor: pointer;"></i>
+                      </div>
+                      <div id="selectedUsers" class="d-flex ms-4 gap-1">
+                        <!-- Contenido dinamico -->
+                      </div>
                     </div>
                   </div>
                 </div>
 
               </div>
               <div class="text-center mt-3">
-                <button id="btnCreateEvent" type="button" class="btn btn-primary">Crear</button>
+                <button onclick="getDataNewEvent()" id="btnCreateEvent" type="button" class="btn btn-primary">Crear</button>
+                <button onclick="updateEventMiddleware()" id="bntEditEvent" type="button" class="btn btn-primary" style="display: none;">Editar</button>
               </div>
             </div>
           </div>
@@ -389,9 +427,6 @@
                 </div>
                 <h6 id="detailDetail" class="m-0 ms-2 text-secondary"></h6>
               </div>
-
-              
-
               <div>
                 <hr class="horizontal dark my-3">
                 <h6>Asistirán</h6>
@@ -412,13 +447,128 @@
                 Eliminar
                 <i class="fas fa-trash ms-1"></i>
               </button>
-              <button type="button" class="btn btn-secondary">
+              <button onclick="updateEventModal()" type="button" class="btn btn-secondary">
                 Editar
                 <i class="fas fa-edit ms-1"></i>
               </button>
               <button onclick="$('#modalDetalle').modal('hide')" type="button" class="btn btn-primary" data-dismiss="modal">Continuar</button>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Modal Reportes -->
+      <div id="modalReportes" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document" style="width: 80vw !important;">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Reporte Vendedores</h5>
+              <div class="d-flex justify-content-center align-items-center gap-2">
+                <button onclick="$('#modalReportes').modal('hide')" type="button" class="btn-close rounded-circle me-1" style="background-color: gray"></button>
+              </div>
+            </div>
+            <div class="modal-body">
+              <table id="tReports" style="table-layout: fixed;">
+                <thead>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Total</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Última Agenda</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Nit</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Vendedor</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Usuario</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Dispositivo</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Version</th>
+                  <th width="15%" class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Bodega</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">ÚLltima entrega</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Gestión CRM</th>
+                </thead>
+                <tbody id="tBodyReports"></tbody>
+              </table>
+            </div>
+            <div class="modal-footer justify-content-center">
+              <button onclick="$('#modalReportes').modal('hide')" type="button" class="btn btn-primary" data-dismiss="modal">Continuar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Reportes -->
+      <div id="modalInforme" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Informes Calendario</h5>
+              <div class="d-flex justify-content-center align-items-center gap-2">
+                <button onclick="$('#modalInforme').modal('hide')" type="button" class="btn-close rounded-circle me-1" style="background-color: gray"></button>
+              </div>
+            </div>
+            <div class="modal-body">
+              <table id="tInform">
+                <thead>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Invitado</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Nit/Id</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Cliente/Prospecto</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Nit Venddedor</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Usuario</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Titulo</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Estado</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Es CRM</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Tipo</th>
+                </thead>
+                <tbody id="tBodyInform"></tbody>
+              </table>
+            </div>
+            <div class="modal-footer justify-content-center">
+              <button onclick="$('#modalInforme').modal('hide')" type="button" class="btn btn-primary" data-dismiss="modal">Continuar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div id="sidebarPage" class="sidebarPage rounded" sidebarState="closed">
+        <div class="d-flex justify-content-center my-3" style="position: relative; margin-bottom: 40px !important">
+          <h5 class="mt-2 mb-0" style="font-weight: 800;">Resumen</h5>
+        </div>
+        <div id="sidebarContent">
+
+          <!-- <div class="mt-2">
+            <h6 class="text-secundary text-muted">Abril 1</h6>
+            <span class='r10 eventCalendar d-flex'>
+              <img src='https://api.pedbox.co:8590/files/profile/cropsantiago_profilepuoNvRe.jpg' width='30' height='30' style="border-radius: 50%; margin: 5px">
+              <div class="d-flex flex-column justify-content-center">
+                <div style="font-weight: 800;">Prueba Edición</div>
+                <div class="text-secondary">prueba de cambio cosa cosas</div>
+                <div>cosas cosas cosas cosas cosas cosas</div>
+                <div>11:00pm - 12:00am</div>
+              </div>
+            </span>
+            <hr class="horizontal dark">
+          </div>
+
+          <div class="mt-2">
+            <h6 class="text-secundary text-muted">Abril 3</h6>
+            <span class='r10 eventCalendar d-flex' style="position: relative;">
+              <img src='https://api.pedbox.co:8590/files/profile/cropsantiago_profilepuoNvRe.jpg' width='30' height='30' style="border-radius: 50%; margin: 5px; margin-right: 15px;">
+              <div class="d-flex flex-column justify-content-center">
+                <div style="font-weight: 800;">Cumpleaños 🎉  </div>
+                <div class="text-secondary">Santiago Berrio Agudelo</div>
+              </div>
+              <div style="position: absolute; height: 100px; width: 3px; background-color: #FBCF32; left: 40px;"></div>
+            </span>
+            <hr class="horizontal dark">
+          </div>
+
+          <div class="mt-2">
+            <h6 class="text-secundary text-muted">Abril 4</h6>
+            <span class='r10 eventCalendar d-flex'>
+              <img src='https://api.pedbox.co:8590/files/profile/cropsantiago_profilepuoNvRe.jpg' width='30' height='30' style="border-radius: 50%; margin: 5px">
+              <div class="d-flex flex-column align-items-center justify-content-center">
+              <div>Prueba Edición</div>
+              </div>
+            </span>
+            <hr class="horizontal dark">
+          </div> -->
+
         </div>
       </div>
 
@@ -451,15 +601,18 @@
   <script>
     let session = `<%- JSON.stringify(session) %>`;
         session = JSON.parse(session);
-    let persons = `<%- JSON.stringify(persons) %>`;
-        persons = handleJSON(persons);
-    let personsCrm = `<%- JSON.stringify(personsCrm) %>`;
-        personsCrm = handleJSON(personsCrm);
-    let mastersCrm = `<%- JSON.stringify(mastersCrm) %>`;
-        mastersCrm = handleJSON(mastersCrm);
 
+    let persons;
+    let personsCrm;
+    let mastersCrm;
+    let cumpleaños;
+    let reportes;
+    let informes;
     let dataComplete;
-        
+    let dataCompleteFormated;
+    let dataReportSeller;
+    let birthdaysFormated = [];
+    let currentEvent;
     
     var calendarEl = document.getElementById('agenda');
     var agenda = new FullCalendar.Calendar(calendarEl, {
@@ -502,14 +655,181 @@
       },
       eventClick: function(event){
         detailEvent(event.event._def.publicId)
+      },
+      eventDrop: function(info){
+        let id = info.event._def.publicId;
+        let newDate = info.event.start.toISOString();
+        updateEvent(id, newDate)
       }
-
     });
     agenda.render();
 
+    let getData =  () => {
+      let currentDate = new Date().toJSON().slice(0,10).replaceAll("-", "");
+      fetch("/agenda/data/"+currentDate)
+      .then(response => response.json())
+      .then(response => {
+        persons = response.persons;
+        personsCrm = response.personsCrm;
+        mastersCrm = response.mastersCrm;
+        cumpleaños = response.cumpleaños;
+        reportes = response.reportes;
+        informes = response.informes;
+
+        formatBirthdays();
+        getDataCells();
+        loadCrmMasters();
+        loadUsersModal();
+        loadUsersCrmModal();
+        printTableReports();
+        printTableInform();
+
+        $("#preloader").hide();
+      });
+    }
+
+    let updateEventModal = () => {
+      $("#modalDetalle").modal("hide")
+      $("#createEventModal").modal("show")
+
+      $("#titleCreateEvent").hide()
+      $("#titleEditEvent").show()
+
+      $("#btnCreateEvent").hide()
+      $("#bntEditEvent").show()
+
+      $("#dataTitle").val(currentEvent.subject)
+      $("#dataPlace").val(currentEvent.place)
+      $("#dataNote").val(currentEvent.detail)
+
+      $(".editEvent").hide()
+    }
+
+    let updateEventMiddleware = () => {
+      if ($("#dataTitle").val() != "") {
+        currentEvent.subject = $("#dataTitle").val()
+      }
+      if ($("#dataPlace").val() != "") {
+        currentEvent.place = $("#dataPlace").val()
+      }
+      if ($("#dataNote").val() != "") {
+        currentEvent.detail = $("#dataNote").val()
+      }
+
+      const objFiltered = {  // Filtering objt 
+        activitie_user: currentEvent.activitie_user, 
+        date_begin: currentEvent.date_begin, 
+        date_end: currentEvent.date_end, 
+        detail: currentEvent.detail, 
+        hour_begin : currentEvent.hour_begin, 
+        hour_end : currentEvent.hour_end, 
+        id : currentEvent.id, 
+        id_company : currentEvent.id_company, 
+        id_reason : currentEvent.id_reason, 
+        id_user_register : currentEvent.id_user_register, 
+        is_crm: currentEvent.is_crm, 
+        notification: currentEvent.notification, 
+        place: currentEvent.place, 
+        repeat_activitie: currentEvent.repeat_activitie, 
+        status: currentEvent.status, 
+        subject: currentEvent.subject, 
+        type_task: currentEvent.type_task 
+      } 
+
+      fetch("/agenda/updateEvent", {
+        method: 'POST',
+        headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+        body: JSON.stringify(objFiltered)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.result.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Evento editado exitosamente',
+            showConfirmButton: false,
+            timer: 1500
+          })
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'No fue posible editar el evento',
+            showConfirmButton: false,
+            timer: 1500
+          })
+        }
+        $("#createEventModal").modal("hide")
+      })
+      .catch(error => console.log('Request failed', error));
+    }
+
+    let updateEvent = (id, newDate) => {
+      let obj = _.findWhere(dataComplete, {id: Number(id)});
+
+      if (obj.date_begin.split("T").length == 1) {
+        obj.date_begin = newDate.split("T")[0];
+        obj.date_end = newDate.split("T")[0];
+      } else {
+        obj.date_begin 
+        obj.date_end 
+      }
+      obj.repeat_activitie = [newDate.split("T")[0]]
+
+      const objFiltered = {  // Filtering objt 
+        activitie_user: obj.activitie_user, 
+        date_begin: obj.date_begin, 
+        date_end: obj.date_end, 
+        detail: obj.detail, 
+        hour_begin : obj.hour_begin, 
+        hour_end : obj.hour_end, 
+        id : obj.id, 
+        id_company : obj.id_company, 
+        id_reason : obj.id_reason, 
+        id_user_register : obj.id_user_register, 
+        is_crm: obj.is_crm, 
+        notification: obj.notification, 
+        place: obj.place, 
+        repeat_activitie: obj.repeat_activitie, 
+        status: obj.status, 
+        subject: obj.subject, 
+        type_task: obj.type_task 
+      } 
+
+      fetch("/agenda/updateEvent", {
+        method: 'POST',
+        headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+        body: JSON.stringify(objFiltered)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.result.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Evento editado exitosamente',
+            showConfirmButton: false,
+            timer: 1500
+          })
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'No fue posible editar el evento',
+            showConfirmButton: false,
+            timer: 1500
+          })
+        }
+      })
+      .catch(error => console.log('Request failed', error));
+    }
+
     let detailEvent = (id) => {
-      let data = _.findWhere(dataComplete, {id: Number(id)});
-      let user = _.findWhere(persons.result.datas.users, {id: data.id_user_register});
+      let data, user;
+      try {
+        data = _.findWhere(dataComplete, {id: Number(id)});
+        user = _.findWhere(persons.result.datas.users, {id: data.id_user_register});
+      } catch (error) {return}
+
+      currentEvent = data
+      console.log(data)
       
       let date;
       if (data.date_begin == data.date_end) {
@@ -564,7 +884,43 @@
       })
 
       $("#modalDetalle").modal("show")
-      console.log(data)
+    }
+
+    let printTableReports = () => {
+      if (reportes.result.success && reportes.result.result.length != 0) {
+        let data = reportes.result.result;
+        for (let i = 0; i < data.length; i++) {
+          let element = `
+            <tr>
+              <td class="text-center">${data[i].total_agendas}</td>
+              <td class="text-center">${data[i].fecha_ultima_agenda || "-"}</td>
+              <td class="text-center">${data[i].nit || "-"}</td>
+              <td class="text-center">${data[i].vendedor || "-"}</td>
+              <td class="text-center">${data[i].usuario || "-"}</td>
+              <td class="text-center">${data[i].dispositivo || "-"}</td>
+              <td class="text-center">${data[i].nro_version || "-"}</td>
+              <td class="text-center">${data[i].bodega || "-"}</td>
+              <td class="text-center">${data[i].fecha_ultima_conexion || "-"}</td>
+              <td class="text-center">${data[i].gestion_crm }</td>
+            </tr>
+          `;
+          $("#tBodyReports").append(element)
+        }
+        const tableObj = new simpleDatatables.DataTable("#tReports", {
+          sortable: false,
+          perPageSelect: false
+        });
+      } else {
+        $("#btnModalReports").hide();
+      }
+    }
+
+    let printTableInform = () => {
+      if (informes.result.success && informes.result.report_quote.length != 0) {
+        console.log("Path not programed yet")
+      } else {
+        $("#btnModalInform").hide();
+      }
     }
     
     let getDataCells = () => {
@@ -577,16 +933,31 @@
       .then(response => response.json())
       .then(data => {
         let dataFormated = data[0];
+            dataCompleteFormated = data[0];
             dataComplete = data[1].result.data_user;
         for (let i = 0; i < dataFormated.length; i++) {
           addEvent(dataFormated[i])
         }
+        printSidebarResume()
       })
       .catch(error => console.log('Request failed', error));
+
+      for (let i = 0; i < birthdaysFormated.length; i++) {
+        addEvent(birthdaysFormated[i])
+      }
     }
 
     let createEvent = () => {
       cleanForm();
+
+      $("#titleCreateEvent").show()
+      $("#titleEditEvent").hide()
+
+      $("#btnCreateEvent").show()
+      $("#bntEditEvent").hide()
+
+      $(".editEvent").show()
+
       $(".fieldInput").removeClass("badField");
       $("#createEventModal").modal("show");
     }
@@ -962,6 +1333,78 @@
       $("#thirdsCrmWindow").hide("fast")
     }
 
+    let formatBirthdays = () => {
+      cumpleaños = cumpleaños.result.result;
+      for (let i = 0; i < cumpleaños.length; i++) {
+        let user = _.findWhere(persons.result.datas.users, {id: cumpleaños[i].id});
+        let year = new Date().getFullYear();
+        let date = cumpleaños[i].date_birth.substring(4, 10);
+            date = year + date;
+        
+        birthdaysFormated.push({
+          id: user.id,
+          title: "🎉 Cumpleaños 🎉 <br>" + user.description, 
+          start: date, 
+          imgUrl: user.photo || "",
+          allDay: true,
+          backgroundColor: "#FBCF32",
+          textColor: "#212020",
+          editable: false
+        })
+      }
+    }
+
+    let printSidebarResume = () => {
+      let data = dataCompleteFormated.concat(birthdaysFormated);
+          data = _.sortBy(data, 'start');
+      let currentMonth = agenda.getDate().getMonth();
+      let currentMonthString = agenda.currentData.viewTitle;
+          currentMonthString = currentMonthString.split(" ")[0];
+      let lastDay = -1;
+
+      $("#sidebarContent").html("")
+      for (let i = 0; i < data.length; i++) {
+        let date = data[i].start;
+            date =  new Date(date)
+
+        if (date.getMonth() == currentMonth) {
+          currentDay = date.getDate();
+          let element = `
+            <div class="mt-2">
+              <h6 class="text-secundary text-muted">${currentMonthString} ${date.getDate()}</h6>
+            </div>
+            <hr class="horizontal dark">
+          `;
+
+          if (lastDay == date.getDate()) {
+            addEventSidebar(data[i])
+            continue
+          }
+
+          $("#sidebarContent").append(element)
+          addEventSidebar(data[i])
+          lastDay = date.getDate()
+        }
+      }
+    }
+
+    let addEventSidebar = (data) => {
+      let element = `
+        <span class='r10 eventCalendar d-flex my-1' style="position: relative;">
+          <img src='https://api.pedbox.co:8590${data.imgUrl}' width='30' height='30' style="border-radius: 50%; margin: 5px; margin-right: 15px;">
+          <div class="d-flex flex-column justify-content-center">
+            <div style="font-weight: 800;"> ${data.title} </div>
+            ${data.detail ? ' <div class="text-secondary">'+data.detail+' </div>' : ''}
+            ${data.place ? ' <div class="text-secondary">'+data.place+' </div>' : ''}
+            ${data.userName ? ' <div class="text-secondary">'+data.userName+' </div>' : ''}
+          </div>
+          <div style="position: absolute; height: 100px; width: 3px; background-color: ${data.backgroundColor}; left: 40px;"></div>
+        </span>
+      `;
+
+      $("#sidebarContent>div").last().append(element)
+    }
+
     let printUsersSelected = (data) => {
       let users = [];
       for (let i = 0; i < data.length; i++) {
@@ -1012,10 +1455,6 @@
 
       $("#createEventBtn").on("click", function () {
         createEvent()
-      })
-
-      $("#btnCreateEvent").on("click", function () {
-        getDataNewEvent()
       })
 
       $('#checkboxCrm').click(function(){
@@ -1096,13 +1535,10 @@
         $(this).find(".badge").hide()
       })
       
-      getDataCells();
-      loadCrmMasters();
-      loadUsersModal();
-      loadUsersCrmModal();
+
+      getData()
 
       $("#menuAgenda").addClass("activeNav")
-      $("#preloader").hide();
     })
   </script>
 

@@ -49,15 +49,15 @@
       <!-- Cotent -->
       <div class="p-4">
         <div class="card p-3 m-3">
-            <div class="d-flex">
+            <div class="d-flex justify-content-center">
               <div class="w-60">
-                <h6 class="mb-4">Mis Documentos</h6>
+                <h6 class="mb-4 text-center">Mis Documentos</h6>
                 <div id="documentsContainer">
                   <!-- Contenido Dinamico -->
                 </div>
               </div>
-              <div class="w-40 ms-3 ps-3" style="border-left: solid 1px lightgray;">
-                <h6 class="mb-4">Subir Documento</h6>
+              <div id="addFileSection" class="w-40 ms-3 ps-3" style="border-left: solid 1px lightgray;">
+                <h6 class="mb-4 text-center">Subir Documento</h6>
                 <form action="" enctype="multipart/form-data" id="f-upload">
                   <input type="file" name="file" id="inputDocument"  accept=".xlsx,.xls, image/*, .doc, .docx, .pptx,.txt,.pdf" hidden> 
                 </form>
@@ -110,6 +110,10 @@
   <script>
     let session = `<%- JSON.stringify(session) %>`;
         session = JSON.parse(session);
+    let masters = `<%- JSON.stringify(masters) %>`;
+        masters = JSON.parse(masters);
+    let documentos = `<%- JSON.stringify(documentos) %>`;
+        documentos = JSON.parse(documentos);
 
     $('input[type=file]').change(function(){
       $("#fileName").text(this.files[0].name)
@@ -122,7 +126,7 @@
 
     $(document).on("click", ".removeDocument", function (){
       Swal.fire({
-        title: '¿Está Seguro de eliminar este documento?',
+        title: '¿Está seguro de eliminar este documento?',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#302560',
@@ -131,145 +135,188 @@
         cancelButtonText: 'Cancelar',
         reverseButtons: true
       }).then((result) => {
-        let id = $(this).attr("data-id")
-        alert("se eliminara el documento"+ id)
+        let idDocument = $(this).attr("data-id");
+        let parent =  $(this).parent().parent();
         if (result.isConfirmed) {
-          $(this).parent().parent().remove();
+          $.ajax({ //Save image 
+            url: '/documentos-usuario/delete', 
+            type: 'POST',
+            data: {id: idDocument},
+          }).done(function (res) {
+            if (res.result.success) {
+              $(parent).remove();
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: 'No fue posible eliminar el Documento',
+                confirmButtonText: 'Continuar',
+              })
+            }
+          })
         }
       })
     })
 
-    const loadMasters = (data) => {
+    const loadMasters = () => {
+      let data = masters.result.result;
       for (let i = 0; i < data.length; i++) {
         let element = `
-          <option value="${data[i].code}">${data[i].type}</option>
+          <option value="${data[i].id}">${data[i].name}</option>
         `;
         $("#inputKind").append(element)
       }
     }
 
-    const loadDocuments = (data) => {
+    const loadDocuments = () => {
+      if (documentos.result.result.length == 0) {
+        return $("#documentsContainer").append('<h6 class="text-center text-secondary" id="noDocumentsAlert">No hay documentos para mostrar</h6>');
+      }
+      let data = documentos.result.result;
       for (let i = 0; i < data.length; i++) {
         let element = `
           <div>
             <div class="d-flex justify-content-between align-items-center">
               <div class="d-flex">
                 <div class="d-flex justify-content-center align-items-center m-3" style="width: 30px;">
-                  <a href="/img/documentos-usuario/${data[i].file_name}" target="_blank">
+                  <a href="http://localhost:7777/documentos_extranet/${data[i].name_file}" target="_blank">
                     <i class="fas fa-file" style="font-size: 25px;"></i>
                   </a>
                 </div>
                 <div class="d-flex flex-column justify-content-center">
-                  <h6 class="fw-bolder m-0">${data[i].document}</h6>
-                  <label style="opacity: 0.7;" class="m-0">Fecha: <span>${data[i].date}</span></label>
+                  <h6 class="fw-bolder m-0">${data[i].type}</h6>
+                  <label style="opacity: 0.7;" class="m-0">Fecha: <span>${data[i].created.split(" ")[0]}</span></label>
                 </div>
               </div>
-              <div class="removeDocument" data-id="${data[i].id_document}">
+              <div class="removeDocument" data-id="${data[i].id}">
                 <i class="fas fa-trash" style="color: red;" ></i>
               </div>
             </div>
             <hr class="horizontal dark my-1">
           </div>
         `;
+        $("#noDocumentsAlert").remove()
         $("#documentsContainer").append(element)
       }
     }
 
     const sendData = () => {
-      if ($('#inputKind option:selected').val() == ""){
-        Swal.fire({
+      if ($('#inputKind option:selected').val() == "-1"){
+        return Swal.fire({
           title: 'Selecciona tipo de documento antes de enviar',
           confirmButtonText: 'Continuar',
         })
       }
 
       if ($("#inputDocument").val() == ''){
-        Swal.fire({
-          title: 'Sube tu archivo antes de enviar',
+        return Swal.fire({
+          title: 'Selecciona tu documento antes de enviar',
+          confirmButtonText: 'Continuar',
+        })
+      }
+
+      if ($("#inputDocument")[0].files[0].size > 3145728){ // Restricción de tamaño a 3mb
+        return Swal.fire({
+          title: 'El archivo seleccionado es demaciado grande',
+          text: 'Selecciona un archivo que pese menos de 3MB',
           confirmButtonText: 'Continuar',
         })
       }
 
       var formData = new FormData($("#f-upload")[0]);
       let filenane = $("#inputDocument")[0].files[0].name;
-      $.ajax({
-          url: '/documentos-usuario/upload',
+      $.ajax({ //Save image 
+          url: 'http://localhost:7777/documentos/upload', 
           type: 'POST',
           data: formData,
           processData: false,
           contentType: false,
       }).done(function (data) {
-        let nameFile = data.file+'-'+filenane;
-        let documentName = $('#inputKind option:selected').text();
-        let documentId = $('#inputKind option:selected').val();
-        let date = getCurrentDate();
-        let id = 1111; //TODO: la id será la respuesta del servicio
-        let id_company ;
-        let nit;
+        if (!data.success) {
+          return Swal.fire({
+            icon: "error",
+            title: 'No fue posible subir el Documento',
+            confirmButtonText: 'Continuar',
+          })
+        } else {
+          let dataDocument = {
+            id_company : session.user.id_company,
+            nit: session.user.nit,
+            year: new Date().getFullYear(),
+            id_type_file: Number($('#inputKind option:selected').val()),
+            type: $('#inputKind option:selected').text(),
+            name_file: data.file + "." + getFileExtension($("#inputDocument")[0].files[0].name)
+          }
 
-        console.log(documentName)
-        let element = `
-         <div>
-            <div class="d-flex justify-content-between align-items-center">
-              <div class="d-flex">
-                <div class="d-flex justify-content-center align-items-center m-3" style="width: 30px;">
-                  <a href="/img/documentos-usuario/${nameFile}" target="_blank">
-                    <i class="fas fa-file" style="font-size: 25px;"></i>
-                  </a>
-                </div>
-                <div class="d-flex flex-column justify-content-center">
-                  <h6 class="fw-bolder m-0">${documentName}</h6>
-                  <label style="opacity: 0.7;" class="m-0">Fecha: <span>${date}</span></label>
-                </div>
+          $.ajax({ //Save image register db
+            url: "/documentos-usuario/upload",
+            type: "POST",
+            data: dataDocument
+          }).done(function (res) {
+            let name = "LAST_INSERT_ID()"; // Object property as a function call
+            if (res.response.result.success) {
+              Swal.fire({
+                icon: "success",
+                title: 'Documento subido con éxito',
+                confirmButtonText: 'Continuar',
+              })
+              
+              $("#inputDocument").val('');
+              $("#fileName").text('Selecciona Archivo');
+              $("#inputKind").val('-1'); 
+
+              addDocument(dataDocument, res.response.result.result[1][0][name])
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: 'No fue posible subir el Documento',
+                confirmButtonText: 'Continuar',
+              })
+            }
+          })
+        }
+      });
+    }
+
+    let addDocument = (data, id) => {
+      let element = `
+        <div>
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex">
+              <div class="d-flex justify-content-center align-items-center m-3" style="width: 30px;">
+                <a href="http://localhost:7777/documentos_extranet/${data.name_file}" target="_blank">
+                  <i class="fas fa-file" style="font-size: 25px;"></i>
+                </a>
               </div>
-              <div class="removeDocument" data-id="${id}">
-                <i class="fas fa-trash" style="color: red;"></i>
+              <div class="d-flex flex-column justify-content-center">
+                <h6 class="fw-bolder m-0">${data.type}</h6>
+                <label style="opacity: 0.7;" class="m-0">Fecha: <span>${new Date().toLocaleDateString()}</span></label>
               </div>
             </div>
-            <hr class="horizontal dark my-1">
+            <div class="removeDocument" data-id="${id}">
+              <i class="fas fa-trash" style="color: red;"></i>
+            </div>
           </div>
-        `;
-        $("#documentsContainer").append(element)
+          <hr class="horizontal dark my-1">
+        </div>
+      `;
+      $("#noDocumentsAlert").remove()
+      $("#documentsContainer").append(element)
+    }
 
-        $("#inputDocument").val('');
-        $("#fileName").text('Selecciona Archivo');
-        $("#inputKind").val('-1');
-      });
+    let handlePermission = () => {
+      // $(".removeDocument").hide() // Esconder boton de eliminar
+      // $("#addFileSection").hide() // Esconde sección para añadir documentos
+      // Esconder sección de documentos
     }
       
     $(document).ready(function () {
-      loadMasters(x);
-      loadDocuments(y);
+      loadMasters();
+      loadDocuments();
+      handlePermission();
 
       $("#menuDocumentosUsuario").addClass("activeNav")
       $("#preloader").hide();
     })
-
-    // *** test
-    let x = [
-      {
-        code : "1",
-        type : "RUT"
-      },
-      {
-        code : "2",
-        type : "Certificado Bancario"
-      },
-      {
-        code : "3",
-        type : "RAUT"
-      },
-    ];
-
-    let y = [
-      {
-        id_document: 3,
-        id_type_document: 1,
-        document: "Certificado Bancario",
-        file_name: "politica-tratamiento-de-datos.pdf",
-        date: "3/11/1111"
-      }
-    ];
   </script>
 
 </body>

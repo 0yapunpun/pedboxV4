@@ -44,10 +44,10 @@ router.post('/permisos', b2bController.updatePemiso);
 router.post('/permisos/nuevo-permiso', b2bController.createPermiso);
 router.get('/documentos-usuario', b2bController.documentosUsuario);
 router.post('/documentos-usuario/upload', b2bController.uploadDocumentoUsuario);
+router.post('/documentos-usuario/delete', b2bController.deleteDocumentoUsuario);
 
 // Herramientas
 router.get('/chat', viewController.chat);
-
 
 // Helpdesk
 router.get('/helpdesk', helpdeskController.helpdesk);
@@ -55,6 +55,7 @@ router.get('/helpdesk/indicators', helpdeskController.helpdeskIndicators);
 router.get('/helpdesk/solicitudes', helpdeskController.helpdeskSolicitudes);
 router.get('/helpdesk/ocurrence/:state/:ocurrence', helpdeskController.helpdeskOcurrence);
 router.get('/helpdesk/formatRead/:id_answer_format', helpdeskController.helpdeskFormatRead);
+router.get('/helpdesk/detailfFormat/:id', helpdeskController.helpdeskFormatReadById);
 router.get('/helpdesk/detail/:id/:id_node/:id_workflow_header/:id_workflow/:id_activitie/:id_format_answer', helpdeskController.helpdeskDetail);
 router.get('/helpdesk/newFormat/:id/:id_node/:id_workflow_header', helpdeskController.helpdeskNewFormat);
 router.get('/helpdesk/editFormat/:id/:id_header', helpdeskController.helpdeskEditFormat);
@@ -64,10 +65,13 @@ router.post('/helpdesk/proceso', helpdeskController.helpdeskProceso);
 router.post('/helpdesk/formatPost', helpdeskController.helpdeskPostFormat);
 router.post('/helpdesk/formatPut', helpdeskController.helpdeskUpdateFormat);
 router.post('/helpdesk/startWorkflow', helpdeskController.helpdeskStartWorkflow);
+router.post('/helpdesk/continueWorkflow', helpdeskController.helpdeskContinueWorkflow);
 
 // Agenda
 router.get('/agenda', agendaController.agenda);
+router.get('/agenda/data/:date', agendaController.agendaData);
 router.post('/agenda/createEvent', agendaController.agendaCreateEvent);
+router.post('/agenda/updateEvent', agendaController.agendaUpdateEvent);
 router.post('/agenda/createEventRepeat', agendaController.agendaCreateEventRepeat);
 router.get('/agenda/deleteEvent/:id', agendaController.agendaDeleteEvent);
 router.get('/agenda/getData/:date_begin/:date_end', agendaController.agendaGetData);

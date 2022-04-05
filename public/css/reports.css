@@ -54,7 +54,7 @@ tr th a {
 }
 
 /* Sidebar */
-.sidebarCRM {
+.sidebarPage {
     display: none;
     background-color: white;
     width: 30vw;
@@ -64,7 +64,7 @@ tr th a {
     position: fixed;
     top: 0;
     right: 0;
-    padding: 20px 40px;
+    padding: 20px 20px;
     box-shadow: 0 8px 26px -4px rgb(20 20 20 / 15%), 0 8px 9px -5px rgb(20 20 20 / 6%);
 }
 .iconsSidebar>div {

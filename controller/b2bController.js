@@ -6,20 +6,9 @@ const { nvFormatCash, hasPermission } = require('./helpers.js');
 const _ = require('underscore');
 const multer  = require('multer');
 const moment = require('moment');
-const { response } = require('express');
+const { response, request } = require('express');
 
 var now = Date.now();
-
-var stoaregeDocumentoUsuario = multer.diskStorage({
-  destination: function (req, file, callback) {
-    callback(null, config.urlBase+'/public/img/documentos-usuario');
-  },
-  filename: function (req, file, callback) {
-      var name = now+'-'+file.originalname;
-      callback(null, name);
-  }
-});
-var uploadDocumentoUsuario = multer({ storage: stoaregeDocumentoUsuario }).single('file');
 
 controller.calidosos = async (req, res, next) => {
   // Validar login
@@ -396,16 +385,25 @@ controller.createPermiso = async(req, res, next) => {
 
 controller.documentosUsuario = async(req, res, next) => {
   // Validar login
-  if (!req.session.login) { return res.redirect('/login'); }
+  if (!req.session.login) { return res.redirect('/login')}
 
-  res.render('documentos-usuario', {'session': req.session});
+  let id_company = req.session.user.id_company;
+
+  let documentos = await service.getDocumentos(id_company);
+  let masters = await service.getMastersDocumentos();
+
+  res.render('documentos-usuario', {'session': req.session, 'documentos': documentos, 'masters': masters});
 }
 
-controller.uploadDocumentoUsuario = async(req, res, next) => {
-  uploadDocumentoUsuario(req, res, (err) => {
-    if (err) { console.log('error uploading image', err); } else {console.log('image uploaded') };
-  })
-  res.send({'file': now});
+controller.uploadDocumentoUsuario = async(req, res, next) => { 
+  let response = await service.uploadDocumentoUsuario(req.body);
+  res.send({'response': response});
 }
+
+controller.deleteDocumentoUsuario = async(req, res, next) => { 
+  let response = await service.deleteDocumentoUsuario(req.body);
+  res.send(response);
+}
+
 
 module.exports = controller

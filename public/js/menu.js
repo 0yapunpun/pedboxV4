@@ -25,6 +25,15 @@ $(document).on('mouseout', '#sidebarMenu', function() {
   }
 });
 
+$(document).on('click', function(e) {
+  if ($("#sidebarPage").attr("sidebarState") == "open") {
+    if (!(e.target.id == "sidebarPage" || $(e.target).parents("#sidebarPage").length)) {
+      $("#sidebarPage").attr("sidebarState", "closed");
+      $("#sidebarPage" ).hide("slide", { direction: "right" }, 300);
+    }
+  }
+});
+
 const setCartIconAmount = () => {
   try {
     if (!(localStorage.getItem(cartInvoiceName) === null)) {
@@ -39,6 +48,30 @@ const setCartIconAmount = () => {
     // Esta vista no tiene boton de carrito    
   }
 }
+
+// Sidebar 
+const showSidebar = function (x) {
+  let state = $("#sidebarPage").attr("sidebarState");
+  if (state == "closed") {
+    $("#sidebarPage" ).css('right', 0); 
+    $("#sidebarPage" ).show("slide", { direction: "right" }, 300);
+    setTimeout(() => {
+      $("#sidebarPage").attr("sidebarState", "open");
+    }, 500);
+  }
+  if (state == "open") {
+    $("#sidebarPage" ).hide("slide", { direction: "right" }, 300);
+    setTimeout(() => {
+      $("#sidebarPage").attr("sidebarState", "closed");
+    }, 500);
+  }
+}
+
+const getFileExtension = function (filename){
+  var ext = /^.+\.([^.]+)$/.exec(filename);
+  return ext == null ? "" : ext[1];
+}
+
 
 $(document).ready(function () {
   // Foto de perfil

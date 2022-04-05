@@ -175,6 +175,14 @@ controller.helpdeskFormatRead = async (req, res, next) => {
   res.send(response)
 }
 
+controller.helpdeskFormatReadById = async (req, res, next) => {
+  let id = req.params.id;
+  
+  let response = await service.getEditDetailFormatById(id);
+
+  res.send(response)
+}
+
 controller.helpdeskNewFormat = async (req, res, next) => {
   let id = req.params.id;
   let id_node = req.params.id_node;
@@ -216,6 +224,14 @@ controller.helpdeskStartWorkflow = async (req, res, next) => {
   let data = req.body;
 
   let response = await service.startWorkflow(data);
+
+  res.send(response)
+}
+
+controller.helpdeskContinueWorkflow = async (req, res, next) => {
+  let data = req.body;
+
+  let response = await service.continueWorkflow(data);
 
   res.send(response)
 }

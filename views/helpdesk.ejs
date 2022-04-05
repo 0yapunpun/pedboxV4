@@ -489,7 +489,7 @@
               <div class="w-80 text-center" style="margin: 0 auto;"> 
                 <div id="verFormatoLlenado"> 
                 </div>
-                <button id='sendDataFormularioDinamicoButton' class='btn bg-gradient-primary my-2' type='button' onclick='sendDataDinamicForm()'>Enviar</button>
+                <button id='sendDataFormularioDinamicoButton' class='btn bg-gradient-primary my-2' type='button' onclick='attendFormatFill()'>Enviar</button>
               </div>
               <hr class="horizontal dark my-3">
               <div id="hideFormGestion">
@@ -642,10 +642,6 @@
       $("#helpDeskMain").html("")
       if (data.length) {
         for (let i = 0; i < data.length; i++) {
-          if (i == 1) {
-            console.log(data)
-          }
-
           // Format date
           let date = data[i].date_create;
               date = date.replace(' ', ', ');
@@ -1220,41 +1216,10 @@
       .catch(error => console.log('Request failed', error));
     }
 
-    // TODO esta funcion deberia desaprecer 
-    // const loadFormatModal = function (operation) { // 1-ver, 2-editar
-    //   fetch("https://raw.githubusercontent.com/0yapunpun/tests/master/ver-editarFormato.json")
-    //   .then(response => response.json())
-    //   .then(data => {
-    //     field = data.attendFormat.detail;
-
-    //     $('#verFormatoBody').html(""); 
-    //     $('#editarFormatoBody').html("");
-
-    //     $("#verFormatoTitle").html(data.attendFormat.message)
-    //     $("#editarFormatoModaltitle").html(data.attendFormat.message)
-        
-    //     if (operation == 1) {
-    //       $('#verFormatoBody').append('<div class=" p-3"></div>');
-    //       for (let i = 0; i < field.length; i++) {
-    //         let fieldDOM = getFormElementResponse(field[i].id_type_field, field[i].question, field[i].content, field[i].web_type);
-    //         $('#verFormatoBody>div').append(fieldDOM);
-    //       }
-    //       $('#verFormatoModal').modal('show');
-    //     } 
-    //     if (operation == 2) {
-    //       $('#editarFormatoModal').modal('show');
-    //       let container = "editarFormatoBody"
-    //       field.forEach(field => loadFormEdit(container, field));
-    //     } 
-    //   }) 
-    //   .catch(error => console.log('Request failed', error));
-    // }
-
     const loadFormatEdit = function (id, id_header, title, idWorkflowHeader) {
       fetch("/helpdesk/editFormat/"+id+"/"+id_header)
       .then(response => response.json())
       .then(data => {    
-        console.log(data)
         field = data.result.detail_activity;
 
         $('#editarFormatoBody').html("");
@@ -1265,7 +1230,6 @@
         $("#editarFormatoModal").attr("data_workflowHeader", idWorkflowHeader);
 
         let container = "editarFormatoBody"
-        console.log("xxx", field)
         field.forEach(field => loadFormEdit(container, field));
         $('#editarFormatoModal').modal('show');
        }) 
@@ -1384,7 +1348,6 @@
 
       for (let i = 0; i < data.workflow.nodes.length; i++) {
         x = data.workflow.nodes;
-        console.log(data)
 
         let timeLineElement = ` 
           <div class="timeline-block mb-3" id="${data.workflow.id}" idWorkflow="${data.workflow.id_workflow}" idNode="${x[i].id_node}" idFormat="${x[i].id_format}" idFormatAnswer="${x[i].id_format_answer}" data-title="${x[i].infoFormat.description}">
@@ -1690,7 +1653,7 @@
               let data = response.response.result.detail_activity.detail
               let sortedFields = _.sortBy(data, 'order_f');
               let container = "verFormatoLlenado";
-              sortedFields.forEach(field => loadFormEdit(container, field)); //TODO revision maestros como ultimo parametro para los inpouts select
+              sortedFields.forEach(field => loadFormEdit(container, field)); 
             }
           }
         }
@@ -1836,8 +1799,6 @@
     }
 
     const addNodeToPlumb = function(input, options) {
-      console.log(input, options)
-
       let newId = ((options.identifier)? options.identifier: "node"+input.id+"plumb"+(new Date().getTime()));
       let newIdEndpoint = newId.replace("node", "endpoint");
 
@@ -1872,7 +1833,7 @@
                 <div >
                   <span class="description">`+elementPrint.info.description+`</span>
                   <div class="description">`+(elementPrint.info.infoArea.description ? elementPrint.info.infoArea.description : "")+`</div>  
-                  <i class="fas fa-eye formatModal" style="font-size: 22px, margin-top: 5px" title="Ver Formato" ></i>
+                  <i class="fas fa-eye formatModal" data-id="${elementPrint.info.id_format}" data-title="${elementPrint.info.description}" style="font-size: 22px, margin-top: 5px" title="Ver Formato" ></i>
                 </div>
             </div>
         </div>
@@ -1931,24 +1892,86 @@
       }
     };
 
-    // const sendDataDinamicForm = function () {
-    //   let formList = document.getElementsByClassName("infoHarvest");
-      
-    //   // Los campos 2 (adjuntos) y 7 (radio button) aún no recolectan la informaciíon
-    //   let formlarioDinamicoData = [];
-    //   for (let i = 0; i < formList.length; i++) {
-    //     formlarioDinamicoData.push({
-    //       "id_field": formList[i].getAttribute("fieldID"),
-    //       "multiple": 0,
-    //       "content": formList[i].value, 
-    //       "id_option": 0,
-    //       "seq": 0,
-    //       "code": "",
-    //       "id_master": 0
-    //     })  
-    //   }
-    //   console.log(formlarioDinamicoData);
-    // };
+    const attendFormatFill = function () {
+      let data = {
+        "date": nvFormatDate(new Date(), "YYYY-MM-DD HH:mm:ss"),
+        "detail_format": [],
+        "id_activity": Number($("#showTimeLineFromDetail").attr("data-id")),
+        "id_company": session.user.id_company,
+        "id_person": "",
+        "id_user": session.user.id,
+        "id_user_take": session.user.id,
+        "longitude": "",
+        "latitude": "",
+        "matrix": [],
+        "version": "",
+      };
+      let formList = $("#verFormatoLlenado").find("[fieldID]");
+      for (let i = 0; i < formList.length; i++) {
+        data.detail_format.push({
+          "id_field": $(formList[i]).attr("fieldID"),
+          "content": $(formList[i]).val(), 
+          "multiple": 0,
+          "id_option": 0, 
+          "seq": 0,
+          "code": "",
+          "id_master": 0
+        })  
+      };
+
+      fetch('/helpdesk/formatPost', {
+        method: 'POST',
+        headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(res =>{
+        if (!res.result.success) {
+          return Swal.fire({
+            icon: 'error',
+            title: 'No fue posible crear el radicado',
+            confirmButtonText: 'Continuar',
+          })
+        }
+
+        let dataWorkflow = {
+          "id_activity": res.result.format.id_activity,
+          "id_behavior": Number($("#showTimeLineFromDetail").attr("data-behavior")) || 8,
+          "id_company": session.user.id_company,
+          "id_format": Number($("#showTimeLineFromDetail").attr("data-format")),
+          "id_header": Number($("#showTimeLineFromDetail").attr("data-header")),
+          "id_node": Number($("#showTimeLineFromDetail").attr("data-node")),
+          "id_priority": Number($("#showTimeLineFromDetail").attr("data-prority")),
+          "id_user": session.user.id,
+          "id_workflow": Number($("#showTimeLineFromDetail").attr("data-workflow"))
+        };
+
+        fetch('/helpdesk/continueWorkflow', {
+          method: 'POST',
+          headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+          body: JSON.stringify(dataWorkflow)
+        })
+        .then(res => res.json())
+        .then(res2 =>{  
+          if (res2.result.success) {
+            $("#helpDeskMain").find(`[id='${dataWorkflow.id_activity}']`).remove();
+            Swal.fire({
+              icon: 'success',
+              title: 'Formulario llenado con exito',
+              confirmButtonText: 'Continuar',
+              timer: 1500
+            })
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'No fue posible crear el radicado',
+              confirmButtonText: 'Continuar',
+            })
+          }
+          $('#llenadoModal').modal("hide");
+        })
+      })
+    };
 
     const sendDataSeguimiento = function () {
       let dataSeguimienti = {
@@ -2020,23 +2043,6 @@
       } else {
         loadRequests({});
       }
-    }
-
-    const sendFormContinueIncidence = function () {
-      // TODO para enviar la informacipon del formulario dentro del incidente 
-      // let data = {
-      //   "date": new Date(),
-      //   "detail_format": [],
-      //   "id_activity": Number($('#nuevaTareaModal').attr("data-activity")),
-      //   "id_company": session.user.id_company,
-      //   "id_person": "",
-      //   "id_user": session.user.id,
-      //   "id_user_take": session.user.id,
-      //   "longitude": "",
-      //   "latitude": "",
-      //   "matrix": [],
-      //   "version": "",
-      // };
     }
 
     const sendFormNewIncidence = async function () { 
@@ -2277,7 +2283,6 @@
       })
       .then(res => res.json())
       .then(res =>{  
-        console.log(res)
         if (res.result.success) {
           return Swal.fire({
             icon: 'success',
@@ -2327,7 +2332,6 @@
         };
         dataToSend.detail_format.push(objt);
       }
-      console.log(dataToSend)
     };
 
     const sendFormSeguimiento = function () {
@@ -2341,7 +2345,6 @@
         "note": $("#seguimientoTextarea").val(),
         "state": $("#seguimienState").val() 
       }
-      console.log(dataToSend)
     }
 
     
@@ -2359,7 +2362,6 @@
       $("#closeModalVerFormato").attr("onclick", "$('#verFormatoModal').modal('hide'); $('#consultaSolicitudModal').modal('show')")
       $('#consultaSolicitudModal').modal('hide');
 
-      console.log(title)
       loadFormatRead(id_answer_format, title)
     });
 
@@ -2559,8 +2561,6 @@
       })
     });
 
-
-    // TODO TODO
     $(document).on( "click", "#timeLineMain .verSolicitudTimeline", function(){
       let id = $(this).attr("data-format")
       let title = $(this).attr("data-title")
@@ -2590,7 +2590,15 @@
     $(document).on("click", ".incidentMain", function (){
       let id = Number($(this).attr("id"));
       let data = _.findWhere(dataIncidencesComplete, {id: id});
-      $("#showTimeLineFromDetail").attr("data-id", id)
+
+      // Buffer data
+      $("#showTimeLineFromDetail").attr("data-id", id);
+      $("#showTimeLineFromDetail").attr("data-behavior", data.id_behavior);
+      $("#showTimeLineFromDetail").attr("data-prority", data.id_priority);
+      $("#showTimeLineFromDetail").attr("data-workflow", data.id_workflow);
+      $("#showTimeLineFromDetail").attr("data-header", data.id_workflow_header);
+      $("#showTimeLineFromDetail").attr("data-format", data.id_format);
+      $("#showTimeLineFromDetail").attr("data-node", data.workflow.nodes[0].id_node);
 
       loadIncidenceFill(data)
     })
@@ -2633,11 +2641,24 @@
       $("#procesoModal").modal("hide");
       $("#closeModalVerFormato").attr("onclick", "$('#verFormatoModal').modal('hide'); $('#procesoModal').modal('show')")
 
-      let id;
-      let title; 
+      let id = Number($(this).attr("data-id"));
+      let title = $(this).attr("data-title"); 
 
-      console.log(id, title)
-      // loadFormatRead(id, tittle)
+      $("#verFormatoTitle").html("")
+      fetch("/helpdesk/detailfFormat/"+id)
+      .then(response => response.json())
+      .then(data => {
+        $("#verFormatoTitle").html(title)
+        let field = data.result.detail_activity.detail;
+
+        $('#verFormatoBody').html('<div class=" p-3"></div>');
+        for (let i = 0; i < field.length; i++) {
+          let fieldDOM = getFormElementResponse(field[i].id_type_field, field[i].description, field[i].content, field[i].web_type);
+          $('#verFormatoBody>div').append(fieldDOM);
+        }
+        $('#verFormatoModal').modal('show');
+      }) 
+      .catch(error => console.log('Request failed', error));
     });
 
     // ChoicesJS

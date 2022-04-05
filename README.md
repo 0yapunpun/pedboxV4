@@ -20,3 +20,14 @@
   -->
 
 
+
+TODO Histirual de documentos
+- Revisar resoluciones (catalogo nombre inputs select)
+- Documentos usuario, guardar en carpeta proyecto
+- b2bFiles tabla
+- tbl-master-file (master)
+- tbl-b2b-files (archivos)
+
+  
+
+
