@@ -178,7 +178,7 @@
             <div class="d-flex justify-content-between align-items-center">
               <div class="d-flex">
                 <div class="d-flex justify-content-center align-items-center m-3" style="width: 30px;">
-                  <a href="http://localhost:7777/documentos_extranet/${data[i].name_file}" target="_blank">
+                  <a href="http://api.pedbox.co:7777/documentos_extranet/${data[i].name_file}" target="_blank">
                     <i class="fas fa-file" style="font-size: 25px;"></i>
                   </a>
                 </div>
@@ -225,11 +225,11 @@
       var formData = new FormData($("#f-upload")[0]);
       let filenane = $("#inputDocument")[0].files[0].name;
       $.ajax({ //Save image 
-          url: 'http://localhost:7777/documentos/upload', 
-          type: 'POST',
-          data: formData,
-          processData: false,
-          contentType: false,
+        url: 'http://api.pedbox.co:7777/documentos/upload', 
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
       }).done(function (data) {
         if (!data.success) {
           return Swal.fire({
