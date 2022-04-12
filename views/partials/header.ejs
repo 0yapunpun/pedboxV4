@@ -1,4 +1,9 @@
 <style>
+  .notificationsHeader{
+    overflow: hidden;
+    font-weight: 600;
+    font-size: 11px;
+  }
   .closeSession a{
     transition: 0.3s;
   }
@@ -11,6 +16,50 @@
     min-width: 100%;
     object-fit: cover;
     border-radius: 50%;
+  }
+  #menuNotifications{
+    top: -10px;
+    max-height: 60vh;
+    margin-top: 0 !important;
+    padding: 5px !important;
+    width: 270px;
+    border: solid 1px #f3efef;
+    overflow-y: scroll;
+    scrollbar-width: none;
+  }
+  #menuNotifications::-webkit-scrollbar { 
+    display: none;  
+  }
+  .notificationTextMessage{ 
+    margin-left: 5px;
+    max-height: 35px;
+    overflow: hidden;
+  }
+  .notificationUserName{
+    margin-top: 5px;
+  }
+  #menuNotifications::before{
+    display: none;
+  }
+  .iconNotification{
+    padding: 0 10px;
+  }
+  #cartIndicator{
+    position: absolute; 
+    bottom: 55%; 
+    left: 10%; 
+    border: solid; 
+    color: white; 
+    padding: 10px !important;
+  }
+
+  .badgeAnimation{
+    animation: blinker 0.5s linear 3;
+  }
+  @keyframes blinker {
+    0% { bottom: 55%; }
+    50% { bottom: 75%; }
+    100% { bottom: 55%; }
   }
 </style>
 
@@ -42,9 +91,15 @@
           </a>
         </li>
         <li class="nav-item dropdown pe-2 d-flex align-items-center">
-          <a href="javascript:;" class="nav-link text-body p-0" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+          <a id="dropMenuNotifications" href="javascript:;" class="nav-link text-body p-0" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="fa fa-bell cursor-pointer"></i>
           </a>
+          <div id="cartIndicator" class="badge badge-sm badge-circle badge-floating badge-primary border-white" ></div>
+          <ul class="dropdown-menu" aria-labelledby="dropMenuNotifications" id="menuNotifications">
+            <div id="emptyNotifications" class="text-center m-2" style="display: none;">
+              <span class="text-secundary text-center">No hay notificaciones por mostrar</span>
+            </div>
+          </ul>
         </li>
       </ul>
     </div>
@@ -63,3 +118,266 @@
     </div>
   </div>
 </nav>
+
+
+<script>
+  let session = `<%- JSON.stringify(session) %>`;
+      session = JSON.parse(session);
+  let currentDate = new Date().toISOString().split("T")[0]
+  let dailyNotifications = "dailyNotifications" + session.user.id;
+  let socketListenerN = false;
+  let enableFetchCall = true; // llevar control del las llamadas fetch y permitir que solo se haga una por vez
+  const audioNotification = new Audio("/sounds/notification.mp3");
+
+  $('#dropMenuNotifications').on('hidden.bs.dropdown', function () {
+    removeNotificationKind(5)
+    let notifications = $("#menuNotifications>li")
+    for (let i = 0; i < notifications.length; i++) {
+      if ($(notifications[i]).attr("data-kind") == "5") {
+        $(notifications[i]).remove()
+      }
+    }
+    notificationsIndicator()
+  })
+
+  $('#dropMenuNotifications').on('shown.bs.dropdown', function () {
+    let notifications = $("#menuNotifications>li").length
+    if (notifications == 0) {
+      $("#emptyNotifications").show()
+    } else {
+      $("#emptyNotifications").hide()
+    }
+  })
+
+  let removeNotificationKind = (kind) => {
+    if (enableFetchCall) {
+      enableFetchCall = false
+      fetch("/removeNotificationByKind/"+session.user.id+"/"+kind)
+      .then(response => response.json())
+      .then(data => {
+        enableFetchCall = true; 
+      });
+    }
+  }
+
+  let playNotificationSound = () => {
+    audioNotification.autoplay = true;
+    try {
+      audioNotification.play();
+    } catch (error) {
+      console.log("unable to reproduce the notification sound")      
+    }
+  };
+
+  let notificationAnimation = () => {
+    $("#cartIndicator").addClass("badgeAnimation")
+    setTimeout(() => {
+      $("#cartIndicator").removeClass("badgeAnimation")
+    }, 1000);
+    playNotificationSound()
+    notificationsIndicator()
+  };
+
+  let notificationsIndicator = () => {
+    let amount = $("#menuNotifications>li").length;
+    if (amount != 0) {$("#cartIndicator").html(amount)}
+    else {$("#cartIndicator").html("")}
+  }
+
+  let messageNotification  = (img, message, emitor) => {
+    let element = `
+      <li data-kind="5">
+        <span class='r10 notificationsHeader d-flex my-1' style="position: relative;">
+          <img src='https://api.pedbox.co:8590${img}' width='30' height='30' style="border-radius: 50%; margin: 5px; margin-right: 15px;">
+          <div class="d-flex flex-column justify-content-center w-100">
+            <div style="font-weight: 800;"> Nuevo Mensaje </div>
+            <div class="text-secondary notificationTextMessage"> <em>" ${message} " </em></div>
+            <div class="text-secondary notificationUserName"> ${emitor} </div>
+            <div class="text-secondary text-end mt-1" style="font-size: 9px;"> ${nvFormatDate(new Date(), "dddd DD de mmmm, YYYY")} </div>
+          </div>
+          <div style="position: absolute; height: 100px; width: 3px; background-color: red; left: 40px;"></div>
+        </span>
+      </li>
+    `;
+    $("#menuNotifications").append(element);
+    notificationsIndicator()
+  }
+
+  let notificationBirthDay = (data) => {
+    let element = `
+      <li class="notificationBirthdays">
+        <span class='r10 notificationsHeader d-flex my-1' style="position: relative;">
+          <img src='https://api.pedbox.co:8590${data.photo}' width='30' height='30' style="border-radius: 50%; margin: 5px; margin-right: 15px;">
+          <div class="d-flex flex-column justify-content-center w-100">
+            <div style="font-weight: 800;"> Es el cumpleaños de: </div>
+            <div class="text-secondary"> 🎉 ${data.first_name + " " + data.first_lastname} 🎉 </div>
+            <div class="text-secondary"> Envíale un mensaje de felicitaciones </div>
+            <div class="text-secondary text-end mt-1" style="font-size: 9px;"> ${nvFormatDate(new Date(), "dddd DD de mmmm, YYYY")} </div>
+          </div>
+          <div style="position: absolute; height: 100px; width: 3px; background-color: #fbcf32; left: 40px;"></div>
+        </span>
+      </li>
+    `;
+    $("#menuNotifications").append(element);
+  }
+
+  let loadNotificationsLocalStorage = (data) => {
+    if (!localStorage.hasOwnProperty('pedboxBirthdays')) {return}
+
+    let date = new Date().toDateInputValue();
+    let dataLS = localStorage.getItem("pedboxBirthdays");
+        dataLS = JSON.parse(dataLS);
+
+    if (dataLS.date == date) { // Current Birthdays
+      for (let i = 0; i < dataLS.data.length; i++) {
+        notificationBirthDay(dataLS.data[i])
+      }
+    } else { // Delete outdated birthdays
+      dataLS.data = {}
+      localStorage.setItem("pedboxBirthdays", JSON.stringify(dataLS))
+    }
+  }
+
+  let createNotification = (data) => {
+    let notificationKind
+    try { // Notification that are not text messages has the notificationData property
+      notificationKind = data.contenido.notificationData.kind;
+    } catch (error) {
+      notificationKind = "textMessage"
+    }
+
+    switch (notificationKind) {
+      case "birthday":
+        if ($(".notificationBirthdays").length != 0) {return} // If the notification it's already called
+        let date = new Date().toDateInputValue();
+        if (localStorage.hasOwnProperty('pedboxBirthdays')) {
+          let dataLS = localStorage.getItem("pedboxBirthdays");
+              dataLS = JSON.parse(dataLS);
+
+          if (dataLS.date != date) {
+            for (let i = 0; i < dataLS.data.length; i++) {
+              notificationBirthDay(dataLS.data[i])
+              let notificationObject = { icon: "https://api.pedbox.co:8590" + dataLS.data[i].photo, }
+              notificationApi("cumpleaños de 🎉" + dataLS.data[i].first_name + " "+ dataLS.data[i].first_lastname+ " 🎉", notificationObject)
+            }
+            notificationAnimation();
+          } else {
+            $(".notificationBirthdays").remove()
+          }
+
+        } else {
+          let dataLS = data.contenido.notificationData.data;
+          localStorage.setItem("pedboxBirthdays", JSON.stringify({date: date, data: dataLS}));
+          for (let i = 0; i < dataLS.length; i++) {
+            notificationBirthDay(dataLS[i])
+            let notificationObject = {icon: "https://api.pedbox.co:8590" + dataLS[i].photo, }
+            notificationApi("cumpleaños de 🎉" + dataLS[i].first_name + " "+ dataLS[i].first_lastname+ " 🎉", notificationObject)
+          }
+          notificationAnimation();
+        }
+        break;
+
+      case "textMessage":
+        let message = data.contenido.texto;
+        if (message.length > 50) {
+          message = message.substring(0, 50);
+          message += " ..."
+        }
+
+        let obj = {
+          "message": message,
+          "title": data.alias, // Saving Message Emitor name
+          "kind": 5, // 5 for messages
+          "params": data.img // Saving Message Emitor Img
+        }
+
+        createNotificationRegister(obj);
+        messageNotification(data.img, obj.message, obj.title);
+        notificationAnimation();
+
+
+        let notificationObject = {
+          body: obj.message,
+          icon: "https://api.pedbox.co:8590" + data.img, 
+        }
+        notificationApi("Mensaje: " + obj.title, notificationObject)
+        break
+
+      default:
+        break;
+    }
+  }
+
+  let removeNotification = (kind) => {
+    fetch("/removeNotificationByKind/"+session.user.id+"/"+ kind)
+    .then(response => response.json())
+    .then(data => {
+      console.log("cleaned Notification")
+    });
+  }
+
+  let createNotificationRegister = (data) => {
+    let dataNotification = {
+      "kind": data.kind, //Message
+      "id_company": session.user.id_company,
+      "id_user": session.user.id,
+      "open": 0,
+      "title": data.title,
+      "message": data.message,
+      "type": "spv4",
+      "params": data.params,
+      "date":new Date().toISOString()
+    }
+
+    fetch("/createNotification", {
+      method: 'POST',
+      body: JSON.stringify(dataNotification), 
+      headers:{'Content-Type': 'application/json'} 
+    })
+  }
+
+  let loadNotificationRegister = () => {
+    fetch("/getNotifications/" + session.user.id)
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        data = data.result
+        for (let i = 0; i < data.length; i++) {
+          messageNotification(data[i].params, data[i].message, data[i].title)
+        }
+        notificationsIndicator()
+      } else {
+
+      }
+    });
+  }
+  
+  let socketChat = io.connect('https://chat.pedbox.co:3333', { transports: ["websocket"] }); // revisar ruta socket
+  socketChat.on('connect', (evt) => {
+    // console.log("socket chat connected"); // Test logs disabled
+    socketChat.emit('login', {'usuario': session.user.user, 'empresa': session.user.id_company});
+    if (!socketListenerN) suscribeSocketsN();
+  });
+  const suscribeSocketsN = () => {
+    // console.log("socket chat subscribed")
+    socketListenerN = true;
+    socketChat.on('new_message', (resp) => { 
+      createNotification(resp)
+    })
+  }
+
+  let notificationApi = (title, body) => {
+    if (Notification.permission === "granted") {
+      var notification = new Notification(title, body);
+    } else if (Notification.permission !== 'denied') {
+      Notification.requestPermission(function (permission) {
+        if (permission === "granted") {
+          var notification = new Notification(title, body);
+        }
+      });
+    }
+  }
+
+  loadNotificationsLocalStorage()
+  loadNotificationRegister()
+</script>

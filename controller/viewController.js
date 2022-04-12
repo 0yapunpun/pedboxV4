@@ -1,6 +1,7 @@
 const controller = {};
 const _ = require('underscore');
 const userController = require('../controller/usersController.js');
+const notificationController = require('../controller/notificationController.js');
 const service = require('../engine/apiService.js');
 const { nvFormatCash } = require('./helpers');
 const moment = require('moment');
@@ -21,11 +22,11 @@ controller.login = async(req, res, next) => {
 controller.loginValidate = async(req, res, next) => {
   const resp = await userController.login(req.body);
   if (resp.result=='ok') {
-    // console.log(resp)
+    const notificationSocket = await notificationController.subscribeSocket(resp.user);
+
     req.session.login = true;
     req.session.urlSocket = resp.urlSocket;
     req.session.user = resp.user;
-    // delete resp.user;
     delete resp.urlSocket;
   }
   return res.send(resp);

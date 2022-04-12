@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const viewController = require('../controller/viewController.js');
+const userController = require('../controller/usersController.js');
+const notificationsController = require('../controller/notificationController.js');
 const b2bController = require('../controller/b2bController.js');
 const helpdeskController = require('../controller/helpdeskController.js');
 const agendaController = require('../controller/agendaController.js');
@@ -13,6 +15,12 @@ router.get('/login/:token', viewController.login);
 router.post('/login/:token', viewController.loginValidate);
 router.get('/logout', viewController.logout);
 router.get('/no-permission', viewController.noPermission);
+
+// Notifications
+router.get('/getNotifications/:id_user', notificationsController.getNotification);
+router.get('/removeNotificationByKind/:id_user/:kind', notificationsController.removeNotificationByKind);
+router.post('/createNotification', notificationsController.createNotification);
+// router.get('/sendNotification', notificationsController.sendNotification);
 
 // b2b
 router.get('/calidosos', b2bController.calidosos);
@@ -40,6 +48,7 @@ router.post('/carrito-compras', b2bController.sendCarritoCompras);
 router.get('/carrito-facturas', b2bController.carritoFacturas);
 router.post('/carrito-facturas', b2bController.sendCarritoFacturas);
 router.get('/permisos', b2bController.permisos);
+router.get('/permisos/get-permisos', b2bController.getPermisos);
 router.post('/permisos', b2bController.updatePemiso);
 router.post('/permisos/nuevo-permiso', b2bController.createPermiso);
 router.get('/documentos-usuario', b2bController.documentosUsuario);

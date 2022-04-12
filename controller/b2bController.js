@@ -371,6 +371,15 @@ controller.permisos = async(req, res, next) => {
   res.render('permisos', {'session': req.session, 'permisos': permisos});
 }
 
+controller.getPermisos = async(req, res, next) => {
+  let id_user_company = req.session.user.id;
+  let id_company = req.session.user.id_company;
+
+  let permisos = await service.getPermisos(id_company, id_user_company);
+
+  res.send({'permisos': permisos});
+}
+
 controller.updatePemiso = async(req, res, next) => {
   let body = req.body;
   let response = await service.updatePemiso(body);

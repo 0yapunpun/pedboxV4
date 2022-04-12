@@ -7,7 +7,6 @@ const _ = require('underscore');
 const moment = require('moment');
 const { response } = require('express');
 
-
 controller.agenda = async(req, res, next) => {
   // Validar login
   if (!req.session.login) { return res.redirect('/login'); }

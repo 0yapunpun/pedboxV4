@@ -7,18 +7,19 @@
   <link rel="shortcut icon" type="image/x-icon" href="https://app.pedbox.co/assets/logos/logo_blanco.png"/>
   <title> Agenda </title>
 
-  <!-- Fonts and icons -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
-  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
   <link href="/css/nucleo-svg.css" rel="stylesheet" />
   <link href="/css/nucleo-icons.css" rel="stylesheet" />
   <link href="/css/nucleo-svg.css" rel="stylesheet" />
-  <!-- CSS Files -->
   <link id="pagestyle" href="/css/soft-ui-dashboard.css?v=1.0.3" rel="stylesheet" />
-  <!-- JQUERY UI -->
   <link rel="stylesheet" href="/css/jquery-ui.min.css">
-  <!-- REPORTS CSS -->
   <link rel="stylesheet" href="/css/reports.css">
+
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.0/socket.io.js" integrity="sha512-+l9L4lMTFNy3dEglQpprf7jQBhQsQ3/WvOnjaN/+/L4i0jOstgScV0q2TjfvRF4V+ZePMDuZYIQtg5T4MKr+MQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="/js/jquery.js"></script>
+  <script src="/js/helpers.js"></script>
+
   <!-- Color Page -->
   <%- include('./partials/colors.ejs') %> 
 
@@ -574,9 +575,7 @@
 
       <!-- preloader -->
       <%- include('./partials/preloader.ejs') %> 
-      
   </main>
-
 
   <!-- Scripts -->
   <script src="/js/core/popper.min.js"></script>
@@ -585,23 +584,15 @@
   <script src="/js/plugins/smooth-scrollbar.min.js"></script>
   <script src="/js/plugins/choices.min.js"></script>
   <script src="/js/soft-ui-dashboard.min.js?v=1.0.3"></script>
-  <script src="/js/plugins/dragula/dragula.min.js"></script>
-  <script src="/js/plugins/jkanban/jkanban.js"></script>
   <script src="/js/plugins/fullcalendar.min.js"></script>
-  <script src="/js/jquery.js"></script>
   <script src="/js/jquery-ui.min.js"></script>
   <script src="/js/plugins/datatables.js"></script>
-  <script src="/js/plugins/chartjs.min.js"></script>
   <script src="/js/underscore-min.js"></script>
   <script src="/js/moment.js"></script>
-  <script src="/js/helpers.js"></script>
   <script src="/js/sweetalert2.all.min.js"></script>
   <script src="/js/menu.js"></script>
     
   <script>
-    let session = `<%- JSON.stringify(session) %>`;
-        session = JSON.parse(session);
-
     let persons;
     let personsCrm;
     let mastersCrm;
@@ -640,7 +631,7 @@
           let e = formatAMPM(arg.event._def.extendedProps.dataE);
           time = s + " - " + e;
         }
-            
+        console.log(arg)
         let customHtml = `
           <span class='r10 eventCalendar d-flex'>
             <img src='https://api.pedbox.co:8590${arg.event._def.extendedProps.imgUrl}' width='30' height='30' style="border-radius: 50%; margin: 5px">
@@ -1441,6 +1432,23 @@
       }
       $("#dataMotivo").append(`<option value="0" selected>Seleccionar</option>`)
     }
+
+    // const showSidebar = function (x) {
+    //   let state = $("#sidebarPage").attr("sidebarState");
+    //   if (state == "closed") {
+    //     $("#sidebarPage" ).css('right', 0); 
+    //     $("#sidebarPage" ).show("slide", { direction: "right" }, 300);
+    //     setTimeout(() => {
+    //       $("#sidebarPage").attr("sidebarState", "open");
+    //     }, 500);
+    //   }
+    //   if (state == "open") {
+    //     $("#sidebarPage" ).hide("slide", { direction: "right" }, 300);
+    //     setTimeout(() => {
+    //       $("#sidebarPage").attr("sidebarState", "closed");
+    //     }, 500);
+    //   }
+    // }
 
     $(document).ready(function () {
       $(".btn-sidenav").on("click", function () {

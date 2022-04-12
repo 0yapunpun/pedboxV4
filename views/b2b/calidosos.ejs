@@ -7,20 +7,19 @@
   <link rel="shortcut icon" type="image/x-icon" href="https://app.pedbox.co/assets/logos/logo_blanco.png"/>
   <title>Calidosos</title>
 
-  <!-- Fonts and icons -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
-  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
   <link href="/css/nucleo-svg.css" rel="stylesheet" />
   <link href="/css/nucleo-icons.css" rel="stylesheet" />
   <link href="/css/nucleo-svg.css" rel="stylesheet" />
-  <!-- CSS Files -->
   <link id="pagestyle" href="/css/soft-ui-dashboard.css?v=1.0.3" rel="stylesheet" />
-  <!-- JQUERY UI -->
   <link rel="stylesheet" href="/css/jquery-ui.min.css">
-  <!-- REPORTS CSS -->
   <link rel="stylesheet" href="/css/reports.css">
-  <!-- Custom -->
-  <link rel="stylesheet" href="/css/custom/tables.css">
+
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.0/socket.io.js" integrity="sha512-+l9L4lMTFNy3dEglQpprf7jQBhQsQ3/WvOnjaN/+/L4i0jOstgScV0q2TjfvRF4V+ZePMDuZYIQtg5T4MKr+MQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="/js/jquery.js"></script>
+  <script src="/js/helpers.js"></script>
+
   <!-- Color Page -->
   <%- include('./partials/colors.ejs') %> 
 
@@ -79,19 +78,15 @@
   <script src="/js/soft-ui-dashboard.min.js?v=1.0.3"></script>
   <script src="/js/plugins/dragula/dragula.min.js"></script>
   <script src="/js/plugins/jkanban/jkanban.js"></script>
-  <script src="/js/jquery.js"></script>
   <script src="/js/jquery-ui.min.js"></script>
   <script src="/js/plugins/datatables.js"></script>
   <script src="/js/plugins/chartjs.min.js"></script>
   <script src="/js/underscore-min.js"></script>
-  <script src="/js/helpers.js"></script>
   <script src="/js/menu.js"></script>
 
   <script>
     let puntos = `<%- JSON.stringify(puntos) %>`;
         puntos = JSON.parse(puntos).result;
-    let session = `<%- JSON.stringify(session) %>`;
-        session = JSON.parse(session);
 
     const printTableData = (data) =>{
       $("#tableBody").html("");

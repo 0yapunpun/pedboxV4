@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 const { showLog } = require('./helpers');
 const service = {};
 const urlPedbox = 'http://api.pedbox.co:5037/';
-const urlServicePedbox4 = 'http://localhost:7777/'; //TODO cambiar
+const urlServicePedbox4 = 'http://localhost:7777/'; //TODO cambiar entre real y pruebas
 const urlPedbox1 = 'https://pedbox.co:8531/';
 const urlKakashi = 'https://api.pedbox.co:8590/';
 const urlCalidosos = 'https://loscalidosos.com/';
@@ -346,6 +346,12 @@ service.agendaCumpleaños = async(id_company) => {
   return data;
 }
 
+service.currentBirthdays = async(id_company) => { 
+  const url = urlServicePedbox4+"currentBirthdays/"+id_company;
+  const data =  await makeRequest(url);
+  return data;
+}
+
 service.agendaCreateEvent = async(body) => {
   const url = urlKakashi+"create_quote";
   const data =  await makeRequest(url, options('post', body));
@@ -375,6 +381,26 @@ service.agendaDeleteEvent = async(body) => {
   const data =  await makeRequest(url, options('delete', body));
   return data;
 }
+
+// Notifications
+service.createNotification = async(body) => { 
+  const url = urlServicePedbox4+"notifications/createNotification";
+  const data =  await makeRequest(url, options('post', body));
+  return data;
+}
+
+service.getNotification = async(id_user) => { 
+  const url = urlServicePedbox4+"notifications/"+id_user;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.removeNotificationByKind = async(id_user, kind) => { 
+  const url = urlServicePedbox4+"removeNotificationByKind/"+id_user+"/"+kind;
+  const data =  await makeRequest(url);
+  return data;
+}
+
 
 // CRM
 service.getMastersCrm = async(id_company) => { 

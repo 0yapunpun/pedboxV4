@@ -67,10 +67,54 @@ const showSidebar = function (x) {
   }
 }
 
-const getFileExtension = function (filename){
-  var ext = /^.+\.([^.]+)$/.exec(filename);
-  return ext == null ? "" : ext[1];
+const loadCartera = (data) => {
+  let cupoCredito = Number(data.cupo);
+  let saldoVencido = Number(data.Vr_Vencido_1_a_15) + Number(data.Vr_Vencido_16_a_30) + Number(data.Vr_Vencido_31_a_45) + Number(data.Vr_Vencido_46_a_60) + Number(data.Vr_Vencido_61_a_90) + Number(data.Vr_Vencido_91_a_120) + Number(data.Vr_Vencido_Mas_120);
+  let saldoTotal = saldoVencido + Number(data.Vr_Saldo_Sin_Vencer);
+  let cupoDisponible = cupoCredito - saldoVencido;
+      cupoDisponible = (cupoDisponible > 0 ? cupoDisponible : 0)
+
+  $("#containerSaldoTotal").html(numberWithCommas(saldoTotal))
+  $("#containerSaldoVencido").html(numberWithCommas(saldoVencido))
+  $("#containerCupoCredito").html(numberWithCommas(cupoCredito))
+  $("#containerCupoDisponible").html(numberWithCommas(cupoDisponible))
+
+  var chartCartera = document.getElementById("chart").getContext("2d");
+    new Chart(chartCartera, {
+    type: "doughnut",
+    data: {
+      labels: ['Saldo Total', 'Saldo Vencido', 'Cupo Disponible'],
+      datasets: [{
+        label: "Projects",
+        weight: 9,
+        cutout: 60,
+        tension: 0.9,
+        pointRadius: 2,
+        borderWidth: 2,
+        backgroundColor: ['#ffa726', '#ef5350', '#67bc6b'],
+        data: [saldoTotal, saldoVencido, cupoDisponible], //Revisar que los valores esten bien
+        fill: false
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+    },
+  });
 }
+
+// Ocultar/Mostrar cartera
+const hideCards = () => {
+  if ($("#cards").is(":visible")) {
+    $("#cards").fadeOut();
+    $("#toggleShowCardsIcon").html('<i class="fas fa-plus"></i> Mostrar Cartera')
+    localStorage.setItem("carteraIsVisible", false);
+  } else {
+    $("#cards").fadeIn();
+    $("#toggleShowCardsIcon").html('<i class="fas fa-minus"></i> Ocultar Cartera')
+    localStorage.setItem("carteraIsVisible", true);
+  }
+};
 
 
 $(document).ready(function () {
