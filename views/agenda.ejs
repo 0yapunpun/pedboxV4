@@ -57,9 +57,9 @@
       border: solid 1px red;
     }
     .eventCalendar{
-      overflow: hidden; 
       font-weight: 600; 
-      font-size: 11px
+      font-size: 11px;
+      padding: 5px;
     }
     .fc-daygrid-day{
       padding: 5px !important;
@@ -81,6 +81,9 @@
     }
     #tBodyReports>tr{
       font-size: 12px !important;
+    }
+    .fc-daygrid-event{
+      white-space: inherit !important;
     }
   </style>
 </head>
@@ -110,8 +113,13 @@
               <div id="cartIndicator" class="badge badge-sm badge-circle badge-floating badge-primary border-white"></div>
             </div>
 
-            <div id="btnModalInform" onclick="showSidebar(1)" class="icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg bntHeader" title="Ver Resumen" data-toggle="tooltip">
+            <div id="btnModalInform" onclick="$('#sidebarContentResume').show(), $('#sidebarContentFilter').hide(), showSidebar(1)" class="icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg bntHeader" title="Ver Resumen" data-toggle="tooltip">
               <i class="fas fa-list" style="font-size: 15px" ></i>
+              <div id="cartIndicator" class="badge badge-sm badge-circle badge-floating badge-primary border-white"></div>
+            </div>
+
+            <div id="btnModalInform" onclick="$('#sidebarContentResume').hide(), $('#sidebarContentFilter').show(), showSidebar(1)" class="icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg bntHeader" title="Filtros" data-toggle="tooltip">
+              <i class="fas fa-filter" style="font-size: 15px" ></i>
               <div id="cartIndicator" class="badge badge-sm badge-circle badge-floating badge-primary border-white"></div>
             </div>
           </div>
@@ -164,8 +172,8 @@
                 <div id="dataCrmSection" style="display: none; transition: 0.3s;">
                   <hr class="horizontal dark my-3">
                   <h6 class="text-center">Datos Evento CRM</h6>
-                  <label for="">Tipo de tarea</label>
-                  <select id="dataTipoTarea" name="" class="form-control">
+                  <label for="">Tipo de tarea *</label>
+                  <select id="dataTipoTarea" name="" class="form-control fieldInput">
                     <option value="0" selected>Seleccionar</option>
                     <option value="1">Envío de correo</option>
                     <option value="2">Llamada</option>
@@ -177,21 +185,22 @@
                   <select id="dataMotivo" name="" class="form-control">
                     <!-- Contenido Dinamico -->
                   </select>
-                  <label for="">Vendedor</label>
-                  <select id="dataVendedor" name="" class="form-control">
-                    <option value="0">Seleccionar</option>
+                  <label for="">Vendedor *</label>
+                  <select id="dataVendedor" name="" class="form-control fieldInput">
+                    <!-- Contenido Dinamico -->
                   </select>
-                  <div class="d-flex flex-column mt-2" style="justify-content: space-between;">
+
+                  <!-- It's this actually necesary -->
+                  <!-- <div class="d-flex flex-column mt-2" style="justify-content: space-between;">
                     <label for="">Vincular Persona</label>
                     <div class="d-flex align-items-center">
                       <div onclick="openUsersCrmModal()">
                         <i class="fas fa-user-plus ms-2" style="font-size: 30px; cursor: pointer;"></i>
                       </div>
                       <div id="selectedUsersCrm" class="d-flex ms-4 gap-1">
-                        <!-- Contenido dinamico -->
                       </div>
                     </div>
-                  </div>
+                  </div> -->
                   <hr class="horizontal dark my-3">
                 </div>
 
@@ -402,7 +411,7 @@
             </div>
             <div class="modal-body">
               <div class="text-center mb-3">
-                <h5 id="titleDetail">EscapeRoom - Enigma</h5>
+                <h5 id="titleDetail"></h5>
               </div>
               <div class="my-1 d-flex gap-2 align-items-center"> 
                 <div style="width: 20px;" class="text-center">
@@ -422,6 +431,21 @@
                 </div>
                 <h6 id="detailPlace" class="m-0 ms-2 text-secondary"></h6>
               </div>
+
+              <div class="my-1 d-flex gap-2 align-items-center"> 
+                <div style="width: 20px;" class="text-center">
+                  <i class="fas fa-tag"></i>
+                </div>
+                <h6 id="detailType" class="m-0 ms-2 text-secondary"></h6>
+              </div>
+
+              <div class="my-1 d-flex gap-2 align-items-center"> 
+                <div style="width: 20px;" class="text-center">
+                  <i class="fas fa-asterisk"></i>
+                </div>
+                <h6 id="detailReason" class="m-0 ms-2 text-secondary"></h6>
+              </div>
+
               <div class="my-1 d-flex gap-2 align-items-center"> 
                 <div style="width: 20px;" class="text-center">
                   <i class="fas fa-info-circle"></i>
@@ -528,47 +552,65 @@
       <!-- Sidebar -->
       <div id="sidebarPage" class="sidebarPage rounded" sidebarState="closed">
         <div class="d-flex justify-content-center my-3" style="position: relative; margin-bottom: 40px !important">
-          <h5 class="mt-2 mb-0" style="font-weight: 800;">Resumen</h5>
+          <h5 class="mt-2 mb-0" style="font-weight: 800; display: none">Resumen</h5>
+          <h5 class="mt-2 mb-0" style="font-weight: 800;">Filtros</h5>
         </div>
-        <div id="sidebarContent">
-
-          <!-- <div class="mt-2">
-            <h6 class="text-secundary text-muted">Abril 1</h6>
-            <span class='r10 eventCalendar d-flex'>
-              <img src='https://api.pedbox.co:8590/files/profile/cropsantiago_profilepuoNvRe.jpg' width='30' height='30' style="border-radius: 50%; margin: 5px">
-              <div class="d-flex flex-column justify-content-center">
-                <div style="font-weight: 800;">Prueba Edición</div>
-                <div class="text-secondary">prueba de cambio cosa cosas</div>
-                <div>cosas cosas cosas cosas cosas cosas</div>
-                <div>11:00pm - 12:00am</div>
+        <div id="sidebarContentResume" style="display: none;">
+          
+        </div>
+        <div id="sidebarContentFilter" style="height: 80%;">
+          <div class="d-flex flex-column justify-content-between h-100">
+            <div>
+              <h6>Eventos CRM</h6>
+              <div class="ms-2">
+                <div>
+                  <div class="form-check editEvent">
+                    <input class="form-check-input" type="checkbox" value="" id="checkboxDayComplete" checked>
+                    <label class="custom-control-label " for="customCheck1">Envío de Correo</label>
+                  </div>
+                </div>
+                <div>
+                  <div class="form-check editEvent">
+                    <input class="form-check-input" type="checkbox" value="" id="checkboxDayComplete" checked>
+                    <label class="custom-control-label " for="customCheck1">Llamada</label>
+                  </div>
+                </div>
+                <div>
+                  <div class="form-check editEvent">
+                    <input class="form-check-input" type="checkbox" value="" id="checkboxDayComplete" checked>
+                    <label class="custom-control-label " for="customCheck1">Visita</label>
+                  </div>
+                </div>
+                <div>
+                  <div class="form-check editEvent">
+                    <input class="form-check-input" type="checkbox" value="" id="checkboxDayComplete" checked>
+                    <label class="custom-control-label " for="customCheck1">Recordatorio</label>
+                  </div>
+                </div>
+                <div>
+                  <div class="form-check editEvent">
+                    <input class="form-check-input" type="checkbox" value="" id="checkboxDayComplete" checked>
+                    <label class="custom-control-label " for="customCheck1">Cotización</label>
+                  </div>
+                </div>
               </div>
-            </span>
-            <hr class="horizontal dark">
+    
+              <h6 class="mt-3">Usuarios</h6>
+              <div class="ms-2">
+                <!-- Contenido dinamico -->
+              </div>
+            </div>
+
+            <div class="text-center">
+              <button id="createEventBtn" class="btn btn-icon btn-outline-dark ms-2" type="button">
+                <i class="fas fa-trash"></i>
+                <span class="btn-inner--text">Limpiar Filtros</span>
+              </button>
+              <button id="createEventBtn" class="btn btn-icon btn-outline-dark ms-2" type="button">
+                <span class="btn-inner--text">Aplicar Filtros</span>
+              </button>
+            </div>
           </div>
-
-          <div class="mt-2">
-            <h6 class="text-secundary text-muted">Abril 3</h6>
-            <span class='r10 eventCalendar d-flex' style="position: relative;">
-              <img src='https://api.pedbox.co:8590/files/profile/cropsantiago_profilepuoNvRe.jpg' width='30' height='30' style="border-radius: 50%; margin: 5px; margin-right: 15px;">
-              <div class="d-flex flex-column justify-content-center">
-                <div style="font-weight: 800;">Cumpleaños 🎉  </div>
-                <div class="text-secondary">Santiago Berrio Agudelo</div>
-              </div>
-              <div style="position: absolute; height: 100px; width: 3px; background-color: #FBCF32; left: 40px;"></div>
-            </span>
-            <hr class="horizontal dark">
-          </div>
-
-          <div class="mt-2">
-            <h6 class="text-secundary text-muted">Abril 4</h6>
-            <span class='r10 eventCalendar d-flex'>
-              <img src='https://api.pedbox.co:8590/files/profile/cropsantiago_profilepuoNvRe.jpg' width='30' height='30' style="border-radius: 50%; margin: 5px">
-              <div class="d-flex flex-column align-items-center justify-content-center">
-              <div>Prueba Edición</div>
-              </div>
-            </span>
-            <hr class="horizontal dark">
-          </div> -->
 
         </div>
       </div>
@@ -604,7 +646,9 @@
     let dataReportSeller;
     let birthdaysFormated = [];
     let currentEvent;
-    
+    let crmEventsType = ["","Envio Correo", "Llamada", "visita", "Recordatorio", "Cotización"]
+    let crmEventsColors = ["","#E67E96", "#7743bf", "#8BBF43", "#F0A000", "#C5BB9A"]
+
     var calendarEl = document.getElementById('agenda');
     var agenda = new FullCalendar.Calendar(calendarEl, {
       initialView: 'dayGridMonth',
@@ -631,13 +675,29 @@
           let e = formatAMPM(arg.event._def.extendedProps.dataE);
           time = s + " - " + e;
         }
-        console.log(arg)
+
+        let nameFormated;
+        try { // Get firt name and last name or first sourname
+          nameFormated = arg.event._def.extendedProps.userName.replace(/\s+/g, '  ').split(' ')
+          console.log(nameFormated)
+          if (nameFormated.length == 1 ) {
+            nameFormated = nameFormated[0]
+          } else {
+            nameFormated = nameFormated[0] + " " + nameFormated[2]
+          }
+        } catch (error) {
+          nameFormated = ""
+        }
+
         let customHtml = `
-          <span class='r10 eventCalendar d-flex'>
-            <img src='https://api.pedbox.co:8590${arg.event._def.extendedProps.imgUrl}' width='30' height='30' style="border-radius: 50%; margin: 5px">
-            <div class="d-flex flex-column align-items-center justify-content-center">
-              ${time ? time + "<br>" : ""}
-              ${arg.event._def.title} 
+          <span class='r10 eventCalendar d-flex flex-column'>
+            <div class="d-flex flex-column align-items-start justify-content-center text-center">
+              <div class="text-center w-100">${time ? time + "<br>" : ""}</div>
+              <div class="text-center w-100">${arg.event._def.title}</div>  
+            </div>
+            <div class="d-flex align-items-center justify-content-center">
+              <img src='https://api.pedbox.co:8590${arg.event._def.extendedProps.imgUrl}' width='30' height='30' style="border-radius: 50%; margin: 5px" onerror="this.onerror=null; this.src='https://app.pedbox.co/assets/images/avatars/profile.jpg'" >
+              <div style="font-style: italic">${nameFormated ? nameFormated : ""}</div>  
             </div>
           </span>
         `;
@@ -651,6 +711,9 @@
         let id = info.event._def.publicId;
         let newDate = info.event.start.toISOString();
         updateEvent(id, newDate)
+      },
+      dateClick: function(info) {
+        openModalNewEventAtDate(info)
       }
     });
     agenda.render();
@@ -670,8 +733,9 @@
         formatBirthdays();
         getDataCells();
         loadCrmMasters();
+        loadCrmSellers();
         loadUsersModal();
-        loadUsersCrmModal();
+        // loadUsersCrmModal();
         printTableReports();
         printTableInform();
 
@@ -813,10 +877,16 @@
     }
 
     let detailEvent = (id) => {
-      let data, user;
+      let data, user, type, reason;
       try {
         data = _.findWhere(dataComplete, {id: Number(id)});
-        user = _.findWhere(persons.result.datas.users, {id: data.id_user_register});
+        if (data.is_crm) {
+          user = _.findWhere(persons.result.datas.users, {id: data.id_seller});
+          reason = _.findWhere(mastersCrm.result.master[0].master, {id: data.id_reason});
+          type = crmEventsType[data.id_type]
+        } else {
+          user = _.findWhere(persons.result.datas.users, {id: data.id_user_register});
+        }
       } catch (error) {return}
 
       currentEvent = data
@@ -840,6 +910,11 @@
         $("#detailDetail").text(data.detail)
       } else {
         $("#detailDetail").parent().css("visibility", "hidden")
+      }
+
+      if (data.is_crm){
+        $("#detailType").text(type)
+        $("#detailReason").text(reason.description)
       }
 
       $("#unconformedContainer").html("")
@@ -927,6 +1002,9 @@
             dataCompleteFormated = data[0];
             dataComplete = data[1].result.data_user;
         for (let i = 0; i < dataFormated.length; i++) {
+          if (dataFormated[i].is_crm) {
+            dataFormated[i].backgroundColor = crmEventsColors[dataFormated[i].id_type]
+          }
           addEvent(dataFormated[i])
         }
         printSidebarResume()
@@ -1048,8 +1126,15 @@
         "type_task": 4, // ?
         "status": 2, // ?
         "is_crm": "",
-        "id_reason": null,
+        "id_reason": null, //crm
         "id_type": null
+      }
+
+      if ($("#checkboxCrm").is(':checked')) {
+        data.is_crm = true;
+        data.id_type = Number($("#dataTipoTarea").val());
+        data.id_seller = Number($("#dataVendedor").val());
+        ($("#dataMotivo").val() != "0" ? data.id_reason = Number($("#dataMotivo").val()) : "")
       }
 
       if ($("#checkboxDayComplete").is(':checked')) {
@@ -1124,9 +1209,6 @@
         } 
       }
 
-      // console.log(data)
-      // return
-
       createEventPetition(data)
     }
     
@@ -1152,6 +1234,18 @@
       if ($("#dataDateE").val() == "") {
         $("#dataDateE").addClass("badField");
         isOkay = false;
+      }
+
+      if ($("#checkboxCrm").is(':checked')) {
+        if ($("#dataTipoTarea").val() == "0") {
+          $("#dataTipoTarea").addClass("badField");
+          isOkay = false;
+        }
+
+        if ($("#dataVendedor").val() == "0") {
+          $("#dataVendedor").addClass("badField");
+          isOkay = false;
+        }
       }
       return isOkay
     }
@@ -1199,11 +1293,27 @@
             title: 'Evento creado con éxito',
             confirmButtonText: 'Continuar',
           }).then(() => {
+            let objUser;
+            try {
+              if (res.result.quote.is_crm) {
+                objUser = _.findWhere(persons.result.datas.persons, {id_user: Number(res.result.quote.id_seller)});
+              } else {
+                objUser = _.findWhere(persons.result.datas.persons, {id_user: Number(res.result.quote.id_user_register)});
+              }
+            } catch (error) {}
+
             let data = {
               id: res.result.quote.id,
               title: res.result.quote.subject,
               start: res.result.quote.date_begin,
-              end: res.result.quote.date_end
+              end: res.result.quote.date_end,
+              imgUrl: objUser.photo || "",
+              userName: objUser.name_person || "",
+              id_type: res.result.quote.id_type
+            }
+
+            if (res.result.quote.is_crm) {
+              data.backgroundColor = crmEventsColors[data.id_type]
             }
             addEvent(data)
             $("#createEventModal").modal("hide")
@@ -1256,7 +1366,7 @@
       });
     }
 
-    let loadUsersCrmModal = () => {
+    let loadUsersCrmModal = () => { // I think this is not necesary
       let data = personsCrm.result.persons || [];
       for (let i = 0; i < data.length; i++) {
         let role;
@@ -1331,6 +1441,7 @@
         let year = new Date().getFullYear();
         let date = cumpleaños[i].date_birth.substring(4, 10);
             date = year + date;
+
         
         birthdaysFormated.push({
           id: user.id,
@@ -1353,7 +1464,7 @@
           currentMonthString = currentMonthString.split(" ")[0];
       let lastDay = -1;
 
-      $("#sidebarContent").html("")
+      $("#sidebarContentResume").html("")
       for (let i = 0; i < data.length; i++) {
         let date = data[i].start;
             date =  new Date(date)
@@ -1372,7 +1483,7 @@
             continue
           }
 
-          $("#sidebarContent").append(element)
+          $("#sidebarContentResume").append(element)
           addEventSidebar(data[i])
           lastDay = date.getDate()
         }
@@ -1389,11 +1500,10 @@
             ${data.place ? ' <div class="text-secondary">'+data.place+' </div>' : ''}
             ${data.userName ? ' <div class="text-secondary">'+data.userName+' </div>' : ''}
           </div>
-          <div style="position: absolute; height: 100px; width: 3px; background-color: ${data.backgroundColor}; left: 40px;"></div>
+          <div style="position: absolute; height: 100%; width: 3px; background-color: ${data.backgroundColor}; left: 40px; margin: 5px"></div>
         </span>
       `;
-
-      $("#sidebarContent>div").last().append(element)
+      $("#sidebarContentResume>div").last().append(element)
     }
 
     let printUsersSelected = (data) => {
@@ -1433,22 +1543,33 @@
       $("#dataMotivo").append(`<option value="0" selected>Seleccionar</option>`)
     }
 
-    // const showSidebar = function (x) {
-    //   let state = $("#sidebarPage").attr("sidebarState");
-    //   if (state == "closed") {
-    //     $("#sidebarPage" ).css('right', 0); 
-    //     $("#sidebarPage" ).show("slide", { direction: "right" }, 300);
-    //     setTimeout(() => {
-    //       $("#sidebarPage").attr("sidebarState", "open");
-    //     }, 500);
-    //   }
-    //   if (state == "open") {
-    //     $("#sidebarPage" ).hide("slide", { direction: "right" }, 300);
-    //     setTimeout(() => {
-    //       $("#sidebarPage").attr("sidebarState", "closed");
-    //     }, 500);
-    //   }
-    // }
+    let loadCrmSellers = () => {
+      let master = persons.result.datas.users || []
+      for (let i = 0; i < master.length; i++) {
+        if (master[i].role != "Vendedor") {continue}
+        let element = `
+          <option value="${master[i].id}">${master[i].description}</option>
+        `;
+        $("#dataVendedor").append(element)
+      }
+      $("#dataVendedor").append(`<option value="0" selected>Seleccionar</option>`)
+    }
+
+    let openModalNewEventAtDate = (data) => {
+      createEvent();
+      if (data.allDay) {
+        $("#dataDateS").val(data.dateStr)
+        $("#dataDateE").val(data.dateStr)  
+      } else {
+        $("#dataDateS").attr("type", "datetime-local")
+        $("#dataDateE").attr("type", "datetime-local")
+
+        $("#dataDateS").val(data.dateStr.slice(0,19))
+        $("#dataDateE").val(data.dateStr.slice(0,19))  
+      }
+
+      $("#createEventModal").modal("show")
+    }
 
     $(document).ready(function () {
       $(".btn-sidenav").on("click", function () {
@@ -1542,7 +1663,6 @@
       $(document).on("mouseout", ".imgUserContainer", function () {
         $(this).find(".badge").hide()
       })
-      
 
       getData()
 

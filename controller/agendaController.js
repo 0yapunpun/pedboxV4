@@ -49,7 +49,12 @@ controller.agendaGetData = async(req, res, next) => {
     for (let i = 0; i < data.result.data_user.length; i++) {
       if(data.result.data_user[i].status == 0) {continue} // No enviar eventos ya cerrados
 
-      let userImg = _.findWhere(users, {id: data.result.data_user[i].id_user_register});
+      let userImg
+      if (data.result.data_user[i].is_crm) {
+        userImg = _.findWhere(users, {id: data.result.data_user[i].id_seller});
+      } else {
+        userImg = _.findWhere(users, {id: data.result.data_user[i].id_user_register});
+      }
 
       let dateS = data.result.data_user[i].date_begin;
       if (data.result.data_user[i].hour_begin && data.result.data_user[i].hour_begin != "00:00:00" ) {
@@ -72,7 +77,9 @@ controller.agendaGetData = async(req, res, next) => {
         dataE: data.result.data_user[i].hour_end, 
         imgUrl: userImg.photo || "",
         userName: userImg.description || "",
-        editable: true
+        editable: true,
+        is_crm: data.result.data_user[i].is_crm,
+        id_type: data.result.data_user[i].id_type,
       })
     }
   }
