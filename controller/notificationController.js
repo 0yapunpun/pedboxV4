@@ -10,8 +10,13 @@ let user;
 
 // Tareas programaticas
 cron.schedule('* * * * *', () => { // Cada minuto
-  // console.log("each minute", moment())
-  controller.birthdaysByCompany();
+  // console.log("each minute", moment().format('hh:mm'))
+  controller.checkCalendarNotification(moment().format('hh:mm'));
+});
+
+cron.schedule('*/5 * * * *', () => { // Cada cinco minuto
+  // console.log("each 5 minutes", moment())
+  // controller.checkCalendarNotification(moment().format('hh:mm'));
 });
 
 cron.schedule('0 0 */1 * * *', async () => { // Cada hora horas
@@ -23,6 +28,7 @@ controller.subscribeSocket = async(userData) => {
   user = userData;
   socket = io.connect('https://chat.pedbox.co:3333');
   socket.on('connect', (evt) => {
+    // console.log("socket notification connected")
     succesSocket = true;
     socket.emit('login', {'usuario': user.user, 'empresa': user.id_company})
   });
@@ -78,12 +84,31 @@ controller.birthdaysByCompany = async() => {
   
   const currentBirthdays = await service.currentBirthdays(user.id_company);
 
-  console.log(currentBirthdays.result)
-
-  if (currentBirthdays.result) {
+  if (currentBirthdays.result.length != 0) {
     controller.sendNotification({kind: "birthday", data: currentBirthdays.result})
   }
 }
+
+controller.checkCalendarNotification = async(currentHour) => {
+  if (!succesSocket) return 
+
+  const currentEvents = await service.agendaGetEventsNotifications(user.id);
+
+  if (currentEvents.result) {
+    
+    let events = currentEvents.result;
+    for (let i = 0; i < events.length; i++) {
+      let notificateMinutesBefore = Number(events[i].notification.split("-")[0]);
+      let notificateAt = moment("1111-11-11T"+ events[i].hour_begin.slice(0, 5)).subtract(notificateMinutesBefore, 'minutes').format("hh:mm") // la hora es formateada con una fecha para poder usar la funcionalidad subtract de moment
+      
+      if (notificateAt == currentHour) {
+        controller.sendNotification({kind: "calendar", data: events[i]})
+      }
+
+    }
+    
+  }
+} 
 
 
 module.exports = controller

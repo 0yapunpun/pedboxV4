@@ -25,10 +25,8 @@ controller.agendaData = async(req, res, next) => {
   let personsCRM = await service.getPersonsCompany(id_company, usersCrm);
   let mastersCrm = await service.getMastersCrm(id_company);
   let cumpleaños = await service.agendaCumpleaños(id_company);
-  let informes = await service.getQuoteReportCrm(id_company);
-  let reportes = await service.getSellersReportsCrm(id_company, currentDate);
-
-  res.send({'persons': persons, 'personsCrm': personsCRM, 'mastersCrm': mastersCrm, "cumpleaños": cumpleaños, "informes": informes, "reportes": reportes});
+  
+  res.send({'persons': persons, 'personsCrm': personsCRM, 'mastersCrm': mastersCrm, "cumpleaños": cumpleaños});
 }
 
 controller.agendaGetData = async(req, res, next) => {
@@ -39,6 +37,8 @@ controller.agendaGetData = async(req, res, next) => {
   let Status = 1; // Usuarios activos
   
   let data = await service.agendaGetDateUser(id_user, date_begin, date_end);
+  let reportes = await service.getSellersReportsCrm(id_company, date_begin, date_end);
+  let informes = await service.getQuoteReportCrm(id_company, date_begin, date_end);
   let persons = await service.getUsersCompany(id_company, Status);
   
   let dataFormated = [];
@@ -84,7 +84,7 @@ controller.agendaGetData = async(req, res, next) => {
     }
   }
   
-  res.send([dataFormated, data]);
+  res.send([dataFormated, data, reportes.result, informes.result]);
 }
 
 controller.agendaCreateEvent = async(req, res, next) => {

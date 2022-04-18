@@ -130,10 +130,14 @@
   const audioNotification = new Audio("/sounds/notification.mp3");
 
   $('#dropMenuNotifications').on('hidden.bs.dropdown', function () {
+    removeNotificationKind(6)
     removeNotificationKind(5)
     let notifications = $("#menuNotifications>li")
     for (let i = 0; i < notifications.length; i++) {
       if ($(notifications[i]).attr("data-kind") == "5") {
+        $(notifications[i]).remove()
+      }
+      if ($(notifications[i]).attr("data-kind") == "6") {
         $(notifications[i]).remove()
       }
     }
@@ -200,7 +204,6 @@
       </li>
     `;
     $("#menuNotifications").append(element);
-    notificationsIndicator()
   }
 
   let notificationBirthDay = (data) => {
@@ -219,6 +222,25 @@
       </li>
     `;
     $("#menuNotifications").append(element);
+    notificationsIndicator()
+  }
+
+  let notificationCalendar = (img, title, minutes) => {
+    let element = `
+      <li data-kind="6">
+        <span class='r10 notificationsHeader d-flex my-1' style="position: relative;">
+          <img src='https://api.pedbox.co:8590${img}' width='30' height='30' style="border-radius: 50%; margin: 5px; margin-right: 15px;">
+          <div class="d-flex flex-column justify-content-center w-100">
+            <div style="font-weight: 800;"> Evento en ${minutes} minutos</div>
+            <div class="text-secondary"> ${title} </div>
+            <div class="text-secondary text-end mt-1" style="font-size: 9px;"> ${nvFormatDate(new Date(), "dddd DD de mmmm, YYYY")} </div>
+          </div>
+          <div style="position: absolute; height: 100px; width: 3px; background-color: #3788D8; left: 40px;"></div>
+        </span>
+      </li>
+    `;
+    $("#menuNotifications").append(element);
+    notificationsIndicator()
   }
 
   let loadNotificationsLocalStorage = (data) => {
@@ -239,7 +261,8 @@
   }
 
   let createNotification = (data) => {
-    let notificationKind
+    let notificationKind;
+    let obj;
     try { // Notification that are not text messages has the notificationData property
       notificationKind = data.contenido.notificationData.kind;
     } catch (error) {
@@ -284,7 +307,7 @@
           message += " ..."
         }
 
-        let obj = {
+        obj = {
           "message": message,
           "title": data.alias, // Saving Message Emitor name
           "kind": 5, // 5 for messages
@@ -301,6 +324,22 @@
           icon: "https://api.pedbox.co:8590" + data.img, 
         }
         notificationApi("Mensaje: " + obj.title, notificationObject)
+        break
+
+      case "calendar":
+        let imgCalendar = _.where(persons.result.datas.persons, {id_user: Number(data.contenido.notificationData.data.id_user_register)}) || {photo: ""}
+        console.log("user calendar", imgCalendar)
+        obj = {
+          "message": data.contenido.notificationData.data.subject,
+          "title": data.contenido.notificationData.data.notification.split("-")[0],
+          "kind": 6, // 5 for calendar events
+          "params": imgCalendar[0].photo 
+        }
+
+        createNotificationRegister(obj);
+        notificationCalendar(obj.params, obj.message, obj.title)
+        notificationAnimation();
+        notificationApi("Evento en " + obj.title + " minutos: " + obj.message)
         break
 
       default:
@@ -343,7 +382,12 @@
       if (data.success) {
         data = data.result
         for (let i = 0; i < data.length; i++) {
-          messageNotification(data[i].params, data[i].message, data[i].title)
+          if (data[i].kind == 5) {
+            messageNotification(data[i].params, data[i].message, data[i].title)
+          }
+          if (data[i].kind == 6) {
+            notificationCalendar(data[i].params, data[i].message, data[i].title)
+          }
         }
         notificationsIndicator()
       } else {

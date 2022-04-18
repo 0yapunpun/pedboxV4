@@ -382,6 +382,12 @@ service.agendaDeleteEvent = async(body) => {
   return data;
 }
 
+service.agendaGetEventsNotifications = async(id_user) => {
+  const url = urlServicePedbox4+"getNotificationsCalendar/"+id_user;
+  const data =  await makeRequest(url);
+  return data;
+}
+
 // Notifications
 service.createNotification = async(body) => { 
   const url = urlServicePedbox4+"notifications/createNotification";
@@ -409,14 +415,14 @@ service.getMastersCrm = async(id_company) => {
   return data;
 }
 
-service.getSellersReportsCrm = async(id_company, date) => { 
-  const url = urlKakashi+"sellersCalendarCrmReport?id_company="+id_company+"&date_begin="+date+"&date_end="+date
+service.getSellersReportsCrm = async(id_company, dateS, dateE) => { 
+  const url = urlKakashi+"sellersCalendarCrmReport?id_company="+id_company+"&date_begin="+dateS+"&date_end="+dateE
   const data =  await makeRequest(url);
   return data;
 }
 
-service.getQuoteReportCrm = async(id_company) => { 
-  const url = urlKakashi+"get_datereport_quotecrm?export=false&id_company="+id_company
+service.getQuoteReportCrm = async(id_company, dateS, dateE) => { 
+  const url = urlKakashi+"get_datereport_quotecrm?export=false&id_company="+id_company+"&date_begin="+dateS+"&date_end="+dateE
   const data =  await makeRequest(url);
   return data;
 }
