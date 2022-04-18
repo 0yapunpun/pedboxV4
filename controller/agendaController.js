@@ -37,7 +37,6 @@ controller.agendaGetData = async(req, res, next) => {
   let date_end = req.params.date_end;
   let id_company = req.session.user.id_company;
   let Status = 1; // Usuarios activos
-
   
   let data = await service.agendaGetDateUser(id_user, date_begin, date_end);
   let persons = await service.getUsersCompany(id_company, Status);
@@ -80,6 +79,7 @@ controller.agendaGetData = async(req, res, next) => {
         editable: true,
         is_crm: data.result.data_user[i].is_crm,
         id_type: data.result.data_user[i].id_type,
+        id_user: userImg.id
       })
     }
   }

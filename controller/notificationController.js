@@ -11,6 +11,7 @@ let user;
 // Tareas programaticas
 cron.schedule('* * * * *', () => { // Cada minuto
   // console.log("each minute", moment())
+  controller.birthdaysByCompany();
 });
 
 cron.schedule('0 0 */1 * * *', async () => { // Cada hora horas
@@ -76,6 +77,8 @@ controller.birthdaysByCompany = async() => {
   if (!succesSocket) return
   
   const currentBirthdays = await service.currentBirthdays(user.id_company);
+
+  console.log(currentBirthdays.result)
 
   if (currentBirthdays.result) {
     controller.sendNotification({kind: "birthday", data: currentBirthdays.result})

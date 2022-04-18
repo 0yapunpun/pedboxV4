@@ -25,15 +25,6 @@ $(document).on('mouseout', '#sidebarMenu', function() {
   }
 });
 
-$(document).on('click', function(e) {
-  if ($("#sidebarPage").attr("sidebarState") == "open") {
-    if (!(e.target.id == "sidebarPage" || $(e.target).parents("#sidebarPage").length)) {
-      $("#sidebarPage").attr("sidebarState", "closed");
-      $("#sidebarPage" ).hide("slide", { direction: "right" }, 300);
-    }
-  }
-});
-
 const setCartIconAmount = () => {
   try {
     if (!(localStorage.getItem(cartInvoiceName) === null)) {
