@@ -84,6 +84,7 @@ router.post('/agenda/updateEvent', agendaController.agendaUpdateEvent);
 router.post('/agenda/createEventRepeat', agendaController.agendaCreateEventRepeat);
 router.get('/agenda/deleteEvent/:id', agendaController.agendaDeleteEvent);
 router.get('/agenda/getData/:date_begin/:date_end', agendaController.agendaGetData);
+router.post('/agenda/eventState', agendaController.agendaChangeEventState);
 
 
 // Por integrar

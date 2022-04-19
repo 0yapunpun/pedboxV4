@@ -85,6 +85,20 @@
     .fc-daygrid-event{
       white-space: inherit !important;
     }
+    .selectEventState h6{
+      text-decoration: underline;
+      cursor: pointer;
+      margin: 0;
+      font-size: 12px
+    }
+    .selectEventState{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 3px;
+      margin-bottom: 7px
+    }
   </style>
 </head>
 
@@ -113,12 +127,12 @@
               <div id="cartIndicator" class="badge badge-sm badge-circle badge-floating badge-primary border-white"></div>
             </div>
 
-            <div id="btnModalInform" onclick="$('#sidebarContentResume').show(), $('#sidebarContentFilter').hide(), showSidebar(1)" class="icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg bntHeader" title="Ver Resumen" data-toggle="tooltip">
+            <div id="btnModalInform" onclick="$('#sidebarContentResume').show(), $('#sidebarResumeTitle').show(), $('#sidebarFilterTitle').hide(), $('#sidebarContentFilter').hide(), showSidebar(1)" class="icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg bntHeader" title="Ver Resumen" data-toggle="tooltip">
               <i class="fas fa-list" style="font-size: 15px" ></i>
               <div id="cartIndicator" class="badge badge-sm badge-circle badge-floating badge-primary border-white"></div>
             </div>
 
-            <div id="btnModalInform" onclick="$('#sidebarContentResume').hide(), $('#sidebarContentFilter').show(), showSidebar(1)" class="icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg bntHeader" title="Filtros" data-toggle="tooltip">
+            <div id="btnModalInform" onclick="$('#sidebarContentResume').hide(), $('#sidebarResumeTitle').hide(), $('#sidebarFilterTitle').show(), $('#sidebarContentFilter').show(), showSidebar(1)" class="icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg bntHeader" title="Filtros" data-toggle="tooltip">
               <i class="fas fa-filter" style="font-size: 15px" ></i>
               <div id="cartIndicator" class="badge badge-sm badge-circle badge-floating badge-primary border-white"></div>
             </div>
@@ -190,17 +204,6 @@
                     <!-- Contenido Dinamico -->
                   </select>
 
-                  <!-- It's this actually necesary -->
-                  <!-- <div class="d-flex flex-column mt-2" style="justify-content: space-between;">
-                    <label for="">Vincular Persona</label>
-                    <div class="d-flex align-items-center">
-                      <div onclick="openUsersCrmModal()">
-                        <i class="fas fa-user-plus ms-2" style="font-size: 30px; cursor: pointer;"></i>
-                      </div>
-                      <div id="selectedUsersCrm" class="d-flex ms-4 gap-1">
-                      </div>
-                    </div>
-                  </div> -->
                   <hr class="horizontal dark my-3">
                 </div>
 
@@ -527,6 +530,29 @@
               </div>
             </div>
             <div class="modal-body">
+              <div class="d-flex gap-3">
+                <div style="width: 300px;">
+                  <label for="">Motivo</label>
+                  <select name="" id="selectMotivoCrm" class="form-control">
+                    <option value="0" selected>...</option>
+                  </select>
+                </div>
+                <div style="width: 300px;">
+                  <label for="">Estado</label>
+                  <select name="" id="selectEstadoCrm" class="form-control">
+                    <option value="0" selected>...</option>
+                    <option value="1">Citas Sin Aprobar</option>
+                    <option value="2">Citas Agendadas</option>
+                    <option value="3">Citas Canceladas</option>
+                    <option value="4">Citas Completadas</option>
+                    <option value="5">Citas Incumplidas</option>
+                  </select>
+                </div>
+                <div id="btnModalInform" onclick="downloadAsExel(informes.report_quote)" title="Exportar Agenda" data-toggle="tooltip" class="icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg bntHeader" style="margin-top: 35px;">
+                  <i class="fas fa-file-download" style="font-size: 15px" ></i>
+                  <div id="cartIndicator" class="badge badge-sm badge-circle badge-floating badge-primary border-white"></div>
+                </div>
+              </div>
               <table id="tInform">
                 <thead style="table-layout: fixed;">
                   <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Invitado</th>
@@ -552,8 +578,8 @@
       <!-- Sidebar -->
       <div id="sidebarPage" class="sidebarPage rounded" sidebarState="closed" style="overflow-x: hidden;">
         <div class="d-flex justify-content-center my-3" style="position: relative; margin-bottom: 40px !important">
-          <h5 class="mt-2 mb-0" style="font-weight: 800; display: none">Resumen</h5>
-          <h5 class="mt-2 mb-0" style="font-weight: 800;">Filtros</h5>
+          <h5 id="sidebarResumeTitle" class="mt-2 mb-0" style="font-weight: 800; display: none">Resumen</h5>
+          <h5 id="sidebarFilterTitle" class="mt-2 mb-0" style="font-weight: 800;">Filtros</h5>
         </div>
         <div id="sidebarContentResume" style="display: none;">
           
@@ -564,7 +590,7 @@
               <div class="ms-2">
                 <div>
                   <div class="form-check editEvent">
-                    <input class="form-check-input" type="checkbox" value="" id="checkboxFilterSend" checked style="position: relative; bottom: 3px;" >
+                    <input class="form-check-input" type="checkbox" value="" id="checkboxFilterSend" style="position: relative; bottom: 3px;" checked>
                     <label class="custom-control-label d-flex gap-2" for="checkboxFilterSend">
                       <div style="width: 20px; height: 20px; border-radius: 50%; background-color: #E67E96;"></div>
                       Envío de Correo
@@ -666,14 +692,20 @@
   <script src="/js/moment.js"></script>
   <script src="/js/sweetalert2.all.min.js"></script>
   <script src="/js/menu.js"></script>
+
+  <!-- Exel Export Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.0/xlsx.min.js" integrity="sha512-1Te7siOLNEh7EcFPjzHSXIX44IlAYuz5mH/w0HgFA1fWTDK8knx+MMbHb2cUD6+PuuCDQicf9M+0wYwRq7960Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js" integrity="sha512-Qlv6VSKh1gDKGoJbnyA5RMXYcvnpIqhO++MhIM2fStMcGT9i2T//tSwYFlcyoRRDcDZ+TYHpH8azBBCyhpSeqw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     
   <script>
     let persons;
     let personsCrm;
     let mastersCrm;
+    let motivosCrm;
     let cumpleaños;
     let reportes;
     let informes;
+    let informesFiltered;
     let dataComplete;
     let dataCompleteFormated;
     let dataReportSeller;
@@ -759,18 +791,22 @@
         persons = response.persons;
         personsCrm = response.personsCrm;
         mastersCrm = response.mastersCrm;
+        motivosCrm = _.where(mastersCrm.result.master[0].master, {id_crm_master: 3});
         cumpleaños = response.cumpleaños;
-        // reportes = response.reportes;
-        // informes = response.informes;
+
+        // Filtros Motivos CRM informes calendario
+        for (let i = 0; i < motivosCrm.length; i++) {
+          let element = `
+            <option value="${motivosCrm[i].code}"> ${motivosCrm[i].description} </option>
+          `;
+          $("#selectMotivoCrm").append(element)
+        }
 
         formatBirthdays();
         getDataCells();
         loadCrmMasters();
         loadCrmSellers();
         loadUsersModal();
-        // loadUsersCrmModal();
-        // printTableReports();
-        // printTableInform();
 
         $("#preloader").hide();
       });
@@ -1019,6 +1055,7 @@
       }
     }
 
+    var tableObj
     let printTableInform = () => {
       if (informes.success && informes.report_quote.length != 0) {
         let data = informes.report_quote;
@@ -1038,7 +1075,7 @@
           `;
           $("#tBodyInform").append(element)
         }
-        const tableObj = new simpleDatatables.DataTable("#tInform", {
+        tableObj = new simpleDatatables.DataTable("#tInform", {
           sortable: false,
           perPageSelect: false
         });
@@ -1175,6 +1212,58 @@
 
       $(".fieldInput").removeClass("badField");
       $("#createEventModal").modal("show");
+    }
+
+    let changeEventState = (operation, id, isCRM) => {
+      let status;
+      let crm = false;
+
+      if (operation == 1) { status = 3 } // Rechazar
+      if (operation == 2) { status = 2 } // Aceptar
+
+      if (isCRM == "true") { crm = true } 
+
+      let obj = { 
+        "activitie_user": [
+          {
+            "id_activitie": Number(id),
+            "id_user": session.user.id,
+            "status": status
+          }
+        ],
+        "is_quote_provider": false,
+        "is_crm": crm
+      }
+
+      fetch("/agenda/eventState", {
+        method: 'POST',
+        headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+        body: JSON.stringify(obj)
+      })
+      .then(response => response.json())
+      .then(response => {
+        console.log(response)
+        if (response.result.success && operation == 2) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Evento Aceptado',
+            showConfirmButton: true,
+            timer: 1500
+          })
+          getDataCells()
+        }
+        if (operation == 1) {
+          let element = `
+            <div class="text-secondary" style="color: red !important"> Rechazado </div>
+          `;
+          $('.rejectEvent[data-id="'+id+'"]').parent().before(element);
+          $('.rejectEvent[data-id="'+id+'"]').parent().remove();
+        }
+      })
+
+
+
+      console.log(operation, id, isCRM)
     }
 
     let deleteEvent = () => {
@@ -1607,14 +1696,15 @@
           allDay: true,
           backgroundColor: "#FBCF32",
           textColor: "#212020",
-          editable: false
+          editable: false,
+          date_begin: date
         })
       }
     }
 
     let printSidebarResume = () => {
-      let data = dataCompleteFormated.concat(birthdaysFormated);
-          data = _.sortBy(data, 'start');
+      let data = dataComplete.concat(birthdaysFormated);
+          data = _.sortBy(data, 'date_begin');
       let currentMonth = agenda.getDate().getMonth();
       let currentMonthString = agenda.currentData.viewTitle;
           currentMonthString = currentMonthString.split(" ")[0];
@@ -1622,7 +1712,10 @@
 
       $("#sidebarContentResume").html("")
       for (let i = 0; i < data.length; i++) {
-        let date = data[i].start;
+        if (data[i].status == 0) { continue } // Avoid closed event
+
+        console.log(data[i])
+        let date = data[i].start || data[i].date_begin;
             date =  new Date(date)
 
         if (date.getMonth() == currentMonth) {
@@ -1647,14 +1740,35 @@
     }
 
     let addEventSidebar = (data) => {
+      console.log("data sibdear", data)
+      let isPending = false;
+      let isRejected = false;
+      try {
+        if (data.activitie_user[0].status == 1) {
+          isPending = true;
+        }
+        if (data.activitie_user[0].status == 3) {
+          isRejected = true;
+        }
+      } catch (error) {}
+
+      let isCRM = data.is_crm || false;
+      let detail = data.detail || false;
+      let title = data.title || data.subject;
+      let place = data.place || false;
+      let user = data.userName || false
+
+
       let element = `
         <span class='r10 eventCalendar d-flex my-1' style="position: relative;">
           <img src='https://api.pedbox.co:8590${data.imgUrl}' width='30' height='30' style="border-radius: 50%; margin: 5px; margin-right: 15px;" onerror="this.onerror=null; this.src='https://app.pedbox.co/assets/images/avatars/profile.jpg'">
           <div class="d-flex flex-column justify-content-center">
-            <div style="font-weight: 800;"> ${data.title} </div>
-            ${data.detail ? ' <div class="text-secondary">'+data.detail+' </div>' : ''}
-            ${data.place ? ' <div class="text-secondary">'+data.place+' </div>' : ''}
-            ${data.userName ? ' <div class="text-secondary">'+data.userName+' </div>' : ''}
+            <div style="font-weight: 800;"> ${title ? title : ""} </div>
+            ${detail ? ' <div class="text-secondary">'+detail+' </div>' : ''}
+            ${place ? ' <div class="text-secondary">'+place+' </div>' : ''}
+            ${user ? ' <div class="text-secondary">'+user+' </div>' : ''}
+            ${isPending && !isRejected? ' <div class="text-secondary selectEventState"> <h6 class="aceptEvent" data-id="'+data.id+'" data-crm="'+(isCRM ? "true" : "false")+'">Rechazar</h6> <h6 class="rejectEvent" data-id="'+data.id+'" data-crm="'+(isCRM ? "true" : "false")+'">Aceptar</h6>  </div>' : ''}
+            ${isRejected ? ' <div class="text-secondary" style="color: red !important"> Rechazado </div>' : ''}
           </div>
           <div style="position: absolute; height: 100%; width: 3px; background-color: ${data.backgroundColor}; left: 40px; margin: 5px"></div>
         </span>
@@ -1729,6 +1843,27 @@
       $("#createEventModal").modal("show")
     }
 
+    // TODO Fncion exel, Mover
+    const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+    const EXCEL_EXTENSION = '.xls';
+
+    function downloadAsExel(data) {
+      const worksheet = XLSX.utils.json_to_sheet(data);
+      const workbook = {
+        Sheets:{
+          'data':worksheet
+        },
+        SheetNames:['data']
+      };
+      const exelBuffer = XLSX.write(workbook, {bookType: 'xls', type: 'array'});
+      saveAsExcel(exelBuffer, "data_calendar_crm");
+    }
+
+    function saveAsExcel(buffer, fileName) {
+      const data = new Blob([buffer], {type: EXCEL_TYPE});
+      saveAs(data, fileName + 'export' + EXCEL_EXTENSION);
+    }
+
     $(document).ready(function () {
       $(".btn-sidenav").on("click", function () {
         setTimeout(() => {
@@ -1796,6 +1931,83 @@
         }
       })
 
+      // Filtros Informes
+      $("#selectEstadoCrm").on("change", function (){
+        $("#selectMotivoCrm").val('0');
+        let selected = $("#selectEstadoCrm option:selected").val();
+        if (selected != "0") {
+          informesFiltered = _.where(informes.report_quote, {status: Number(selected)})
+
+          tableObj.destroy();
+          $("#tBodyInform").html("")
+
+          let data = informesFiltered;
+          for (let i = 0; i < data.length; i++) {
+            let element = `
+              <tr>
+                <td class="text-center">Cliente</td>
+                <td class="text-center">${data[i].nit_customer || "-"}</td>
+                <td class="text-center">${data[i].name_customer || "-"}</td>
+                <td class="text-center">${data[i].nit_seller || "-"}</td>
+                <td class="text-center">${data[i].name_seller || "-"}</td>
+                <td class="text-center">${data[i].subject || "-"}</td>
+                <td class="text-center">${crmStatus[data[i].status]}</td>
+                <td class="text-center">${(data[i].is_crm ? "Sí" : "No") }</td>
+                <td class="text-center">${data[i].type_activity || "-" }</td>
+              </tr>
+            `;
+            $("#tBodyInform").append(element)
+          }
+          tableObj = new simpleDatatables.DataTable("#tInform", {
+            sortable: false,
+            perPageSelect: false
+          });
+
+        } else {
+          tableObj.destroy();
+          $("#tBodyInform").html("")
+          printTableInform()
+        }
+      })
+
+      $("#selectMotivoCrm").on("change", function (){
+        $("#selectEstadoCrm").val('0');
+        let selected = $("#selectMotivoCrm option:selected").val();
+        if (selected != "0") {
+          informesFiltered = _.where(informes.report_quote, {type_reason: Number(selected)})
+
+          tableObj.destroy();
+          $("#tBodyInform").html("")
+
+          let data = informesFiltered;
+          for (let i = 0; i < data.length; i++) {
+            let element = `
+              <tr>
+                <td class="text-center">Cliente</td>
+                <td class="text-center">${data[i].nit_customer || "-"}</td>
+                <td class="text-center">${data[i].name_customer || "-"}</td>
+                <td class="text-center">${data[i].nit_seller || "-"}</td>
+                <td class="text-center">${data[i].name_seller || "-"}</td>
+                <td class="text-center">${data[i].subject || "-"}</td>
+                <td class="text-center">${crmStatus[data[i].status]}</td>
+                <td class="text-center">${(data[i].is_crm ? "Sí" : "No") }</td>
+                <td class="text-center">${data[i].type_activity || "-" }</td>
+              </tr>
+            `;
+            $("#tBodyInform").append(element)
+          }
+          tableObj = new simpleDatatables.DataTable("#tInform", {
+            sortable: false,
+            perPageSelect: false
+          });
+
+        } else {
+          tableObj.destroy();
+          $("#tBodyInform").html("")
+          printTableInform()
+        }
+      })
+
       // Sidebar
       $(document).on('click', function(e) { // Cerrar sidebar 
         if ($("#sidebarPage").attr("sidebarState") == "open") {
@@ -1817,6 +2029,14 @@
         $("#thirdsWindow").hide( "slow" )
         $("#thirdsCrmWindow").hide( "slow" )
       });
+
+      $(document).on("click", ".aceptEvent", function () {
+        changeEventState(1, $(this).attr("data-id"), $(this).attr("data-crm"))
+      })
+
+      $(document).on("click", ".rejectEvent", function () {
+        changeEventState(2, $(this).attr("data-id"), $(this).attr("data-crm"))
+      })
 
       $(document).on("click", ".fc-next-button", function () {
         getDataCells()

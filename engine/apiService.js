@@ -388,6 +388,12 @@ service.agendaGetEventsNotifications = async(id_user) => {
   return data;
 }
 
+service.agendaChangeEventState = async(body) => {
+  const url = urlKakashi+"change_state_quote";
+  const data =  await makeRequest(url, options('put', body));
+  return data;
+}
+
 // Notifications
 service.createNotification = async(body) => { 
   const url = urlServicePedbox4+"notifications/createNotification";
@@ -406,7 +412,6 @@ service.removeNotificationByKind = async(id_user, kind) => {
   const data =  await makeRequest(url);
   return data;
 }
-
 
 // CRM
 service.getMastersCrm = async(id_company) => { 

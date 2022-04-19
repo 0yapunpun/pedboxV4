@@ -47,6 +47,7 @@ controller.agendaGetData = async(req, res, next) => {
   if (data.result.success) {
     for (let i = 0; i < data.result.data_user.length; i++) {
       if(data.result.data_user[i].status == 0) {continue} // No enviar eventos ya cerrados
+      
 
       let userImg
       if (data.result.data_user[i].is_crm) {
@@ -65,12 +66,17 @@ controller.agendaGetData = async(req, res, next) => {
         dateE = dateE + "T" + data.result.data_user[i].hour_end
       }
 
+      data.result.data_user[i].imgUrl = userImg.photo || ""; // Adding the img user to the complete data
+      data.result.data_user[i].userName = userImg.description || ""; // Adding the user name to the complete data
+
+      if(data.result.data_user[i].activitie_user[0].status != 2) {continue} // No enviar eventos que no hayan sido aceptados,
+
       dataFormated.push({
         id: data.result.data_user[i].id,
         title: data.result.data_user[i].subject, 
         detail: data.result.data_user[i].detail, 
         place: data.result.data_user[i].place, 
-        start: dateS , 
+        start: dateS, 
         end: dateE, 
         dataS: data.result.data_user[i].hour_begin,
         dataE: data.result.data_user[i].hour_end, 
@@ -116,6 +122,13 @@ controller.agendaDeleteEvent = async(req, res, next) => {
 controller.agendaCreateEventRepeat = async(req, res, next) => {
   let body = req.body;
   let response = await service.agendaCreateEventRepeat(body);
+
+  res.send(response);
+}
+
+controller.agendaChangeEventState = async(req, res, next) => {
+  let body = req.body;
+  let response = await service.agendaChangeEventState(body);
 
   res.send(response);
 }
