@@ -44,10 +44,19 @@
   .iconNotification{
     padding: 0 10px;
   }
-  #cartIndicator{
+  #notificationCenterIndicator{
     position: absolute; 
     bottom: 55%; 
     left: 10%; 
+    border: solid; 
+    color: white; 
+    padding: 10px !important;
+  }
+
+  .notificationCenterSectionIndicator{
+    position: absolute; 
+    bottom: 55%; 
+    left: 50%; 
     border: solid; 
     color: white; 
     padding: 10px !important;
@@ -60,6 +69,36 @@
     0% { bottom: 55%; }
     50% { bottom: 75%; }
     100% { bottom: 55%; }
+  }
+
+  #notificationCenterContainer{
+    display: none;
+    width: 300px;
+    height: 300px;
+    background-color: white;
+    top: 100%;
+    padding: 10px;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 30%);
+    overflow-y: scroll;
+  }
+  .notificationCenterHeader{
+    padding: 5px;
+    display: flex;
+  }
+  .boderRightNotificationHeader{
+    border-right: solid 1px lightgray ;
+  }
+  .notificationCenterHeader i {
+    font-size: 18px;
+  }
+  #notificationCenterContainerBody li{
+    transition: 0.3s;
+    border-radius: 0.5rem;
+    cursor: pointer;
+  }
+  #notificationCenterContainerBody li:hover{
+    background-color: #ebebeb !important;
   }
 </style>
 
@@ -90,16 +129,53 @@
             <i class="fa fa-cog  cursor-pointer"></i>
           </a>
         </li>
-        <li class="nav-item dropdown pe-2 d-flex align-items-center">
-          <a id="dropMenuNotifications" href="javascript:;" class="nav-link text-body p-0" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fa fa-bell cursor-pointer"></i>
+        <li class="nav-item dropdown pe-2 d-flex align-items-center" style="position: relative;">
+          <a onclick="showNotificationsCenter()"  id="dropMenuNotifications" href="javascript:;" class="nav-link text-body p-0" >
+            <i class="fa fa-bell cursor-pointer" id="notificationBellIcon"></i>
           </a>
-          <div id="cartIndicator" class="badge badge-sm badge-circle badge-floating badge-primary border-white" ></div>
-          <ul class="dropdown-menu" aria-labelledby="dropMenuNotifications" id="menuNotifications">
-            <div id="emptyNotifications" class="text-center m-2" style="display: none;">
-              <span class="text-secundary text-center">No hay notificaciones por mostrar</span>
+          <div id="notificationCenterIndicator" class="badge badge-sm badge-circle badge-floating badge-primary border-white" ></div>
+
+          <div id="notificationCenterContainer" style="position: absolute;">
+            <div>
+              <div class="notificationCenterHeader">
+                <div class="nav-wrapper position-relative end-0 w-100">
+                  <ul class="nav nav-pills nav-fill p-1" role="tablist">
+                    <li class="nav-item">
+                      <a id="notificationCenterSection1" class="nav-link mb-0 px-0 py-1 active" data-bs-toggle="tab" role="tab" aria-controls="notificationM" aria-selected="true">
+                        <div data-section="1" class="notificationCenterSectionBtn d-flex align-items-center justify-content-center ">
+                          <div style="position: relative;">
+                            <i class="fas fa-comment-alt"></i>
+                            <div id="notificationCenterIndicatorSection1" class="badge badge-sm badge-circle badge-floating badge-primary border-white notificationCenterSectionIndicator">  </div>
+                          </div>
+                        </div>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a id="notificationCenterSection2" class="nav-link mb-0 px-0 py-1 " data-bs-toggle="tab"  role="tab" aria-controls="notificationC" aria-selected="false">
+                        <div data-section="2" class="notificationCenterSectionBtn d-flex align-items-center justify-content-center ">
+                          <div style="position: relative;">
+                            <i class="fas fa-calendar" ></i>
+                            <div id="notificationCenterIndicatorSection2" class="badge badge-sm badge-circle badge-floating badge-primary border-white notificationCenterSectionIndicator">  </div>
+                          </div>
+                        </div>
+                      </a>
+                    </li>
+
+                  </ul>
+               </div>
+              </div>
+              <hr class="horizontal dark" style="margin: 0;"> 
+              <div style="padding: 5px;" id="notificationCenterContainerBody"> 
+                <div data-section="1" id="notificationCenterMessages" class="notificationCenterSection">
+                  <!-- Contenido Dinamico --> 
+                </div>
+                <div data-section="2" id="notificationCenterCalendar" class="notificationCenterSection" style="display: none;">
+                  <!-- Contenido Dinamico --> 
+                </div>
+              </div>
             </div>
-          </ul>
+
+          </div>
         </li>
       </ul>
     </div>
@@ -129,30 +205,6 @@
   let enableFetchCall = true; // llevar control del las llamadas fetch y permitir que solo se haga una por vez
   const audioNotification = new Audio("/sounds/notification.mp3");
 
-  $('#dropMenuNotifications').on('hidden.bs.dropdown', function () {
-    removeNotificationKind(6)
-    removeNotificationKind(5)
-    let notifications = $("#menuNotifications>li")
-    for (let i = 0; i < notifications.length; i++) {
-      if ($(notifications[i]).attr("data-kind") == "5") {
-        $(notifications[i]).remove()
-      }
-      if ($(notifications[i]).attr("data-kind") == "6") {
-        $(notifications[i]).remove()
-      }
-    }
-    notificationsIndicator()
-  })
-
-  $('#dropMenuNotifications').on('shown.bs.dropdown', function () {
-    let notifications = $("#menuNotifications>li").length
-    if (notifications == 0) {
-      $("#emptyNotifications").show()
-    } else {
-      $("#emptyNotifications").hide()
-    }
-  })
-
   let removeNotificationKind = (kind) => {
     if (enableFetchCall) {
       enableFetchCall = false
@@ -174,23 +226,48 @@
   };
 
   let notificationAnimation = () => {
-    $("#cartIndicator").addClass("badgeAnimation")
+    $("#notificationCenterIndicator").addClass("badgeAnimation")
     setTimeout(() => {
-      $("#cartIndicator").removeClass("badgeAnimation")
+      $("#notificationCenterIndicator").removeClass("badgeAnimation")
     }, 1000);
     playNotificationSound()
     notificationsIndicator()
   };
 
   let notificationsIndicator = () => {
-    let amount = $("#menuNotifications>li").length;
-    if (amount != 0) {$("#cartIndicator").html(amount)}
-    else {$("#cartIndicator").html("")}
+    let amountSection1 = $("#notificationCenterMessages>li").length;
+    let amountSection2 = $("#notificationCenterCalendar>li").length;
+    let totalAmount = amountSection1 + amountSection2;
+    
+    if (totalAmount == 0) {
+      $("#notificationCenterIndicator").html("")
+    } else {
+      $("#notificationCenterIndicator").html(totalAmount)
+    }
+
+    if (amountSection1 == 0) {
+      $("#notificationCenterIndicatorSection1").html("")
+      $("#notificationIndicatorSidebarChat").html("")
+      $("#notificationCenterMessages").html("<div class='noMessageIndicator text-center text-secondary font-weight-bolder text-xs mt-2'>No hay notificaciones</div>")
+
+    } else {
+      $("#notificationCenterMessages").find(".noMessageIndicator").remove()
+      $("#notificationCenterIndicatorSection1").html(amountSection1)
+      $("#notificationIndicatorSidebarChat").html(amountSection1)
+    }
+
+    if (amountSection2 == 0) {
+      $("#notificationCenterIndicatorSection2").html("")
+      $("#notificationCenterCalendar").html("<div class='noMessageIndicator text-center text-secondary font-weight-bolder text-xs mt-2'>No hay notificaciones</div>")
+    } else {
+      $("#notificationCenterCalendar").find(".noMessageIndicator").remove()
+      $("#notificationCenterIndicatorSection2").html(amountSection2)
+    }
   }
 
-  let messageNotification  = (img, message, emitor) => {
+  let messageNotification  = (img, message, emitor, idEmisor) => {
     let element = `
-      <li data-kind="5">
+      <li data-kind="5" class="notificationKindMessage" data-emisor="${idEmisor}">
         <span class='r10 notificationsHeader d-flex my-1' style="position: relative;">
           <img src='https://api.pedbox.co:8590${img}' width='30' height='30' style="border-radius: 50%; margin: 5px; margin-right: 15px;">
           <div class="d-flex flex-column justify-content-center w-100">
@@ -203,12 +280,12 @@
         </span>
       </li>
     `;
-    $("#menuNotifications").append(element);
+    $("#notificationCenterMessages").prepend(element);
   }
 
   let notificationBirthDay = (data) => {
     let element = `
-      <li class="notificationBirthdays">
+      <li class="notificationKindCalendar notificationBirthdays" data-emisor="${data.id}">
         <span class='r10 notificationsHeader d-flex my-1' style="position: relative;">
           <img src='https://api.pedbox.co:8590${data.photo}' width='30' height='30' style="border-radius: 50%; margin: 5px; margin-right: 15px;">
           <div class="d-flex flex-column justify-content-center w-100">
@@ -221,13 +298,13 @@
         </span>
       </li>
     `;
-    $("#menuNotifications").append(element);
+    $("#notificationCenterCalendar").prepend(element);
     notificationsIndicator()
   }
 
   let notificationCalendar = (img, title, minutes) => {
     let element = `
-      <li data-kind="6">
+      <li data-kind="6" class="notificationKindCalendar">
         <span class='r10 notificationsHeader d-flex my-1' style="position: relative;">
           <img src='https://api.pedbox.co:8590${img}' width='30' height='30' style="border-radius: 50%; margin: 5px; margin-right: 15px;">
           <div class="d-flex flex-column justify-content-center w-100">
@@ -239,7 +316,7 @@
         </span>
       </li>
     `;
-    $("#menuNotifications").append(element);
+    $("#notificationCenterCalendar").prepend(element);
     notificationsIndicator()
   }
 
@@ -271,23 +348,25 @@
 
     switch (notificationKind) {
       case "birthday":
-        if ($(".notificationBirthdays").length != 0) {return} // If the notification it's already called
+        if ($(".notificationBirthdays").length != 0) {return} // If the notification it's already displayed
         let date = new Date().toDateInputValue();
+
         if (localStorage.hasOwnProperty('pedboxBirthdays')) {
+
+          if ($(".notificationBirthdays").length) { return }
+
           let dataLS = localStorage.getItem("pedboxBirthdays");
               dataLS = JSON.parse(dataLS);
-
           if (dataLS.date != date) {
-            for (let i = 0; i < dataLS.data.length; i++) {
-              notificationBirthDay(dataLS.data[i])
-              let notificationObject = { icon: "https://api.pedbox.co:8590" + dataLS.data[i].photo, }
-              notificationApi("cumpleaños de 🎉" + dataLS.data[i].first_name + " "+ dataLS.data[i].first_lastname+ " 🎉", notificationObject)
+            dataLS = data.contenido.notificationData.data;
+            localStorage.setItem("pedboxBirthdays", JSON.stringify({date: date, data: dataLS}));
+            for (let i = 0; i < dataLS.length; i++) {
+              notificationBirthDay(dataLS[i])
+              let notificationObject = {icon: "https://api.pedbox.co:8590" + dataLS[i].photo, }
+              notificationApi("cumpleaños de 🎉" + dataLS[i].first_name + " "+ dataLS[i].first_lastname+ " 🎉", notificationObject)
             }
             notificationAnimation();
-          } else {
-            $(".notificationBirthdays").remove()
-          }
-
+          } 
         } else {
           let dataLS = data.contenido.notificationData.data;
           localStorage.setItem("pedboxBirthdays", JSON.stringify({date: date, data: dataLS}));
@@ -311,13 +390,13 @@
           "message": message,
           "title": data.alias, // Saving Message Emitor name
           "kind": 5, // 5 for messages
-          "params": data.img // Saving Message Emitor Img
+          "params": data.img, // Saving Message Emitor Img
+          "idChat": data.emisor
         }
 
         createNotificationRegister(obj);
-        messageNotification(data.img, obj.message, obj.title);
+        messageNotification(data.img, obj.message, obj.title, data.emisor);
         notificationAnimation();
-
 
         let notificationObject = {
           body: obj.message,
@@ -349,10 +428,6 @@
 
   let removeNotification = (kind) => {
     fetch("/removeNotificationByKind/"+session.user.id+"/"+ kind)
-    .then(response => response.json())
-    .then(data => {
-      console.log("cleaned Notification")
-    });
   }
 
   let createNotificationRegister = (data) => {
@@ -363,7 +438,7 @@
       "open": 0,
       "title": data.title,
       "message": data.message,
-      "type": "spv4",
+      "type": (data.idChat ? data.idChat : "spv4"),
       "params": data.params,
       "date":new Date().toISOString()
     }
@@ -383,16 +458,14 @@
         data = data.result
         for (let i = 0; i < data.length; i++) {
           if (data[i].kind == 5) {
-            messageNotification(data[i].params, data[i].message, data[i].title)
+            messageNotification(data[i].params, data[i].message, data[i].title, data[i].type)
           }
           if (data[i].kind == 6) {
             notificationCalendar(data[i].params, data[i].message, data[i].title)
           }
         }
         notificationsIndicator()
-      } else {
-
-      }
+      } 
     });
   }
   
@@ -421,6 +494,73 @@
       });
     }
   }
+
+  let showNotificationsCenter = () => {
+    if ($("#notificationCenterContainer").is(":visible")) {
+      $("#notificationCenterContainer").hide()
+    } else {
+      $("#notificationCenterContainer").fadeIn("fast")
+    }
+  }
+
+  let redirectChat = (idChat) => {
+    window.location.href = '/chat/chatId/'+idChat;
+  }
+
+  $("#notificationCenterSection1").on("click", function () {
+    $(".notificationCenterSection").hide();
+    $("#notificationCenterMessages").show()
+  })
+
+  $("#notificationCenterSection2").on("click", function () {
+    $(".notificationCenterSection").hide();
+    $("#notificationCenterCalendar").show()
+  })
+
+  $(document).on("click", ".notificationKindMessage", function () {
+    removeNotificationKind(5);
+    $("#notificationCenterMessages").html("");
+    showNotificationsCenter()
+
+    setTimeout(() => {
+      notificationsIndicator()
+    }, 300);
+
+    let idChat = $(this).attr("data-emisor")
+    redirectChat(idChat)
+  })
+
+  $(document).on("click", ".notificationBirthdays", function () {
+    removeNotificationKind(6);
+    $(".notificationBirthdays").remove();
+
+    let dataLS = JSON.parse(window.localStorage.getItem('pedboxBirthdays')); 
+        dataLS.data = {}
+    window.localStorage.setItem('pedboxBirthdays', JSON.stringify(dataLS));
+    
+    showNotificationsCenter()
+    notificationsIndicator()
+
+    let idChat = $(this).attr("data-emisor")
+    redirectChat(idChat)
+  })
+
+  $(document).on("click", ".notificationKindCalendar", function () {
+    removeNotificationKind(6);
+    $("#notificationCenterCalendar").html("");
+    showNotificationsCenter()
+
+    setTimeout(() => {
+      notificationsIndicator()
+    }, 300);
+  })
+
+  const notificationCenterContainerEl = document.querySelector('#notificationCenterContainer');
+  $(document).on('click', function(e) { // Cerrar sidebar 
+    if (!notificationCenterContainerEl.contains(e.target) && e.target.id != "notificationBellIcon") {
+      $("#notificationCenterContainer").hide();
+    }
+  });
 
   loadNotificationsLocalStorage()
   loadNotificationRegister()

@@ -1108,7 +1108,6 @@
           } else {
             dataFormated[i].editable = false
           }
-          console.log(dataFormated[i])
           addEvent(dataFormated[i])
         }
         printTableInform()
@@ -1169,7 +1168,6 @@
             idUsersFilter.push(Number($(items[i]).attr("data-user"))) 
           }
         }
-        console.log(idUsersFilter)
         
         let indexEventsFilteredByUserId = [];
         for (let i = 0; i < dataApliedFilter.length; i++) { // Index de los eventos con id_user de los usuarios seleccionados
@@ -1260,10 +1258,6 @@
           $('.rejectEvent[data-id="'+id+'"]').parent().remove();
         }
       })
-
-
-
-      console.log(operation, id, isCRM)
     }
 
     let deleteEvent = () => {
@@ -1525,7 +1519,6 @@
       })
       .then(res => res.json())
       .then(res =>{   
-        console.log(res)
         if (res.result.success) {
           Swal.fire({
             icon: 'success',
@@ -1714,7 +1707,6 @@
       for (let i = 0; i < data.length; i++) {
         if (data[i].status == 0) { continue } // Avoid closed event
 
-        console.log(data[i])
         let date = data[i].start || data[i].date_begin;
             date =  new Date(date)
 
@@ -1740,7 +1732,6 @@
     }
 
     let addEventSidebar = (data) => {
-      console.log("data sibdear", data)
       let isPending = false;
       let isRejected = false;
       try {

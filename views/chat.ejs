@@ -351,6 +351,9 @@
   <script src="/fonts/emoticons.js"></script>
     
   <script>
+    let idChat = `<%- JSON.stringify(id_chat) %>`;
+        idChat = JSON.parse(idChat);
+
     var isUsers = false;
     var isModal = false;
     var isFiltersLoaded = false;
@@ -697,7 +700,8 @@
 
       // Listener message incoming
       socket.on('new_message', (resp) => {
-        console.log("coming here each time?")
+        if (!(resp.contenido.notificationData === undefined)) { return } // ignore if it's a notification
+
         new Notification(resp.alias, {
           "body": resp.contenido.texto, 
           "data": {},
@@ -1687,6 +1691,12 @@
     $(document).ready(function () {
       $("#menuChat").addClass("activeNav")
       $("#preloader").hide();
+
+      setTimeout(() => {
+        if (idChat) {
+          setChat(idChat)
+        }
+      }, 1300);
     })
   </script> 
 

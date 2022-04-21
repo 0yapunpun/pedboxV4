@@ -56,8 +56,17 @@ controller.noPermission = async(req, res, next) => {
 controller.chat = async(req, res, next) => {
   // Validar login
   if (!req.session.login) { return res.redirect('/login'); }
+
+  let response = await service.removeNotificationByKind(req.session.user.id, 5); // Delete all notification of messages 
   
-  res.render('chat', {'session': req.session});
+  res.render('chat', {'session': req.session, "id_chat": false});
+}
+
+controller.chatOpenConversation = async(req, res, next) => {
+  // Validar login
+  if (!req.session.login) { return res.redirect('/login'); }
+  
+  res.render('chat', {'session': req.session, "id_chat": req.params.id});
 }
 
 controller.agenda = async(req, res, next) => {

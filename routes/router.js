@@ -20,7 +20,6 @@ router.get('/no-permission', viewController.noPermission);
 router.get('/getNotifications/:id_user', notificationsController.getNotification);
 router.get('/removeNotificationByKind/:id_user/:kind', notificationsController.removeNotificationByKind);
 router.post('/createNotification', notificationsController.createNotification);
-// router.get('/sendNotification', notificationsController.sendNotification);
 
 // b2b
 router.get('/calidosos', b2bController.calidosos);
@@ -57,6 +56,7 @@ router.post('/documentos-usuario/delete', b2bController.deleteDocumentoUsuario);
 
 // Herramientas
 router.get('/chat', viewController.chat);
+router.get('/chat/chatId/:id', viewController.chatOpenConversation);
 
 // Helpdesk
 router.get('/helpdesk', helpdeskController.helpdesk);
