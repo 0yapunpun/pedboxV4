@@ -155,8 +155,13 @@ controller.catalogo = async (req, res, next) => {
   // Validar login
   if (!req.session.login) { return res.redirect('/login'); }
   if (!(hasPermission(req.session.user.permission ,"8045_CAN_VIEW_SHOPPING_CAR"))) {return res.redirect('/no-permission');}
-  
-  res.render('b2b/catalogo', {'session': req.session});
+
+  let isGyW = true;
+  if (isGyW) {
+    res.render('b2b/catalogo_v2', {'session': req.session});
+  } else {
+    res.render('b2b/catalogo', {'session': req.session});
+  }
 }
 
 controller.catalogoProductos = async (req, res, next) => {
@@ -247,6 +252,22 @@ controller.catalogoTop = async (req, res, next) => {
     items = [];
   }
   res.render('b2b/catalogo-top50', {'session': req.session, 'productos': items});
+}
+
+controller.catalogColors = async(req, res, next) => {
+  let colores = await service.catalogColors(req.session.user.id_company);
+  res.send(colores.result);
+}
+
+controller.catalogGyW = async(req, res, next) => {
+  let catalog = await service.getCatalogGyW();
+  res.send(catalog.result);
+}
+
+controller.catalogDetailGyW = async(req, res, next) => {
+  let code = req.params.code;
+  let catalog = await service.getCatalogDetailGyW(req.session.user.id_company, code);
+  res.send(catalog.result);
 }
 
 controller.certificados = async(req, res, next) => {

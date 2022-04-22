@@ -1,142 +1,104 @@
-<!-- ** Handle colors by company  -->
 
 <% 
-  if ( 
-    session.user.id_company == 36 ||
-    session.user.id_company == 5 ||
-    session.user.id_company == 10 ||
-    session.user.id_company == 39 ||
-    session.user.id_company == 22
-  ) { 
-%>
-  <style>
-    .bg-gradient-primary {
-      background: linear-gradient(310deg, rgba(250,117,124,1) 0%, rgba(216,8,17,1) 100%) !important;
-    }
+let colorPage1 = "#312560"; // color primary
+let colorPage2 = "#fff";  // colors secundary 
+let colorPage3 = "#4861b9"; // color gradient 1
+let colorPage4 = "#302560"; // color gradient 2
 
-    .activeNav .icon {
-      color: white !important;
-      background: linear-gradient(310deg, rgba(250,117,124,1) 0%, rgba(216,8,17,1) 100%) !important;
-    }
+if ( 
+  session.user.id_company == 36 ||
+  session.user.id_company == 5 ||
+  session.user.id_company == 10 ||
+  session.user.id_company == 39 ||
+  session.user.id_company == 22
+) {
+  colorPage1 = "#d80811"
+  colorPage2 = "#fff"
+  colorPage3 = "#fa757c"
+  colorPage4 = "#d80811"
+}
 
-    .badge-primary {
-      color: white;
-      background :rgba(250,117,124,1) !important;
-    }
 
-    .dataTable-pagination .active a, .dataTable-pagination .active a:focus, .dataTable-pagination .active a:hover {
-      background: transparent;
-      background: linear-gradient(310deg, rgba(250,117,124,1) 0%, rgba(216,8,17,1) 100%) !important;
-      box-shadow: 0 3px 5px -1px rgb(0 0 0 / 9%), 0 2px 3px -1px rgb(0 0 0 / 7%);
-      color: #fff;
-      border: none;
-      border-radius: 50% !important;
-    }
-
-    .btn-primary {
-      color: #fff;
-      background-color: #d80811 !important;
-      border-color: #d80811 !important; }
-      .btn-primary:hover {
-        color: #fff;
-        background-color: #d80811 !important;
-        border-color: #d80811 !important; }
-      .btn-check:focus + .btn-primary, .btn-primary:focus {
-        color: #fff;
-        background-color: #d80811 !important; 
-        border-color: #d80811 !important;
-        box-shadow: 0 0 0 0.2rem rgba(250,117,124,1); }
-      .btn-check:checked + .btn-primary,
-      .btn-check:active + .btn-primary, .btn-primary:active, .btn-primary.active,
-      .show > .btn-primary.dropdown-toggle {
-        color: #fff;
-        background-color: #d80811 !important;
-        border-color: #d80811 !important; }
-        .btn-check:checked + .btn-primary:focus,
-        .btn-check:active + .btn-primary:focus, .btn-primary:active:focus, .btn-primary.active:focus,
-        .show > .btn-primary.dropdown-toggle:focus {
-          box-shadow: 0 0 0 0.2rem rgba(250,117,124,1); }
-      .btn-primary:disabled, .btn-primary.disabled {
-        color: #fff;
-        background-color: #d80811 !important;
-        border-color: #d80811 !important; }
-
-    .bg-primary {
-      background-color: #d80811 !important; 
-    }
-    .border-primary {
-      border-color: #d80811 !important; 
-    }
-  </style>
-<% 
-  } 
+if ( 
+  session.user.id_company == 15
+) { 
+  colorPage1 = "#ffff01"
+  colorPage2 = "#373737"
+  colorPage3 = "#01457b"
+  colorPage4 = "#0262b0"
+}
 %>
 
-<% 
-  if ( 
-    session.user.id_company == 15
-  ) { 
-%>
-  <style>
-    .bg-gradient-primary {
-      background: linear-gradient(310deg, rgba(1,69,123,1) 17%, rgba(2,98,176,1) 65%);
-    }
+<style>
+  .bg-gradient-primary {
+    background: linear-gradient(310deg, <%- colorPage3 %> 17%, <%- colorPage4 %> 65%);
+  }
 
-    .activeNav .icon {
-      color: white !important;
-      background: linear-gradient(310deg, rgba(1,69,123,1) 17%, rgba(1,69,123,0.9304096638655462) 65%) !important;
-    }
+  .activeNav .icon {
+    color: white !important;
+    background: linear-gradient(310deg, <%- colorPage3 %> 17%, <%- colorPage4 %> 65%) !important;
+  }
 
-    .badge-primary {
-      color: #373737 !important;
-      background :#ffff01 !important;
-    }
+  .badge-primary {
+    color: <%- colorPage2 %> !important;
+    background : <%- colorPage1 %> !important;
+  }
 
-    .dataTable-pagination .active a, .dataTable-pagination .active a:focus, .dataTable-pagination .active a:hover {
-      background: transparent;
-      background: linear-gradient(310deg, rgba(1,69,123,1) 17%, rgba(1,69,123,0.9304096638655462) 65%) !important;
-      box-shadow: 0 3px 5px -1px rgb(0 0 0 / 9%), 0 2px 3px -1px rgb(0 0 0 / 7%);
-      color: #fff;
-      border: none;
-      border-radius: 50% !important;
-    }
+  .dataTable-pagination .active a, .dataTable-pagination .active a:focus, .dataTable-pagination .active a:hover {
+    background: transparent;
+    background: linear-gradient(310deg, <%- colorPage3 %> 17%, <%- colorPage4 %> 65%) !important;
+    box-shadow: 0 3px 5px -1px rgb(0 0 0 / 9%), 0 2px 3px -1px rgb(0 0 0 / 7%);
+    color: #fff;
+    border: none;
+    border-radius: 50% !important;
+  }
 
-    .btn-primary {
-      color: #373737;
-      background-color: #ffff01 !important;
-      border-color: #ffff01 !important; }
-      .btn-primary:hover {
-        color: #373737;
-        background-color: #ffff01 !important;
-        border-color: #ffff01 !important; }
-      .btn-check:focus + .btn-primary, .btn-primary:focus {
-        color: #373737;
-        background-color: #ffff01 !important; 
-        border-color: #ffff01 !important;
-        box-shadow: 0 0 0 0.2rem rgba(250,117,124,1); }
-      .btn-check:checked + .btn-primary,
-      .btn-check:active + .btn-primary, .btn-primary:active, .btn-primary.active,
-      .show > .btn-primary.dropdown-toggle {
-        color: #373737;
-        background-color: #ffff01 !important;
-        border-color: #ffff01 !important; }
-        .btn-check:checked + .btn-primary:focus,
-        .btn-check:active + .btn-primary:focus, .btn-primary:active:focus, .btn-primary.active:focus,
-        .show > .btn-primary.dropdown-toggle:focus {
-          box-shadow: 0 0 0 0.2rem rgba(250,117,124,1); }
-      .btn-primary:disabled, .btn-primary.disabled {
-        color: #373737;
-        background-color: #ffff01 !important;
-        border-color: #ffff01 !important; }
+  .btn-primary {
+    color: <%- colorPage2 %>;
+    background-color:  <%- colorPage1 %>  !important;
+    border-color: #ffff01 !important; 
+  }
+  .btn-primary:hover {
+    color: <%- colorPage2 %>;
+    background-color: <%- colorPage1 %>  !important;
+    border-color: <%- colorPage1 %> !important; 
+  }
+  .btn-check:focus + .btn-primary, .btn-primary:focus {
+    color: <%- colorPage2 %>;
+    background-color: <%- colorPage1 %> !important; 
+    border-color: <%- colorPage1 %> !important;
+    box-shadow: 0 0 0 0.2rem rgba(250,117,124,1); 
+  }
+  .btn-check:checked + .btn-primary,
+  .btn-check:active + .btn-primary, .btn-primary:active, .btn-primary.active,
+  .show > .btn-primary.dropdown-toggle {
+    color: <%- colorPage2 %>;
+    background-color: <%- colorPage1 %> !important;
+    border-color: <%- colorPage1 %> !important; 
+  }
+  .btn-check:checked + .btn-primary:focus,
+  .btn-check:active + .btn-primary:focus, .btn-primary:active:focus, .btn-primary.active:focus,
+  .show > .btn-primary.dropdown-toggle:focus {
+    box-shadow: 0 0 0 0.2rem rgba(250,117,124,1); 
+  }
+  .btn-primary:disabled, .btn-primary.disabled {
+    color: <%- colorPage2 %>;
+    background-color: <%- colorPage1 %> !important;
+    border-color: <%- colorPage1 %> !important;
+  }
 
-    .bg-primary {
-      color: #373737 !important;
-      background-color: #ffff01 !important; 
-    }
-    .border-primary {
-      border-color: #ffff01 !important; 
-    }
-  </style>
-<% 
-  } 
-%>
+  .bg-primary {
+    color: <%- colorPage2 %> !important;
+    background-color: <%- colorPage1 %> !important; 
+  }
+  .border-primary {
+    border-color: <%- colorPage1 %> !important; 
+  }
+  .alert-primary {
+    background: linear-gradient(310deg, <%- colorPage3 %> 17%, <%- colorPage4 %> 65%);
+  }
+  .swal2-styled.swal2-confirm {
+    color: <%- colorPage2 %> !important;
+    background-color:  <%- colorPage1 %>  !important;
+  }
+</style>

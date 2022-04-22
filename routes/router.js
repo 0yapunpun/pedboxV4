@@ -21,7 +21,7 @@ router.get('/getNotifications/:id_user', notificationsController.getNotification
 router.get('/removeNotificationByKind/:id_user/:kind', notificationsController.removeNotificationByKind);
 router.post('/createNotification', notificationsController.createNotification);
 
-// b2b
+// b2b - extranet
 router.get('/calidosos', b2bController.calidosos);
 router.get('/historial-transacciones', b2bController.historialTransacciones);
 router.get('/historial-facturas', b2bController.historialFacturas);
@@ -31,9 +31,6 @@ router.get('/historial-pedidos/:numero', b2bController.historialPedidosDetalle);
 router.get('/cotizaciones', b2bController.cotizaciones);
 router.get('/nuevo-pedido/:codigo', b2bController.nuevoPedido);
 router.get('/infoVendedor/:id', b2bController.getInfoVendedor);
-router.get('/catalogo', b2bController.catalogo);
-router.get('/catalogo/productos', b2bController.catalogoProductos);
-router.get('/catalogo/top', b2bController.catalogoTop);
 router.get('/certificados', b2bController.certificados);
 router.get('/retenciones', b2bController.retenciones);
 router.post('/retenciones/update', b2bController.retencionesUpdate);
@@ -53,6 +50,13 @@ router.post('/permisos/nuevo-permiso', b2bController.createPermiso);
 router.get('/documentos-usuario', b2bController.documentosUsuario);
 router.post('/documentos-usuario/upload', b2bController.uploadDocumentoUsuario);
 router.post('/documentos-usuario/delete', b2bController.deleteDocumentoUsuario);
+
+router.get('/catalogo', b2bController.catalogo);
+router.get('/catalogo/productos', b2bController.catalogoProductos);
+router.get('/catalogo/top', b2bController.catalogoTop);
+router.get('/catalogo/colors', b2bController.catalogColors);
+router.get('/catalogo/GyW', b2bController.catalogGyW); 
+router.get('/catalogo/GyW/detail/:code', b2bController.catalogDetailGyW); 
 
 // Herramientas
 router.get('/chat', viewController.chat);

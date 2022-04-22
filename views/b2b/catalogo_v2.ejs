@@ -1,6 +1,4 @@
-<!-- TODO:
-  - Añadir preloader (al boton para mostrar vista en tabla)
--->
+<!-- Catalogo hecho para Grulla&Wellco (id_company 20) -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -134,6 +132,15 @@
     }
     @keyframes cssAnimation {
       to   { visibility: visible; }
+    }
+
+    .pagesList a{
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   </style>
 </head>
@@ -269,64 +276,8 @@
       </div>
     </div>
 
-    <!-- Alerts -->
-    <div class="alert alert-primary alert-dismissible fade show alertsStyle" role="alert" id="alertProductExist" style="display: none;">
-      <span class="alert-text">El producto ya fue agregado al carrito</span>
-      <button type="button" class="btn-close" onclick="$(this).parent().hide()">
-          <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-
-    <!-- Modales -->
+    <!-- Modal detalle  -->
     <div class="modal fade" id="modalDetalle">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Detalle</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: gray; border-radius: 50%;"></button>
-          </div>
-          <div class="modal-body" >
-            <div class="w-100 d-flex">
-              <div class="w-50">
-                <img id="modalDetalleImg" src="" alt="" style="max-width: 100%; max-height: 100%;">
-              </div>
-              <div class="w-50 p-5 pt-1 pe-1 pb-2">
-                <div>
-                  <div>
-                    <h6 id="modalDetalleN"></h6>
-                  </div>
-                  <div>
-                    <h5 id="modalDetalleP"></h5>
-                  </div>
-                  <div class="d-flex align-items-center justify-content-between gap-1">
-                    <div style="position: relative;" class="w-40">
-                      <input class="form-control" type="number" name="" id="numberProductsD" minlength="1" value="1" style="padding-left: 50px;">
-                      <h6 style="position: absolute; left: 5%; top: 15%" >Cant:</h6>
-                    </div>
-                    <div style="position: relative;" class="mb-2">
-                      <button onclick="addProductCart()" id="idProductD" class="btn btn-primary m-0 d-flex align-items-center" style="font-size: 10px; height: 39px;">
-                        <i class="fas fa-shopping-cart me-1" style="font-size: 20px" title="Carrito de compra"></i>
-                        AGREGAR AL CARRITO
-                      </button>
-                      <div class="text-center w-100" style="position: absolute; font-size: 13px;">
-                        <a href="#" onclick='window.location.href = "/carrito-compras"'>Ver carrito</a>
-                      </div>
-                    </div>
-                  </div>
-                  <hr>
-                  <div id="datilProductItems">
-                    <!-- Contenido Dinamico -->
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal detalle Grulla  -->
-    <div class="modal fade" id="modalPrueba">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
@@ -336,44 +287,38 @@
           <div class="modal-body">
             <div class="w-100 d-flex">
               <div class="w-50">
-                <img id="modalDetalleImg" src="https://api.pedbox.co:8590/files/attached/ur/CV01006.png" alt="" style="max-width: 100%; max-height: 100%;">
+                <img id="modalDetalleImg" src="https://upload.wikimedia.org/wikipedia/commons/d/da/Imagen_no_disponible.svg" alt="" style="max-width: 100%; max-height: 100%;">
               </div>
               <div class="w-50 p-5 pt-1 pe-1 pb-2">
                 <div>
                   <div>
-                    <h6 id="modalDetalleN">CADENA DISTRIBUCION CHEV. LUV 1.6 - 8-94200-948-1 - 06B-1*92L - MAXTOP - TAIWAN</h6>
+                    <h6 id="modalDetalleN">a</h6>
                   </div>
                   <div>
-                    <h5 id="modalDetalleP">$ 19,750</h5>
+                    <h5 id="modalDetalleP">$ 0,0</h5>
                   </div>
 
                   <div class="d-flex align-items-center justify-content-between gap-1">
-                    <div style="width: 33%;">
-                      <label for="">Cantidad</label>
-                      <input class="form-control" type="number" name="" id="numberProductsD" minlength="1" value="1" style="padding-left: 50px;">
-                    </div>
                     <div>
                       <label for="">Talla</label>
-                      <select name="" id="" class="form-control">
-                        <option value="" selected>Seleccionar</option>
-                        <option value="">1</option>
-                        <option value="">2</option>
-                        <option value="">3</option>
+                      <select name="" id="selectSizeProduct" class="form-control">
+                        <option value="-1" selected>Seleccionar</option>
                       </select>
                     </div>
                     <div>
                       <label for="">Color</label>
-                      <select name="" id="" class="form-control">
-                        <option value="" selected>Seleccionar</option>
-                        <option value="">Negro</option>
-                        <option value="">Azul</option>
-                        <option value="">Blanco</option>
+                      <select name="" id="selectColorProduct" class="form-control">
+                        <option value="-1" selected>Seleccionar</option>
                       </select>
+                    </div>
+                    <div style="width: 33%;">
+                      <label for="">Cantidad</label>
+                      <input class="form-control" type="number" name="" id="numberProductsD" minlength="1" value="1" style="padding-left: 50px;">
                     </div>
                   </div>
 
                   <div class="mt-3 d-flex flex-column w-100 align-items-center justify-content-center">
-                    <button onclick="addProductCart()" id="idProductD" class="btn btn-primary m-0 d-flex align-items-center" style="font-size: 10px; height: 39px;" codigo="CV01006">
+                    <button onclick="addProductCart()" id="idProductD" class="btn btn-primary m-0 d-flex align-items-center" style="font-size: 10px; height: 39px;" codigo="">
                       <i class="fas fa-shopping-cart me-1" style="font-size: 20px" title="Carrito de compra" aria-hidden="true"></i><span class="sr-only">Carrito de compra</span>
                       AGREGAR AL CARRITO
                     </button>
@@ -417,7 +362,7 @@
       </div>
     </div>
 
-    <!-- Producto agregado al carrito -->
+    <!-- modal productos agregados -->
     <div id="modalAddedToCart" class="border modalAddedToCart" style="display: none;">
       <div class="d-flex flex-column p-2 text-center">
         <h6 style="margin: 5px;">Recién agregados a tu carrito de compras</h5>
@@ -450,6 +395,7 @@
   <script src="/js/plugins/chartjs.min.js"></script>
   <script src="/js/underscore-min.js"></script>
   <script src="/js/menu.js"></script>
+  <script src="/js/sweetalert2.all.min.js"></script>
   
   <script>
     let cartName = "storeCart" + session.user.id;
@@ -467,6 +413,9 @@
     let dataSidebar = {};
     let dataSidebarMaster;
     let dataTagsObjectName = "grupo";
+
+    let colorsProducts;
+
 
     const choicesPrice = new Choices($('#selectByPrice')[0]);
     const choicesItems = new Choices($('#selectNumberRange')[0]);
@@ -521,13 +470,15 @@
     $(document).on("click", ".productCard", function (e) {
       $("#modalDetalleT").html("");
       $("#numberProductsD").val(1);
+      $("#selectSizeProduct").val(-1);
+      $("#selectColorProduct").val(-1);
 
       let obj = JSON.parse($(this).attr("data-object"))
 
       let img = obj.imagen;
       let name = obj.descripcion;
       let price = obj.format_precio;
-      let codigo = obj.codigo;
+      let codigo = obj.codep;
 
       $("#datilProductItems").html("")
       for (const key in dataSidebarMaster) {
@@ -546,6 +497,9 @@
       $("#modalDetalleN").text(name)
       $("#modalDetalleP").text(price)
       $("#idProductD").attr("codigo",codigo)
+
+      let codeProduct = $(this).attr("codigo")
+      getProductDetail(codeProduct)
 
       $("#modalDetalle").modal("show")
     })
@@ -692,22 +646,18 @@
       $("#productsContainer").html("")
       for (let i = 0; i < dataPaginated.length; i++) {
         let element = `
-          <div class="card cardItemHover productCard" style="width: 31%" codigo="${dataPaginated[i].codigo}" name="${dataPaginated[i].descripcion}" price="${dataPaginated[i].format_precio}" marca="${dataPaginated[i].marca}" grupo="${dataPaginated[i].grupo}" subgrupo="${dataPaginated[i].sub_grupo}" modelo="${dataPaginated[i].modelo_moto}" talla="${dataPaginated[i].talla}" img="${dataPaginated[i].imagen}" data-object='${JSON.stringify(dataPaginated[i])}'>
+          <div class="card cardItemHover productCard" style="width: 31%" codigo="${dataPaginated[i].codep}" name="${dataPaginated[i].descripcion}" price="${dataPaginated[i].format_precio}" marca="${dataPaginated[i].marca}" grupo="${dataPaginated[i].grupo}" subgrupo="${dataPaginated[i].sub_grupo}" modelo="${dataPaginated[i].modelo_moto}" talla="${dataPaginated[i].talla}" img="${dataPaginated[i].imagen}" data-object='${JSON.stringify(dataPaginated[i])}'>
             <div style="width: 100%; height: 50%; min-height: 200px; max-height: 200px"><img class="card-img-top" src="${dataPaginated[i].imagen}" alt="" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/d/da/Imagen_no_disponible.svg'" style="max-width: 100%; max-height: 100%; object-fit: scale-down"></div>
             <div class="card-body pb-0 px-1 pt-2">
               <ul class="list-group list-group-flush d-flex h-100" >
                 <li class="list-group-item flex-fill p-0 pb-2 ps-2 bg-transparent d-flex flex-column justify-content-between" >
-                  <h6 class="card-title "><span style="font-weight: 400"> ${dataPaginated[i].codigo} </span>- ${dataPaginated[i].descripcion}</h6>
+                  <h6 class="card-title "><span style="font-weight: 400"> ${dataPaginated[i].codep} </span>- ${dataPaginated[i].description}</h6>
                   <p class="card-text"> ${dataPaginated[i].format_precio}</p>
                 </li>
                 <li class="list-group-item d-flex justify-content-between mx-1 my-1 bg-transparent">
-                  <div class="d-flex align-items-center addCart" style="cursor: pointer;" value="${dataPaginated[i].codigo}" >
+                  <div class="d-flex align-items-center justify-content-center w-100" style="cursor: pointer; font-size: 13px" value="${dataPaginated[i].codigo}">
                     <i class="fas fa-shopping-cart me-1" style="font-size: 18px"></i>
-                    Agregar
-                  </div>
-                  <div class="d-flex align-items-center" style="cursor: pointer;" value="${dataPaginated[i].codigo}">
-                    <i class="fas fa-eye me-1" style="font-size: 18px"></i>
-                    Ver
+                    Seleccionar Opciones 
                   </div>
                 </li>
               </ul>
@@ -935,23 +885,42 @@
     }
 
     const addProductCart = (idProduct, amount) => {
-      let numberProducts;
-      let productID;
-      
-      if (idProduct) {
-        numberProducts = 1;
-        productID = idProduct;
-      } else {
-        numberProducts = Number($("#numberProductsD").val());
-        productID = $("#idProductD").attr("codigo");
-      }
+      let numberProducts = Number($("#numberProductsD").val());
+      let productID = $("#idProductD").attr("codigo");
+
       if (amount) {
         numberProducts = amount;
         productID = idProduct;
       }
+
+      let size = $("#selectSizeProduct").val();
+      if (size == "-1") {
+        return Swal.fire({
+          title: 'Selecciona un talla antes de agregar al carrito',
+          confirmButtonText: 'Continuar',
+        })
+      }
+
+      let color = $("#selectColorProduct").val();
+      if (color == "-1") {
+        return Swal.fire({
+          title: 'Selecciona un color antes de agregar al carrito',
+          confirmButtonText: 'Continuar',
+        })
+      }
       
-      let productToCar = _.findWhere(dataProductsComplete, {"codigo": productID});
+      let productSelected = _.findWhere(dataProductsComplete, {"codep": productID});
+      let productToCar = {
+        codep: productSelected.codep,
+        description: productSelected.description
+      }
+
+      // console.log("l", productToCar)
+      // console.log("ll", productID)
+
       productToCar.qty = numberProducts;
+      productToCar.codep = productID + size + color;
+
       saveLocalStorage(productToCar);
     }
 
@@ -961,11 +930,13 @@
       } else {
         let localObject = JSON.parse(localStorage.getItem(cartName));
 
-        
-        let productExist = _.findWhere(localObject, {"codigo": product.codigo});
-        if (productExist) {productExistAlert(); return} 
-        
-
+        let productExist = _.findWhere(localObject, {"codep": product.codep});
+        if (productExist) {
+          return Swal.fire({
+          title: 'El producto ya fue agregado al carrito',
+          confirmButtonText: 'Continuar',
+        })
+       } 
         localObject.push(product)
         localStorage.setItem(cartName, JSON.stringify(localObject));
       }
@@ -973,15 +944,9 @@
       setCartIconAmount();
     }
 
-    const productExistAlert = () => {
-      $("#alertProductExist").show();
-      setTimeout(() => {
-        $("#alertProductExist").fadeOut();
-      }, 5000);
-    }
-
     const loadPreviewCart = () => {
-      $("#modalAddedToCart").css("display", "block")
+      $("#modalDetalle").modal("hide")
+      
       let products = JSON.parse(localStorage.getItem(cartName))
 
       $("#addedToCartItems").html('')
@@ -999,25 +964,80 @@
         `;
         $("#addedToCartItems").append(element)
       }
+
+      setTimeout(() => {
+        $("#modalAddedToCart").show()
+      }, 300);
     }
 
     const getColorsCatalog = () => {
       fetch("/catalogo/colors") 
       .then(response => response.json())
       .then(data => {
-        console.log(data)
+        if (data.success) {
+          colorsProducts = data.result;          
+        }
       }) 
       .catch(error => console.log('Request failed', error));
     } 
 
     const getCatalogGyW = () => { // catalogo Grulla y Wellco, id company
-      fetch("/catalogo/colors") 
+      fetch("/catalogo/GyW") 
       .then(response => response.json())
       .then(data => {
-        console.log(data)
+        if (data.success) {
+          dataProductsComplete = data.result;
+          dataProductsPrint = dataProductsComplete;
+          printPaginator();
+          selectView(0, 8);
+        }
       }) 
       .catch(error => console.log('Request failed', error));
     } 
+
+    const getProductDetail = (code) => { // Tallas y colores
+    fetch("/catalogo/GyW/detail/"+code) 
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          data = data.result;
+
+          let sizes = [];
+          let colors = [];
+          for (let i = 0; i < data.length; i++) {
+            if (!sizes.includes(data[i].size)) {
+              sizes.push(data[i].size)
+            }
+            if (!colors.includes(data[i].color)) {
+              colors.push(data[i].color)
+            }
+          };
+
+          $("#selectSizeProduct").html("")
+          for (let i = 0; i < sizes.length; i++) {
+            let el = `
+              <option value="${sizes[i]}">${sizes[i]}</option>
+            `;
+            $("#selectSizeProduct").append(el)
+          }
+          $("#selectSizeProduct").append('<option value="-1" selected>Seleccionar</option>')
+
+          $("#selectColorProduct").html("")
+          for (let i = 0; i < colors.length; i++) {
+            let colorObj = _.findWhere(colorsProducts, {cod_color: colors[i]});
+
+            if (colorObj == undefined) {return}
+
+            let el = `
+              <option value="${colors[i]}">${colorObj.color}</option>
+            `;
+            $("#selectColorProduct").append(el)
+          }
+          $("#selectColorProduct").append('<option value="-1" selected>Seleccionar</option>')
+        }
+      }) 
+      .catch(error => console.log('Request failed', error));
+    }
 
     const getProductsData = () => {
       fetch("/catalogo/productos") 
@@ -1028,20 +1048,6 @@
       .catch(error => console.log('Request failed', error));
     }
 
-    function databaseExists(dbname, callback) {
-      var req = indexedDB.open(dbname);
-      var existed = true;
-      req.onsuccess = function () {
-          req.result.close();
-          if (!existed)
-              indexedDB.deleteDatabase(dbname);
-          callback(existed);
-      }
-      req.onupgradeneeded = function () {
-          existed = false;
-      }
-    }
-
     const selectView = (nS, nE) => {
       if (currentView == "tarjetas") {
         printProducts(nS, nE);
@@ -1050,65 +1056,6 @@
         printProductsTable(nS, nE);
       }
     }
-
-    const createIndexedDB = (data) => {
-      if (!window.indexedDB) {
-        console.error("Tu navegador no soporta indexedDB");
-        return;
-      }
-
-      const request = indexedDB.open(catalogName, 2);
-      request.onerror = (event) => {
-        console.error(`Database error: ${event.target.errorCode}`);
-      };
-      request.onupgradeneeded = (event) => {
-        const db = request.result;
-        const store = db.createObjectStore("products", { keyPath: "id", autoIncrement: true });
-      }
-      request.onsuccess = (event) => {
-        const db = request.result;
-        const transaction = db.transaction("products", "readwrite");
-        const store = transaction.objectStore("products");
-        store.put(data)
-
-        transaction.oncomplete = function () {
-          db.close();
-        };
-
-        getDataFromIndexedDB()
-          .then(function (response) {
-            dataProductsComplete = response.result;
-
-            for (let i = 0; i < dataProductsComplete.length; i++) {
-              dataProductsComplete[i].precio = Number(dataProductsComplete[i].precio) 
-              collapseData(dataProductsComplete[i]);
-            }
-            dataProductsPrint = dataProductsComplete;
-            printTags();
-            printCollapse();
-            printPaginator();
-            selectView(0, 8)
-            setCartIconAmount();
-          })
-      };
-    }
-
-    const getDataFromIndexedDB = () => {
-      return new Promise(function (resolve, reject) {
-          const request = indexedDB.open(catalogName, 2);
-          request.onerror = (event) => {
-            console.error(`Database error: ${event.target.errorCode}`);
-          };
-          request.onsuccess = (event) => {
-            const db = request.result;
-            const transaction = db.transaction("products", "readwrite");
-            const store = transaction.objectStore("products");
-            const dataProductsDB = store.get(1);
-            dataProductsDB.onsuccess = () => resolve(dataProductsDB);
-          };
-        }
-      )
-    };
 
     const handlePermissions = () => {
       let permissions = session.user.permission;
@@ -1136,47 +1083,9 @@
       handlePermissions(); 
       $("#menuCatalogo").addClass("activeNav");
 
-      // Obtener filtros catalogo
-      if (hasCustomFilters != -1) {
-        filters = session.user.permission.find(e => e.code == "8050_MANEJA_FILTROS_DINAMICOS")
-        filters = filters.content.split(",");
-      } else{
-        if (otherFilters != -1) {
-          if (session.user.permission[otherFilters].content == "S" && session.user.id_company == 15) {
-            filters = ["marca","modelo","categoria_x002F_parte","fabricante"];
-          }
-        }
-      }
-      for (let i = 0; i < filters.length; i++) {
-        dataSidebar[filters[i]] = {};
-      }
-      dataSidebarMaster = JSON.parse(JSON.stringify(dataSidebar)) // Copia vacia para restaurar filtros
+      getColorsCatalog()
+      getCatalogGyW()
 
-      // Nombre del objeto de donde salen las tags
-      if (session.user.id_company == 5){dataTagsObjectName = "producto"}
-      if (session.user.id_company == 15){dataTagsObjectName = "marca"} 
-
-      // Comprobar si la lista de productos esta en el localStorage (indexedDB)
-      databaseExists(catalogName, function (state) {
-        if (state) {
-          getDataFromIndexedDB()
-          .then(function (response) {
-            dataProductsComplete = response.result;
-
-            for (let i = 0; i < dataProductsComplete.length; i++) {
-              dataProductsComplete[i].precio = Number(dataProductsComplete[i].precio) 
-              collapseData(dataProductsComplete[i]);
-            }
-            dataProductsPrint = dataProductsComplete;
-            printTags();
-            printCollapse();
-            printPaginator();
-            selectView(0, 8);
-          })
-        } else {
-          getProductsData();
-        }
-      });
     });
   </script>
 

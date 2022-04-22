@@ -80,6 +80,24 @@ service.productos = async(url_company, nit, id_company) => {
   return data;
 }
 
+service.catalogColors = async(id_company) => {
+  const url = urlServicePedbox4+'catalog/colors/'+ id_company
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.getCatalogGyW = async() => {
+  const url = urlServicePedbox4+'catalog/GyW'
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.getCatalogDetailGyW = async(id_company, code_product) => {
+  const url = urlServicePedbox4+'catalog/detail/'+id_company+'/'+code_product
+  const data =  await makeRequest(url);
+  return data;
+}
+
 service.topProductos = async(url_company, nit, id_company) => {
   const url = urlKakashi+'get_extranet?nit='+nit+'&tipo=34&url='+url_company+'&id_company='+id_company;
   const data =  await makeRequest(url);
