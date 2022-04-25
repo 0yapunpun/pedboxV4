@@ -784,6 +784,8 @@
     agenda.render();
 
     let getData =  () => {
+
+
       let currentDate = new Date().toJSON().slice(0,10).replaceAll("-", "");
       fetch("/agenda/data/"+currentDate)
       .then(response => response.json())
@@ -804,11 +806,9 @@
 
         formatBirthdays();
         getDataCells();
-        loadCrmMasters();
         loadCrmSellers();
+        loadCrmMasters();
         loadUsersModal();
-
-        $("#preloader").hide();
       });
     }
 
@@ -1856,6 +1856,8 @@
     }
 
     $(document).ready(function () {
+      $("#preloader").hide();
+
       $(".btn-sidenav").on("click", function () {
         setTimeout(() => {
           agenda.render();

@@ -39,6 +39,7 @@ router.get('/usuarios', b2bController.usuarios);
 router.post('/usuarios/updatePassword', b2bController.password);
 router.post('/usuarios/updateUser', b2bController.updateUser);
 router.get('/facturas', b2bController.facturas);
+router.get('/facturas/universal_repuestos/:id_factura', b2bController.extranetFacturasUR);
 router.get('/carrito-compras', b2bController.carritoCompras);
 router.post('/carrito-compras', b2bController.sendCarritoCompras);
 router.get('/carrito-facturas', b2bController.carritoFacturas);

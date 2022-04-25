@@ -65,6 +65,20 @@ controller.facturas = async(req, res, next) => {
   res.render('b2b/facturas', {'session': req.session, 'facturas': facturas});
 }
 
+// Las facturas de universal de respuesto tienen un tratamiento diferente
+controller.extranetFacturasUR = async(req, res, next) => {  
+  let idFactura = req.params.id_factura;
+  let factura = await service.faturaUR(req.params.id_factura);
+
+  try {
+    factura = factura.result.elements[0].elements[0].elements[0].elements[0].elements[1].elements[0].elements[0].elements;
+  } catch (error) {
+    factura = [];
+  }
+
+  res.send(factura)
+}
+
 controller.historialPedidos = async (req, res, next) => {
   // Validar login
   if (!req.session.login) { return res.redirect('/login'); }
@@ -157,7 +171,7 @@ controller.catalogo = async (req, res, next) => {
   if (!(hasPermission(req.session.user.permission ,"8045_CAN_VIEW_SHOPPING_CAR"))) {return res.redirect('/no-permission');}
 
   let isGyW = true;
-  if (isGyW) {
+  if (isGyW) { // TODO cambiar 
     res.render('b2b/catalogo_v2', {'session': req.session});
   } else {
     res.render('b2b/catalogo', {'session': req.session});

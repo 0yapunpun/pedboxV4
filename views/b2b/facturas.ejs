@@ -122,15 +122,13 @@
   <script>
     let facturas = `<%- JSON.stringify(facturas) %>`;
         facturas = JSON.parse(facturas).result.extranet;
-    let session = `<%- JSON.stringify(session) %>`;
-        session = JSON.parse(session);
     let catalogName = "storeCatalog" + session.user.id;
     let cartInvoiceName = "storeInvoice" + session.user.id;
-    
 
     const loadTablePedidoRepetido = (data) => {
       let tableContent;
       for(let i = 0; i < data.length; i++){
+
         let icon;
         if (isInLocalStorage(data[i].Numero_Documento)) {
           icon = `<i class="fas fa-check iconCheck" style="display: none" title="Añadir factura al carrito"></i><i class="fas fa-trash iconRemove" title="Remover factura del carrito"></i>`;
@@ -138,8 +136,17 @@
           icon = `<i class="fas fa-check iconCheck" title="Añadir factura al carrito"></i><i class="fas fa-trash iconRemove" style="display: none" title="Remover factura del carrito"></i>`;
         }
 
+        let factura;
+        let inNewPage = "";
+        if (session.user.id_company == 39) {
+          factura = `javascript:extranetFacturas(${data[i].Numero_Documento})`
+        } else {
+          factura = data[i].Url_fe;
+          inNewPage = 'target="_blank"';
+        }
+
         tableContent+= '<tr >';
-        tableContent+= `<td class="text-center"><a target="_blank" href="${data[i].Url_fe}"> <i class="fas fa-file-pdf me-1"></i> <br> ${data[i].Numero_Documento} </a></td>`;
+        tableContent+= `<td class="text-center"><a ${inNewPage} href="${factura}"> <i class="fas fa-file-pdf me-1"></i> <br> ${data[i].Numero_Documento} </a></td>`;
         tableContent+= `<td class="text-center">${data[i].Fecha_Vencimiento}</td>`;
         tableContent+= `<td class="text-center">$${numberWithCommas(data[i].Subtotal)}</td>`;
         tableContent+= `<td class="text-center">$${numberWithCommas(Math.round(data[i].Descuento))}</td>`;
@@ -155,13 +162,6 @@
       const tableObj = new simpleDatatables.DataTable("#table", {});
     }
 
-    $(document).on("click", ".addRemoveCart", function () {
-      if (!(localStorage.getItem(cartInvoiceName) === null)) {
-        let localObjectLenght = JSON.parse(localStorage.getItem(cartInvoiceName)).length;
-        $("#invoicesIndicator").text((localObjectLenght ? localObjectLenght : ""))
-      } 
-    })
-
     const isInLocalStorage = (data) => {
       if (localStorage.getItem(cartInvoiceName) === null) {
         return false;
@@ -171,6 +171,36 @@
         if (productExist) {return true} 
         return false;
       }
+    }
+
+    const dataURItoBlob = (dataURI) => {
+      const byteString = window.atob(dataURI);
+      const arrayBuffer = new ArrayBuffer(byteString.length);
+      const int8Array = new Uint8Array(arrayBuffer);
+      for (let i = 0; i < byteString.length; i++) {
+        int8Array[i] = byteString.charCodeAt(i);
+      }
+      const blob = new Blob([int8Array], { type: 'application/pdf'});
+      return blob;
+    }
+
+
+    const extranetFacturas = (id_factura) => {
+      fetch("/facturas/universal_repuestos/"+id_factura)
+      .then(response => response.json())
+      .then(response => {
+        console.log(response)
+        let strB64 = "";
+        for (let i = 0; i < response.length; i++) {
+          if (response[i].elements) {
+            strB64 += response[i].elements[0].text
+          }
+        }
+
+        const blob = dataURItoBlob(strB64);
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+      })
     }
 
     $(document).on("click", ".iconCheck", function () {
@@ -208,8 +238,14 @@
       $(this).siblings(".iconCheck").show();
     });
 
+    $(document).on("click", ".addRemoveCart", function () {
+      if (!(localStorage.getItem(cartInvoiceName) === null)) {
+        let localObjectLenght = JSON.parse(localStorage.getItem(cartInvoiceName)).length;
+        $("#invoicesIndicator").text((localObjectLenght ? localObjectLenght : ""))
+      } 
+    })
 
-    $( document ).ready(function() {
+    $(document).ready(function() {
       try {
         loadCartera(facturas.Table[0]);
         loadTablePedidoRepetido(facturas.Table1);

@@ -1,4 +1,7 @@
 const fetch = require('node-fetch');
+
+const xml_json = require('xml-js')
+
 const { showLog } = require('./helpers');
 const service = {};
 const urlPedbox = 'http://api.pedbox.co:5037/';
@@ -40,6 +43,27 @@ service.historialTransacciones = async(id_company, nit) => {
 service.historialFacturas = async(url_company, nit, id_company) => {
   const url = urlKakashi+'get_extranet?nit='+nit+'&tipo=1&url='+url_company+'&id_company='+id_company;
   const data =  await makeRequest(url);
+  return data;
+}
+
+service.faturaUR = async(id_factura) => {
+  const url = "http://181.49.236.254:5067/wspedbox/wsgenesis.asmx?op=detalle_extranet"
+  const options = {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/xml' },
+    body: `<?xml version="1.0" encoding="utf-8"?>
+      <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+        <soap:Body>
+          <detalle_extranet xmlns="http://navacom.com.co/">
+            <pnumero>${id_factura}</pnumero>
+            <ptipo_doc>FE</ptipo_doc>
+            <ptipo>20</ptipo>
+          </detalle_extranet>
+        </soap:Body>
+      </soap:Envelope>
+    `,
+  }
+  const data =  await makeRequestXML(url, options);
   return data;
 }
 
@@ -455,9 +479,20 @@ const makeRequest = async (url, options) => {
   try {
       var resp = await fetch(url, options || {});
       if (!resp.ok) return {'err': 'Error obteniendo los datos'};
-      
       const json = await resp.json();
       return {'result': json};
+  } catch(error) {
+      showLog('REQUEST URL: '+url, error);
+      return {'err': 'Error obteniendo los datos', 'err_service': error};
+  }
+}
+
+const makeRequestXML = async (url, options) => {
+  try {
+      var resp = await fetch(url, options || {});
+      let xml = await resp.text();
+      const json = xml_json.xml2json(xml, {compact: false, spaces: 2, trim: true})
+      return {'result': JSON.parse(json)};
   } catch(error) {
       showLog('REQUEST URL: '+url, error);
       return {'err': 'Error obteniendo los datos', 'err_service': error};
