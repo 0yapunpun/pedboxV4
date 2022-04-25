@@ -1834,11 +1834,8 @@
       $("#createEventModal").modal("show")
     }
 
-    // TODO Fncion exel, Mover
-    const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
-    const EXCEL_EXTENSION = '.xls';
-
-    function downloadAsExel(data) {
+    // Exportar exel
+    let downloadAsExel = (data) => {
       const worksheet = XLSX.utils.json_to_sheet(data);
       const workbook = {
         Sheets:{
@@ -1850,9 +1847,9 @@
       saveAsExcel(exelBuffer, "data_calendar_crm");
     }
 
-    function saveAsExcel(buffer, fileName) {
-      const data = new Blob([buffer], {type: EXCEL_TYPE});
-      saveAs(data, fileName + 'export' + EXCEL_EXTENSION);
+    let saveAsExcel = (buffer, fileName) => {
+      const data = new Blob([buffer], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8"});
+      saveAs(data, fileName + 'export' + ".xls");
     }
 
     $(document).ready(function () {
