@@ -1001,23 +1001,16 @@
       }
     }
 
-    const getColorsCatalog = () => {
-      fetch("/catalogo/colors") 
-      .then(response => response.json())
-      .then(data => {
-        console.log(data)
-      }) 
-      .catch(error => console.log('Request failed', error));
-    } 
-
-    const getCatalogGyW = () => { // catalogo Grulla y Wellco, id company
-      fetch("/catalogo/colors") 
-      .then(response => response.json())
-      .then(data => {
-        console.log(data)
-      }) 
-      .catch(error => console.log('Request failed', error));
-    } 
+    const isItGreaterThan = (date1, date2, days) => { 
+      var firstDate = new Date(date1);
+      var secondDate = new Date(date2);
+      var time = days * 60 * 60 * 24 * 1000
+      if ((secondDate.getTime() - firstDate.getTime()) < time) {
+        return false
+      } else {
+        return true
+      }
+    }
 
     const getProductsData = () => {
       fetch("/catalogo/productos") 
@@ -1028,18 +1021,46 @@
       .catch(error => console.log('Request failed', error));
     }
 
-    function databaseExists(dbname, callback) {
-      var req = indexedDB.open(dbname);
-      var existed = true;
-      req.onsuccess = function () {
-          req.result.close();
-          if (!existed)
-              indexedDB.deleteDatabase(dbname);
-          callback(existed);
+    const printProductsData = () => {
+      fetch("/catalogo/productos") 
+      .then(response => response.json())
+      .then(data => {
+        dataProductsComplete = data.items;
+        for (let i = 0; i < dataProductsComplete.length; i++) {
+          dataProductsComplete[i].precio = Number(dataProductsComplete[i].precio) 
+          collapseData(dataProductsComplete[i]);
+        }
+        dataProductsPrint = dataProductsComplete;
+        printTags();
+        printCollapse();
+        printPaginator();
+        selectView(0, 8);
+      }) 
+      .catch(error => console.log('Request failed', error));
+    }
+
+    async function databaseExists(dbname, callback) {
+      const currentDate = new Date().toISOString().split("T")[0];
+      const dbName = dbname;
+      const isExisting = (await window.indexedDB.databases()).map(db => db.name).includes(dbName);
+
+      if (!isExisting) {  // BD no existe
+        localStorage.setItem(dbname, new Date().toISOString().split("T")[0]);
+        return callback(false);
+      } else {
+        if (!localStorage.hasOwnProperty(dbname)) { // BD existe pero no hay registro de creación en LS
+          localStorage.setItem(dbname, new Date().toISOString().split("T")[0]);
+          indexedDB.deleteDatabase(dbname);
+          return callback(false);
+        }
+
+        if (isItGreaterThan(localStorage.getItem(dbname), currentDate, 3)) { // BD existe pero el registro de creación es de hace más de tres días
+          localStorage.setItem(dbname, new Date().toISOString().split("T")[0]);
+          indexedDB.deleteDatabase(dbname);
+          return callback(false);
+        }
       }
-      req.onupgradeneeded = function () {
-          existed = false;
-      }
+      return callback(true); // BD existe y el registro es de hace menos de tres días
     }
 
     const selectView = (nS, nE) => {
@@ -1054,7 +1075,7 @@
     const createIndexedDB = (data) => {
       if (!window.indexedDB) {
         console.error("Tu navegador no soporta indexedDB");
-        return;
+        return printProductsData();
       }
 
       const request = indexedDB.open(catalogName, 2);

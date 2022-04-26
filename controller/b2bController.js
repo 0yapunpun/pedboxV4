@@ -170,8 +170,8 @@ controller.catalogo = async (req, res, next) => {
   if (!req.session.login) { return res.redirect('/login'); }
   if (!(hasPermission(req.session.user.permission ,"8045_CAN_VIEW_SHOPPING_CAR"))) {return res.redirect('/no-permission');}
 
-  let isGyW = true;
-  if (isGyW) { // TODO cambiar 
+  let isGyW = false; // TODO remplazar por id company GyW cuando ya tengan permisos para el catalogo 
+  if (isGyW) { 
     res.render('b2b/catalogo_v2', {'session': req.session});
   } else {
     res.render('b2b/catalogo', {'session': req.session});

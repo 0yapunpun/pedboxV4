@@ -259,9 +259,7 @@
                   <td class="text-uppercase text-secondary text-xxs text-center font-weight-bolder opacity-7 noSorter">Añadir</td>
                 </tr>
               </thead>
-              <tbody id="tableBody">
-
-              </tbody>
+              <tbody id="tableBody"></tbody>
             </table>
             <!-- contenido dinamico -->
           </div>
@@ -984,7 +982,18 @@
       .catch(error => console.log('Request failed', error));
     } 
 
-    const getCatalogGyW = () => { // catalogo Grulla y Wellco, id company
+    const getCalogGyW = () => {
+      fetch("/catalogo/GyW") 
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          createIndexedDB(data.result)
+        }
+      }) 
+      .catch(error => console.log('Request failed', error));
+    }
+
+    const printCatalogGyW = () => { // catalogo Grulla y Wellco, id company
       fetch("/catalogo/GyW") 
       .then(response => response.json())
       .then(data => {
@@ -1042,15 +1051,6 @@
       .catch(error => console.log('Request failed', error));
     }
 
-    const getProductsData = () => {
-      fetch("/catalogo/productos") 
-      .then(response => response.json())
-      .then(data => {
-        createIndexedDB(data.items)
-      }) 
-      .catch(error => console.log('Request failed', error));
-    }
-
     const selectView = (nS, nE) => {
       if (currentView == "tarjetas") {
         printProducts(nS, nE);
@@ -1082,13 +1082,113 @@
       };
     };
 
+     const isItGreaterThan = (date1, date2, days) => { 
+      var firstDate = new Date(date1);
+      var secondDate = new Date(date2);
+      var time = days * 60 * 60 * 24 * 1000
+      if ((secondDate.getTime() - firstDate.getTime()) < time) {
+        return false
+      } else {
+        return true
+      }
+    }
+
+    async function databaseExists(dbname, callback) {
+      const currentDate = new Date().toISOString().split("T")[0];
+      const dbName = dbname;
+      const isExisting = (await window.indexedDB.databases()).map(db => db.name).includes(dbName);
+
+      if (!isExisting) {  // BD no existe
+        localStorage.setItem(dbname, new Date().toISOString().split("T")[0]);
+        return callback(false);
+      } else {
+        if (!localStorage.hasOwnProperty(dbname)) { // BD existe pero no hay registro de creación en LS
+          localStorage.setItem(dbname, new Date().toISOString().split("T")[0]);
+          indexedDB.deleteDatabase(dbname);
+          return callback(false);
+        }
+
+        if (isItGreaterThan(localStorage.getItem(dbname), currentDate, 3)) { // BD existe pero el registro de creación es de hace más de tres días
+          localStorage.setItem(dbname, new Date().toISOString().split("T")[0]);
+          indexedDB.deleteDatabase(dbname);
+          return callback(false);
+        }
+      }
+
+      return callback(true); // BD existe y el registro es de hace menos de tres días
+    }
+
+    const createIndexedDB = (data) => {
+      if (!window.indexedDB) {
+        console.error("Tu navegador no soporta indexedDB");
+        return printCatalogGyW();
+      }
+
+      const request = indexedDB.open(catalogName, 1);
+      request.onerror = (event) => {
+        console.error(`Database error: ${event.target.errorCode}`);
+      };
+      request.onupgradeneeded = (event) => {
+        const db = request.result;
+        const store = db.createObjectStore("products", { keyPath: "id", autoIncrement: true });
+      }
+      request.onsuccess = (event) => {
+        const db = request.result;
+        const transaction = db.transaction("products", "readwrite");
+        const store = transaction.objectStore("products");
+        store.put(data)
+
+        transaction.oncomplete = function () {
+          db.close();
+        };
+
+        getDataFromIndexedDB()
+        .then(function (response) {
+          dataProductsComplete = response.result;
+          dataProductsPrint = dataProductsComplete;
+          printPaginator();
+          selectView(0, 8);
+        })
+      };
+    };
+
+    const getDataFromIndexedDB = () => {
+      return new Promise(function (resolve, reject) {
+          const request = indexedDB.open(catalogName, 2);
+          request.onerror = (event) => {
+            console.error(`Database error: ${event.target.errorCode}`);
+          };
+          request.onsuccess = (event) => {
+            const db = request.result;
+            const transaction = db.transaction("products", "readwrite");
+            const store = transaction.objectStore("products");
+            const dataProductsDB = store.get(1);
+            dataProductsDB.onsuccess = () => resolve(dataProductsDB);
+          };
+        }
+      )
+    };
+
     $( document ).ready(function() {
       handlePermissions(); 
       $("#menuCatalogo").addClass("activeNav");
 
-      getColorsCatalog()
-      getCatalogGyW()
+      databaseExists(catalogName, function (state) {
+        if (state) {
+          getDataFromIndexedDB()
+          .then(function (response) {
+            dataProductsComplete = response.result;
+            dataProductsPrint = dataProductsComplete;
+            printPaginator();
+            selectView(0, 8);
+          })
+        } else {
+          getCalogGyW();
+        }
+      });
 
+      getColorsCatalog();
+      setCartIconAmount();
     });
   </script>
 

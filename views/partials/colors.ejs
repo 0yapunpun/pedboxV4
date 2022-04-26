@@ -1,32 +1,32 @@
 
 <% 
-let colorPage1 = "#312560"; // color primary
-let colorPage2 = "#fff";  // colors secundary 
-let colorPage3 = "#4861b9"; // color gradient 1
-let colorPage4 = "#302560"; // color gradient 2
+  let colorPage1 = "#312560"; // color primary
+  let colorPage2 = "#fff";  // color secundary 
+  let colorPage3 = "#4861b9"; // color gradient 1
+  let colorPage4 = "#302560"; // color gradient 2
 
-if ( 
-  session.user.id_company == 36 ||
-  session.user.id_company == 5 ||
-  session.user.id_company == 10 ||
-  session.user.id_company == 39 ||
-  session.user.id_company == 22
-) {
-  colorPage1 = "#d80811"
-  colorPage2 = "#fff"
-  colorPage3 = "#fa757c"
-  colorPage4 = "#d80811"
-}
+  if ( 
+    session.user.id_company == 36 ||
+    session.user.id_company == 5 ||
+    session.user.id_company == 10 ||
+    session.user.id_company == 39 ||
+    session.user.id_company == 22
+  ) {
+    colorPage1 = "#d80811"
+    colorPage2 = "#fff"
+    colorPage3 = "#fa757c"
+    colorPage4 = "#d80811"
+  }
 
 
-if ( 
-  session.user.id_company == 15
-) { 
-  colorPage1 = "#ffff01"
-  colorPage2 = "#373737"
-  colorPage3 = "#01457b"
-  colorPage4 = "#0262b0"
-}
+  if ( 
+    session.user.id_company == 15
+  ) { 
+    colorPage1 = "#ffff01"
+    colorPage2 = "#373737"
+    colorPage3 = "#01457b"
+    colorPage4 = "#0262b0"
+  }
 %>
 
 <style>
@@ -41,16 +41,20 @@ if (
 
   .badge-primary {
     color: <%- colorPage2 %> !important;
-    background : <%- colorPage1 %> !important;
+    background : <%- colorPage3 %> !important;
   }
 
-  .dataTable-pagination .active a, .dataTable-pagination .active a:focus, .dataTable-pagination .active a:hover {
+  .dataTable-pagination .active a, .dataTable-pagination .active a:focus, .dataTable-pagination .active a:hover{
     background: transparent;
     background: linear-gradient(310deg, <%- colorPage3 %> 17%, <%- colorPage4 %> 65%) !important;
     box-shadow: 0 3px 5px -1px rgb(0 0 0 / 9%), 0 2px 3px -1px rgb(0 0 0 / 7%);
     color: #fff;
     border: none;
     border-radius: 50% !important;
+  }
+
+  .dataTable-pagination a{
+    border-radius: 50% !important
   }
 
   .btn-primary {
@@ -100,5 +104,8 @@ if (
   .swal2-styled.swal2-confirm {
     color: <%- colorPage2 %> !important;
     background-color:  <%- colorPage1 %>  !important;
+  }
+  .choices-dark{
+    background-color:  <%- colorPage3 %>  !important;
   }
 </style>
