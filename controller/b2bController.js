@@ -122,25 +122,30 @@ controller.historialPedidosDetalle = async (req, res, next) => {
   let detalle = await service.detallePedido(url_company, numero);
       detalle = detalle.result.report.Table;
 
+  console.time()
+  
   let itemsDetail = [];
   for (let i = 0; i < detalle.length; i++) {
     let item = await service.detalleProductos(id_company, detalle[i].codigo);
         item = item.result.items[0];
 
     itemsDetail.push({
-        'codigo': item.code,
-        'descripcion': item.description,
-        'cantidad': detalle[i].cantidad,
-        'precio': detalle[i].valor_unitario,
-        'descuento': item.discount,
-        'por_desc': detalle[i].porcentaje_descuento,
-        'qty': detalle[i].cantidad,
-        'imagen': item.image,
-        'format_precio': nvFormatCash(detalle[i].valor_unitario, '$', 0),
-        "porcentaje_iva": detalle[i].porcentaje_iva,
-        'isCopy': true
+      'codigo': item.code,
+      'descripcion': item.description,
+      'cantidad': detalle[i].cantidad,
+      'precio': detalle[i].valor_unitario,
+      'descuento': item.discount,
+      'por_desc': detalle[i].porcentaje_descuento,
+      'qty': detalle[i].cantidad,
+      'imagen': item.image,
+      'format_precio': nvFormatCash(detalle[i].valor_unitario, '$', 0),
+      "porcentaje_iva": detalle[i].porcentaje_iva,
+      'isCopy': true
     });
   }
+
+  console.timeEnd()
+
   res.send({'detalle': itemsDetail});
 }
 

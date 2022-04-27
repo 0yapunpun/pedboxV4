@@ -238,14 +238,6 @@
       $("#modalPdf").modal("show")
     }
 
-    $("#exportPdfBtn").on("click", function () {
-      let nit = session.user.nit;
-      let id_company = session.user.dataCompany[0].id;
-
-      // TODO: revisar si el valor venderdor es simepre 56
-      window.open(`https://api.pedbox.co:8590/export_account_quotas?nit=${nit}&vendedor=56&id_company=${id_company}`, '_blank');
-    })
-
     $( document ).ready(function() {
       try {
         loadCartera(facturas.Table[0]);

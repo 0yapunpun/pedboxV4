@@ -44,6 +44,7 @@
           PDF
         </div>
       </div>
+
     </div>
   </div>
   <div id="cards">
@@ -122,3 +123,12 @@
     </div>
   </div>
 </div>
+
+<script>
+  $("#exportPdfBtn").on("click", function () {
+    let nit = session.user.nit;
+    let id_company = session.user.dataCompany[0].id;
+
+    window.open(`https://api.pedbox.co:8590/export_account_quotas?nit=${nit}&vendedor=0&id_company=${id_company}`, '_blank');
+  })
+</script>
