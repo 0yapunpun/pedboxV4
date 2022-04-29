@@ -4,42 +4,26 @@ const service = require('../engine/apiService.js');
 const config = require('../engine/config.js');
 const { nvFormatCash, hasPermission } = require('./helpers.js');
 const _ = require('underscore');
-const multer  = require('multer');
 const moment = require('moment');
-const { response, request } = require('express');
 
 var now = Date.now();
 
-controller.calidosos = async (req, res, next) => {
-  // Validar login
-  if (!req.session.login) { return res.redirect('/login');}
-  if (!(hasPermission(req.session.user.permission ,"8028_CAN_ACCESS_TO_CALIDOSOS"))) {return res.redirect('/no-permission');}
-
-  let body = {"doc": req.session.user.nit};
-  let puntos = await service.calidosos(body);
-
-  res.render('b2b/calidosos', {'session': req.session, 'puntos': puntos});
+controller.calidososData = async (req, res, next) => {
+  let puntos = await service.calidosos({"doc": req.session.user.nit});
+  res.send({'puntos': puntos});
 }
 
-controller.historialTransacciones = async (req, res, next) => {
-  // Validar login
-  if (!req.session.login) { return res.redirect('/login'); }
-  if (!(hasPermission(req.session.user.permission ,"8065_VIEW_ECOMMERCE"))) {return res.redirect('/no-permission');}
-
+controller.historialTransaccionesData = async (req, res, next) => {
   let url_company = req.session.user.dataCompany[0].Url;
   let id_company = req.session.user.id_company;
   let nit = req.session.user.nit;
 
-  let historial = await service.historialTransacciones(url_company, id_company, nit);
+  let historial = await service.historialTransacciones(id_company, nit);
 
-  res.render('b2b/historial-transacciones', {'session': req.session, 'historial': historial});
+  res.send({'historial': historial});
 }
 
-controller.historialFacturas = async (req, res, next) => {
-  // Validar login
-  if (!req.session.login) { return res.redirect('/login'); }
-  if (!(hasPermission(req.session.user.permission ,"8010_CAN_VIEW_DOCUMENT_HISTORY_EXTRANET"))) {return res.redirect('/no-permission');}
-
+controller.historialFacturasData = async (req, res, next) => {
   let url_company = req.session.user.dataCompany[0].Url;
   let id_company = req.session.user.id_company;
   let nit = req.session.user.nit;
@@ -48,24 +32,20 @@ controller.historialFacturas = async (req, res, next) => {
   let recibos = await service.historialRecibos(url_company, nit, id_company);
   let notas = await service.historialNotas(url_company, nit, id_company);
 
-  res.render('b2b/historial-facturas', {'session': req.session, 'facturas': facturas, "recibos": recibos, "notas": notas});
+  res.send({'facturas': facturas, "recibos": recibos, "notas": notas});
 }
 
-controller.facturas = async(req, res, next) => {
-  // Validar login
-  if (!req.session.login) { return res.redirect('/login'); }
-  if (!(hasPermission(req.session.user.permission ,"8035_CAN_VIEW_PORTFOLIO_EXTRANET"))) {return res.redirect('/no-permission');}
-
+controller.facturasData = async(req, res, next) => {
   let url_company = req.session.user.dataCompany[0].Url;
   let id_company = req.session.user.id_company;
   let nit = req.session.user.nit;
 
   let facturas = await service.historialFacturas(url_company, nit, id_company);
   
-  res.render('b2b/facturas', {'session': req.session, 'facturas': facturas});
+  res.send({'facturas': facturas});
 }
 
-// Las facturas de universal de respuesto tienen un tratamiento diferente
+
 controller.extranetFacturasUR = async(req, res, next) => {  
   let idFactura = req.params.id_factura;
   let factura = await service.faturaUR(req.params.id_factura);
@@ -79,29 +59,18 @@ controller.extranetFacturasUR = async(req, res, next) => {
   res.send(factura)
 }
 
-controller.historialPedidos = async (req, res, next) => {
-  // Validar login
-  if (!req.session.login) { return res.redirect('/login'); }
-  if (!(hasPermission(req.session.user.permission ,"8020_CAN_VIEW_ORDERS_EXTRANET"))) {return res.redirect('/no-permission');}
-
+controller.historialPedidosData = async (req, res, next) => {
   let url_company = req.session.user.dataCompany[0].Url;
   let id_company = req.session.user.id_company;
   let nit = req.session.user.nit;
-  let id_person = req.session.user.id_person;
 
   let facturas = await service.historialFacturas(url_company, nit, id_company);
   let pedidos = await service.historialPedidos(url_company, nit, id_company);
-  let vendedor = await service.informacionVendedor(id_person);
 
-
-  res.render('b2b/historial-pedidos', {'session': req.session, 'vendedor': vendedor, 'facturas': facturas, 'pedidos': pedidos});
+  res.send({'facturas': facturas, 'pedidos': pedidos})
 }
 
-controller.cotizaciones = async (req, res, next) => {
-  // Validar login
-  if (!req.session.login) { return res.redirect('/login'); }
-  if (!(hasPermission(req.session.user.permission ,"8015_CAN_VIEW_QUOTATION_EXTRANET"))) {return res.redirect('/no-permission');}
-
+controller.cotizacionesData = async (req, res, next) => {
   let url_company = req.session.user.dataCompany[0].Url;
   let id_company = req.session.user.id_company;
   let nit = req.session.user.nit;
@@ -110,43 +79,48 @@ controller.cotizaciones = async (req, res, next) => {
   let facturas = await service.historialFacturas(url_company, nit, id_company);
   let vendedor = await service.informacionVendedor(id_person);
 
-  // res.render('catalogo', {'session': req.session});
-  res.render('b2b/cotizaciones', {'session': req.session, 'vendedor': vendedor, 'facturas': facturas});
+  res.send({'vendedor': vendedor, 'facturas': facturas});
 }
 
 controller.historialPedidosDetalle = async (req, res, next) => {
   let url_company = req.session.user.dataCompany[0].Url;
-  let id_company = req.session.user.id_company;
+  
   let numero = req.params.numero;
 
   let detalle = await service.detallePedido(url_company, numero);
       detalle = detalle.result.report.Table;
 
-  console.time()
-  
   let itemsDetail = [];
   for (let i = 0; i < detalle.length; i++) {
-    let item = await service.detalleProductos(id_company, detalle[i].codigo);
-        item = item.result.items[0];
-
     itemsDetail.push({
-      'codigo': item.code,
-      'descripcion': item.description,
+      'codigo': detalle[i].codigo,
+      'descripcion': detalle[i].descripcion,
       'cantidad': detalle[i].cantidad,
       'precio': detalle[i].valor_unitario,
-      'descuento': item.discount,
+      'descuento': "",
       'por_desc': detalle[i].porcentaje_descuento,
-      'qty': detalle[i].cantidad,
-      'imagen': item.image,
-      'format_precio': nvFormatCash(detalle[i].valor_unitario, '$', 0),
+      'qty': detalle[i].cantid1htCash(detalle[i].valor_unitario, '$', 0),
       "porcentaje_iva": detalle[i].porcentaje_iva,
       'isCopy': true
     });
   }
 
-  console.timeEnd()
-
   res.send({'detalle': itemsDetail});
+}
+
+controller.productosImagenes = async (req, res, next) => {
+  let id_company = req.session.user.id_company;
+  let products = req.body;
+  console.log(products)
+
+  for (let i = 0; i < products.length; i++) {
+    let item = await service.detalleProductos(id_company, products[i].codigo);
+        item = item.result.items[0];
+
+    products[i].imagen = item.image;
+  }
+
+  res.send(products);
 }
 
 controller.historialPedidosPedido = async (req, res, next) => {
@@ -166,20 +140,12 @@ controller.nuevoPedido = async (req, res, next) => {
 controller.getInfoVendedor = async (req, res, next) => {
   let id_person = req.params.id;
 
-  let info = await service.informacionVendedor(id_person);
-  res.send({'vendedor': info});
-}
-
-controller.catalogo = async (req, res, next) => {
-  // Validar login
-  if (!req.session.login) { return res.redirect('/login'); }
-  if (!(hasPermission(req.session.user.permission ,"8045_CAN_VIEW_SHOPPING_CAR"))) {return res.redirect('/no-permission');}
-
-  let isGyW = false; // TODO remplazar por id company GyW cuando ya tengan permisos para el catalogo 
-  if (isGyW) { 
-    res.render('b2b/catalogo_v2', {'session': req.session});
+  if (req.session.user.infoVendedor) {
+    res.send({'vendedor': req.session.user.infoVendedor});
   } else {
-    res.render('b2b/catalogo', {'session': req.session});
+    let info = await service.informacionVendedor(id_person);
+    req.session.user.infoVendedor = info;
+    res.send({'vendedor': info});
   }
 }
 
@@ -226,11 +192,7 @@ controller.catalogoProductos = async (req, res, next) => {
   res.send({"items":items})
 }
 
-controller.catalogoTop = async (req, res, next) => {
-  // Validar login
-  if (!req.session.login) { return res.redirect('/login'); }
-  if (!(hasPermission(req.session.user.permission ,"8029_VIEW_TOP_50_PRODUCTS"))) {return res.redirect('/no-permission');}
-
+controller.catalogoTopData = async (req, res, next) => {
   let id_company = req.session.user.id_company;
   let url_company = req.session.user.dataCompany[0].Url;
   let nit = req.session.user.nit;
@@ -270,7 +232,7 @@ controller.catalogoTop = async (req, res, next) => {
     console.log(error)
     items = [];
   }
-  res.render('b2b/catalogo-top50', {'session': req.session, 'productos': items});
+  res.send({'productos': items});
 }
 
 controller.catalogColors = async(req, res, next) => {
@@ -289,25 +251,13 @@ controller.catalogDetailGyW = async(req, res, next) => {
   res.send(catalog.result);
 }
 
-controller.certificados = async(req, res, next) => {
-  // Validar login
-  if (!req.session.login) { return res.redirect('/login')}
-  if (!(hasPermission(req.session.user.permission ,"8025_CAN_EXPORT_CERTIFICATES_EXTRANET"))) {return res.redirect('/no-permission');}
-  
-  res.render('b2b/certificados', {'session': req.session});
-}
-
-controller.retenciones = async(req, res, next) => {
-  // Validar login
-  if (!req.session.login) { return res.redirect('/login'); }
-  if (!(hasPermission(req.session.user.permission ,"8030_CAN_CONFIGURE_EXTRANET"))) {return res.redirect('/no-permission');}
-
+controller.retencionesData = async(req, res, next) => {
   let id_company = req.session.user.id_company;
   let id_country = req.session.user.id_country;
 
   let retenciones = await service.getRetenciones(id_company, id_country);
   
-  res.render('b2b/retenciones', {'session': req.session, 'retenciones': retenciones});
+  res.send({'retenciones': retenciones});
 }
 
 controller.retencionesUpdate = async (req, res, next) => {
@@ -324,18 +274,14 @@ controller.retencionesCreate = async (req, res, next) => {
   res.send({"response": response})
 }
 
-controller.usuarios = async(req, res, next) => {
-  // Validar login
-  if (!req.session.login) { return res.redirect('/login'); }
-  if (!(hasPermission(req.session.user.permission ,"8030_CAN_CONFIGURE_EXTRANET"))) {return res.redirect('/no-permission');}
-
+controller.usuariosData = async(req, res, next) => {
   let id_company = req.session.user.id_company;
   let id_user_company = req.session.user.id;
 
   let users = await service.getUsers(id_company, id_user_company);
   let roles = await service.getRoles(id_company, id_user_company);
   
-  res.render('usuarios', {'session': req.session, 'users': users, "roles": roles});
+  res.send({'users': users, "roles": roles});
 }
 
 controller.password = async(req, res, next) => {
@@ -361,16 +307,11 @@ controller.updateUser = async(req, res, next) => {
   res.send({"response": response})
 }
 
-controller.carritoCompras = async(req, res, next) => {
-  // Validar login
-  if (!req.session.login) { return res.redirect('/login'); }
-  if (!(hasPermission(req.session.user.permission ,"8045_CAN_VIEW_SHOPPING_CAR"))) {return res.redirect('/no-permission');}
-  // TODO problema de con permisos del usuario de igb 
-  
+controller.carritoComprasData = async(req, res, next) => {
   let id_person = req.session.user.id_person;
   let address = await service.informacionVendedor(id_person);
   
-  res.render('b2b/carrito-compras', {'session': req.session, "address": address});
+  res.send({"address": address});
 }
 
 controller.sendCarritoCompras = async(req, res, next) => {
@@ -385,33 +326,16 @@ controller.sendCarritoFacturas = async(req, res, next) => {
   res.send({"response": response})
 }
 
-controller.carritoFacturas = async(req, res, next) => {
-  // Validar login
-  if (!req.session.login) { return res.redirect('/login'); }
-  if (!(hasPermission(req.session.user.permission ,"8005_CAN_PAY_INVOICES_EXTRANET"))) {return res.redirect('/no-permission');}
-
+controller.carritoFacturasData = async(req, res, next) => {
   let id_company = req.session.user.id_company;
   let id_country = req.session.user.id_country;
 
   let retenciones = await service.getRetenciones(id_company, id_country);
    
-  res.render('b2b/carrito-facturas', {'session': req.session, "retenciones": retenciones});
+  res.send({"retenciones": retenciones});
 }
 
-controller.permisos = async(req, res, next) => {
-  // Validar login
-  if (!req.session.login) { return res.redirect('/login'); }
-  if ((req.session.user.type_user == "E")) {return res.redirect('/no-permission');}
-  
-  let id_user_company = req.session.user.id;
-  let id_company = req.session.user.id_company;
-
-  let permisos = await service.getPermisos(id_company, id_user_company);
-
-  res.render('permisos', {'session': req.session, 'permisos': permisos});
-}
-
-controller.getPermisos = async(req, res, next) => {
+controller.permisosData = async(req, res, next) => {
   let id_user_company = req.session.user.id;
   let id_company = req.session.user.id_company;
 
@@ -432,16 +356,13 @@ controller.createPermiso = async(req, res, next) => {
   res.send({'response': response});
 }
 
-controller.documentosUsuario = async(req, res, next) => {
-  // Validar login
-  if (!req.session.login) { return res.redirect('/login')}
-
+controller.documentosUsuarioData = async(req, res, next) => {
   let id_company = req.session.user.id_company;
 
   let documentos = await service.getDocumentos(id_company);
   let masters = await service.getMastersDocumentos();
 
-  res.render('documentos-usuario', {'session': req.session, 'documentos': documentos, 'masters': masters});
+  res.send({'documentos': documentos, 'masters': masters});
 }
 
 controller.uploadDocumentoUsuario = async(req, res, next) => { 

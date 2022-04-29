@@ -133,7 +133,7 @@ service.imagenesProductos = async(id_company) => {
   return data;
 }
 
-service.informacionVendedor = async(id_person) =>{
+service.informacionVendedor = async(id_person) => {
   const url = urlKakashi+'get_info_seller?id_person='+id_person;
   const data =  await makeRequest(url);
   return data;

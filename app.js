@@ -3,7 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 const session = require('express-session');
-// const formData = require('express-form-data');
+const compression = require('compression');
 var router = require('./routes/router');
 
 var app = express();
@@ -11,14 +11,15 @@ var app = express();
 
 //Session
 app.use(session({secret: 'calidosos_session', saveUninitialized: true, resave: true}));
-// Parse form data
-// app.use(formData.parse());
+
+// gzip compression
+app.use(compression());
 
 // view engine setup
+app.set('view engine', 'ejs');
 app.set('views', [path.join(__dirname, 'views'),
                   path.join(__dirname, 'views/elements'),
                   path.join(__dirname, 'views/b2b')]);
-app.set('view engine', 'ejs');
 
 //Midleware para  configurar el server para permitir cross domain
 var allowCrossDomain = function (req, res, next) {
@@ -27,8 +28,6 @@ var allowCrossDomain = function (req, res, next) {
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
   res.header('Access-Control-Allow-Credentials', true);
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-generaled-With, Origin, Accept, x-xsrf-token, X-XSRF-TOKEN, Cache-Control, Pragma');
-  //res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-generaled-With,Accept, Accept-Encoding, Accept-Language, Cache-Control, Connection, Host, If-Modified-Since, If-None-Match, Origin, Referer, User-Agent')
-  // intercept OPTIONS method
   if ('OPTIONS' === req.method) {
       res.send(200);
   } else {

@@ -249,13 +249,25 @@
   <script src="/js/menu.js"></script>
 
   <script>
-    let users = `<%- JSON.stringify(users) %>`;
-        users = JSON.parse(users).result;
-    let roles = `<%- JSON.stringify(roles) %>`;
-        roles = JSON.parse(roles).result;
-
+    let users;
+    let roles;
     let userUpload = {};
     let userCode; 
+
+    const getData = () => {
+      fetch("/usuarios/data")
+      .then(res => res.json())
+      .then(res => {
+        users = res.users.result;
+        roles = res.roles.result;
+
+        printTableData(users.user);
+        loadRoles(roles.Rol);
+        handlePermissions(session)
+
+        $("#preloader").hide();
+      })
+    }
 
     const openNewUserModal = () => {
       $("#buttonNewUser").show();
@@ -443,6 +455,7 @@
       $("#changePassword").prop('checked',true)
     }
 
+    
     const printTableData = (data) =>{
       $("#tableBody").html("");
       for (let i = 0; i < data.length; i++) {
@@ -468,6 +481,9 @@
         $("#tableBody").append(element)
       }
       const tableObj = new simpleDatatables.DataTable("#table", {});
+      tableObj.on('datatable.sort', function(column, direction) {
+        handlePermissions(session)
+      });
     };
 
     $(document).on("change", ".userStateCbx", function () {
@@ -537,23 +553,19 @@
       permissionIndex = permissions.map(e => e.code).lastIndexOf( "5400_CAN_EDIT_EXTERNAL_USERS");
       if (permissionIndex  == -1 || permissions[permissionIndex].content == "N") {
         $(".stateUser").remove();
-        $(".deleteUser").hide();
-        $(".changePassword").hide();
+        $(".deleteUser").remove();
+        $(".changePassword").remove();
       };
 
       permissionIndex = permissions.map(e => e.code).lastIndexOf( "5400_CAN_DELETE_EXTERNAL_USERS");
       if (permissionIndex  == -1 || permissions[permissionIndex].content == "N") {
-        $(".deleteUser").hide();
+        $(".deleteUser").remove();
       };
     }
 
     $(document).ready(function () {
-      printTableData(users.user);
-      loadRoles(roles.Rol);
-      handlePermissions(session)
-      
       $("#menuUsuarios").addClass("activeNav");
-      $("#preloader").hide();
+      getData()
     })
   </script>
 

@@ -142,10 +142,21 @@
   <script src="/js/menu.js"></script>
 
   <script>
-    let retencionData = `<%- JSON.stringify(retenciones) %>`;
-        retencionData = JSON.parse(retencionData).result.data;
+    let retencionData; 
     let cartName = "storeCart" + session.user.id;
     let cartInvoiceName = "storeInvoice" + session.user.id;
+
+    const getData = () => {
+      fetch("/carrito-facturas/data")
+      .then(res => res.json())
+      .then(res => {
+        console.log(res)
+
+        retencionData = res.retenciones.result.data;
+        getLocalStorage();
+        $("#preloader").hide();
+      })
+    }
 
     const loadProdutcs = (data) => {
       for (let i = 0; i < data.length; i++) {
@@ -434,12 +445,9 @@
     }
 
     $(document).ready(function () {
-      getLocalStorage();
+      getData();
       $("#menuCarritoFacturas").addClass("activeNav")
-
-      $("#preloader").hide();
     })
-  
   </script>
 </body>
 </html>

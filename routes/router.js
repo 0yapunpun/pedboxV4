@@ -7,64 +7,84 @@ const b2bController = require('../controller/b2bController.js');
 const helpdeskController = require('../controller/helpdeskController.js');
 const agendaController = require('../controller/agendaController.js');
 
-
+//** user
 router.get('/', viewController.index);
 router.get('/login', viewController.login);
-router.post('/login', viewController.loginValidate);
+router.post('/login', userController.loginValidate);
 router.get('/login/:token', viewController.login);
-router.post('/login/:token', viewController.loginValidate);
-router.get('/logout', viewController.logout);
+router.post('/login/:token', userController.loginValidate);
+router.get('/logout', userController.logout);
 router.get('/no-permission', viewController.noPermission);
 
-// Notifications
-router.get('/getNotifications/:id_user', notificationsController.getNotification);
-router.get('/removeNotificationByKind/:id_user/:kind', notificationsController.removeNotificationByKind);
-router.post('/createNotification', notificationsController.createNotification);
+//**  B2B - extranet
+router.get('/calidosos', viewController.calidosos);
+router.get('/calidosos/data', b2bController.calidososData);
 
-// b2b - extranet
-router.get('/calidosos', b2bController.calidosos);
-router.get('/historial-transacciones', b2bController.historialTransacciones);
-router.get('/historial-facturas', b2bController.historialFacturas);
-router.get('/historial-pedidos', b2bController.historialPedidos);
+router.get('/historial-transacciones', viewController.historialTransacciones);
+router.get('/historial-transacciones/data', b2bController.historialTransaccionesData);
+
+router.get('/historial-facturas', viewController.historialFacturas); // Historial-facturas aka Historial-documentos
+router.get('/historial-facturas/data', b2bController.historialFacturasData);
+
+router.get('/historial-pedidos', viewController.historialPedidos);
+router.get('/historial-pedidos/data', b2bController.historialPedidosData);
 router.post('/historial-pedidos', b2bController.historialPedidosPedido);
 router.get('/historial-pedidos/:numero', b2bController.historialPedidosDetalle);
-router.get('/cotizaciones', b2bController.cotizaciones);
+
+router.get('/cotizaciones', viewController.cotizaciones);
+router.get('/cotizaciones/data', b2bController.cotizacionesData);
 router.get('/nuevo-pedido/:codigo', b2bController.nuevoPedido);
 router.get('/infoVendedor/:id', b2bController.getInfoVendedor);
-router.get('/certificados', b2bController.certificados);
-router.get('/retenciones', b2bController.retenciones);
+
+router.get('/certificados', viewController.certificados);
+
+router.get('/retenciones', viewController.retenciones);
+router.get('/retenciones/data', b2bController.retencionesData);
 router.post('/retenciones/update', b2bController.retencionesUpdate);
 router.post('/retenciones/create', b2bController.retencionesCreate);
-router.get('/usuarios', b2bController.usuarios);
+
+router.get('/usuarios', viewController.usuarios);
+router.get('/usuarios/data', b2bController.usuariosData);
 router.post('/usuarios/updatePassword', b2bController.password);
 router.post('/usuarios/updateUser', b2bController.updateUser);
-router.get('/facturas', b2bController.facturas);
+
+router.get('/facturas', viewController.facturas);
+router.get('/facturas/data', b2bController.facturasData);
 router.get('/facturas/universal_repuestos/:id_factura', b2bController.extranetFacturasUR);
-router.get('/carrito-compras', b2bController.carritoCompras);
+
+router.get('/carrito-compras', viewController.carritoCompras);
+router.get('/carrito-compras/data', b2bController.carritoComprasData);
 router.post('/carrito-compras', b2bController.sendCarritoCompras);
-router.get('/carrito-facturas', b2bController.carritoFacturas);
+
+router.get('/carrito-facturas', viewController.carritoFacturas);
+router.get('/carrito-facturas/data', b2bController.carritoFacturasData);
 router.post('/carrito-facturas', b2bController.sendCarritoFacturas);
-router.get('/permisos', b2bController.permisos);
-router.get('/permisos/get-permisos', b2bController.getPermisos);
+
+router.get('/permisos', viewController.permisos);
+router.get('/permisos/data', b2bController.permisosData);
 router.post('/permisos', b2bController.updatePemiso);
 router.post('/permisos/nuevo-permiso', b2bController.createPermiso);
-router.get('/documentos-usuario', b2bController.documentosUsuario);
+
+router.get('/documentos-usuario', viewController.documentosUsuario);
+router.get('/documentos-usuario/data', b2bController.documentosUsuarioData);
 router.post('/documentos-usuario/upload', b2bController.uploadDocumentoUsuario);
 router.post('/documentos-usuario/delete', b2bController.deleteDocumentoUsuario);
 
-router.get('/catalogo', b2bController.catalogo);
+router.get('/catalogo', viewController.catalogo);
+router.get('/catalogo/top', viewController.catalogoTop);
 router.get('/catalogo/productos', b2bController.catalogoProductos);
-router.get('/catalogo/top', b2bController.catalogoTop);
+router.get('/catalogo/top/data', b2bController.catalogoTopData);
 router.get('/catalogo/colors', b2bController.catalogColors);
+router.post('/catalogo/img', b2bController.productosImagenes);
 router.get('/catalogo/GyW', b2bController.catalogGyW); 
 router.get('/catalogo/GyW/detail/:code', b2bController.catalogDetailGyW); 
 
-// Herramientas
+//** Herramientas
 router.get('/chat', viewController.chat);
 router.get('/chat/chatId/:id', viewController.chatOpenConversation);
 
-// Helpdesk
-router.get('/helpdesk', helpdeskController.helpdesk);
+router.get('/helpdesk', viewController.helpdesk);
+router.get('/helpdesk/data', helpdeskController.helpdeskData);
 router.get('/helpdesk/indicators', helpdeskController.helpdeskIndicators);
 router.get('/helpdesk/solicitudes', helpdeskController.helpdeskSolicitudes);
 router.get('/helpdesk/ocurrence/:state/:ocurrence', helpdeskController.helpdeskOcurrence);
@@ -81,8 +101,7 @@ router.post('/helpdesk/formatPut', helpdeskController.helpdeskUpdateFormat);
 router.post('/helpdesk/startWorkflow', helpdeskController.helpdeskStartWorkflow);
 router.post('/helpdesk/continueWorkflow', helpdeskController.helpdeskContinueWorkflow);
 
-// Agenda
-router.get('/agenda', agendaController.agenda);
+router.get('/agenda', viewController.agenda);
 router.get('/agenda/data/:date', agendaController.agendaData);
 router.post('/agenda/createEvent', agendaController.agendaCreateEvent);
 router.post('/agenda/updateEvent', agendaController.agendaUpdateEvent);
@@ -91,8 +110,12 @@ router.get('/agenda/deleteEvent/:id', agendaController.agendaDeleteEvent);
 router.get('/agenda/getData/:date_begin/:date_end', agendaController.agendaGetData);
 router.post('/agenda/eventState', agendaController.agendaChangeEventState);
 
+//**  Notifications
+router.get('/getNotifications/:id_user', notificationsController.getNotification);
+router.get('/removeNotificationByKind/:id_user/:kind', notificationsController.removeNotificationByKind);
+router.post('/createNotification', notificationsController.createNotification);
 
-// Por integrar
+// ** pendiente
 router.get('/crm', viewController.crm);
 
 

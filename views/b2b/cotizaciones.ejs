@@ -330,18 +330,26 @@
   <script src="/js/menu.js"></script>
 
   <script>
-    let facturas = `<%- JSON.stringify(facturas) %>`;
-        facturas = JSON.parse(facturas).result.extranet;
-    // let pedidos = `<%- JSON.stringify(pedidos) %>`;
-    //     pedidos = JSON.parse(pedidos).result.extranet;
-    let vendedor = `<%- JSON.stringify(vendedor) %>`;
-        vendedor = JSON.parse(vendedor).result;
+    let facturas, vendedor;
     let cartName = "storeCart" + session.user.id;
-
 
     const canSeePdf = true;
     const canSeeEstadoPedido = true;
     const pdfLink = "http://www.secst.cl/upfiles/documentos/19072016_1207am_578dc39115fe9.pdf";
+
+    const getData = () => {
+      fetch("/historial-pedidos/data")
+      .then(res => res.json())
+      .then(res => {
+        facturas = res.facturas.result.extranet;
+        vendedor = res.vendedor.result;
+
+        loadCartera(facturas.Table[0]);
+        handlePermissions(session.user.permission)
+
+        $("#preloader").hide();
+      })
+    }
 
     const printDirections = () => {
       let id = session.user.id_person;
@@ -822,13 +830,10 @@
 
     $( document ).ready(function() {
       $("#titleModalNuevoPedido").text(session.user.company + " - " + session.user.nit)
-      loadCartera(facturas.Table[0]);
-      handlePermissions(session.user.permission)
-
+      $("#menuCotizaciones").addClass("activeNav");
       $('#inputDateModal').val(new Date().toDateInputValue());
 
-      $("#menuCotizaciones").addClass("activeNav");
-      $("#preloader").hide();
+      getData();
     });
   </script>
   

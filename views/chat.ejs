@@ -36,7 +36,7 @@
     .c-msg a{color: #63B3ED;text-decoration: underline;}
     .c-emi{background-color: #302560; color: #fff;}
     .c-msg .hour-msg{text-align: right;font-size: 10px; color: #828282;width: 100%;display: block;}
-    .c-emi .hour-msg{text-align: left;font-size: 10px; color: #c3c3c3;}
+    .c-emi .hour-msg{text-align: right;font-size: 10px; color: #c3c3c3;width: 100%;display: block;}  /*quitar desde width y text-align: left*/
     .audio-cont{font-size: 19px;}
     .audio-cont i{font-weight: normal;font-size: 25px;}
     .btn-send{width: 50px;height: 50px;padding: 10px 16px; border-radius: 25px;}
@@ -81,6 +81,15 @@
     .shadowInput{box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);}
     .massiveMesage .imgPreviewUpload {max-width: 100px !important; max-height: 100px !important;}
     .massiveMesage img {max-width: 100%; width: auto;}
+    #lastChats{ background-color: white; border-radius: 1rem; box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%)}
+    .menu { border-radius: 5px; background: transparent; border: none; position: absolute; right: 0px;}
+    .menu button {font-size: large; line-height: normal;}
+    .menu ul{border: 0 solid rgba(0, 0, 0, 0.125); box-shadow: 0 0 10px 0px;}
+    .menu li a {text-decoration: none; color: #525151;}
+    .menuStatus { border-radius: 5px; background: transparent; border: none;}
+    .menuStatus button {font-size: large; line-height: normal;}
+    .menuStatus ul{border: 0 solid rgba(0, 0, 0, 0.125); box-shadow: 0 0 10px 0px;}
+    .menuStatus li a {text-decoration: none; color: #525151;}
   </style>
 </head>
 
@@ -98,26 +107,25 @@
       <div class="p-4 ps-0 pt-0">
         <div class="">
 
-          <div style="display: flex; justify-content: end; margin-right: 15px; margin-top: 15px">
-            <a id="btnMassiveTest" class="nav-link btn btn-danger mb-1 bg-danger tab m-0" style="border-radius: 8px; color: white; width: 150px" href="javascript:toggleViewChat();">
-              <i class="fa fa-bell"></i> Mensaje Masivo
-            </a>
 
-            <a  id="btnChats" class="nav-link btn btn-danger mb-1 bg-primary tab m-0" style="border-radius: 8px; color: white; width: 150px; display: none;" href="javascript:toggleViewChat();">
-              <i class="fa fa-envelope-open-text"></i> Chats
-            </a>
-
-          </div>
 
           <div class="tab-content">
 
             <div class="container-fluid py-3 tab-pane" id="users" style="position: relative">
 
               <div class="d-flex"> 
-                <ul class="nav flex-column bg-white border-radius-lg p-3 listUsers shadowInput" style="height: -webkit-fill-available">
-                  <li class="nav-item" id="listgroups">
-                  </li>
-                </ul>
+                <div class="">
+                  <div style="display: flex; justify-content: center; align-items: center;">
+                    <a  id="btnChats" class="nav-link btn btn-danger mb-1 bg-primary tab m-0 d-flex align-items-center justify-content-center" style="border-radius: 8px; color: white; display: none;" href="javascript:toggleViewChat();" data-bs-toggle="tooltip" data-bs-placement="top" title="Bandeja de entrada">
+                      <i class="fa fa-envelope-open-text me-2"></i> Bandeja de entrada
+                    </a>
+                  </div>
+  
+                  <ul class="nav flex-column bg-white border-radius-lg p-3 listUsers shadowInput" style="height: -webkit-fill-available">
+                    <li class="nav-item" id="listgroups">
+                    </li>
+                  </ul>
+                </div>
                 <div id="cards" class="flex-fill p-3 pt-0"> </div>
               </div>
 
@@ -127,21 +135,30 @@
 
             </div>
 
-            <div class="container-fluid py-3 px-0 tab-pane show active tab-content pt-0" id="chats" style="height: 65vh;">
+            <div class="container-fluid py-3 px-0 tab-pane show active tab-content pt-0" id="chats" style="height: 75vh;">
+            
               <div class="row" style="height: 100%">
                 <div class="col-12 col-md-5 col-xl-4 h-100 pe-1">
-                  <div class="card my-1 mx-3 shadow">
-                    <div class="d-flex align-items-center">
-                      <div class="input-group">
-                        <input type="text" class="form-control border-0" placeholder="Buscar..." id="search-msg">
-                        <span class="input-group-text text-body border-0"><i class="fas fa-search" aria-hidden="true"></i></span>
+                  <div class="d-flex">
+                    <div class="card my-1 mx-3 shadow w-100" >
+                      <div class="d-flex align-items-center">
+                        <div class="input-group">
+                          <input type="text" class="form-control border-0" placeholder="Buscar..." id="search-msg">
+                          <span class="input-group-text text-body border-0"><i class="fas fa-search" aria-hidden="true"></i></span>
+                        </div>
                       </div>
+                    </div>
+                    <div style="display: flex; justify-content: center; align-items: center;">
+                      <a id="btnMassiveTest" class="nav-link btn btn-danger bg-danger m-0 d-flex align-items-center justify-content-center" style="border-radius: 8px; color: white; width: 30px" href="javascript:toggleViewChat();" data-bs-toggle="tooltip" data-bs-placement="top" title="Mensajes Masivos">
+                        <i class="fa fa-bell"></i> 
+                      </a>
                     </div>
                   </div>
                   <ul class="list-group overflow-scroll" id="listSerch" style="height: 100%;display: none;"></ul>
                   <ul class="list-group overflow-scroll" id="lastChats" style="height: 100%;"></ul>
                 </div>
                 <div class="col-12 col-md-7 col-xl-8 cont-chat-history" style="display: none;">
+
                   <div class="card my-1 mx-2" style="height: 90px">
                     <div class="card-body px-4 py-1" style="display: flex; align-items: center">
                       <li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">
@@ -155,7 +172,7 @@
                       </li>
                     </div>
                   </div>
-                  <div class="card my-1 mx-2 cont-chat position-relative" style="height: calc(100vh - 250px); margin-bottom: 15px !important;">
+                  <div class="card my-1 mx-2 cont-chat position-relative" style="height: calc(100vh - 235px); margin-bottom: 15px !important;">
                     <div id="preview" class="preview" style="display: none; opacity: 0.9;">
                       <div class="previewBorder h-100 m-4">
                         <div class="d-flex flex-column h-100">
@@ -353,7 +370,7 @@
   <script>
     let idChat = `<%- JSON.stringify(id_chat) %>`;
         idChat = JSON.parse(idChat);
-
+    var firstmsg = true;
     var isUsers = false;
     var isModal = false;
     var isFiltersLoaded = false;
@@ -366,6 +383,7 @@
     var fileToSend = [];
     var listUsers = [];
     var idsMessage = [];
+    var users = [];
     var chat = [];
     var showHistory = false;
     var views = [];
@@ -422,6 +440,22 @@
       var src = $('#e-user-avatar').attr('src');
       window.open(src, '_blank')
     })
+
+    $('#msg-text').on('keydown', e => {
+      if(last_key != 16 && e.which==13){
+        if ($('#msg-text').val().length > 0) {
+          sendChat();
+          e.preventDefault();
+        }
+      }
+      last_key = e.keyCode;
+    })
+
+    $('#message').on('hidden.bs.modal', function(){ 
+      $('#broadcast').val('');
+      cancelPreview(1);
+      cancelAudio();
+    });
 
     //vaciar el modal 
     $('.modal').on('hidden.bs.modal', function(){ 
@@ -549,15 +583,20 @@
 
     // Buscador de mensajes
     $('#search-msg').keyup(function() {
+      $('#listSerch').html('');
       let query = $(this).val()
       if (query.length > 3) {
-        if ($('#listSerch').css('display') == 'none') {
-          $('#listSerch').html('');
-        }
+        $('#listSerch').html('');
         $('#listSerch').show();
         $('#lastChats').hide();
-        showFindMessages({'query': query, 'empresa': user.empresa, 'emisor': user._id})
-      } else {
+        setTimeout(showFindMessages({'query': query, 'empresa': user.empresa, 'emisor': user._id}),5000);
+      } else if(query.length > 0 && query.length <= 3){
+        $('#listSerch').html('');
+        $('#listSerch').hide();
+        $('#lastChats').show();
+      }else if(query.length == 0){
+        $(this).val('');
+        $('#listSerch').html('');
         $('#listSerch').hide();
         $('#lastChats').show();
       }
@@ -751,16 +790,17 @@
     }
 
     // Funcion para setear la información básica del usuario logueado
-    // const setUserInfo = () => {
-    //   $('#user-avatar').attr('src', urlBase+user.url_img);
-    //   $('#user-name').html(user.alias);
-    //   $('#user-legend').val(user.leyenda);
-    //   $('#user-tel').val(user.telefono);
-    // }
+    const setUserInfo = () => {
+      $('#user-avatar').attr('src', urlBase+user.url_img);
+      $('#user-name').html(user.alias);
+      $('#user-legend').val(user.leyenda);
+      $('#user-tel').val(user.telefono);
+      $('#user-status').val()
+    }
 
     const showLastMessages = () => {
       socket.emit('last_messages', {"_id": user._id}, msgs => {
-        $('#listSerch').hide();
+        $('#listSerch').html('').hide();
         $('#lastChats').show().html('');
         _.each(msgs, (m, i) => {
           $('#lastChats').append(newLastChat(m,i));
@@ -773,20 +813,29 @@
     }
     
     const newLastChat = (m, i) => {
-      let u = m.usuario_emisor;
-      if (String(i) != m.usuario_emisor._id) u = m.usuario_receptor;
-      uChatsActivos[u._id] = u;
-      let img = (u.url_img) ? urlBase+u.url_img : '/img/profile.jpg';
-      let alias = u.alias;
-      var texto = ' * Notificación ';
-      try{
-        texto = lastMessageChat[m.contenido.tipo](m)
-      } catch {}
+        let u = m.usuario_emisor;
+        if (String(i) != m.usuario_emisor._id) u = m.usuario_receptor;
+        uChatsActivos[u._id] = u;
+        let img = (u.url_img) ? urlBase+u.url_img : '../assets/img/profile.jpg';
+        let alias = u.alias;
+        var texto = ' * Notificación ';
+        try{
+          texto = lastMessageChat[m.contenido.tipo](m)
+        } catch {}
 
-      let diff = (moment(m.creado_en, "DD-MM-YYYY")).diff(moment(), 'd'); 
-
-      return `
-        <div class="my-1 mx-0 chat-cont" style="position: relative" data-id="${u._id}" data-order="${moment(m.creado_en, "DD-MM-YYYY, HH:mm:ss").unix()}">
+        let diff = (moment(m.creado_en, "DD-MM-YYYY")).diff(moment(), 'd');
+        var msgtexto = '';
+        let emi = m.usuario_emisor._id
+        let rec = m.usuario_receptor._id
+        if(emi == user._id && m.estado[emi] == 0){
+          msgtexto = `<div class="status" style='color: gray; font-style: italic;'><i class="fas fa-ban">&nbsp</i>eliminaste este mensaje</div>`
+        }else if(emi != user._id && m.estado[rec] == 0){
+          msgtexto = `<div class="status" style='color: gray; font-style: italic;'><i class="fas fa-ban">&nbsp</i>se eliminó este mensaje</div>`
+        }else{
+          msgtexto = `<div class="status">${texto}</div>`
+        }
+        
+        return `<div class="my-1 mx-3 chat-cont" style="position: relative" data-id="${u._id}" data-order="${moment(m.creado_en, "DD-MM-YYYY, HH:mm:ss").unix()}">
           <div class="px-4 py-1">
             <li class="list-group-item border-0 d-flex align-items-center px-0 mb-2 bg-transparent" onclick="setChat('${u._id}')">
               <div class="avatar me-3 col-2 overflow-hidden">
@@ -795,18 +844,17 @@
               </div>
               <div class="d-flex align-items-start flex-column justify-content-center col-8 text-truncate">
                 <h6 class="mb-0 col-11 text-truncate">${alias}</h6>
-                <div class="mb-0 text-xs col-11 text-truncate text-preview"><div class="hide-status">Mensaje</div><div class="status">${texto}</div></div>
+                <div class="mb-0 text-xs col-11 text-truncate text-preview"><div class="hide-status">Mensaje</div>${msgtexto}</div>
               </div>
               <p style="font-size:10px" class="time-msg">${(diff == 0) ? moment(m.creado_en, "DD-MM-YYYY, hh:mm:ss").format("hh:mm a") : diff*-1+' día(s)'}</p>
               <div id="count-${u._id}" class="counters"></div>
-              <div onclick='event.stopPropagation();'  class="form-check toggleCheckSelector" style="position: absolute; left: -5%; display: none">
+              <div onclick='event.stopPropagation();'  class="form-check toggleCheckSelector" style="position: absolute; right: 0%; top: 60%; display: none">
                   <input class="form-check-input inputCheckBoxDelete" type="checkbox" value="">
-                </div>
+              </div>
             </li>
           </div>
-        </div>
-      `;
-    }
+        </div>`;
+      }
 
     // Cambio de fuente;
     const validarFuente = () => {
@@ -843,76 +891,121 @@
 
     // Funcion para seleccionar un chat
     const setChat = (id, tab) => {
-      socket.emit('read_messages', {'receptor': user._id, 'emisor': id})
-      let chatCont = $(`.chat-cont[data-id="${id}"]`);
-      $(`#count-${id}`)
-        .hide()
-        .html('');
-      if (chatCont.hasClass('card')) return;
+        if($('#listSerch').attr('display') != 'none'){
+          $('#listSerch').html('');
+          $('#listSerch').hide();
+          $('#lastChats').show();
+        }
+        socket.emit('read_messages', {'receptor': user._id, 'emisor': id})
+        let chatCont = $(`.chat-cont[data-id="${id}"]`);
+        console.log(chatCont);
+        $(`#count-${id}`)
+          .hide()
+          .html('');
 
-      $('#chat-history').html('');
+        $('#chat-history').html('');
 
-      // Buscar información del usuario
-      userSelected = uChatsActivos[id];
-      let img = (userSelected.url_img) ? urlBase+userSelected.url_img : '/img/profile.jpg';
+        // Buscar información del usuario
+        console.log(uChatsActivos[id]);
+        userSelected = uChatsActivos[id] ? uChatsActivos[id] : _.find(users, u => u._id == id);
+        let img = (userSelected.url_img) ? urlBase+userSelected.url_img : '../assets/img/profile.jpg';
 
-      let leyenda = (userSelected.leyenda) ? ` <br><i style="text-style: italic;font-weight: 100" title="Leyenda">"${userSelected.leyenda}"</i>` : '';
-      let info = '';
-      if (userSelected.grupo && userSelected.subgroup) {
-        info = `${userSelected.grupo} - ${userSelected.subgrupo} `;
+        let leyenda = (userSelected.leyenda) ? ` <br><i style="text-style: italic;font-weight: 100" title="Leyenda">"${userSelected.leyenda}"</i>` : '';
+        let info = '';
+        if (userSelected.grupo && userSelected.subgroup) {
+          info = `${userSelected.grupo} - ${userSelected.subgrupo} `;
+        }
+
+        if(userSelected.telefono) info += ` - <b>${userSelected.telefono}</b>`;
+
+        // Seleccionar usuario en lista de chats activos
+        $('.chat-cont').removeClass('card');
+        chatCont.addClass('card');
+
+        // Setear información de usuario
+        $('#e-user-avatar').attr('src', img);
+        $('#e-user-name').html(userSelected.alias+leyenda);
+        $('#e-user-info').html(info);
+
+        $('.cont-chat-history').show();
+
+        showHistoryChats({
+          "emisor": user._id,
+          "receptor": id,
+          "tipo_receptor": "usuario",
+          "allUnread": true,
+          "limit": true
+        })
+        validarFuente();
+        
+        if(tab) {
+          $(".main-content").scrollTop(0);
+          document.getElementById('chats-tab').click()
+        }
       }
 
-      if(userSelected.telefono) info += ` - <b>${userSelected.telefono}</b>`;
-
-      // Seleccionar usuario en lista de chats activos
-      $('.chat-cont').removeClass('card');
-      chatCont.addClass('card');
-
-      // Setear información de usuario
-      $('#e-user-avatar').attr('src', img);
-      $('#e-user-name').html(userSelected.alias+leyenda);
-      $('#e-user-info').html(info);
-
-      $('.cont-chat-history').show();
-
-      showHistoryChats({
-        "emisor": user._id,
-        "receptor": id,
-        "tipo_receptor": "usuario",
-        "allUnread": true,
-        "limit": true
-      })
-      validarFuente();
-      
-      if(tab) {
-        $(".main-content").scrollTop(0);
-        document.getElementById('chats-tab').click()
+      const showHistoryChats = (input) => {
+        if (!showHistory) {
+          showHistory = true;
+          socket.emit('history', input, (resp) => {
+            console.log(resp);
+            showHistory = false;
+            var lastDate = '';
+            chat = resp.history;
+            _.each(resp.history, (h, i) => {
+              if(h.emisor == user._id && h.estado[user._id] != 0){
+                var menu = `<div class="menu" id="m-${h._id}" style="display: none">
+                              <button type="button" class="dropdown-toggle menu float-right" style="color: white;" data-bs-toggle="dropdown" aria-expanded="false">
+                              </button>
+                              <ul class="dropdown-menu px-2 py-3" aria-labelledby="dropdownMenuButton">
+                                <li><a class="dropdown-item border-radius-md" href="javascript: deleteMsg(${h._id}, ${h.receptor})">Eliminar para mi</a></li>
+                                <li><a class="dropdown-item border-radius-md" href="javascript: deleteMsgAll(${h._id}, ${h.emisor}, ${h.receptor})">Eliminar para todos</a></li>
+                                <!--<li><a class="dropdown-item border-radius-md" href="#">Reenviar</a></li>-->
+                              </ul>
+                            </div>`
+              }else{
+                if(h.emisor == user._id){
+                  var clase = `<button type="button" class="dropdown-toggle menu float-righ" style="color: white;" data-bs-toggle="dropdown" aria-expanded="false">
+                              </button>`
+                }else{
+                  var clase = `<button type="button" class="dropdown-toggle menu float-right" data-bs-toggle="dropdown" aria-expanded="false">
+                              </button>`
+                }
+                var menu = `<div class="menu" id="m-${h._id}" style="display: none">
+                              ${clase}
+                              <ul class="dropdown-menu px-2 py-3" aria-labelledby="dropdownMenuButton">
+                                <li><a class="dropdown-item border-radius-md" href="javascript: deleteMsg(${h._id}, ${h.receptor})">Eliminar para mi</a></li>
+                                <!--<li><a class="dropdown-item border-radius-md" href="#">Reenviar</a></li>-->
+                              </ul>
+                            </div>`
+              }
+              var msgtexto = '';
+              let emi = h.emisor
+              let rec = h.receptor
+              if(emi == user._id && h.estado[emi] == 0){
+                var msg = `<div><i class="fas fa-ban">&nbsp</i><i>eliminaste este mensaje</i></div>`
+              }else if(emi != user._id && h.estado[rec] == 0){
+                var msg = `<div><i class="fas fa-ban">&nbsp<i>se eliminó este mensaje</i></i></div>`
+              }else{
+                var msg = chatMessage[h.contenido.tipo](h);
+              }
+                var cMsg = "c-msg mb-1 card shadow py-2 px-3 float-start";
+                if (user._id == h.emisor) cMsg = "c-msg c-emi mb-1 card shadow py-2 px-3 float-end";
+                var fecha = moment(h.creado_en, "DD-MM-YYYY, HH:mm:ss").format('dddd, DD [de] MMMM [/] YYYY');
+                var fechaDiv = '';
+                fecha = (fecha != moment().format('dddd, DD [de] MMMM [/] YYYY')) ? fecha : moment().format('dddd, DD [de] MMMM [/] YYYY');
+                var next = chat[i+1];
+                if(next) lastDate = moment(next.creado_en, "DD-MM-YYYY, HH:mm:ss").format('dddd, DD [de] MMMM [/] YYYY')
+                if (lastDate != fecha && lastDate != ''){ fechaDiv = `<div class="badge text-dark date-msg">${fecha}</div>`;} 
+                lastDate = fecha;
+                msg = `<br>${fechaDiv}<div class="${cMsg}" onmouseover="show(${h._id})" onmouseout="hide(${h._id})" data-id="${h._id}">${msg}${menu}<span class="hour-msg">${moment(h.creado_en, "DD-MM-YYYY, HH:mm:ss").format('h:mma')}</span></div>`;
+                $('#chat-history').prepend(msg);
+            })
+              validarFuente();
+              if (!resp.last) scrollHistory();
+          });
+        }
       }
-    }
-
-    const showHistoryChats = (input) => {
-      if (!showHistory) {
-        showHistory = true;
-        socket.emit('history', input, (resp) => {
-          showHistory = false;
-          var lastDate = '';
-          chat = resp.history;
-          _.each(resp.history, (h) => {
-            var msg = chatMessage[h.contenido.tipo](h);
-            var cMsg = "c-msg mb-1 card shadow py-2 px-3 float-start";
-            if (user._id == h.emisor) cMsg = "c-msg c-emi mb-1 card shadow py-2 px-3 float-end";
-            var fecha = moment(h.creado_en, "DD-MM-YYYY, HH:mm:ss").format('dddd, DD [de] MMMM [/] YYYY');
-            var fechaDiv = '';
-            if (lastDate != fecha) fechaDiv = `<div class="badge text-dark date-msg">${fecha}</div>`;
-            lastDate = fecha;
-            msg = `<br>${fechaDiv}<div class="${cMsg}" data-id="${h._id}">${msg}<br><span class="hour-msg">${moment(h.creado_en, "DD-MM-YYYY, HH:mm:ss").format('h:mma')}</span></div>`;
-            $('#chat-history').prepend(msg);
-          })
-          validarFuente();
-          if (!resp.last) scrollHistory();
-        });
-      }
-    }
 
     const chatMessage = {
       "attached": msg => { 
@@ -957,13 +1050,13 @@
             + `<p class="ci-info" style="font-size: smaller;"><b>Fin: </b>${end.format('ddd DD MMM YYYY')} ${hour_end}</p>`
             + `<p class="ci-info" style="margin-bottom: 12px; font-size: smaller"><b>Lugar: </b>${msg.contenido.texto.info.place}</p>` 
             + `<div>`;
-
-            if(msg.contenido.texto.status != 0 && msg.contenido.texto.activitie_user.status == 1 && msg.contenido.texto.status != 4 && msg.contenido.texto.status != 5 && msg.contenido.texto.info.id_user_register != user._id){
-              mensaje += `<button type="button" class="btn bg-gradient-chat" style="font-size: small; float: right; padding: 8px" onclick="calendarRequest(2,${msg.contenido.texto.id}, ${msg})">Aceptar</button>`
-              + `<a href="calendarRequest(3,${msg.contenido.texto.id}, ${msg})" style="color: red; float: right; margin-right: 25px">Rechazar</a>`
-              + `</div>`
-              + `</div>`
-              + `</div>`;
+            let status = _.find(msg.contenido.texto.activitie_user, s => s.id_user == user._id);
+            if(msg.contenido.texto.status != 0 && status.status == 1 && msg.contenido.texto.status != 4 && msg.contenido.texto.status != 5 && msg.contenido.texto.info.id_user_register != user._id){
+            mensaje += `<button type="button" class="btn bg-gradient-chat" style="font-size: small; float: right; padding: 8px" onclick="javascript: calendarRequest(2,${msg.contenido.texto.id}, ${msg.contenido})">Aceptar</button>`
+            + `<a href="javascript: calendarRequest(3,${msg.contenido.texto.id}, ${msg.contenido})" style="color: red; float: right; margin-right: 25px">Rechazar</a>`
+            + `</div>`
+            + `</div>`
+            + `</div>`;
           }else {
             mensaje += `</div>`
               + `</div>`
@@ -1288,10 +1381,12 @@
 
     const stopTimerAudio = () => {
       clearInterval(timerAudio);
+      $('#broadcast').show();
     }
 
     const startAudio = () => {
       startTimerAudio();
+      $('#broadcast').hide();
       $('.start-audio').fadeOut('fast', () => {
         $('.audio-controls').fadeIn('fast', () => {
           startRecordAudio();
@@ -1301,6 +1396,8 @@
 
     // Iniciar contador de envío de audio
     const startTimerAudio = () => {
+      $('#broadcast').hide();
+      $('#broadcast').val('');
       $('.timer-audio>span').html('00:00');
       var start = new Date;    
       
@@ -1428,91 +1525,90 @@
     };
 
     const broadcastMessage = () => {
-      var texto = nl2br($('#broadcast').val().replace(/^\s+|\s+$/g, ""));
-      _.each(idsMessage, d => {
-        let emisor = user._id;
-        let receptor = d;
-        let tipoReceptor = "usuario";
-      
-        // Parámetros básicos de mensaje
-        var type_msg = "sos";
-        var has_files = false;
-        var files = [];
+        var texto = nl2br($('#broadcast').val().replace(/^\s+|\s+$/g, ""));
+        _.each(idsMessage, d => {
+          let emisor = user._id;
+          let receptor = d;
+          let tipoReceptor = "usuario";
+        
+          // Parámetros básicos de mensaje
+          var type_msg = "sos";
+          var has_files = false;
+          var files = [];
 
-        // Validar mensajes adjuntos
-        if (fileToSend.length > 0) {
-          type_msg = "attached";
-          has_files = true;
-          files = _.map(fileToSend, (f) => {
-              var ext = f.result.original_name.split('.').pop();
-              var n = {
-                  "url":f.result.url_file.replace('/public',''),
-                  "ext":ext,
-                  "typeFile":getTypeFile(ext),
-                  "name":f.result.original_name,
-              };
-              return n;
-          });
-        }
+          // Validar mensajes adjuntos
+          if (fileToSend.length > 0) {
+            type_msg = "attached";
+            has_files = true;
+            files = _.map(fileToSend, (f) => {
+                var ext = f.result.original_name.split('.').pop();
+                var n = {
+                    "url":f.result.url_file.replace('/public',''),
+                    "ext":ext,
+                    "typeFile":getTypeFile(ext),
+                    "name":f.result.original_name,
+                };
+                return n;
+            });
+          }
+          if(texto !== "" || fileToSend.length > 0){
+          var msg_data = { 
+            "alias": user.alias,
+            "img": user.url_img,
+            "emisor": emisor, 
+            "receptor": receptor, 
+            "leido_por": [], 
+            "recibido_por": [], 
+            "empresa": user.empresa, 
+            "unread": {},
+            "creado_en": moment().format("DD-MM-YYYY, HH:mm:ss"),
+            "contenido": { 
+              "texto": texto, 
+              "tipo": type_msg, 
+              "url": files 
+            }, 
+            "tipo_receptor": tipoReceptor, 
+            "estado": {} 
+          };
 
-        var msg_data = { 
-          "alias": user.alias,
-          "img": user.url_img,
-          "emisor": emisor, 
-          "receptor": receptor, 
-          "leido_por": [], 
-          "recibido_por": [], 
-          "empresa": user.empresa, 
-          "unread": {},
-          "creado_en": moment().format("DD-MM-YYYY, HH:mm:ss"),
-          "contenido": { 
-            "texto": texto, 
-            "tipo": type_msg, 
-            "url": files 
-          }, 
-          "tipo_receptor": tipoReceptor, 
-          "estado": {} 
-        };
+          // Objeto para lectura de mensajes
+          msg_data.unread[emisor] = 0;
+          msg_data.unread[receptor] = 0;
 
-        // Objeto para lectura de mensajes
-        msg_data.unread[emisor] = 0;
-        msg_data.unread[receptor] = 0;
+          // Objeto de estado
+          msg_data.estado[receptor] = 1;
+          msg_data.estado[emisor] = 1;
+          if ($('.chat-cont[data-id="'+parseInt(d)+'"]')) {
+            console.log('entro');
+            var nOrder = new Date().getTime();
+            $('.chat-cont[data-id="'+parseInt(d)+'"]')
+              .attr('data-order', new Date().getTime())
+              .data('order', nOrder)
 
-        // Objeto de estado
-        msg_data.estado[receptor] = 1;
-        msg_data.estado[emisor] = 1;
+            var textof = ' * Notificación ';
+            try{
+              textof = lastMessageChat[type_msg](msg_data);
+            } catch {}
+            console.log(d, textof);
+            $('.chat-cont[data-id="'+parseInt(d)+'"]').find('.text-preview').html(textof);
+            $('.chat-cont[data-id="'+parseInt(d)+'"]').find('.time-msg').html(moment().format('h:mma'));
+            sortLastChats();
 
-        if ($('.chat-cont[data-id="'+receptor+'"]').hasClass('card')) {
-          var nOrder = new Date().getTime();
-          $('.chat-cont[data-id="'+receptor+'"]')
-            .attr('data-order', new Date().getTime())
-            .data('order', nOrder)
+            var msg = chatMessage[type_msg](msg_data);
+            var cMsg = "c-msg c-emi mb-1 card shadow py-2 px-3 float-end";
+            msg = `<div class="${cMsg}">${msg}<span class="hour-msg">${moment().format('h:mma')}</span></div>`;
+            $('#chat-history').append(msg);
+            scrollHistory();
+          }
 
-          var textoF = ' * Notificación ';
-          try{
-            textoF = lastMessageChat[type_msg](msg_data);
-          } catch {}
-          
-          $('.chat-cont[data-id="'+d+'"]').find('.text-preview').html(textoF);
-          $('.chat-cont[data-id="'+d+'"]').find('.time-msg').html(moment().format('h:mma'));
-          sortLastChats();
-
-          var msg = chatMessage[type_msg](msg_data);
-          var cMsg = "c-msg c-emi mb-1 card shadow py-2 px-3 float-end";
-          msg = `<div class="${cMsg}">${msg}<span class="hour-msg">${moment().format('h:mma')}</span></div>`;
-          $('#chat-history').append(msg);
-          scrollHistory();
-        }
-
-        socket.emit('new_message', msg_data, (result) => { });
-      });
-      
-      $('#broadcast').val('');
-      // $(".toggleCheckSend").fadeOut("fast");
-      // $("#sendMessage").fadeOut("fast")
-      $('#message').modal('hide');
-      cancelPreview(1);
-    }
+            socket.emit('new_message', msg_data, (result) => { });
+          }
+        });
+          $('#broadcast').val('');
+          $('#message').modal('hide');
+          $(".inputCheckBoxSend").prop('checked', false);
+          cancelPreview(1);
+      }
 
     const lastMessageChat = {
       "attached": msg => {
@@ -1644,7 +1740,7 @@
     //función para filtrar los grupos y subgrupos
     const newFilter = (id) => {
       for(i=0; i<views.length; i++){
-        $('html, body').scrollTop(0);
+        $(".main-content").scrollTop(0);
         if(views[i] != id){
           $('#'+views[i]+'View').addClass('noTiene');
         }else{
@@ -1686,6 +1782,206 @@
           icon: 'warning',
         })
       }
+    }
+
+    const calendarRequest = (action, id, msg) => {
+      let event = {
+        'activitie_user': [{
+          'id_activitie': id, //id del evento
+          'id_user': user._id, //id del usuario
+          'status': action  //2 para aceptar y 3 para rechazar
+        }],
+        'is_quote_provider': false,
+        'is_crm': false
+            }
+      fetch('https://api.pedbox.co:8590/change_state_quote', {
+        method: 'PUT', 
+        body: JSON.stringify(event),
+        headers:{
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        if(data.success){
+          msg.texto.status = action;
+          for(let activitie_user of msg.texto.activitie_user){
+            if(activitie_user.id_user == user._id){
+              activitie_user.status = action;
+            }
+          }
+          let type_msg = "calendar"
+          var msg_data = {
+            "alias": user.alias,
+            "img": user.url_img, 
+            "emisor": user._id, 
+            "receptor": msg.texto.info.id_user_register, 
+            "leido_por": [], 
+            "recibido_por": [], 
+            "empresa": user.empresa, 
+            "unread": {},
+            "creado_en": moment().format("DD-MM-YYYY, HH:mm:ss"),
+            "contenido": { 
+              "texto": {
+                  "subject": msg.texto.subject+" - "+(action == 3 ? "Rechazada" : "Aprobada"),
+                  "detail": msg.texto.detail,
+                  "id": ""+msg.texto.id+"",
+                  "activitie_user": msg.texto.activitie_user,
+                  "status": action,
+                  "name_user_register": msg.texto.name_user_register,
+                  "info": msg.texto.info
+                }, 
+              "tipo": type_msg, 
+              "url": ""
+            }, 
+            "tipo_receptor": tipoReceptor, 
+            "estado": {} 
+          };
+
+          // Objeto para lectura de mensajes
+          msg_data.unread[emisor] = 0;
+          msg_data.unread[receptor] = 0;
+
+          // Objeto de estado
+          msg_data.estado[receptor] = 1;
+          msg_data.estado[emisor] = 1;
+
+          if ($('.chat-cont[data-id="'+receptor+'"]').hasClass('card')) {
+            var nOrder = new Date().getTime();
+            $('.chat-cont[data-id="'+receptor+'"]')
+              .attr('data-order', new Date().getTime())
+              .data('order', nOrder)
+
+            var texto = ' * Notificación ';
+            try{
+              texto = lastMessageChat[type_msg](msg_data);
+            } catch {}
+            
+            $('.chat-cont[data-id="'+userSelected._id+'"]').find('.text-preview').html(texto);
+            $('.chat-cont[data-id="'+userSelected._id+'"]').find('.time-msg').html(moment().format('h:mma'));
+            sortLastChats();
+
+            var msg = chatMessage[type_msg](msg_data);
+            var cMsg = "c-msg c-emi mb-1 card shadow py-2 px-3 float-end";
+            msg = `<div class="${cMsg}">${msg}<span class="hour-msg">${moment().format('h:mma')}</span></div>`;
+            $('#chat-history').append(msg);
+            scrollHistory();
+          }
+          console.log(msg_data);
+          socket.emit('new_message', msg_data, (result) => { });
+          $('#msg-text').val('');
+          validarFuente();
+          cancelPreview(0);
+        }
+      });
+    };
+
+    const buscar = () => {
+      var filtro = $("#buscar").val().toLowerCase().replace(/\s/g,'');
+      _.each(listUsers, (lu, i) => {
+        _.each(_.groupBy(lu, 'subgrupo'), (u, j) => {
+          $('#'+i.split(" ").join("").replace(/[&]/g,'y').replace(/[.]/g,'').replace(/["'\(\)]/g, "").replace(/[#]/g,'')+j.split(" ").join("").replace(/[&]/g,'y').replace(/[.]/g,'')+'View').addClass('noTiene');
+          _.each(u, a =>{
+            if((a.alias.toLowerCase().replace(/\s/g,'').indexOf(filtro) > -1)
+                    || (a.usuario.toLowerCase().replace(/\s/g,'').indexOf(filtro) > -1 )
+                    || (a.grupo.toLowerCase().replace(/\s/g,'').indexOf(filtro) > -1  )
+                    || (a.subgrupo.toLowerCase().replace(/\s/g,'').indexOf(filtro) > -1)
+                    || (a.telefono.toLowerCase().replace(/\s/g,'').indexOf(filtro) > -1)
+                    || (a.identificacion.toLowerCase().replace(/\s/g,'').indexOf(filtro) > -1)
+                    || filtro.length == 0){
+                $('#u-'+a._id).parent().removeClass('noTiene');
+                $('#u-'+a._id).removeClass('noTiene');
+              }else{
+                $('#u-'+a._id).addClass('noTiene');
+              }
+          }); 
+        })
+      })
+    }
+
+    const deleteMsg = (msgId, msgReceptor) => {
+      Swal.fire({
+        title: '¿Está seguro de eliminar el mensaje?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#8392ab',
+        cancelButtonColor: '#8392ab',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          dataId = msgId;
+          console.log(dataId, msgReceptor);
+          let obj = {'emisor': user._id.toString(), 'id': msgId.toString()};
+          socket.emit('remove_msg', obj);
+          $(`.card .shadow[data-id="${msgId}"]`).remove();
+        }
+      })
+    }
+
+    const deleteMsgAll = (msgId, msgEmisor, msgReceptor) => {
+      Swal.fire({
+        title: '¿Está seguro de eliminar el mensaje?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#8392ab',
+        cancelButtonColor: '#8392ab',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          dataId = msgId;
+          console.log(dataId, msgEmisor, msgReceptor);
+          let obj = {'emisor': msgEmisor.toString(), 'receptor': msgReceptor.toString(), 'id': msgId.toString()};
+          socket.emit('remove_msg_all', obj);
+          $($('.c-msg[data-id="'+msgId+'"]')).html('<div><i class="fas fa-ban">&nbsp</i><i>eliminaste este mensaje</i></div>');
+          if(chat[0].indexToOrder == msgId)$($('.chat-cont[data-id="'+msgReceptor+'"]')).find('.text-preview').html(`<div class="status" style='color: gray; font-style: italic;'><i class="fas fa-ban">&nbsp</i>eliminaste este mensaje</div>`);
+        }
+      })
+    }
+
+    const deleteSelectedChats = () => { 
+      Swal.fire({
+        title: '¿Está seguro de eliminar los chats seleccionados?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#8392ab',
+        cancelButtonColor: '#8392ab',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          let checkBoxs = $(".inputCheckBoxDelete");
+          dataIdElements = [];
+          console.log(checkBoxs);
+          for (let i = 0; i < checkBoxs.length; i++) {
+            if (checkBoxs[i].checked) {
+              parentContainerCheckbox = checkBoxs[i].parentElement.parentElement.parentElement.parentElement;
+              dataId = $(parentContainerCheckbox).attr("data-id");
+              console.log(dataId);
+              dataIdElements.push(dataId)
+              parentContainerCheckbox.remove();
+              let obj = {'emisor': dataId.toString(), 'receptor': user._id.toString(), 'tipo_receptor': 'usuario'};
+              socket.emit('remove_chat', obj);
+            }
+          }
+          console.log(dataIdElements);
+          $("#toggleStyleDeleteChat").css("text-decoration", "")
+          $(".toggleCheckSelector").fadeOut("fast");
+          $("#deleteSelectedChat").fadeOut("fast")
+          currentStateDeleteChats = false;
+        }
+      })
+    }
+
+    //para mostrar el eliminar 
+    const show = (id) => {
+      $('#m-'+id).show()
+    }
+
+    const hide = (id) => {
+      $('#m-'+id).hide();
     }
 
     $(document).ready(function () {

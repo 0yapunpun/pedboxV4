@@ -33,6 +33,9 @@
     .dataTable-sorter::after {
       display: none !important;
     }
+    td{
+      white-space: break-spaces !important;
+    }
   </style>
 </head>
 
@@ -118,18 +121,60 @@
   <script src="/js/menu.js"></script>
   
   <script>
-    let facturas = `<%- JSON.stringify(facturas) %>`;
-        facturas = JSON.parse(facturas).result.extranet;
-    let recibos = `<%- JSON.stringify(recibos) %>`;
-        recibos = JSON.parse(recibos).result.extranet;
-    let notas = `<%- JSON.stringify(notas) %>`;
-        notas = JSON.parse(notas).result.extranet;
+    let facturas, recibos, notas;
     let cartName = "storeCart" + session.user.id;
     let cartInvoiceName = "storeInvoice" + session.user.id;
 
-    // PDF prueba
+    // TODO revisar y quitar
     const canSeePdf = false; //Para probar el modal del pdf
     const pdfLink = "http://www.secst.cl/upfiles/documentos/19072016_1207am_578dc39115fe9.pdf";
+
+    const getData = () => {
+      fetch("/historial-facturas/data")
+      .then(res => res.json())
+      .then(res => {
+        facturas = res.facturas.result.extranet;
+        console.log(facturas)
+        recibos = res.recibos.result.extranet;
+        console.log(recibos)
+        notas = res.notas.result.extranet;
+        console.log(notas)
+
+        loadCartera(facturas.Table[0]);
+        loadTable("tablaFacturas", facturas.Table1);
+
+        $("#preloader").hide();
+      })
+    }
+
+    const dataURItoBlob = (dataURI) => {
+      const byteString = window.atob(dataURI);
+      const arrayBuffer = new ArrayBuffer(byteString.length);
+      const int8Array = new Uint8Array(arrayBuffer);
+      for (let i = 0; i < byteString.length; i++) {
+        int8Array[i] = byteString.charCodeAt(i);
+      }
+      const blob = new Blob([int8Array], { type: 'application/pdf'});
+      return blob;
+    }
+
+    const extranetFacturas = (id_factura) => {
+      fetch("/facturas/universal_repuestos/"+id_factura)
+      .then(response => response.json())
+      .then(response => {
+        let strB64 = "";
+        for (let i = 0; i < response.length; i++) {
+          if (response[i].elements) {
+            strB64 += response[i].elements[0].text
+          }
+        }
+
+        const blob = dataURItoBlob(strB64);
+        const url = URL.createObjectURL(blob);
+
+        window.open(url, '_blank');
+      })
+    }
 
     const loadTable = (tableNombre, body) => {
       let table = `<table id="${tableNombre}" class="table align-items-center mb-1 table-hover" style="overflow:scroll"></table>`;
@@ -156,11 +201,18 @@
         try {
           for(let i = 0; i < body.length; i++){
             let pdf;
-            if (canSeePdf) {pdf = `<a onclick="openModalPdf('${pdfLink}')" href="#"> <i class="fas fa-file-pdf me-1"></i>  <br> ${body[i].Numero_Documento}</a>`} 
-            else {pdf = `<a href="${body[i].Url_fe}" target="_blank"> <i class="fas fa-file-pdf me-1"></i>  <br> ${body[i].Numero_Documento} </a>`}
+            if (canSeePdf) {
+              pdf = `<a onclick="openModalPdf('${pdfLink}')" href="#"> <i class="fas fa-file-pdf me-1"></i>  <br> ${body[i].Numero_Documento}</a>`
+            } else {
+              pdf = `<a href="${body[i].Url_fe}" target="_blank"> <i class="fas fa-file-pdf me-1"></i>  <br> ${body[i].Numero_Documento} </a>`
+            }
+
+            if (session.user.id_company == 39) {
+              pdf = `<a href="javascript:extranetFacturas(${body[i].Numero_Documento})"> <i class="fas fa-file-pdf me-1"></i>  <br> ${body[i].Numero_Documento} </a>`
+            } 
   
             tableContent+= '<tr >';
-            tableContent+= `<td class="text-center" style="cursor: pointer">${pdf} </td>`;
+            tableContent+= `<td class="text-center" style="cursor: pointer"> ${pdf} </td>`;
             tableContent+= `<td class="text-center">${body[i].Fecha_Emision}</td>`;
             tableContent+= `<td class="text-center">$${numberWithCommas(body[i].Subtotal)}</td>`;
             tableContent+= `<td class="text-center">$${numberWithCommas(body[i].Iva)}</td>`;
@@ -239,16 +291,15 @@
     }
 
     $( document ).ready(function() {
+      $("#menuHistorialDocumentos").addClass("activeNav");
+
       try {
-        loadCartera(facturas.Table[0]);
-        loadTable("tablaFacturas", facturas.Table1);
+        getData()
       } catch (error) {
         console.error(error);
         $("#error400").show();  
+        $("#preloader").hide();
       }
-      
-      $("#menuHistorialDocumentos").addClass("activeNav");
-      $("#preloader").hide();
     });
   </script>
   

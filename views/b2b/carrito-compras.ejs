@@ -151,10 +151,8 @@
   <script src="/js/menu.js"></script>
 
   <script>
-    let address = `<%- JSON.stringify(address) %>`;
-        address = JSON.parse(address);
-    let seller = address.result.result.seller[0];
-
+    let address;
+    let seller;
     let cartName = "storeCart" + session.user.id;
     let cartInvoiceName = "storeInvoice" + session.user.id;
 
@@ -166,6 +164,19 @@
     };
     const IVA = 0.19;
 
+    const getData = () => {
+      fetch("/carrito-compras/data")
+      .then(res => res.json())
+      .then(res => {
+        address = res.address;
+        seller = res.address.result.result.seller[0]
+
+        setAddress(address.result.result)
+        getLocalStorage();
+
+        $("#preloader").hide();
+      })
+    }
 
     $(document).on('keyup mouseup', '.inputAmount', function(e) {       
       let value = $(this).attr("value");  
@@ -467,13 +478,10 @@
     }
 
     $( document ).ready(function() {
-      setAddress(address.result.result)
-      getLocalStorage();
+      $("#menuCarritoCompras").addClass("activeNav")
       $('#inputDate').val(new Date().toDateInputValue());
 
-      $("#menuCarritoCompras").addClass("activeNav")
-
-      $("#preloader").hide();
+      getData()
     });
 
   </script>

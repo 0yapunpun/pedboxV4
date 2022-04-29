@@ -107,10 +107,23 @@
   <script src="/js/menu.js"></script>
     
   <script>
-    let masters = `<%- JSON.stringify(masters) %>`;
-        masters = JSON.parse(masters);
-    let documentos = `<%- JSON.stringify(documentos) %>`;
-        documentos = JSON.parse(documentos);
+    let masters;
+    let documentos;
+
+    const getData = () => {
+      fetch("/documentos-usuario/data")
+      .then(res => res.json())
+      .then(res => {
+        masters = res.masters
+        documentos = res.documentos
+
+        loadMasters();
+        loadDocuments();
+        handlePermission();
+
+        $("#preloader").hide();
+      })
+    }
 
     $('input[type=file]').change(function(){
       $("#fileName").text(this.files[0].name)
@@ -307,12 +320,8 @@
     }
       
     $(document).ready(function () {
-      loadMasters();
-      loadDocuments();
-      handlePermission();
-
-      $("#menuDocumentosUsuario").addClass("activeNav")
-      $("#preloader").hide();
+      $("#menuDocumentosUsuario").addClass("activeNav");
+      getData();
     })
   </script>
 

@@ -67,6 +67,9 @@
         </div>
       </div>
     </div>
+
+    <!-- preloader -->
+    <%- include('./partials/preloader.ejs') %> 
   </main>
 
   <!-- Scripts -->
@@ -85,8 +88,16 @@
   <script src="/js/menu.js"></script>
 
   <script>
-    let puntos = `<%- JSON.stringify(puntos) %>`;
-        puntos = JSON.parse(puntos).result;
+    const getData = () => {
+      fetch("/calidosos/data")
+      .then(res => res.json())
+      .then(res => {
+        puntos = res.puntos.result
+        printTableData(puntos.pointsHistory)
+        $("#preloader").hide();
+        $("#totalpoints").text(numberWithCommas(puntos.points))
+      })
+    }
 
     const printTableData = (data) =>{
       $("#tableBody").html("");
@@ -116,10 +127,8 @@
     }
 
     $(document).ready(function () {
-      $("#totalpoints").text(numberWithCommas(puntos.points))
-      printTableData(puntos.pointsHistory)
-
       $("#menuCalidosos").addClass("activeNav")
+      getData()
     })
   </script>
 

@@ -7,19 +7,12 @@ const _ = require('underscore');
 const moment = require('moment');
 const { response } = require('express');
 
-controller.agenda = async(req, res, next) => {
-  // Validar login
-  if (!req.session.login) { return res.redirect('/login'); }
-
-  res.render('agenda', {'session': req.session});
-}
 
 controller.agendaData = async(req, res, next) => {
   let id_company = req.session.user.id_company;
   let Status = 1; // Usuarios activos
   let usersCrm = 3; // Usuarios CRM
   let currentDate = req.params.date;
-
 
   let persons = await service.getUsersCompany(id_company, Status);
   let personsCRM = await service.getPersonsCompany(id_company, usersCrm);

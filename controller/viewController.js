@@ -1,11 +1,9 @@
 const controller = {};
 const _ = require('underscore');
 const userController = require('../controller/usersController.js');
-const notificationController = require('../controller/notificationController.js');
 const service = require('../engine/apiService.js');
-const { nvFormatCash } = require('./helpers');
-const moment = require('moment');
-const { response } = require('express');
+
+const { hasPermission } = require('./helpers.js');
 
 controller.login = async(req, res, next) => {
   let token = (req.params.token ? req.params.token : "");
@@ -19,66 +17,169 @@ controller.login = async(req, res, next) => {
   res.render('login', {"dataCompany": {}});
 }
 
-controller.loginValidate = async(req, res, next) => {
-  const resp = await userController.login(req.body);
-  if (resp.result=='ok') {
-    const notificationSocket = await notificationController.subscribeSocket(resp.user);
-
-    req.session.login = true;
-    req.session.urlSocket = resp.urlSocket;
-    req.session.user = resp.user;
-    delete resp.urlSocket;
-  }
-  return res.send(resp);
-}
-
-controller.logout = (req, res) => {
-  req.session.destroy((err) => {
-    if(err) return console.error(err);
-    res.redirect('/login'); return;
-  });
-}
-
 controller.index = async(req, res, next) => {
   // Validar login
   if (!req.session.login) { return res.redirect('/login'); }
-  
+
   res.render('index', {'session': req.session});
 }
 
 controller.noPermission = async(req, res, next) => {
-  // Validar login
   if (!req.session.login) { return res.redirect('/login'); }
 
   res.render('elements/no-permission', {'session': req.session});
 }
 
-controller.chat = async(req, res, next) => {
-  // Validar login
-  if (!req.session.login) { return res.redirect('/login'); }
-
-  let response = await service.removeNotificationByKind(req.session.user.id, 5); // Delete all notification of messages 
-  
-  res.render('chat', {'session': req.session, "id_chat": false});
-}
-
-controller.chatOpenConversation = async(req, res, next) => {
-  // Validar login
-  if (!req.session.login) { return res.redirect('/login'); }
-  
-  res.render('chat', {'session': req.session, "id_chat": req.params.id});
-}
-
 controller.agenda = async(req, res, next) => {
-  // Validar login
   if (!req.session.login) { return res.redirect('/login'); }
   
   res.render('agenda', {'session': req.session});
 }
 
+//** B2B - Extranet
+controller.calidosos = async (req, res, next) => {
+  if (!req.session.login) { return res.redirect('/login');}
+  if (!(hasPermission(req.session.user.permission ,"8028_CAN_ACCESS_TO_CALIDOSOS"))) {return res.redirect('/no-permission');}
+
+  res.render('b2b/calidosos', {'session': req.session});
+}
+
+controller.historialTransacciones = async (req, res, next) => {
+  if (!req.session.login) { return res.redirect('/login'); }
+  if (!(hasPermission(req.session.user.permission ,"8065_VIEW_ECOMMERCE"))) {return res.redirect('/no-permission');}
+
+  res.render('b2b/historial-transacciones', {'session': req.session});
+}
+
+controller.historialFacturas = async (req, res, next) => {
+  if (!req.session.login) { return res.redirect('/login'); }
+  if (!(hasPermission(req.session.user.permission ,"8010_CAN_VIEW_DOCUMENT_HISTORY_EXTRANET"))) {return res.redirect('/no-permission');}
+
+  res.render('b2b/historial-facturas', {'session': req.session});
+}
+
+controller.historialPedidos = async (req, res, next) => {
+  if (!req.session.login) { return res.redirect('/login'); }
+  if (!(hasPermission(req.session.user.permission ,"8020_CAN_VIEW_ORDERS_EXTRANET"))) {return res.redirect('/no-permission');}
+
+  res.render('b2b/historial-pedidos', {'session': req.session});
+}
+
+controller.cotizaciones = async (req, res, next) => {
+  if (!req.session.login) { return res.redirect('/login'); }
+  if (!(hasPermission(req.session.user.permission ,"8015_CAN_VIEW_QUOTATION_EXTRANET"))) {return res.redirect('/no-permission');}
+
+  res.render('b2b/cotizaciones', {'session': req.session});
+}
+
+controller.certificados = async(req, res, next) => {
+  if (!req.session.login) { return res.redirect('/login')}
+  if (!(hasPermission(req.session.user.permission ,"8025_CAN_EXPORT_CERTIFICATES_EXTRANET"))) {return res.redirect('/no-permission');}
+  
+  res.render('b2b/certificados', {'session': req.session});
+}
+
+controller.retenciones = async(req, res, next) => {
+  if (!req.session.login) { return res.redirect('/login'); }
+  if (!(hasPermission(req.session.user.permission ,"8030_CAN_CONFIGURE_EXTRANET"))) {return res.redirect('/no-permission');}
+  
+  res.render('b2b/retenciones', {'session': req.session});
+}
+
+controller.usuarios = async(req, res, next) => {
+  if (!req.session.login) { return res.redirect('/login'); }
+  if (!(hasPermission(req.session.user.permission ,"8030_CAN_CONFIGURE_EXTRANET"))) {return res.redirect('/no-permission');}
+  
+  res.render('usuarios', {'session': req.session});
+}
+
+controller.facturas = async(req, res, next) => {
+  if (!req.session.login) { return res.redirect('/login'); }
+  if (!(hasPermission(req.session.user.permission ,"8035_CAN_VIEW_PORTFOLIO_EXTRANET"))) {return res.redirect('/no-permission');}
+
+  res.render('b2b/facturas', {'session': req.session});
+}
+
+controller.carritoCompras = async(req, res, next) => {
+  if (!req.session.login) { return res.redirect('/login'); }
+  if (!(hasPermission(req.session.user.permission ,"8045_CAN_VIEW_SHOPPING_CAR"))) {return res.redirect('/no-permission');}
+  
+  res.render('b2b/carrito-compras', {'session': req.session});
+}
+
+controller.carritoFacturas = async(req, res, next) => {
+  if (!req.session.login) { return res.redirect('/login'); }
+  if (!(hasPermission(req.session.user.permission ,"8005_CAN_PAY_INVOICES_EXTRANET"))) {return res.redirect('/no-permission');}
+   
+  res.render('b2b/carrito-facturas', {'session': req.session}); 
+}
+
+controller.permisos = async(req, res, next) => {
+  if (!req.session.login) { return res.redirect('/login'); }
+  if ((req.session.user.type_user == "5100_CAN_ACCESS_PERMISSIONS")) {return res.redirect('/no-permission');}
+
+  res.render('permisos', {'session': req.session});
+}
+
+controller.documentosUsuario = async(req, res, next) => {
+  if (!req.session.login) { return res.redirect('/login')}
+
+  res.render('documentos-usuario', {'session': req.session});
+}
+
+controller.catalogo = async (req, res, next) => {
+  if (!req.session.login) { return res.redirect('/login'); }
+  if (!(hasPermission(req.session.user.permission ,"8045_CAN_VIEW_SHOPPING_CAR"))) {return res.redirect('/no-permission');}
+
+  let isGyW = false; // TODO remplazar por id company GyW cuando ya tengan permisos para el catalogo 
+  if (isGyW) { 
+    res.render('b2b/catalogo_v2', {'session': req.session});
+  } else {
+    res.render('b2b/catalogo', {'session': req.session});
+  }
+}
+
+controller.catalogoTop = async (req, res, next) => {
+  // Validar login
+  if (!req.session.login) { return res.redirect('/login'); }
+  if (!(hasPermission(req.session.user.permission ,"8029_VIEW_TOP_50_PRODUCTS"))) {return res.redirect('/no-permission');}
+
+  res.render('b2b/catalogo-top50', {'session': req.session});
+}
+
+// ** Herramientas
+controller.chat = async(req, res, next) => {
+  if (!req.session.login) { return res.redirect('/login'); }
+
+  service.removeNotificationByKind(req.session.user.id, 5); // Delete all messages notification when enter to chat
+  
+  res.render('chat', {'session': req.session, "id_chat": false});
+}
+
+controller.chatOpenConversation = async(req, res, next) => { // open specific chat
+  if (!req.session.login) { return res.redirect('/login'); }
+
+  service.removeNotificationByKind(req.session.user.id, 5); 
+  
+  res.render('chat', {'session': req.session, "id_chat": req.params.id});
+}
+
+controller.helpdesk = async (req, res, next) => {
+  if (!req.session.login) { return res.redirect('/login');}
+  if (!(hasPermission(req.session.user.permission ,"4000_CAN_ACCESS_HELPDESK"))) {return res.redirect('/no-permission');}
+
+  res.render('helpdesk', {'session': req.session})
+} 
+
+controller.agenda = async(req, res, next) => {
+  if (!req.session.login) { return res.redirect('/login'); }
+  if (!(hasPermission(req.session.user.permission ,"4500_CAN_ACCESS_CALENDAR"))) {return res.redirect('/no-permission');}
+
+  res.render('agenda', {'session': req.session});
+}
+
 //** Vistas no integradas
 controller.crm = async(req, res, next) => {
-  // Validar login
   if (!req.session.login) { return res.redirect('/login'); }
   
   res.render('crm', {'session': req.session});

@@ -252,14 +252,11 @@
                       <input class="form-control" type="number" name="" id="numberProductsD" minlength="1" value="1" style="padding-left: 50px;">
                       <h6 style="position: absolute; left: 5%; top: 15%" >Cant:</h6>
                     </div>
-                    <div style="position: relative;" class="mb-2">
+                    <div class="mb-2">
                       <button onclick="addProductCart()" id="idProductD" class="btn btn-primary m-0 d-flex align-items-center" style="font-size: 10px; height: 39px;">
                         <i class="fas fa-shopping-cart me-1" style="font-size: 20px" title="Carrito de compra"></i>
                         AGREGAR AL CARRITO
                       </button>
-                      <div class="text-center w-100" style="position: absolute; font-size: 13px;">
-                        <a href="#" onclick='window.location.href = "/carrito-compras"'>Ver carrito</a>
-                      </div>
                     </div>
                   </div>
                   <hr>
@@ -282,6 +279,9 @@
                   <div class="d-flex gap-2" id="modalDetalleT">
                     <!-- <h6 class="m-0">Talla: </h6>
                     <h6 class="text-secondary m-0" id="modalDetalleT">L</h6> -->
+                  </div>
+                  <div class="text-end mt-4" style=" font-style: italic;">
+                    <a class="btn btn-primary mb-0" href="#" onclick='window.location.href = "/carrito-compras"'>Ver carrito</a>
                   </div>
                 </div>
               </div>
@@ -325,11 +325,27 @@
   <script src="/js/menu.js"></script>
   
   <script>
-    let productos = `<%- JSON.stringify(productos) %>`;
-        productos = JSON.parse(productos);
+    let productos;
     let cartName = "storeCart" + session.user.id;
     let cartInvoiceName = "storeInvoice" + session.user.id;
-    
+
+    const getData = () => {
+      fetch("/catalogo/top/data")
+      .then(res => res.json())
+      .then(res => {
+        productos = res.productos;
+
+        handlePermissions(); 
+
+        dataProductsComplete = productos;
+        dataProductsPrint = dataProductsComplete;
+
+        printPaginator();
+        selectView(0, 8);
+
+        $("#preloader").hide();
+      })
+    }
 
     const loadTable = (body) => {
       $("#tableContainer").html("");
@@ -735,18 +751,9 @@
     };
 
     $( document ).ready(function() {
-      handlePermissions(); 
-
-      dataProductsComplete = productos;
-      dataProductsPrint = dataProductsComplete;
-
-      printPaginator();
-      selectView(0, 8);
-
       $("#menuCatalogoTop").addClass("activeNav");
-      $("#preloader").hide();
+      getData();
     });
-
   </script>
 
 </body>

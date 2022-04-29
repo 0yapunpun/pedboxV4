@@ -320,7 +320,7 @@
           <hr class="m-0">
           <div class="d-flex justify-content-center m-3 gap-3">
             <button class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Cancelar</button>
-            <button class="btn btn-primary" onclick="sendCartPedidoRepetido()">Repetir Pedido</button>
+            <button class="btn btn-primary" onclick="getImgProducts()">Repetir Pedido</button>
           </div>
         </div>
       </div>
@@ -414,18 +414,29 @@
   <script src="/js/menu.js"></script>
 
   <script>
-    let facturas = `<%- JSON.stringify(facturas) %>`;
-        facturas = JSON.parse(facturas).result.extranet;
-    let pedidos = `<%- JSON.stringify(pedidos) %>`;
-        pedidos = JSON.parse(pedidos).result.extranet;
-    let vendedor = `<%- JSON.stringify(vendedor) %>`;
-        vendedor = JSON.parse(vendedor).result;
+    let facturas; 
+    let pedidos; 
     let cartName = "storeCart" + session.user.id;
     let cartInvoiceName = "storeInvoice" + session.user.id;
+    let catalogName = "storeCatalog" + session.user.id;
 
     const canSeePdf = true;
     const canSeeEstadoPedido = true;
     const pdfLink = "http://www.secst.cl/upfiles/documentos/19072016_1207am_578dc39115fe9.pdf";
+
+    const getData = () => {
+      fetch("/historial-pedidos/data")
+      .then(res => res.json())
+      .then(res => {
+        facturas = res.facturas.result.extranet;
+        pedidos = res.pedidos.result.extranet;
+
+        handlePermissions(session.user.permission)
+        loadCartera(facturas.Table[0]);
+
+        $("#preloader").hide();
+      })
+    }
 
     const printDirections = () => {
       let id = session.user.id_person;
@@ -573,11 +584,9 @@
     $(document).on('click','.pedidoDetail',function(){
       $("#loadingAnimationTable").show()
       let id =  $(this).attr("id");
-      console.time()
-      fetch("/historial-pedidos/"+id)
+      fetch("/historial-pedidos/"+id) 
       .then(response => response.json())
       .then(data => {
-        console.timeEnd()
         if (data.detalle) {
           dataPedidoRepetido = data.detalle;
           loadTablePedidoRepetido(data.detalle)
@@ -586,6 +595,19 @@
         }
       });
     });
+
+    const getImgProducts = () => {
+      fetch("/catalogo/img", {
+        method: 'POST',
+        headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+        body: JSON.stringify(dataPedidoRepetido)
+      }) 
+      .then(response => response.json())
+      .then(data => {
+        dataPedidoRepetido = data;
+        sendCartPedidoRepetido();
+      });
+    }
     
     $(document).on('click',function(e){
       if (e.target.className != 'productsPrediction' ) {
@@ -912,14 +934,13 @@
       $("#menuHistorialPedidos").addClass("activeNav");
 
       try {
-        handlePermissions(session.user.permission)
-        loadCartera(facturas.Table[0]);
+        getData()
       } catch (error) {
         console.error(error);
-        $("#error400").show();        
+        $("#error400").show();  
+        $("#preloader").hide();      
       }
 
-      $("#preloader").hide();
     });
   </script>
   

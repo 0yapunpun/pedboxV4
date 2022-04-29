@@ -60,11 +60,7 @@ function getFilterFormat(formats, input) {
   return ((filterFormat) ? filterFormat: {});
 }
 
-controller.helpdesk = async (req, res, next) => {
-  // Validar login
-  if (!req.session.login) { return res.redirect('/login');}
-  if (!(hasPermission(req.session.user.permission ,"4000_CAN_ACCESS_HELPDESK"))) {return res.redirect('/no-permission');}
-
+controller.helpdeskData = async (req, res, next) => {
   let id_company = req.session.user.id_company;
   let id_user = req.session.user.id;
 
@@ -120,7 +116,7 @@ controller.helpdesk = async (req, res, next) => {
     }
   }
 
-  res.render('helpdesk', {'session': req.session, 'content': helpdeskContent, 'masters':masters, 'formats': formats, "users": users})
+  res.send({'content': helpdeskContent, 'masters':masters, 'formats': formats, "users": users})
 } 
 
 controller.helpdeskIndicators = async(req, res, next) => {

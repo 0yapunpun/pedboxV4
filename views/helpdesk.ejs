@@ -682,14 +682,10 @@
   <script src="/js/menu.js"></script>
 
   <script>
-    let content = `<%- JSON.stringify(content) %>`;
-        content = JSON.parse(content);
-    let masters = `<%- JSON.stringify(masters) %>`;
-        masters = JSON.parse(masters);
-    let formats = `<%- JSON.stringify(formats) %>`;
-        formats = JSON.parse(formats);
-    let users = `<%- JSON.stringify(users) %>`;
-        users = JSON.parse(users);
+    let content;
+    let masters;
+    let formats;
+    let users;
 
     // Dropzone js configuration
     var myDropzone
@@ -707,6 +703,32 @@
     let adminMasters;
     let dataIncidencesComplete;
     let currentIncidence;
+
+    const getData = () => {
+      fetch("/helpdesk/data")
+      .then(res => res.json())
+      .then(res => {
+        content = res.content;
+        masters = res.masters;
+        formats = res.formats;
+        users = res.users;
+
+        loadHelpdeskCharts(content.result.helpdesk);
+        loadHelpdeskUsers(users.result);
+        handlePermissions(session.user.permission);
+
+        $("#dropMenuPrioridad .dropdown-item")[$("#dropMenuPrioridad .dropdown-item").length -1].click();
+        $("#dropMenuComportamiento .dropdown-item")[$("#dropMenuComportamiento .dropdown-item").length -1].click();
+        $('#dateIncidencia').val(new Date().toDateInputValue());
+        
+        $("#helpdeskCharts>div:first").click();
+        setTimeout(() => {
+          $("#helpdeskHeaderIndicators>div:first").click()
+        }, 300);
+
+        $("#preloader").hide();
+      })
+    }
 
     const loadHelpdeskIncidents = function (data) {
       $("#helpDeskMain").html("")
@@ -2817,21 +2839,8 @@
     }
 
     $( document ).ready(function() {
-      loadHelpdeskCharts(content.result.helpdesk);
-      loadHelpdeskUsers(users.result);
-      handlePermissions(session.user.permission);
-
-      $("#dropMenuPrioridad .dropdown-item")[$("#dropMenuPrioridad .dropdown-item").length -1].click();
-      $("#dropMenuComportamiento .dropdown-item")[$("#dropMenuComportamiento .dropdown-item").length -1].click();
-      $('#dateIncidencia').val(new Date().toDateInputValue());
-      
-      $("#helpdeskCharts>div:first").click();
-      setTimeout(() => {
-        $("#helpdeskHeaderIndicators>div:first").click()
-      }, 300);
-
       $("#menuHelpdesk").addClass("activeNav");
-      $("#preloader").hide();
+      getData()
     }); 
   </script>
 

@@ -85,8 +85,17 @@
   <script src="/js/menu.js"></script>
 
   <script>
-    let historial = `<%- JSON.stringify(historial) %>`;
-        historial = JSON.parse(historial).result;
+    let historial;
+
+    const getData = () => {
+      fetch("/historial-transacciones/data")
+      .then(res => res.json())
+      .then(res => {
+        historial = res.historial.result
+        printTable(historial.data)
+        $("#preloader").hide();
+      })
+    }
 
     const printTable = (data) =>{
       for (let i = 0; i < data.headers.length; i++) {
@@ -112,14 +121,13 @@
     }
 
     $(document).ready(function () {
+      $("#menuHistorialTransacciones").addClass("activeNav");
       try {
-        printTable(historial.data)
+        getData()
       } catch (error) {
         $("#emptyResponse").show();
+        $("#preloader").hide();
       }
-      
-      $("#menuHistorialTransacciones").addClass("activeNav");
-      $("#preloader").hide();
     });
   </script>
 

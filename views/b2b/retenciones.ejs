@@ -164,8 +164,19 @@
   <script src="/js/menu.js"></script>
 
   <script>
-    let retenciones = `<%- JSON.stringify(retenciones) %>`;
-        retenciones = JSON.parse(retenciones).result;
+    let retenciones;
+
+    const getData = () => {
+      fetch("/retenciones/data")
+      .then(res => res.json())
+      .then(res => {
+        retenciones = res.retenciones.result;
+        if (retenciones.success) {
+          printTableData(retenciones.data.retention)
+        }
+        $("#preloader").hide();
+      })
+    }
         
     const getFormData = () => {
       let data = {
@@ -306,11 +317,8 @@
     })
 
     $(document).ready(function () {
-      if (retenciones.success) {
-        printTableData(retenciones.data.retention)
-      }
-      $("#menuRetenciones").addClass("activeNav")
-      $("#preloader").hide();
+      $("#menuRetenciones").addClass("activeNav");
+      getData();
     })
   </script>
 

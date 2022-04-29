@@ -120,10 +120,22 @@
   <script src="/js/menu.js"></script>
 
   <script>
-    let facturas = `<%- JSON.stringify(facturas) %>`;
-        facturas = JSON.parse(facturas).result.extranet;
+    let facturas;
     let catalogName = "storeCatalog" + session.user.id;
     let cartInvoiceName = "storeInvoice" + session.user.id;
+
+    const getData = () => {
+      fetch("/facturas/data")
+      .then(res => res.json())
+      .then(res => {
+        facturas = res.facturas.result.extranet;
+
+        loadCartera(facturas.Table[0]);
+        loadTablePedidoRepetido(facturas.Table1);
+
+        $("#preloader").hide();
+      })
+    }
 
     const loadTablePedidoRepetido = (data) => {
       let tableContent;
@@ -184,12 +196,10 @@
       return blob;
     }
 
-
     const extranetFacturas = (id_factura) => {
       fetch("/facturas/universal_repuestos/"+id_factura)
       .then(response => response.json())
       .then(response => {
-        console.log(response)
         let strB64 = "";
         for (let i = 0; i < response.length; i++) {
           if (response[i].elements) {
@@ -246,16 +256,15 @@
     })
 
     $(document).ready(function() {
+      $("#menuFacturas").addClass("activeNav");
+
       try {
-        loadCartera(facturas.Table[0]);
-        loadTablePedidoRepetido(facturas.Table1);
+        getData();
       } catch (error) {
         console.error(error);
-        $("#error400").show();         
+        $("#error400").show();   
+        $("#preloader").hide();      
       }
-
-      $("#menuFacturas").addClass("activeNav")
-      $("#preloader").hide();
     });
   </script>
 

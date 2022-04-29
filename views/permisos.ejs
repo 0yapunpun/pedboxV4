@@ -180,8 +180,8 @@
         idPermission,
         idDescription;
 
-    const getPermissions = function () {
-      fetch("/permisos/get-permisos")
+    const getData = function () {
+      fetch("/permisos/data")
       .then(res => res.json())
       .then(res => {
         permisos = res.permisos.result.permission
@@ -453,7 +453,7 @@
 
 
     $(document).ready(function () {
-      getPermissions()
+      getData()
 
       $("#menuPermisos").addClass("activeNav");
       $("#preloader").hide();
