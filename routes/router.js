@@ -8,7 +8,7 @@ const helpdeskController = require('../controller/helpdeskController.js');
 const agendaController = require('../controller/agendaController.js');
 
 //** user
-router.get('/', viewController.index);
+router.get('/', viewController.login);
 router.get('/login', viewController.login);
 router.post('/login', userController.loginValidate);
 router.get('/login/:token', viewController.login);
