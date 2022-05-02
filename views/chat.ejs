@@ -24,7 +24,7 @@
   <%- include('./partials/colors.ejs') %> 
 
   <style>
-    .counters{display: none;background: rgb(76, 175, 80); color: #fff; font-size: 10px; margin-left: 11px; width: 20px; height: 20px; text-align: center; position: absolute; right: -20px; border-radius: 10px; line-height: 20px;}
+    .counters{display: none;background: rgb(76, 175, 80); color: #fff; font-size: 10px; margin-left: 11px; width: 20px; height: 20px; text-align: center; position: absolute; right: -35px; border-radius: 10px; line-height: 20px;}
     .bg-gradient-chat { background-image: linear-gradient( 310deg , #7928CA 0%, #302560 100%);color: #fff; }
     .chat-cont{cursor: pointer;}
     /*.top-navbar{background-image: url(../assets/img/logo-pedbox-chat.png); background-size: 215px; background-repeat: no-repeat; background-position: center 16px;} /*Para IOS*/
@@ -90,6 +90,13 @@
     .menuStatus button {font-size: large; line-height: normal;}
     .menuStatus ul{border: 0 solid rgba(0, 0, 0, 0.125); box-shadow: 0 0 10px 0px;}
     .menuStatus li a {text-decoration: none; color: #525151;}
+    .chat-cont.card{background-color: #e5e3e3 !important;}
+    .toggleCheckSelector {top: 30% !important; right: 100% !important}
+    #optionsChatDropdown .dropdown {margin-top: 0.30rem; margin-bottom: 0.30rem;}
+    #optionsChatDropdown .dropdown-toggle:after {display: none !important}
+    .dropdown a, .dropdown a:hover {color: inherit; text-decoration: inherit;}
+    #listSerch{background-color: white; border-radius: 1rem; box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);}
+    .btnDropdownChat{padding: 10px !important; border-radius: 50%; width: 30px; height: 30px; display: flex; justify-content: center; align-items: center;}
   </style>
 </head>
 
@@ -107,12 +114,8 @@
       <div class="p-4 ps-0 pt-0">
         <div class="">
 
-
-
           <div class="tab-content">
-
             <div class="container-fluid py-3 tab-pane" id="users" style="position: relative">
-
               <div class="d-flex"> 
                 <div class="">
                   <div style="display: flex; justify-content: center; align-items: center;">
@@ -128,42 +131,53 @@
                 </div>
                 <div id="cards" class="flex-fill p-3 pt-0"> </div>
               </div>
-
               <a href="javascript:sendMessage()" id="sendMessage" class="deleteButton text-white position-fixed px-3 py-2 " title="Enviar mensaje masivo">
                 <i class="fa fa-paper-plane py-1"> </i>
               </a>
-
             </div>
 
             <div class="container-fluid py-3 px-0 tab-pane show active tab-content pt-0" id="chats" style="height: 75vh;">
             
               <div class="row" style="height: 100%">
                 <div class="col-12 col-md-5 col-xl-4 h-100 pe-1">
-                  <div class="d-flex">
-                    <div class="card my-1 mx-3 shadow w-100" >
-                      <div class="d-flex align-items-center">
+                  <div class="d-flex justify-content-between">
+                    <div class="my-1 mx-3 ms-0 w-100">
+                      <div class="d-flex align-items-center" style="box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%); border-radius: 0.5rem">
                         <div class="input-group">
                           <input type="text" class="form-control border-0" placeholder="Buscar..." id="search-msg">
                           <span class="input-group-text text-body border-0"><i class="fas fa-search" aria-hidden="true"></i></span>
                         </div>
                       </div>
                     </div>
-                    <div style="display: flex; justify-content: center; align-items: center;">
-                      <a id="btnMassiveTest" class="nav-link btn btn-danger bg-danger m-0 d-flex align-items-center justify-content-center" style="border-radius: 8px; color: white; width: 30px" href="javascript:toggleViewChat();" data-bs-toggle="tooltip" data-bs-placement="top" title="Mensajes Masivos">
-                        <i class="fa fa-bell"></i> 
-                      </a>
+                    <div id="optionsChatDropdown" style="display: flex; justify-content: center; align-items: center;">
+                      <div class="dropdown">
+                        <a href="javascript:;"  style="padding: 10px !important" class="btn bg-gradient-dark dropdown-toggle m-0 btnDropdownChat" data-bs-toggle="dropdown" id="navbarDropdownMenuLink2">
+                          <i class="fas fa-ellipsis-v"></i> 
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink2">
+                          <li>
+                            <a id="btnMassiveTest" class="nav-link m-0"  href="javascript:toggleViewChat();">
+                              <i class="fa fa-bell me-2" style="color: red;"></i> Mensajes Masivos
+                            </a>
+                          </li>
+                          <li>
+                            <a id="btnMassiveTest" class="nav-link m-0"  href="javascript:toggleDeleteChats();">
+                              <i class="fas fa-trash me-2" style="color: red;"></i> Eliminar Chats
+                            </a>
+                          </li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
-                  <ul class="list-group overflow-scroll" id="listSerch" style="height: 100%;display: none;"></ul>
+                  <ul class="list-group overflow-scroll" id="listSerch" style="height: 100%;display: none"></ul>
                   <ul class="list-group overflow-scroll" id="lastChats" style="height: 100%;"></ul>
                 </div>
                 <div class="col-12 col-md-7 col-xl-8 cont-chat-history" style="display: none;">
-
                   <div class="card my-1 mx-2" style="height: 90px">
                     <div class="card-body px-4 py-1" style="display: flex; align-items: center">
                       <li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">
                         <div class="avatar me-3 overflow-hidden">
-                          <img src="/img/profile.jpg" alt="kal" class="w-100 border-radius-lg shadow" id="e-user-avatar">
+                          <img src="https://app.pedbox.co/assets/images/avatars/profile.jpg" alt="kal" class="w-100 border-radius-lg shadow" id="e-user-avatar">
                         </div>
                         <div class="d-flex align-items-start flex-column justify-content-center">
                           <h6 class="mb-0 text-sm" id="e-user-name"></h6>
@@ -337,6 +351,10 @@
         </div>
       </div>
 
+      <a href="javascript:deleteSelectedChats()" id="deleteSelectedChat" class="deleteButton text-white position-fixed px-3 py-2 " title="Eliminar mensajes Seleccionados" style="display: none;">
+        <i class="fa fa-trash py-1"> </i>
+      </a>
+
       <!-- preloader -->
       <%- include('./partials/preloader.ejs') %> 
       
@@ -352,12 +370,10 @@
   <script src="/js/soft-ui-dashboard.min.js?v=1.0.3"></script>
   <script src="/js/plugins/dragula/dragula.min.js"></script>
   <script src="/js/plugins/jkanban/jkanban.js"></script>
-  <!-- <script src="/js/jquery.js"></script> -->
   <script src="/js/jquery-ui.min.js"></script>
   <script src="/js/plugins/datatables.js"></script>
   <script src="/js/plugins/chartjs.min.js"></script>
   <script src="/js/underscore-min.js"></script>
-  <!-- <script src="/js/helpers.js"></script> -->
   <script src="/js/menu.js"></script>
 
   <!-- Socket -->
@@ -744,7 +760,7 @@
         new Notification(resp.alias, {
           "body": resp.contenido.texto, 
           "data": {},
-          "icon": (resp.img) ? urlBase+resp.img : '/img/profile.jpg'
+          "icon": (resp.img) ? urlBase+resp.img : 'https://app.pedbox.co/assets/images/avatars/profile.jpg'
         });
         var countActual = $(`#count-${resp.emisor}`).html()
         var nCount = 1
@@ -816,7 +832,7 @@
         let u = m.usuario_emisor;
         if (String(i) != m.usuario_emisor._id) u = m.usuario_receptor;
         uChatsActivos[u._id] = u;
-        let img = (u.url_img) ? urlBase+u.url_img : '../assets/img/profile.jpg';
+        let img = (u.url_img) ? urlBase+u.url_img : 'https://app.pedbox.co/assets/images/avatars/profile.jpg';
         let alias = u.alias;
         var texto = ' * Notificación ';
         try{
@@ -908,7 +924,7 @@
         // Buscar información del usuario
         console.log(uChatsActivos[id]);
         userSelected = uChatsActivos[id] ? uChatsActivos[id] : _.find(users, u => u._id == id);
-        let img = (userSelected.url_img) ? urlBase+userSelected.url_img : '../assets/img/profile.jpg';
+        let img = (userSelected.url_img) ? urlBase+userSelected.url_img : 'https://app.pedbox.co/assets/images/avatars/profile.jpg';
 
         let leyenda = (userSelected.leyenda) ? ` <br><i style="text-style: italic;font-weight: 100" title="Leyenda">"${userSelected.leyenda}"</i>` : '';
         let info = '';
@@ -1227,19 +1243,56 @@
     }
 
     const showFindMessages = (input) => {
-      socket.emit('find_messages', input, (msgs) => {
-        $('#listSerch').html('');
-        if (msgs) {
-          _.each(msgs, m => {
-            let reg = new RegExp($('#search-msg').val().split(' ').join('|'));
-            let u = m.usuario_emisor;
-            let img = (u.url_img) ? urlBase+u.url_img : '/img/profile.jpg';
-            let alias = u.alias;
-            let texto = chatMessage[m.contenido.tipo](m).replace(reg, s => `<b style="color: #ea0606 !important">${s}</b>`)
-            let diff = (moment(m.creado_en, "DD-MM-YYYY")).diff(moment(), 'd'); 
+      $('#listSerch').html('');
+      socket.emit('users_list', user, (lUsers) => {
+          //$('#usuariosB').html('');
+          $('#listSerch').html('');
+          var cont = 0;
+          $('#usuariosB').remove();
+          $('#listSerch').append(`<div id="usuariosB"><h5 style="text-align: center; margin-top: 15px; margin-bottom: -15px;">Usuarios</h5><hr class="horizontal dark" style="width: 80%; margin-left: 10%;"></div>`);
+          _.each(lUsers, a =>{
+              if((a.alias.toLowerCase().replace(/\s/g,'').indexOf(input.query.toLowerCase().replace(/\s/g,'')) > -1)){
+                let img = (a.url_img) ? urlBase+a.url_img : '../assets/img/profile.jpg';
+                let alias = a.alias;
+                cont++
 
-            var msgSearch = `
-              <div class="my-1 mx-3 chat-cont" style="position: relative" data-id="${u._id}" data-order="${moment(m.creado_en, "DD-MM-YYYY, HH:mm:ss").unix()}">
+                let msgSearch = `<div class="my-1 mx-3 chat-cont" style="position: relative" data-id="${a._id}" data-order="${moment(a.creado_en, "DD-MM-YYYY, HH:mm:ss").unix()}">
+                  <div class="px-4 py-1">
+                    <li class="list-group-item border-0 d-flex align-items-center px-0 mb-2 bg-transparent" onclick="setChat('${a._id}')">
+                      <div class="avatar me-3 col-2 overflow-hidden">
+                        <img src="${img}" alt="kal" class="h-200 border-radius-lg shadow">
+                        <i class="indicator fa fa-circle conn" id="con-${a._id}" style="color:#4CAF50"></i>
+                      </div>
+                      <div class="d-flex align-items-start flex-column justify-content-center col-8">
+                        <h6 class="mb-0 col-11 text-truncate">${alias}</h6>
+                        <div class="mb-0 text-xs col-11 text-preview">${a.usuario}</div>
+                      </div>
+                    </li>
+                  </div>
+                </div>`;
+                
+                $('#usuariosB').append(msgSearch);
+              }
+          });
+          if(cont == 0){$('#usuariosB').remove();} 
+          socket.emit('find_connections', {"empresa": user.empresa});
+        socket.emit('find_messages', input, (msgs) => {
+          var temp = $('#usuariosB');
+          $('#listSerch').html('');
+          $('#listSerch').append(temp);
+          if (msgs.length) {
+              if(cont != 0){var htemp = `<h5 style="text-align: center; margin-bottom: -15px;">Mensajes</h5>`}
+              else{var htemp = `<h5 style="text-align: center; margin-bottom: -15px; margin-top: 15px;">Mensajes</h5>`}
+            $('#listSerch').append(`<div>${htemp}<hr class="horizontal dark" style="width: 80%; margin-left: 10%;"></div>`)
+            _.each(msgs, m => {
+              let reg = new RegExp($('#search-msg').val().split(' ').join('|'));
+              let u = m.usuario_emisor;
+              let img = (u.url_img) ? urlBase+u.url_img : '../assets/img/profile.jpg';
+              let alias = u.alias;
+              let texto = chatMessage[m.contenido.tipo](m).replace(reg, s => `<b style="color: #ea0606 !important">${s}</b>`)
+              let diff = (moment(m.creado_en, "DD-MM-YYYY")).diff(moment(), 'd'); 
+
+              var msgSearch = `<div class="my-1 mx-3 chat-cont" style="position: relative" data-id="${u._id}" data-order="${moment(m.creado_en, "DD-MM-YYYY, HH:mm:ss").unix()}">
                 <div class="px-4 py-1">
                   <li class="list-group-item border-0 d-flex align-items-center px-0 mb-2 bg-transparent" onclick="setChat('${u._id}')">
                     <div class="avatar me-3 col-2 overflow-hidden">
@@ -1251,18 +1304,19 @@
                       <div class="mb-0 text-xs col-11 text-preview">${texto}</div>
                     </div>
                     <p style="font-size:10px" class="time-msg">${(diff == 0) ? moment(m.creado_en, "DD-MM-YYYY, hh:mm:ss").format("hh:mm a") : diff*-1+' día(s)'}</p>
-                    <div onclick='event.stopPropagation();'  class="form-check toggleCheckSelector" style="position: absolute; left: -5%; display: none">
+                    <div onclick='event.stopPropagation();'  class="form-check toggleCheckSelector" style="position: absolute; display: none">
                         <input class="form-check-input inputCheckBoxDelete" type="checkbox" value="">
                       </div>
                   </li>
                 </div>
-              </div>
-            `;
-            
-            $('#listSerch').append(msgSearch);
-          })
-        }
-      })
+              </div>`;
+              
+              $('#listSerch').append(msgSearch);
+            })
+            socket.emit('find_connections', {"empresa": user.empresa});
+          }
+        });
+      });
     }
 
     var objDataForm 
@@ -1690,7 +1744,7 @@
                                     <input class="form-check-input inputCheckBoxSend" type="checkbox" value="">
                                   </div>
                             <div class="avatar me-3 col-2 overflow-hidden">
-                              <img src="${(a.url_img && a.url_img != null) ? urlBase+a.url_img : '/img/profile.jpg'}" alt="kal"
+                              <img src="${(a.url_img && a.url_img != null) ? urlBase+a.url_img : 'https://app.pedbox.co/assets/images/avatars/profile.jpg'}" alt="kal"
                                 class="h-200 border-radius-lg shadow" href="#chats">
                             </div>
                             <div class="d-flex align-items-start flex-column justify-content-center col-8 text-truncate">
@@ -1982,6 +2036,22 @@
 
     const hide = (id) => {
       $('#m-'+id).hide();
+    }
+
+    // delete Selected Chat
+    let currentStateDeleteChats = false
+    const toggleDeleteChats = () => { 
+      if (!currentStateDeleteChats) {
+        $("#toggleStyleDeleteChat").css("text-decoration", "underline")
+        $(".toggleCheckSelector").fadeIn("fast");
+        $("#deleteSelectedChat").fadeIn("fast");
+        currentStateDeleteChats = true;
+      } else {
+        $("#toggleStyleDeleteChat").css("text-decoration", "")
+        $(".toggleCheckSelector").fadeOut("fast");
+        $("#deleteSelectedChat").fadeOut("fast")
+        currentStateDeleteChats = false;
+      }
     }
 
     $(document).ready(function () {
