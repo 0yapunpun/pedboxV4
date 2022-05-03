@@ -2,7 +2,16 @@ const controller = {};
 const userController = require('../controller/usersController.js');
 const service = require('../engine/apiService.js');
 const config = require('../engine/config.js');
-const { nvFormatCash, hasPermission } = require('./helpers.js');
+const { nvFormatCash, hasPermission, dataURItoBlob} = require('./helpers.js');
+
+
+// var createObjectURL = require('create-object-url');
+// import { URL } from 'node:url';
+// const URL = require('node:url');
+// const {URL} = require('buffer');
+
+
+
 const _ = require('underscore');
 const moment = require('moment');
 
@@ -52,11 +61,20 @@ controller.extranetFacturasUR = async(req, res, next) => {
 
   try {
     factura = factura.result.elements[0].elements[0].elements[0].elements[0].elements[1].elements[0].elements[0].elements;
-  } catch (error) {
-    factura = [];
-  }
+    let strB64 = "";
 
-  res.send(factura)
+    for (let i = 0; i < factura.length; i++) {
+      if (factura[i].elements) {
+        strB64 += factura[i].elements[0].text
+      }
+    }
+
+    const blob = dataURItoBlob(strB64);
+    factura = blob;
+    return res.send({success: true, data: factura})
+  } catch (error) {
+    return res.send({success: false, data: []})
+  }
 }
 
 controller.historialPedidosData = async (req, res, next) => {

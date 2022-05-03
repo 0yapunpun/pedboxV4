@@ -9,6 +9,7 @@ const agendaController = require('../controller/agendaController.js');
 
 //** user
 router.get('/', viewController.login);
+router.post('/', userController.loginValidate);
 router.get('/login', viewController.login);
 router.post('/login', userController.loginValidate);
 router.get('/login/:token', viewController.login);
@@ -23,7 +24,7 @@ router.get('/calidosos/data', b2bController.calidososData);
 router.get('/historial-transacciones', viewController.historialTransacciones);
 router.get('/historial-transacciones/data', b2bController.historialTransaccionesData);
 
-router.get('/historial-facturas', viewController.historialFacturas); // Historial-facturas aka Historial-documentos
+router.get('/historial-facturas', viewController.historialFacturas); // aka Historial-documentos
 router.get('/historial-facturas/data', b2bController.historialFacturasData);
 
 router.get('/historial-pedidos', viewController.historialPedidos);
@@ -36,7 +37,7 @@ router.get('/cotizaciones/data', b2bController.cotizacionesData);
 router.get('/nuevo-pedido/:codigo', b2bController.nuevoPedido);
 router.get('/infoVendedor/:id', b2bController.getInfoVendedor);
 
-router.get('/certificados', viewController.certificados);
+router.get('/certificados', viewController.certificados); 
 
 router.get('/retenciones', viewController.retenciones);
 router.get('/retenciones/data', b2bController.retencionesData);

@@ -147,30 +147,30 @@
       })
     }
 
-    const dataURItoBlob = (dataURI) => {
-      const byteString = window.atob(dataURI);
-      const arrayBuffer = new ArrayBuffer(byteString.length);
-      const int8Array = new Uint8Array(arrayBuffer);
-      for (let i = 0; i < byteString.length; i++) {
-        int8Array[i] = byteString.charCodeAt(i);
-      }
-      const blob = new Blob([int8Array], { type: 'application/pdf'});
-      return blob;
-    }
+    // const dataURItoBlob = (dataURI) => {
+    //   const byteString = window.atob(dataURI);
+    //   const arrayBuffer = new ArrayBuffer(byteString.length);
+    //   const int8Array = new Uint8Array(arrayBuffer);
+    //   for (let i = 0; i < byteString.length; i++) {
+    //     int8Array[i] = byteString.charCodeAt(i);
+    //   }
+    //   const blob = new Blob([int8Array], { type: 'application/pdf'});
+    //   return blob;
+    // }
 
     const extranetFacturas = (id_factura) => {
       fetch("/facturas/universal_repuestos/"+id_factura)
       .then(response => response.json())
       .then(response => {
-        let strB64 = "";
-        for (let i = 0; i < response.length; i++) {
-          if (response[i].elements) {
-            strB64 += response[i].elements[0].text
-          }
-        }
+        // let strB64 = "";
+        // for (let i = 0; i < response.length; i++) {
+        //   if (response[i].elements) {
+        //     strB64 += response[i].elements[0].text
+        //   }
+        // }
+        // const blob = dataURItoBlob(strB64);
 
-        const blob = dataURItoBlob(strB64);
-        const url = URL.createObjectURL(blob);
+        const url = URL.createObjectURL(response.data);
 
         window.open(url, '_blank');
       })
