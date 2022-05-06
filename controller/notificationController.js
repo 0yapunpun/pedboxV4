@@ -63,7 +63,7 @@ controller.sendNotification = async(notification) => {
     "estado": {},
   };
 
-  socket.emit('new_message', notification_data, (result) => { console.log(result) });
+  socket.emit('new_message', notification_data, (result) => {});
 }
 
 controller.getNotification = async(req, res, next) => {
@@ -86,6 +86,7 @@ controller.birthdaysByCompany = async() => {
   const currentBirthdays = await service.currentBirthdays(user.id_company);
 
   if (currentBirthdays.result.length != 0) {
+    console.log("if not coming here why fire a notificcation xD")
     controller.sendNotification({kind: "birthday", data: currentBirthdays.result})
   }
 }
@@ -96,7 +97,6 @@ controller.checkCalendarNotification = async(currentHour) => {
   const currentEvents = await service.agendaGetEventsNotifications(user.id);
 
   if (currentEvents.result) {
-    
     let events = currentEvents.result;
     for (let i = 0; i < events.length; i++) {
       let notificateMinutesBefore = Number(events[i].notification.split("-")[0]);

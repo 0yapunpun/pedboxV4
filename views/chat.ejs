@@ -156,6 +156,11 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink2">
                           <li>
+                            <a id="btnMassiveTest" class="nav-link m-0"  href="javascript:toggleViewChat(true);">
+                              <i class="fas fa-user-alt me-2" style="color: red;"></i> Usuarios
+                            </a>
+                          </li>
+                          <li>
                             <a id="btnMassiveTest" class="nav-link m-0"  href="javascript:toggleViewChat();">
                               <i class="fa fa-bell me-2" style="color: red;"></i> Mensajes Masivos
                             </a>
@@ -433,7 +438,6 @@
         "tel": $('#user-tel').val(),
         "user": user
       }
-      console.log(info);
     });
 
     $('#user-tel').blur(function(){
@@ -443,7 +447,6 @@
         "tel": $('#user-tel').val(),
         "user": user
       }
-      console.log(info);
     });
 
     // Abrir avatar
@@ -914,15 +917,14 @@
         }
         socket.emit('read_messages', {'receptor': user._id, 'emisor': id})
         let chatCont = $(`.chat-cont[data-id="${id}"]`);
-        console.log(chatCont);
         $(`#count-${id}`)
           .hide()
           .html('');
 
         $('#chat-history').html('');
 
+
         // Buscar información del usuario
-        console.log(uChatsActivos[id]);
         userSelected = uChatsActivos[id] ? uChatsActivos[id] : _.find(users, u => u._id == id);
         let img = (userSelected.url_img) ? urlBase+userSelected.url_img : 'https://app.pedbox.co/assets/images/avatars/profile.jpg';
 
@@ -956,15 +958,14 @@
         
         if(tab) {
           $(".main-content").scrollTop(0);
-          document.getElementById('chats-tab').click()
+          toggleViewChat();
         }
-      }
+    }
 
       const showHistoryChats = (input) => {
         if (!showHistory) {
           showHistory = true;
           socket.emit('history', input, (resp) => {
-            console.log(resp);
             showHistory = false;
             var lastDate = '';
             chat = resp.history;
@@ -1206,8 +1207,6 @@
         $('#chat-history').append(msg);
         scrollHistory();
       }
-
-      console.log(msg_data)
 
       socket.emit('new_message', msg_data, (result) => { });
       $('#msg-text').val('');
@@ -1534,7 +1533,10 @@
 
       if(typeof navigator.mediaDevices === 'undefined' || !navigator.mediaDevices.getUserMedia) {
         alert('No es poisble grabar audio.');
-        if(!!navigator.getUserMedia) alert('No es posible grabar audio.');
+        if(!!navigator.getUserMedia){
+          alert('No es posible grabar audio.');
+          $(".audio-controls").hide();
+        } 
       }
 
       navigator.mediaDevices.getUserMedia({
@@ -1633,7 +1635,6 @@
           msg_data.estado[receptor] = 1;
           msg_data.estado[emisor] = 1;
           if ($('.chat-cont[data-id="'+parseInt(d)+'"]')) {
-            console.log('entro');
             var nOrder = new Date().getTime();
             $('.chat-cont[data-id="'+parseInt(d)+'"]')
               .attr('data-order', new Date().getTime())
@@ -1643,7 +1644,6 @@
             try{
               textof = lastMessageChat[type_msg](msg_data);
             } catch {}
-            console.log(d, textof);
             $('.chat-cont[data-id="'+parseInt(d)+'"]').find('.text-preview').html(textof);
             $('.chat-cont[data-id="'+parseInt(d)+'"]').find('.time-msg').html(moment().format('h:mma'));
             sortLastChats();
@@ -1683,11 +1683,11 @@
       "to_do_list": msg => '<i class="fa fa-list-ol"></i> Tarea',
     };
 
-    const showUsersLists = (user) => {
+    const showUsersLists = (user, isUserView) => {
       views = [];
       socket.emit('users_list', user, (lUsers) => {
+        users = lUsers;
         listUsers = _.groupBy(_.sortBy(lUsers, 'grupo'), 'grupo');
-        console.log(listUsers)
         //var htmlUsers = '';
         $('#cards').append(`
           <div class="input-group">
@@ -1733,7 +1733,7 @@
                 }
 
                 if(a.telefono) info += ` - <b>${a.telefono}</b>`;
-                if($('#list_group').attr('aria-selected') === 'true'){
+                if(isUserView){
                   var card = `<div style="padding: 0rem !important;" class="card-body pt-0" id="u-${a._id}" style="cursor: pointer;" onClick="setChat(${a._id}, 1)">` 
                 }else{
                   var card = `<div style="padding: 0rem !important;" class="card-body pt-0" id="u-${a._id}" style="cursor: pointer;">`
@@ -1763,7 +1763,6 @@
           toggleSendMessage();
         }
       })
-      console.log(views);
     }
 
     //enviar mensaje masivo
@@ -1772,7 +1771,7 @@
       $("#sendMessage").fadeIn("fast");
     }
 
-    const toggleViewChat = () => {
+    const toggleViewChat = (isUserView) => {
       if ($("#chats").is(":visible") == true) {
         $("#chats").hide();
         $("#btnMassiveTest").hide();
@@ -1781,7 +1780,23 @@
 
         if (!isFiltersLoaded) {
           isFiltersLoaded = true;
-          showUsersLists(user);
+          if (isUserView) {
+            showUsersLists(user, true);
+            setTimeout(() => {
+                $("#cards").find(".inputCheckBoxSend").hide()
+                $("#sendMessage").hide()
+            }, 300);
+          } else {
+            showUsersLists(user, false);
+          }
+        } else {
+          if (isUserView) {
+              $("#sendMessage").hide()
+              $("#cards").find(".inputCheckBoxSend").hide()
+          } else {
+              $("#sendMessage").show()
+              $("#cards").find(".inputCheckBoxSend").show()
+          }
         }
       } else {
         $("#users").hide();
@@ -1857,7 +1872,6 @@
       })
       .then(response => response.json())
       .then(data => {
-        console.log(data);
         if(data.success){
           msg.texto.status = action;
           for(let activitie_user of msg.texto.activitie_user){
@@ -1922,7 +1936,6 @@
             $('#chat-history').append(msg);
             scrollHistory();
           }
-          console.log(msg_data);
           socket.emit('new_message', msg_data, (result) => { });
           $('#msg-text').val('');
           validarFuente();
@@ -1966,7 +1979,6 @@
       }).then((result) => {
         if (result.isConfirmed) {
           dataId = msgId;
-          console.log(dataId, msgReceptor);
           let obj = {'emisor': user._id.toString(), 'id': msgId.toString()};
           socket.emit('remove_msg', obj);
           $(`.card .shadow[data-id="${msgId}"]`).remove();
@@ -1986,7 +1998,6 @@
       }).then((result) => {
         if (result.isConfirmed) {
           dataId = msgId;
-          console.log(dataId, msgEmisor, msgReceptor);
           let obj = {'emisor': msgEmisor.toString(), 'receptor': msgReceptor.toString(), 'id': msgId.toString()};
           socket.emit('remove_msg_all', obj);
           $($('.c-msg[data-id="'+msgId+'"]')).html('<div><i class="fas fa-ban">&nbsp</i><i>eliminaste este mensaje</i></div>');
@@ -2008,19 +2019,16 @@
         if (result.isConfirmed) {
           let checkBoxs = $(".inputCheckBoxDelete");
           dataIdElements = [];
-          console.log(checkBoxs);
           for (let i = 0; i < checkBoxs.length; i++) {
             if (checkBoxs[i].checked) {
               parentContainerCheckbox = checkBoxs[i].parentElement.parentElement.parentElement.parentElement;
               dataId = $(parentContainerCheckbox).attr("data-id");
-              console.log(dataId);
               dataIdElements.push(dataId)
               parentContainerCheckbox.remove();
               let obj = {'emisor': dataId.toString(), 'receptor': user._id.toString(), 'tipo_receptor': 'usuario'};
               socket.emit('remove_chat', obj);
             }
           }
-          console.log(dataIdElements);
           $("#toggleStyleDeleteChat").css("text-decoration", "")
           $(".toggleCheckSelector").fadeOut("fast");
           $("#deleteSelectedChat").fadeOut("fast")
