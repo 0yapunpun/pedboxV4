@@ -415,7 +415,7 @@
         for (let i = 0; i < rows.length; i++) {
           dataFacturas.push({
             "invoice": $(rows[i]).find(".ref").attr("facturaref"),
-            "total": $(rows[i]).find(".vAbono").val()
+            "total": Number($(rows[i]).find(".vAbono").val())
           })  
         }
         let data = {
@@ -424,15 +424,17 @@
           "invoices": dataFacturas
         };
 
-        fetch("/carrito-compras", {
-        method:"POST",
-        body: JSON.stringify(data),
-        headers: {"Content-type": "application/json"}
+        fetch("/carrito-facturas", {
+          method:"POST",
+          body: JSON.stringify(data),
+          headers: {"Content-type": "application/json"}
         })
         .then(res => res.json())
         .then(res => {
-          console.log(res)
-          // TODO: eliminar local storage despues del envio
+          try {
+            window.open(res.result.url, '_blank');
+            localStorage.removeItem(cartInvoiceName)
+          } catch (error) {}
         })
       } else {
         Swal.fire({

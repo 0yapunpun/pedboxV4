@@ -11,7 +11,6 @@ let user;
 // Tareas programaticas
 cron.schedule('* * * * *', () => { // Cada minuto
   // console.log("each minute", moment().format('hh:mm'))
-  controller.birthdaysByCompany();
   controller.checkCalendarNotification(moment().format('hh:mm'));
 });
 
@@ -22,7 +21,7 @@ cron.schedule('*/5 * * * *', () => { // Cada cinco minuto
 
 cron.schedule('0 0 */1 * * *', async () => { // Cada hora horas
   // console.log("each hour", moment())
-  // controller.birthdaysByCompany();
+  controller.birthdaysByCompany();
 });
 
 controller.subscribeSocket = async(userData) => {

@@ -69,9 +69,7 @@ controller.extranetFacturasUR = async(req, res, next) => {
       }
     }
 
-    const blob = dataURItoBlob(strB64);
-    factura = blob;
-    return res.send({success: true, data: factura})
+    return res.send({success: true, data: strB64})
   } catch (error) {
     return res.send({success: false, data: []})
   }
@@ -341,7 +339,7 @@ controller.sendCarritoCompras = async(req, res, next) => {
 controller.sendCarritoFacturas = async(req, res, next) => {
   let data = req.body;
   let response = await service.sendCarritoFacturas(data);
-  res.send({"response": response})
+  res.send(response)
 }
 
 controller.carritoFacturasData = async(req, res, next) => {
