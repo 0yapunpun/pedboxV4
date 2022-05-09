@@ -784,8 +784,6 @@
     agenda.render();
 
     let getData =  () => {
-
-
       let currentDate = new Date().toJSON().slice(0,10).replaceAll("-", "");
       fetch("/agenda/data/"+currentDate)
       .then(response => response.json())
@@ -1093,6 +1091,8 @@
       fetch(`/agenda/getData/${firstDate}/${lastDate}`)
       .then(response => response.json())
       .then(data => {
+        console.log(data)
+
         let dataFormated = data[0];
             dataCompleteFormated = data[0];
             dataComplete = data[1].result.data_user;
@@ -1213,6 +1213,7 @@
     }
 
     let changeEventState = (operation, id, isCRM) => {
+      console.log(operation, id, isCRM)
       let status;
       let crm = false;
 
@@ -1240,7 +1241,6 @@
       })
       .then(response => response.json())
       .then(response => {
-        console.log(response)
         if (response.result.success && operation == 2) {
           Swal.fire({
             icon: 'success',
@@ -1735,10 +1735,11 @@
       let isPending = false;
       let isRejected = false;
       try {
-        if (data.activitie_user[0].status == 1) {
+        let user = _.findWhere(data.activitie_user, {id_user: session.user.id});
+        if (user.status == 1) {
           isPending = true;
         }
-        if (data.activitie_user[0].status == 3) {
+        if (user.status == 3) {
           isRejected = true;
         }
       } catch (error) {}
@@ -1758,7 +1759,7 @@
             ${detail ? ' <div class="text-secondary">'+detail+' </div>' : ''}
             ${place ? ' <div class="text-secondary">'+place+' </div>' : ''}
             ${user ? ' <div class="text-secondary">'+user+' </div>' : ''}
-            ${isPending && !isRejected? ' <div class="text-secondary selectEventState"> <h6 class="aceptEvent" data-id="'+data.id+'" data-crm="'+(isCRM ? "true" : "false")+'">Rechazar</h6> <h6 class="rejectEvent" data-id="'+data.id+'" data-crm="'+(isCRM ? "true" : "false")+'">Aceptar</h6>  </div>' : ''}
+            ${isPending && !isRejected ? ' <div class="text-secondary selectEventState"> <h6 class="rejectEvent" data-id="'+data.id+'" data-crm="'+(isCRM ? "true" : "false")+'">Rechazar</h6> <h6 class="aceptEvent" data-id="'+data.id+'" data-crm="'+(isCRM ? "true" : "false")+'">Aceptar</h6>  </div>' : ''}
             ${isRejected ? ' <div class="text-secondary" style="color: red !important"> Rechazado </div>' : ''}
           </div>
           <div style="position: absolute; height: 100%; width: 3px; background-color: ${data.backgroundColor}; left: 40px; margin: 5px"></div>
@@ -2020,11 +2021,11 @@
         $("#thirdsCrmWindow").hide( "slow" )
       });
 
-      $(document).on("click", ".aceptEvent", function () {
+      $(document).on("click", ".rejectEvent", function () {
         changeEventState(1, $(this).attr("data-id"), $(this).attr("data-crm"))
       })
 
-      $(document).on("click", ".rejectEvent", function () {
+      $(document).on("click", ".aceptEvent", function () {
         changeEventState(2, $(this).attr("data-id"), $(this).attr("data-crm"))
       })
 

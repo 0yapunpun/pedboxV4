@@ -36,7 +36,6 @@
     .cursorPointer{
       cursor: pointer;
     }
-
   </style>
 </head>
 
@@ -150,11 +149,8 @@
       fetch("/carrito-facturas/data")
       .then(res => res.json())
       .then(res => {
-        console.log(res)
-
         retencionData = res.retenciones.result.data;
         getLocalStorage();
-        $("#preloader").hide();
       })
     }
 
@@ -447,8 +443,9 @@
     }
 
     $(document).ready(function () {
-      getData();
       $("#menuCarritoFacturas").addClass("activeNav")
+      $("#preloader").hide();
+      getData();
     })
   </script>
 </body>

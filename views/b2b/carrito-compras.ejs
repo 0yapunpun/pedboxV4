@@ -173,8 +173,6 @@
 
         setAddress(address.result.result)
         getLocalStorage();
-
-        $("#preloader").hide();
       })
     }
 
@@ -478,7 +476,8 @@
     }
 
     $( document ).ready(function() {
-      $("#menuCarritoCompras").addClass("activeNav")
+      $("#preloader").hide();
+      $("#menuCarritoCompras").addClass("activeNav");
       $('#inputDate').val(new Date().toDateInputValue());
 
       getData()

@@ -62,7 +62,11 @@ controller.agendaGetData = async(req, res, next) => {
       data.result.data_user[i].imgUrl = userImg.photo || ""; // Adding the img user to the complete data
       data.result.data_user[i].userName = userImg.description || ""; // Adding the user name to the complete data
 
-      if(data.result.data_user[i].activitie_user[0].status != 2) {continue} // No enviar eventos que no hayan sido aceptados,
+
+      console.log(data.result.data_user[i])
+
+      let eventState = _.findWhere(data.result.data_user[i].activitie_user, {id_user: req.session.user.id});
+      if(eventState.status != 2) {continue} // No enviar eventos que no hayan sido aceptados,
 
       dataFormated.push({
         id: data.result.data_user[i].id,
