@@ -5,6 +5,7 @@ const config = require('../engine/config.js');
 const { nvFormatCash, hasPermission} = require('./helpers.js');
 const _ = require('underscore');
 const moment = require('moment');
+const path = require('path')
 
 var now = Date.now();
 
@@ -80,17 +81,18 @@ controller.PDFFacturasUR = async(req, res, next) => {
       }
     }
       console.log(strB64)
-      console.log(dataBuffer);
       var dataBuffer = Buffer.from(strB64, 'base64');
+      console.log(dataBuffer);
       //let name = new Date().getTime();
       let route = "../public/PDFs/"+idFactura+".pdf"
-      require("fs").writeFile(route, dataBuffer, function(err) {
+      require("fs").writeFile(path.join(__dirname, route), dataBuffer, function(err) {
           if(err){
               return res.status(500).send({message: err});
           }else{
               let pdf = {
                   "name": idFactura+".pdf",
-                  "route": route
+                  "route": route,
+                  "url": "http://api.pedbox.co:4040/PDFs/"+idFactura+".pdf"
               }
               return res.status(200).send(pdf);
               }
