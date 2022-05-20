@@ -465,7 +465,7 @@
               <div>
                 <hr class="horizontal dark my-3">
                 <h6>Sin Confirmar</h6>
-                <div id="unconformedContainer" class="d-flex gap-2">
+                <div id="unconfirmedContainer" class="d-flex gap-2">
                   <!-- Contenido dinamico -->
                 </div>
               </div>
@@ -943,7 +943,7 @@
       .catch(error => console.log('Request failed', error));
     }
 
-    let detailEvent = (id) => {
+    let detailEvent = (id) => {      
       let data, user, type, reason;
       try {
         data = _.findWhere(dataComplete, {id: Number(id)});
@@ -957,6 +957,9 @@
       } catch (error) {return}
 
       currentEvent = data
+
+      console.log("coming here??")
+      console.log(user, reason)
       
       let date;
       if (data.date_begin == data.date_end) {
@@ -989,22 +992,26 @@
         $("#detailReason").parent().attr("style", "display: none !important")
       }
 
-      $("#unconformedContainer").html("")
+      $("#unconfirmedContainer").html("")
       $("#confirmedContainer").html("")
       for (let i = 0; i < data.activitie_user.length; i++) {
-        let id = data.activitie_user[i].id_user;
-        let dataUser = _.findWhere(persons.result.datas.users, {id: id});
+        try {
+          let id = data.activitie_user[i].id_user;
+          let dataUser = _.findWhere(persons.result.datas.users, {id: id});
 
-        let element = `
-          <div class="imgUser" title="${dataUser.description}" data-toggle="tooltip">
-            <img src="https://api.pedbox.co:8590${dataUser.photo}" alt="" style="max-width: 100%; max-height: 100%;">
-          </div>
-        `;
-        
-        if (data.activitie_user[i].status == 2) {
-          $("#confirmedContainer").append(element)
-        } else {
-          $("#unconformedContainer").append(element)
+          let element = `
+            <div class="imgUser" title="${dataUser.description}" data-toggle="tooltip">
+              <img src="https://api.pedbox.co:8590${dataUser.photo}" alt="" style="max-width: 100%; max-height: 100%;">
+            </div>
+          `;
+          
+          if (data.activitie_user[i].status == 2) {
+            $("#confirmedContainer").append(element)
+          } else {
+            $("#unconfirmedContainer").append(element)
+          }          
+        } catch (error) {
+          continue
         }
       }
 
@@ -1012,9 +1019,9 @@
       if ($("#confirmedContainer>div").length == 0) {
         $("#confirmedContainer").parent().hide();
       }
-      $("#unconformedContainer").parent().show();
-      if ($("#unconformedContainer>div").length == 0) {
-        $("#unconformedContainer").parent().hide();
+      $("#unconfirmedContainer").parent().show();
+      if ($("#unconfirmedContainer>div").length == 0) {
+        $("#unconfirmedContainer").parent().hide();
       }
 
       $(function () {

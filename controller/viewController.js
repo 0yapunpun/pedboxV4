@@ -129,9 +129,9 @@ controller.documentosUsuario = async(req, res, next) => {
 
 controller.catalogo = async (req, res, next) => {
   if (!req.session.login) { return res.redirect('/login'); }
-  if (!(hasPermission(req.session.user.permission ,"8045_CAN_VIEW_SHOPPING_CAR"))) {return res.redirect('/no-permission');}
+  // if (!(hasPermission(req.session.user.permission ,"8045_CAN_VIEW_SHOPPING_CAR"))) {return res.redirect('/no-permission');}
 
-  let isGyW = false; // TODO remplazar por id company GyW cuando ya tengan permisos para el catalogo 
+  let isGyW = true; // TODO remplazar por id company GyW cuando ya tengan permisos para el catalogo 
   if (isGyW) { 
     res.render('b2b/catalogo_v2', {'session': req.session});
   } else {
@@ -147,7 +147,22 @@ controller.catalogoTop = async (req, res, next) => {
   res.render('b2b/catalogo-top50', {'session': req.session});
 }
 
+controller.catalogoAdministrador = async (req, res, next) => {
+  // Validar login
+  if (!req.session.login) { return res.redirect('/login'); }
+  // if (!(hasPermission(req.session.user.permission ,"8029_VIEW_TOP_50_PRODUCTS"))) {return res.redirect('/no-permission');}
+
+  res.render('b2b/administrador-catalogo', {'session': req.session});
+}
+
 // ** Herramientas
+controller.dashboard = async (req, res, next) => {
+  if (!req.session.login) { return res.redirect('/login');}
+  if (!(hasPermission(req.session.user.permission ,"6200_CAN_ACCESS_DASHBOARD"))) {return res.redirect('/no-permission');}
+
+  res.render('dashboard', {'session': req.session})
+} 
+
 controller.chat = async(req, res, next) => {
   if (!req.session.login) { return res.redirect('/login'); }
 

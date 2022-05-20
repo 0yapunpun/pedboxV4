@@ -1251,7 +1251,7 @@
           $('#listSerch').append(`<div id="usuariosB"><h5 style="text-align: center; margin-top: 15px; margin-bottom: -15px;">Usuarios</h5><hr class="horizontal dark" style="width: 80%; margin-left: 10%;"></div>`);
           _.each(lUsers, a =>{
               if((a.alias.toLowerCase().replace(/\s/g,'').indexOf(input.query.toLowerCase().replace(/\s/g,'')) > -1)){
-                let img = (a.url_img) ? urlBase+a.url_img : '../assets/img/profile.jpg';
+                let img = (a.url_img) ? urlBase+a.url_img : 'https://app.pedbox.co/assets/images/avatars/profile.jpg';
                 let alias = a.alias;
                 cont++
 
@@ -1286,7 +1286,7 @@
             _.each(msgs, m => {
               let reg = new RegExp($('#search-msg').val().split(' ').join('|'));
               let u = m.usuario_emisor;
-              let img = (u.url_img) ? urlBase+u.url_img : '../assets/img/profile.jpg';
+              let img = (u.url_img) ? urlBase+u.url_img : 'https://app.pedbox.co/assets/images/avatars/profile.jpg';
               let alias = u.alias;
               let texto = chatMessage[m.contenido.tipo](m).replace(reg, s => `<b style="color: #ea0606 !important">${s}</b>`)
               let diff = (moment(m.creado_en, "DD-MM-YYYY")).diff(moment(), 'd'); 
@@ -1699,7 +1699,7 @@
           <div class="form-check toggleCheckSend" style="float: left; margin-left: 15px; display: none">
               <input id="checkAll" class="form-check-input inputCheckBoxSend" type="checkbox" value="">
           </div>
-          <h6 style= "float: left">Seleccionar todos</h6><br>
+          <h6 style= "float: left" id="labelSelectAll">Seleccionar todos</h6><br>
         `) 
         _.each(listUsers, (lu, i) => {  //href
           i = (i.length>0) ? i : 'Grupo sin asignar'
@@ -1784,7 +1784,8 @@
             showUsersLists(user, true);
             setTimeout(() => {
                 $("#cards").find(".inputCheckBoxSend").hide()
-                $("#sendMessage").hide()
+                $("#sendMessage").hide();
+                $("#labelSelectAll").hide()
             }, 300);
           } else {
             showUsersLists(user, false);
@@ -1792,9 +1793,11 @@
         } else {
           if (isUserView) {
               $("#sendMessage").hide()
+              $("#labelSelectAll").hide()
               $("#cards").find(".inputCheckBoxSend").hide()
           } else {
               $("#sendMessage").show()
+              $("#labelSelectAll").show()
               $("#cards").find(".inputCheckBoxSend").show()
           }
         }

@@ -3,8 +3,8 @@ const xml_json = require('xml-js')
 const { showLog } = require('./helpers');
 const service = {};
 const urlPedbox = 'http://api.pedbox.co:5037/';
-// const urlServicePedbox4 = 'http://localhost:7777/';
-const urlServicePedbox4 = 'http://api.pedbox.co:7777/'; 
+const urlServicePedbox4 = 'http://localhost:7777/';
+// const urlServicePedbox4 = 'http://api.pedbox.co:7777/'; 
 const urlPedbox1 = 'https://pedbox.co:8531/';
 const urlKakashi = 'https://api.pedbox.co:8590/';
 const urlCalidosos = 'https://loscalidosos.com/';
@@ -16,7 +16,7 @@ const options = (method, body) => {
 }
 
 service.login = async(body) => {
-  const url = urlKakashi+'validater_user';
+  const url = urlKakashi+'validater_user'; 
   return await makeRequest(url, options('post', body));
 }
 
@@ -96,6 +96,36 @@ service.detalleProductos = async(id_company, codigo) => {
   return data;
 }
 
+service.productosLimit = async(id_company) => {
+  const url = urlKakashi+'get_items?id_company='+id_company+'&limit=100'
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.productosFilter = async(id_company, word) => {
+  const url = urlKakashi+'get_items?id_company='+id_company+'&limit=100&params='+word;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.productosById = async(id) => {
+  const url = urlKakashi+'get_items?id='+id;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.productosUpdate = async(body) =>{
+  const url = urlKakashi+'items';
+  const data =  await makeRequest(url, options('put', body));
+  return data;
+}
+
+service.catalogImagesAttachment = async(string) =>{
+  const url = urlServicePedbox4+'catalog/getImagesAttachment/'+string;
+  const data =  await makeRequest(url);
+  return data;
+}
+
 service.productos = async(url_company, nit, id_company) => {
   const extranet = (id_company == 39 ? 12 : 10) // El catalogo de "universal de respuestos" es consultado en un extranet diferente
   const url = urlKakashi+'get_extranet?nit='+nit+'&tipo='+extranet+'&url='+url_company+'&id_company='+id_company;
@@ -132,6 +162,55 @@ service.imagenesProductos = async(id_company) => {
   const data =  await makeRequest(url);
   return data;
 }
+
+service.imagenesProductosServicePB4 = async(id_company) => { // TODO
+  const url = urlServicePedbox4+"catalog/images/"+id_company;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.catalogAttachments = async(id_company) => { // TODO
+  const url = urlServicePedbox4+"catalog/attachments/"+id_company
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.getCodesCatalog = async(id_company) => { // TODO
+  const url = urlServicePedbox4+"catalog/codes/"+id_company;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.catalogRemoveImg = async(code, id_company) => { 
+  const url = urlServicePedbox4+"catalog/removeImages/"+code+"/"+id_company;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.catalogAddImg = async(body) => { 
+  const url = urlServicePedbox4+"catalog/uploadImgCode";
+  const data =  await makeRequest(url, options('post', body));
+  return data;
+}
+
+service.catalogAddRelateImageArray = async(body) => { 
+  const url = urlServicePedbox4+"catalog/relateImageArray";
+  const data =  await makeRequest(url, options('post', body));
+  return data;
+}
+
+service.catalogProductsByCode = async(code, id_company) => { 
+  const url = urlServicePedbox4+"catalog/getItems/substring/"+code+"/"+id_company;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.catalogItemsAtributes = async(id_company) => { 
+  const url = urlKakashi+"items_attributes?id_company="+id_company;
+  const data =  await makeRequest(url);
+  return data;
+}
+
 
 service.informacionVendedor = async(id_person) => {
   const url = urlKakashi+'get_info_seller?id_person='+id_person;
@@ -454,7 +533,7 @@ service.removeNotificationByKind = async(id_user, kind) => {
   return data;
 }
 
-// CRM
+// ** CRM
 service.getMastersCrm = async(id_company) => { 
   const url = urlKakashi+"get_master_crm?id_company="+id_company;
   const data =  await makeRequest(url);
@@ -472,6 +551,28 @@ service.getQuoteReportCrm = async(id_company, dateS, dateE) => {
   const data =  await makeRequest(url);
   return data;
 }
+
+// ** Dashboard
+service.dashboardReport = async(id_company, dateS, dateE, user) => { 
+  const url = urlPedbox1+"dashboardreport2?id_company="+id_company+"&date_begin="+dateS+"&date_end="+dateE+"&user="+user;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.dashboardReportSeller = async(id_company, dateS, dateE, type, seller) => { 
+  const url = urlPedbox1+"dashboardreportdetail2?id_company="+id_company+"&date_begin="+dateS+"&date_end="+dateE+"&type="+type+"&seller="+seller;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.dashboardReportProducts = async(id_company, dateS, dateE, seller) => { 
+  const url = urlPedbox1+"dashboardinformeproductos2?id_company="+id_company+"&date_begin="+dateS+"&date_end="+dateE+"&user="+seller;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+
+
 
 
 const makeRequest = async (url, options) => {

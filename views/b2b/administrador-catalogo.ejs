@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" type="image/x-icon" href="https://app.pedbox.co/assets/logos/logo_blanco.png"/>
+  <title> Administrador Items </title>
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <link href="/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <link id="pagestyle" href="/css/soft-ui-dashboard.css?v=1.0.3" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/jquery-ui.min.css">
+  <link rel="stylesheet" href="/css/reports.css">
+  <link rel="stylesheet" href="/css/tagify.css" />
+
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.0/socket.io.js" integrity="sha512-+l9L4lMTFNy3dEglQpprf7jQBhQsQ3/WvOnjaN/+/L4i0jOstgScV0q2TjfvRF4V+ZePMDuZYIQtg5T4MKr+MQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="/js/jquery.js"></script>
+  <script src="/js/helpers.js"></script>
+
+  <!-- Color Page -->
+  <%- include('./partials/colors.ejs') %> 
+
+  <style>
+    .inputFile{
+      border: dashed 2px lightgray;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 0.5rem;
+      padding: 3px;
+    }  
+    .removeDocument{
+      cursor: pointer;
+    }
+    .backBtn{
+      cursor: pointer;
+      transition: 0.3s;
+      border-bottom: solid 1px transparent;
+    }
+    .backBtn:hover{
+      border-bottom: solid 1px lightgray;
+    }
+
+    .navSectionsItemsAdmin{
+      display: flex;
+      gap: 1;
+      background-color: #F8F9FA;
+      flex-wrap: wrap;
+      
+    }
+    .navSectionsItemsAdmin>div{
+      margin: 5px;
+      padding: 5px;
+      border-radius: 0.5rem;
+      text-align: center;
+      flex-grow: 1;
+      flex-basis: 0;
+      min-width: 0;
+      font-weight: 600;
+      cursor: pointer;
+      width: min-content;
+    }
+    .activeNavitemAdmin{
+      transition: 0.3s;
+      background-color: white;
+      box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+    }
+
+    .imgTable{
+      max-width: 100%;
+      max-height: 100%;
+      overflow: hidden;
+    }
+    .imgTableCont{
+      margin: 0 auto;
+      width: 50px;
+      height: 50px;
+    }
+    tr th a{
+      text-align: center !important;
+    }
+    .dataTable-sorter::before {
+      display: none !important;
+    }
+    .dataTable-sorter::after {
+      display: none !important;
+    }
+
+    .imgAdminImage{
+      width: 50px;
+      height: 50px;
+    }
+    .imgAdminImage img{
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    #imgCatalogAdministratorContainer>div{
+      cursor: pointer;
+    }
+
+    #imgAdminDetail{
+      width: 150px;
+      height: 150px;
+      margin: 0 auto;
+    }
+    #imgAdminDetail img{
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    /* Animation Loading */
+    .sk-circle {
+      margin: 100px auto;
+      width: 40px;
+      height: 40px;
+      position: relative;
+    }
+    .sk-circle .sk-child {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+    .sk-circle .sk-child:before {
+      content: '';
+      display: block;
+      margin: 0 auto;
+      width: 15%;
+      height: 15%;
+      background-color: #333;
+      border-radius: 100%;
+      -webkit-animation: sk-circleBounceDelay 1.2s infinite ease-in-out both;
+              animation: sk-circleBounceDelay 1.2s infinite ease-in-out both;
+    }
+    .sk-circle .sk-circle2 {
+      -webkit-transform: rotate(30deg);
+          -ms-transform: rotate(30deg);
+              transform: rotate(30deg); }
+    .sk-circle .sk-circle3 {
+      -webkit-transform: rotate(60deg);
+          -ms-transform: rotate(60deg);
+              transform: rotate(60deg); }
+    .sk-circle .sk-circle4 {
+      -webkit-transform: rotate(90deg);
+          -ms-transform: rotate(90deg);
+              transform: rotate(90deg); }
+    .sk-circle .sk-circle5 {
+      -webkit-transform: rotate(120deg);
+          -ms-transform: rotate(120deg);
+              transform: rotate(120deg); }
+    .sk-circle .sk-circle6 {
+      -webkit-transform: rotate(150deg);
+          -ms-transform: rotate(150deg);
+              transform: rotate(150deg); }
+    .sk-circle .sk-circle7 {
+      -webkit-transform: rotate(180deg);
+          -ms-transform: rotate(180deg);
+              transform: rotate(180deg); }
+    .sk-circle .sk-circle8 {
+      -webkit-transform: rotate(210deg);
+          -ms-transform: rotate(210deg);
+              transform: rotate(210deg); }
+    .sk-circle .sk-circle9 {
+      -webkit-transform: rotate(240deg);
+          -ms-transform: rotate(240deg);
+              transform: rotate(240deg); }
+    .sk-circle .sk-circle10 {
+      -webkit-transform: rotate(270deg);
+          -ms-transform: rotate(270deg);
+              transform: rotate(270deg); }
+    .sk-circle .sk-circle11 {
+      -webkit-transform: rotate(300deg);
+          -ms-transform: rotate(300deg);
+              transform: rotate(300deg); }
+    .sk-circle .sk-circle12 {
+      -webkit-transform: rotate(330deg);
+          -ms-transform: rotate(330deg);
+              transform: rotate(330deg); }
+    .sk-circle .sk-circle2:before {
+      -webkit-animation-delay: -1.1s;
+              animation-delay: -1.1s; }
+    .sk-circle .sk-circle3:before {
+      -webkit-animation-delay: -1s;
+              animation-delay: -1s; }
+    .sk-circle .sk-circle4:before {
+      -webkit-animation-delay: -0.9s;
+              animation-delay: -0.9s; }
+    .sk-circle .sk-circle5:before {
+      -webkit-animation-delay: -0.8s;
+              animation-delay: -0.8s; }
+    .sk-circle .sk-circle6:before {
+      -webkit-animation-delay: -0.7s;
+              animation-delay: -0.7s; }
+    .sk-circle .sk-circle7:before {
+      -webkit-animation-delay: -0.6s;
+              animation-delay: -0.6s; }
+    .sk-circle .sk-circle8:before {
+      -webkit-animation-delay: -0.5s;
+              animation-delay: -0.5s; }
+    .sk-circle .sk-circle9:before {
+      -webkit-animation-delay: -0.4s;
+              animation-delay: -0.4s; }
+    .sk-circle .sk-circle10:before {
+      -webkit-animation-delay: -0.3s;
+              animation-delay: -0.3s; }
+    .sk-circle .sk-circle11:before {
+      -webkit-animation-delay: -0.2s;
+              animation-delay: -0.2s; }
+    .sk-circle .sk-circle12:before {
+      -webkit-animation-delay: -0.1s;
+              animation-delay: -0.1s; }
+
+    @-webkit-keyframes sk-circleBounceDelay {
+      0%, 80%, 100% {
+        -webkit-transform: scale(0);
+                transform: scale(0);
+      } 40% {
+        -webkit-transform: scale(1);
+                transform: scale(1);
+      }
+    }
+
+    @keyframes sk-circleBounceDelay {
+      0%, 80%, 100% {
+        -webkit-transform: scale(0);
+                transform: scale(0);
+      } 40% {
+        -webkit-transform: scale(1);
+                transform: scale(1);
+      }
+    }
+  </style>
+</head>
+
+<body class="g-sidenav-show bg-gray-100">
+
+  <!-- Menu -->
+  <%- include('./partials/menu.ejs') %> 
+
+  <main class="main-content max-height-vh-100 h-100">
+
+    <!-- Cabecera -->
+    <%- include('./partials/header.ejs') %>
+  
+      <!-- Cotent -->
+      <div id="ProductsCatalogAdministrator" class="p-4">
+        <div class="d-flex flex-column">
+
+          <div class="d-flex justify-content-between my-2">
+            <div class="" style="position: relative;">
+              <input id="filterTableProducts" type="text" class="form-control" placeholder="Buscar" style="padding-left: 35px;">
+              <i class="fas fa-search" style="position: absolute; top: 30%; left: 5%; cursor: pointer;"></i>
+            </div>
+            
+            <div class="d-flex justify-content-center gap-2" >
+              <div id="btnModalInform" onclick="$('#ProductsCatalogAdministrator').hide(); $('#formCatalogAdministrator').show()" class="icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg bntHeader" title="Nuevo Producto" data-toggle="tooltip">
+                <i class="fas fa-plus"  style="font-size: 15px"></i>
+              </div>
+
+              <div id="btnModalInform" onclick="$('#ProductsCatalogAdministrator').hide(); $('#imagesCatalogAdministrator').show()" class="icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg bntHeader" title="Administrador de Imagenes" data-toggle="tooltip">
+                <i class="fas fa-image" style="font-size: 15px"></i>
+              </div>
+
+              <div id="btnModalInform" onclick="$('#ProductsCatalogAdministrator').hide(); $('#attachedFilesAdministrator').show()" class="icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg bntHeader" title="Administrador de Adjuntos" data-toggle="tooltip">
+                <i class="fas fa-file" style="font-size: 15px"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="">
+            <div class="card p-2 ">
+              <table id="tableProductsAdmin" class="w-100" style="table-layout:fixed;">
+                <thead>
+                  <tr id="tableHead">
+                    <th width="15%" class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7" > Imágen </th>
+                    <th width="20%" class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"> Código </th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Descripción</th>
+                    <th width="5%" class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"></th>
+                  </tr> 
+                </thead>  
+                <tbody id="tableProductsContent"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ** Vista administrador de imagenes -->
+      <div id="imagesCatalogAdministrator" class="p-4" style="display: none;">
+        <div class="d-flex">
+          <div onclick="$('#ProductsCatalogAdministrator').show(); $('#imagesCatalogAdministrator').hide()" class="backBtn d-flex gap-2 align-items-center mb-2" style="cursor: pointer;">
+            <i class="fas fa-chevron-left" aria-hidden="true"></i>
+            <h6 class="mb-0">Volver al catálogo</h6>
+          </div>
+        </div>
+
+        <div class="card p-3" >
+          <div class="d-flex">
+            <div class="flex-fill me-3" style="border-right: solid 2px lightgrey; width: 50%;">
+              <h6>Imágenes Productos</h6>
+              <div class="me-2 my-2">
+                <div class="" style="position: relative;">
+                  <input id="filterTableImages" type="text" class="form-control" placeholder="Buscar" style="padding-left: 35px;">
+                  <i class="fas fa-search" style="position: absolute; top: 30%; left: 2%; cursor: pointer;"></i>
+                </div>
+              </div>
+              <div>
+                <div id="imgCatalogAdministratorContainer" style="max-height: 60vh; overflow-y: auto;"> 
+
+
+                </div>
+              </div>
+            </div>
+            <div class="flex-fill" style="width: 50%;">
+              
+              <div id="imgAdminUploadForm">
+                <h6>Subir Imágenes</h6>
+                <div >
+                  <form action="" enctype="multipart/form-data" id="f-upload-images">
+                    <input type="file" name="file" id="inputImages"  accept="image/*" hidden multiple>   
+                  </form>
+                  <div class="inputFile" id="inputImageLabel">
+                    <div id="fileNameImage" style="display: flex; flex-direction: column;">
+                      Seleccione Imágenes
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-2 d-flex">
+                  <button onclick="uploadImage()" class="btn btn-primary m-0 btnColor" style="margin: 0 auto !important;"> Añadir </button>
+                </div>
+              </div>
+
+              <div id="imgAdminDateil" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h6 class="m-0 mb-2 ">Imágen <span>ED0243.jpg</span> </h6>
+                  <button onclick="$('#imgAdminDateil').hide(); $('#imgAdminUploadForm').show()" type="button" class="btn-close rounded-circle me-1 p-1" style="background-color: gray"></button>
+                </div>
+
+                <div id="imgAdminDetail">
+                  <img src="https://wali.igbcolombia.com/api/shared/images/mtz/ED0243.jpg" alt="">
+                </div>
+                <h6 class="m-0">Productos Asociados:</h6>
+                <input id="imageSelectedTagsAdmin" class="form-control" type="text" value="">
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ** Vista administrador de adjuntos -->
+      <div id="attachedFilesAdministrator" class="p-4" style="display: none;">
+        <div class="d-flex">
+          <div onclick="$('#ProductsCatalogAdministrator').show(); $('#attachedFilesAdministrator').hide()" class="backBtn d-flex gap-2 align-items-center mb-2" style="cursor: pointer;">
+            <i class="fas fa-chevron-left" aria-hidden="true"></i>
+            <h6 class="mb-0">Volver al catálogo</h6>
+          </div>
+        </div>
+
+        <div class="card p-3" >
+          <div class="d-flex">
+            <!-- Not enought time to make this, Juan Blame -->
+            <div class="flex-fill me-3" style="border-right: solid 2px lightgrey; width: 50%;">
+              <h6>Adjuntos</h6>
+              <div class="me-2 my-2">
+                <div class="" style="position: relative;">
+                  <input id="" type="text" class="form-control" placeholder="Buscar" style="padding-left: 35px;"> 
+                  <i class="fas fa-search" style="position: absolute; top: 30%; left: 2%; cursor: pointer;"></i>
+                </div>
+              </div>
+              <div>
+                <div id="attachedFilesAdministratorContainer" style="max-height: 60vh; overflow-y: auto;"> 
+
+                </div>
+              </div>
+            </div>
+            <div class="flex-fill" style="width: 50%;">
+              <div id="attachedAdminUploadForm">
+                <h6>Subir Adjuntos</h6>
+                <div>
+                  <form action="" enctype="multipart/form-data" id="f-upload-attached">
+                    <input type="file" name="file" id="inputAttached"  accept="image/*, application/pdf" hidden multiple>   
+                  </form>
+                  <div class="inputFile" id="inputAttachedLabel">
+                    <div id="fileNameAttached" style="display: flex; flex-direction: column;">
+                      Seleccione Adjuntos
+                    </div>
+                  </div>
+                </div>
+
+                <div class="my-2" style="display: none;">
+                  <input type="text" id="inputAttachedRelateProducts" class="form-control" placeholder="Seleccionar Items">
+                </div>
+                <div class="my-3 mb-4">
+                  <div class="form-check form-switch ps-0 d-flex flex-column align-items-center">
+                    <label for="">Relacionar Items Manualmente</label>
+                    <div class="d-flex align-items-center gap-2 ms-2">
+                      <div class="d-flex gap-2"> 
+                        <i class="fas fa-question-circle" data-toggle="tooltip" title="Utilizado para relacionar adjuntos basados en el nombre del archivo"></i>
+                        <h6  class="m-0 text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Inactivo</h6>
+                      </div>
+                      <div>
+                        <input class="form-check-input m-0 disableToggle" type="checkbox" id="toggleButtonAutomaticRelate" >
+                      </div>
+                      <div class="d-flex gap-2">
+                        <h6 class="m-0 text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Activo</h6>
+                        <i class="fas fa-question-circle" data-toggle="tooltip" title="Utilizado para relacionar un cojunto de imágenes ordenadas a uno o varios items. " ></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="display: none;">
+                  <select name="" id="selectColorUploadAttachment" class="form-control">
+                    <option value="01">Negro</option>
+                    <option value="03">Amarillo</option>
+                    <option value="04">Blanco</option>
+                    <option value="05">Azul</option>
+                    <option value="06">Rojo</option>
+                    <option value="07">Naranja</option>
+                    <option value="08">Fucsia</option>
+                    <option value="10">Morado</option>
+                    <option value="11">Gris</option>
+                    <option value="12">Verde</option>
+                    <option value="13">Surtido</option>
+                    <option value="14">Turquesa</option>
+                    <option value="15">Rosado</option>
+                    <option value="21">Beige</option>
+                  </select>
+                </div>
+                <div class="my-3 mb-4" id="selectColorToggleContainer" style="display: none;">
+                  <div class="form-check form-switch ps-0 d-flex flex-column align-items-center">
+                    <label for="">Seleccionar Color</label>
+                    <div class="d-flex align-items-center gap-2 ms-2">
+                      <div class="d-flex gap-2"> 
+                        <h6  class="m-0 text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Inactivo</h6>
+                      </div>
+                      <div>
+                        <input class="form-check-input m-0 disableToggle" type="checkbox" id="toggleButtonSelectColor" >
+                      </div>
+                      <div class="d-flex gap-2">
+                        <h6 class="m-0 text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Activo</h6>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+
+                <div class="mt-2 d-flex">
+                  <button onclick="uploadAttached()" class="btn btn-primary m-0 btnColor" style="margin: 0 auto !important;"> Añadir </button>
+                </div>
+              </div>
+
+              <div id="attachedAdminDateil" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h6 class="m-0 mb-2 ">Adjunto <span>ED0243.jpg</span> </h6>
+                  <button onclick="$('#attachedAdminDateil').hide(); $('#attachedAdminUploadForm').show()" type="button" class="btn-close rounded-circle me-1 p-1" style="background-color: gray"></button>
+                </div>
+
+                <div id="imgAdminDetail">
+                  <img src="https://wali.igbcolombia.com/api/shared/images/mtz/ED0243.jpg" alt="">
+                </div>
+                <h6 class="m-0">Productos Asociados:</h6>
+                <input id="attachedSelectedTagsAdmin" class="form-control" type="text" value="">
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ** Vista formulario producto -->
+      <div id="formCatalogAdministrator" class="p-4" style="display: none;">
+       <div>
+         <div class="navSectionsItemsAdmin">
+           <div onclick="$('.sectionformAdmin').hide(); $('#informationSection').show()" class="activeNavitemAdmin">Información</div>
+           <div onclick="$('.sectionformAdmin').hide(); $('#atributesSection').show()">Atributos</div>
+           <div onclick="$('.sectionformAdmin').hide(); $('#attachedSection').show()">Adjuntos</div>
+           <div id="navPriceListSection" onclick="$('.sectionformAdmin').hide(); $('#priceListSection').show()" style="display: none;">Lista de Precios</div>
+           <div id="navCodesSection" onclick="$('.sectionformAdmin').hide(); $('#alternCodeSection').show()" style="display: none;">Códigos Alternos</div>
+           <div id="navSustitueSection" onclick="$('.sectionformAdmin').hide(); $('#sustitutesSection').show()" style="display: none;">Productos Sustitutos</div>
+           <div id="navSuppliersSection" onclick="$('.sectionformAdmin').hide(); $('#supplierSection').show()" style="display: none;">Proveedores</div>
+           <div id="navKitSection" onclick="$('.sectionformAdmin').hide(); $('#kitSection').show()" style="display: none;">Kit</div>
+         </div>
+       </div>
+
+       <div id="formNewItemContainer" class="card mt-1 p-4 pb-2">
+
+        <div id="informationSection" class="sectionformAdmin">
+          <div class="d-flex">
+            <div class="w-50 pe-2">
+              <label for="inputReference">Referencia</label>
+              <input id="inputReference" type="text" class="form-control">
+  
+              <label for="inputDescription">Descripción</label>
+              <input id="inputDescription" type="text" class="form-control">
+  
+              <div class="d-flex gap-2">
+                <div class="flex-fill">
+                  <label for="">Precio Costo</label>
+                  <input id="inputPriceCost" type="number" class="form-control">
+                </div>
+
+                <div class="flex-fill">
+                  <label for="">Precio Venta</label>
+                  <input id="inputPriceShop" type="number" class="form-control">
+                </div>
+
+              </div>
+
+              <label for="">Cantidad minima de compra</label>
+              <input id="inputMinAmount" type="number" class="form-control">
+  
+  
+              <label for="">Impuesto</label>
+              <select name="" id="inputTax" class="form-control">
+                <option value="1">No IVA (0%)</option>
+                <option value="2">IVA (19%)</option>
+              </select>
+  
+              <label for="">Unidad</label>
+              <select name="" id="inputMeasure" class="form-control">
+                <option value="1">Unidad (1)</option>
+                <option value="2">Docena (12)</option>
+              </select>
+  
+              <label for="">Estado</label>
+              <select name="" id="inputState" class="form-control">
+                <option value="0">Inactivo</option>
+                <option value="1">Activo</option>
+              </select>
+ 
+              <div class="mt-3 d-flex flex-column ms-1" >
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="" id="chekcPriceList">
+                  <label class="custom-control-label" for="chekcPriceList">Maneja Lisa de Precios</label>
+                </div>
+
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="" id="chekcAlternCode">
+                  <label class="custom-control-label" for="chekcAlternCode">Maneja Código Alternos</label>
+                </div>
+                 
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="" id="chekcSustitute" >
+                  <label class="custom-control-label" for="chekcSustitute">Maneja Productos Sustitutos</label>
+                </div>
+
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="" id="chekcasign">
+                  <label class="custom-control-label" for="chekcasign">Maneja Proveedores Asignados</label>
+                </div>
+                   
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="" id="checkKit" >
+                  <label class="custom-control-label" for="checkKit">Es un Kit</label>
+                </div>
+              </div>
+  
+            </div>
+ 
+            <div class="w-50 ps-2">
+              <label for="">Imagen Producto</label>
+              <div class="d-flex justify-content-center" style="width: 100%; height: 300px;">
+                <img id="imgProductForm" src="" alt="" style="max-width: 100%; max-height: 100%;"> 
+              </div>
+  
+            </div>
+ 
+           
+          </div>
+        </div>
+
+        <div id="atributesSection" class="sectionformAdmin" style="display: none;">
+          <div class="d-flex">
+            <div class="flex-fill me-3" style="border-right: solid 2px lightgrey;">
+              <h6>Atributos</h6>
+            </div>
+            <div class="flex-fill">
+              <h6>Añadir Atributo</h6>
+              <div>
+
+                <label for="" class="mt-3">Atributo</label>
+                <select name="" id="" class="form-control"> 
+                  <option value="">1</option>
+                  <option value="">2</option>
+                  <option value="">3</option>
+                </select>
+
+                <label for="" class="mt-3">Detalle</label>
+                <select name="" id="" class="form-control"> 
+                  <option value="">1</option>
+                  <option value="">2</option>
+                  <option value="">3</option>
+                </select>
+
+                <label for="" class="mt-3">Activo</label>
+                <select name="" id="" class="form-control"> 
+                  <option value="">Activo</option>
+                  <option value="">Inactivo</option>
+                </select>
+
+                <div class="mt-2 d-flex">
+                  <button onclick="" class="btn btn-primary m-0 btnColor" style="margin: 0 auto !important;"> Añadir </button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="attachedSection" class="sectionformAdmin" style="display: none;">
+          <div class="d-flex">
+            <div class="flex-fill me-3" style="border-right: solid 2px lightgrey;">
+              <h6>Archivos Adjuntos</h6>
+            </div>
+            <div class="flex-fill">
+              <h6>Subir Archivo</h6>
+              <div >
+                <form action="" enctype="multipart/form-data" id="f-upload">
+                  <input type="file" name="file" id="inputDocument"  accept=".xlsx,.xls, image/*, .doc, .docx, .pptx,.txt,.pdf" hidden> 
+                </form>
+                <div class="inputFile" id="inputFileLabel">
+                  <span id="fileName">
+                    Seleccione Archivo
+                  </span>
+                </div>
+              </div>
+              <div class="mt-2 d-flex">
+                <button onclick="" class="btn btn-primary m-0 btnColor" style="margin: 0 auto !important;"> Añadir </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="supplierSection" class="sectionformAdmin" style="display: none;">
+          <div class="d-flex">
+            <div class="flex-fill me-3" style="border-right: solid 2px lightgrey;">
+              <h6>Proveedores Asignados</h6>
+            </div>
+            <div class="flex-fill">
+              <h6>Añadir Proveedor</h6>
+              <div >
+                <select name="" id="" class="form-control"> 
+                  <option value="">1</option>
+                  <option value="">2</option>
+                  <option value="">3</option>
+                </select>
+              </div>
+              <div class="mt-2 d-flex">
+                <button onclick="" class="btn btn-primary m-0 btnColor" style="margin: 0 auto !important;"> Añadir </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div id="sustitutesSection" class="sectionformAdmin" style="display: none;">
+          <div class="d-flex">
+            <div class="flex-fill me-3" style="border-right: solid 2px lightgrey;">
+              <h6>Productos Sustitutos</h6>
+            </div>
+            <div class="flex-fill">
+              <h6>Añadir Producto Sustituto</h6>
+              <div>
+                <select name="" id="" class="form-control"> 
+                  <option value="">1</option>
+                  <option value="">2</option>
+                  <option value="">3</option>
+                </select>
+              </div>
+              <div class="mt-2 d-flex">
+                <button onclick="" class="btn btn-primary m-0 btnColor" style="margin: 0 auto !important;"> Añadir </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="alternCodeSection" class="sectionformAdmin" style="display: none;">
+          <div class="d-flex">
+            <div class="flex-fill me-3" style="border-right: solid 2px lightgrey;">
+              <h6>Códigos alternos</h6>
+            </div>
+            <div class="flex-fill">
+              <h6>Añadir Código Alterno</h6>
+              <div class="d-flex flex-column">
+                <label for="">Código</label>
+                <input type="text" class="form-control">
+                <label for="" class="mt-3">Descripción</label>
+                <input type="text" class="form-control">
+              </div>
+              <div class="mt-2 d-flex">
+                <button onclick="" class="btn btn-primary m-0 btnColor" style="margin: 0 auto !important;"> Añadir </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="priceListSection" class="sectionformAdmin" style="display: none;">
+          <div class="d-flex">
+            <div class="flex-fill me-3" style="border-right: solid 2px lightgrey;">
+              <h6>Lista de Precios</h6>
+
+              <div id="priceListSectionContent" class="ms-2">
+
+                <!-- <div>
+                  <div>
+                    <label for="" class="m-0">Codigo de Lista: </label>
+                    1
+                  </div>
+                  <div>
+                    <label for="" class="m-0">Descripción: </label>
+                      Lista de precio 1
+                  </div>
+                  <div>
+                    <label for="" class="m-0">Precio: </label>
+                    $54,000
+                  </div>
+                </div> -->
+
+              </div>
+            </div>
+            <div class="flex-fill">
+              <h6>Añadir Nuevo Precio</h6>
+              <div class="d-flex flex-column">
+                <label for="">Codigo de lista</label>
+                <input type="text" class="form-control">
+                <label for="" class="mt-3">Descripción</label>
+                <input type="text" class="form-control">
+                <label for="" class="mt-3">Precio</label>
+                <input type="number" class="form-control">
+              </div>
+              <div class="mt-2 d-flex">
+                <button onclick="" class="btn btn-primary m-0 btnColor" style="margin: 0 auto !important;"> Añadir </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="kitSection" class="sectionformAdmin" style="display: none;">
+          <div class="d-flex">
+            <div class="flex-fill me-3" style="border-right: solid 2px lightgrey;">
+              <h6>Producto del Kit</h6>
+            </div>
+            <div class="flex-fill">
+              <h6>Añadir Nuevo Producto</h6>
+              <div class="d-flex flex-column">
+                <label for="" class="mt-3">Producto</label>
+                <select name="" id="" class="form-control"> 
+                  <option value="">1</option>
+                  <option value="">2</option>
+                  <option value="">3</option>
+                </select>
+                <label for="" class="mt-3">Cantidad</label>
+                <input type="number" class="form-control">
+              </div>
+              <div class="mt-2 d-flex">
+                <button onclick="" class="btn btn-primary m-0 btnColor" style="margin: 0 auto !important;"> Añadir </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer form-->
+        <div class="mt-5 d-flex justify-content-between">
+           <div onclick="$('#ProductsCatalogAdministrator').show(); $('#formCatalogAdministrator').hide()" class="backBtn d-flex gap-2 align-items-center" style="cursor: pointer;">
+             <i class="fas fa-chevron-left" aria-hidden="true"></i>
+             <h6 class="mb-0">Volver al catálogo</h6>
+           </div>
+
+           <div class="d-flex justify-content-end" style="width: 150px;">
+            <button onclick="" class="btn btn-primary m-0 btnColor" id="saveButton" >
+              <i class="far fa-save ms-2" aria-hidden="true"></i>
+              Guardar
+            </button>
+          </div>
+         </div>
+       </div>
+
+      </div>
+
+      <!-- Modal Loader -->
+      <div class="modal fade" id="preloaderImagesUpload" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-body">
+              <div class="text-center d-flex flex-column">
+                <h5>Subiendo Imágenes</h5>
+                <span>Esto puede tardar un momento</span> 
+                <span>No cierres la ventana</span>
+              </div>
+              <div class="sk-circle my-5" >
+                <div class="sk-circle1 sk-child"></div>
+                <div class="sk-circle2 sk-child"></div>
+                <div class="sk-circle3 sk-child"></div>
+                <div class="sk-circle4 sk-child"></div>
+                <div class="sk-circle5 sk-child"></div>
+                <div class="sk-circle6 sk-child"></div>
+                <div class="sk-circle7 sk-child"></div>
+                <div class="sk-circle8 sk-child"></div>
+                <div class="sk-circle9 sk-child"></div>
+                <div class="sk-circle10 sk-child"></div>
+                <div class="sk-circle11 sk-child"></div>
+                <div class="sk-circle12 sk-child"></div>
+              </div>
+              <div class="text-center">
+                <label for="" class="ms-0" style="font-size: 15px;"> <span id="imgLoaderCurrent" style="font-size: 15px;">1</span> / <span id="imgLoaderTotal" style="font-size: 15px;">20</span> </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- preloader -->
+      <%- include('./partials/preloader.ejs') %> 
+      
+  </main>
+
+
+  <!-- Scripts -->
+  <script src="/js/core/popper.min.js"></script>
+  <script src="/js/core/bootstrap.min.js"></script>
+  <script src="/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="/js/plugins/choices.min.js"></script>
+  <script src="/js/soft-ui-dashboard.min.js?v=1.0.3"></script>
+  <script src="/js/plugins/dragula/dragula.min.js"></script>
+  <script src="/js/plugins/jkanban/jkanban.js"></script>
+  <script src="/js/jquery-ui.min.js"></script>
+  <script src="/js/plugins/datatables.js"></script>
+  <script src="/js/plugins/chartjs.min.js"></script>
+  <script src="/js/underscore-min.js"></script>
+  <script src="/js/sweetalert2.all.min.js"></script>
+  <script src="/js/menu.js"></script>
+
+  <script src="/js/jQuery.tagify.min.js"></script>
+
+  
+    
+  <script>
+    let currentProductObj = null;
+    let imagesCatalog = null;
+    let attachmentsCatalog = null;
+    let codesCatalog = null;
+
+    const getData = () => {
+      fetch("/catalogo/productos/limit")
+      .then(res => res.json())
+      .then(res => {
+        console.log(res)
+        if (res.result.success) {
+          printTableProducts(res.result.items)
+        }
+      })
+    }
+
+    const getDataFilter = (word) => {
+      fetch("/catalogo/productos/filter", {
+        method: 'POST',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json'},
+        body: JSON.stringify({text: word})
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.result.success) {
+          printTableProducts(res.result.items)
+        }
+      })
+    }
+
+    const getDataItem = (id_product) => {
+      fetch("/catalogo/productById/"+id_product)
+      .then(res => res.json())
+      .then(res => {
+        if (res.result.success) {
+          currentProductObj = res.result.items;
+          loadDataItem(res.result.items)
+        } 
+      })
+    } 
+
+    const getImagesCatalog = () => {
+      fetch("/catalogo/productsImages")
+      .then(res => res.json())
+      .then(res => {
+        console.log(res)
+        if (res.result.success) {
+          imagesCatalog = res.result.result
+          printImagesCatalog(imagesCatalog)
+        }
+      })
+    }
+
+    const getAttachmentsCatalog = () => {
+      fetch("/catalogo/productsAttachments")
+      .then(res => res.json())
+      .then(res => {
+        console.log("attachments", res)
+        if (res.result.success) {
+          attachmentsCatalog = res.result.result
+          printAttachmentsCatalog(attachmentsCatalog)
+        }
+      })
+    }
+
+    const getCodesCatalog = () => {
+      fetch("/catalogo/codes")
+      .then(res => res.json())
+      .then(res => {
+        codesCatalog = res.result
+        tagify.whitelist = codesCatalog
+        tagifyAttached.whitelist = codesCatalog
+      })
+    }
+
+    const updateDataItem = (body) => {
+      fetch("/catalogo/productUpdate", {
+        method: 'POST',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json'},
+        body: JSON.stringify(body)
+      })
+      .then(res => res.json())
+      .then(res => {
+        console.log(res)
+      })
+    }
+
+    const getAttributes = (body) => {
+      fetch("/catalogo/getAttributes")
+      .then(res => res.json())
+      .then(res => {
+        console.log(res)
+      })
+    }
+
+    const uploadAttached = async() => {
+      if ($("#toggleButtonAutomaticRelate").is(':checked')) {
+        relateUnautomatic();
+      } else {
+        relateAutomatic();
+      }
+    }
+
+    const relateAutomatic = async() => {
+      let id_company = session.user.id_company;
+
+      if ($("#inputAttached")[0].files.length == 0) {
+        return Swal.fire({
+          title: 'Seleccione los adjuntos antes de enviar',
+          icon: 'warning',
+          timer: 2500
+        })
+      }
+
+      if ($("#inputAttached")[0].files[0].name.indexOf("-") != -1) {
+        let arrayCodes = [];
+        let codeSubstring = $("#inputAttached")[0].files[0].name.split("-")[0]
+        let codes = await fetch(`/catalogo/productsByCode/${codeSubstring}`);
+            codes = await codes.json();
+
+        for (let i = 0; i < codes.result.result.length; i++) {
+          arrayCodes.push(codes.result.result[i].code)
+        }
+
+        return relateBasedOnGivenArray(arrayCodes);
+      }
+
+      $("#preloaderImagesUpload").modal("show")
+      $("#imgLoaderCurrent").parent().hide()
+
+      for (let i = 0; i < $("#inputAttached")[0].files.length; i++) {
+        let fileName = $("#inputAttached")[0].files[i].name.split(".")[0];
+        let formData = new FormData();
+            formData.append("file", $("#inputAttached")[0].files[i])
+
+        let response = await fetch(`http://api.pedbox.co:7777/catalog/uploadAttachedsFichas/${fileName}/${id_company}`, { method: 'POST', body: formData });
+            response = await response.json()
+      }
+
+      $("#preloaderImagesUpload").modal("hide");
+      $("#imgLoaderCurrent").parent().show()
+
+      $("#inputAttached")[0].value = null;
+      $("#fileNameAttached").text("Seleccione Adjuntos");
+
+      succesUpload();
+      getAttachmentsCatalog()
+    } 
+
+    const relateBasedOnGivenArray = async(givenArray) => {
+      let productsToAsociate = givenArray;
+      let imagesArray = [];
+      let id_company = session.user.id_company;
+
+      $("#preloaderImagesUpload").modal("show")
+      $("#imgLoaderCurrent").parent().hide()
+
+      // Upload Images
+      let filenane = $("#inputAttached")[0].files[0].name.split(".")[0].split("-")[0];
+      for (let i = 0; i < $("#inputAttached")[0].files.length; i++) {
+        let sequence = $("#inputAttached")[0].files[i].name.split(".")[0].split("-")[1];
+        let formData = new FormData();
+        formData.append("file", $("#inputAttached")[0].files[i])
+
+        let response = await fetch(`http://api.pedbox.co:7777/catalog/uploadAttachedsImages/${filenane}/${id_company}/${sequence}`, { method: 'POST', body: formData });
+            response = await response.json()
+
+        imagesArray.push(response.id_image)
+      }
+
+      // Relate images to items
+      for (let i = 0; i < productsToAsociate.length; i++) {
+        let response = await fetch("/catalogo/relateImageArray", {
+            method: "POST",
+            headers: { 'Accept': 'application/json', 'Content-Type': 'application/json'},
+            body: JSON.stringify({id_product: productsToAsociate[i], image_array: imagesArray})
+        })
+        response = await response.json()
+      }
+
+      $("#preloaderImagesUpload").modal("hide")
+      $("#imgLoaderCurrent").parent().show()
+
+      $("#inputAttached")[0].value = null;
+      $("#fileNameAttached").text("Seleccione Adjuntos");
+
+      succesUpload();
+      getAttachmentsCatalog()
+    }
+
+    const relateUnautomatic = async() => {
+      let products = $("#inputAttachedRelateProducts").val();
+      let productsToAsociate = [];
+      let imagesArray = [];
+      let id_company = session.user.id_company;
+
+      if ($("#inputAttached")[0].files.length == 0) {
+        return Swal.fire({
+          title: 'Seleccione los adjuntos antes de enviar',
+          icon: 'warning',
+          timer: 2500
+        })
+      }
+
+      if (products == "") {
+        return Swal.fire({
+          title: 'Seleccione los productos asociados antes de enviar',
+          icon: 'warning',
+          timer: 2500
+        })
+      }
+
+      $("#preloaderImagesUpload").modal("show")
+      $("#imgLoaderCurrent").parent().hide()
+
+      // Productos asociados
+      products = JSON.parse($("#inputAttachedRelateProducts").val());
+      for (let i = 0; i < products.length; i++) {
+        productsToAsociate.push(products[i].value)
+      }
+
+      let fileName = $("#inputAttached")[0].files[0].name.split(".")[0];
+      if ($("#inputAttached")[0].files[0].name.indexOf("-") != -1) {
+        fileName = $("#inputAttached")[0].files[0].name.split("-")[0] + $("#inputAttached")[0].files[0].name.split("-")[1]  
+      }
+
+      for (let i = 0; i < $("#inputAttached")[0].files.length; i++) {
+        let sequence = $("#inputAttached")[0].files[i].name.split(".")[0].split("-")[$("#inputAttached")[0].files[i].name.split(".")[0].split("-").length -1];
+        let formData = new FormData();
+
+        formData.append("file", $("#inputAttached")[0].files[i]);
+
+        let response = await fetch(`http://api.pedbox.co:7777/catalog/uploadAttachedsImages/${fileName}/${id_company}/${sequence}`, { method: 'POST', body: formData });
+            response = await response.json();
+
+        imagesArray.push(response.id_image)
+      }
+
+      // Relate images to items
+      for (let i = 0; i < productsToAsociate.length; i++) {
+        let response = await fetch("/catalogo/relateImageArray", {
+            method: "POST",
+            headers: { 'Accept': 'application/json', 'Content-Type': 'application/json'},
+            body: JSON.stringify({id_product: productsToAsociate[i], image_array: imagesArray})
+        })
+        response = await response.json()
+      }
+
+      $("#preloaderImagesUpload").modal("hide")
+      $("#imgLoaderCurrent").parent().show()
+
+      $("#inputAttached")[0].value = null;
+      $("#fileNameAttached").text("Seleccione Adjuntos");
+
+      succesUpload();
+      getAttachmentsCatalog();
+    } 
+
+    const uploadImage = async() => { 
+      let id_company = session.user.id_company;
+
+      if ($("#inputImages")[0].files.length == 0) {
+        return Swal.fire({
+          title: 'Seleccione las imágenes antes de enviar',
+          icon: 'warning',
+          timer: 2500
+        })
+      }
+
+      $("#imgLoaderTotal").html($("#inputImages")[0].files.length)
+      $("#preloaderImagesUpload").modal("show") // Preloader
+
+      for (let i = 0; i < $("#inputImages")[0].files.length; i++) {
+        $("#imgLoaderCurrent").html(i + 1)
+
+        let filenane = $("#inputImages")[0].files[i].name.split(".")[0];
+        let formData = new FormData();
+            formData.append("file", $("#inputImages")[0].files[i])
+        
+        let response = await fetch(`http://api.pedbox.co:7777/catalog/uploadImages/${filenane}/${id_company}` , { method: 'POST', body: formData });
+            response = await response.json()
+      }
+
+      getImagesCatalog(); // Actualizar sección de imagenes catalogo
+
+      $("#inputImages")[0].value = null;
+      $("#fileNameImage").text("Seleccione Imágenes")
+
+      $("#preloaderImagesUpload").modal("hide")
+      succesUpload();
+    }
+
+    const removeImg = (code) => {
+      fetch("/catalogo/removeImg/"+code)
+      .then(res => res.json())
+      .then(res => {
+        getImagesCatalog()
+
+        if (tagify.getTagElms().length == 0) {
+          $('#imgAdminDateil').hide(); 
+          $('#imgAdminUploadForm').show()
+        }
+      })
+    }
+
+    const addImage = (body) => {
+      fetch("/catalogo/addImg", {
+        method: 'POST',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json'},
+        body: JSON.stringify(body)
+      })
+      .then(res => res.json())
+      .then(res => {
+        console.log(res)
+      })
+    }
+
+    const succesUpload = ()  => {
+      Swal.fire({
+        icon: 'success',
+        title: 'Archivos Subidos Exitosamente',
+        showConfirmButton: false,
+        timer: 1500
+      })
+    }
+
+    const printImagesCatalog = (imgsObj) => {
+      $("#imgCatalogAdministratorContainer").html("")
+      let iterations = (imgsObj.length < 100 ? imgsObj.length : 100)
+
+      for (let i = 0; i < iterations; i++) {
+        let el = `
+          <div class="d-flex gap-2 ms-2 mt-3">
+            <div class="imgAdminImage">
+              <img src="${imgsObj[i].image}" alt="" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/d/da/Imagen_no_disponible.svg'">
+            </div>
+            <div class="ms-2" style="max-width: 80%">
+              <h6 class="m-0">${imgsObj[i].image.split("/").slice(-1).pop()}</h6>
+              <label class="m-0 text-secondary"> ${imgsObj[i].code.replaceAll(",", ", ")} </label>
+            </div>
+          </div>
+        `;
+        $("#imgCatalogAdministratorContainer").append(el)
+      }
+    }
+
+    const printAttachmentsCatalog = (attchObj) => {
+      $("#attachedFilesAdministratorContainer").html("")
+      let iterations = (attchObj.length < 100 ? attchObj.length : 100)
+
+      for (let i = 0; i < iterations; i++) {
+        let imgs = "";
+        let imgsArray = attchObj[i].url.split(",")
+
+        for (let e = 0; e < imgsArray.length; e++) {
+          imgs += `
+            <div class="imgAdminImage">
+                <img src="${imgsArray[e]}" alt="" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/d/da/Imagen_no_disponible.svg'">
+            </div>
+          `;
+        }
+
+        let el = `
+          <div class="d-flex flex-column gap-2 ms-2 mt-3">
+            <div class="ms-2" style="max-width: 80%">
+              <h6 class="m-0">${attchObj[i].id_item}</h6>
+            </div>
+            <div class="d-flex gap-2">
+              ${imgs}
+            </div>
+          </div>
+        `;
+        $("#attachedFilesAdministratorContainer").append(el)
+      }
+    }
+
+    const updateDataHarvest = () => {
+      let body = {
+        "code": $("#inputReference").val(),
+        "description": $("#inputDescription").val(),
+        "ean": currentProductObj.ean,
+        "reference": currentProductObj.reference,
+        "id_unity": Number($("#inputMeasure").val()),
+        "id_tax": Number($("#inputTax").val()),
+        "price_cost": Number($("#inputPriceCost").val()),
+        "price_sale": Number($("#inputPriceShop").val()),
+        "has_list": ($("#chekcPriceList").is(":checked") ? 1 : 0),
+        "image": $("#imgProductForm").attr("src"),
+        "name_file": $("#imgProductForm").attr("src").split("/").slice(-1).pop(),
+        "has_inventory": currentProductObj.has_inventory,
+        "min_amount_purchase": Number($("#inputMinAmount").val()),
+        "discount": currentProductObj.discount,
+        "status": Number($("#inputState").val()),
+        "is_kit": ($("#checkKit").is(":checked") ? 1 : 0),
+        "id_user": session.user.id,
+        "id_company": session.user.id_company,
+        "add": {
+            "attributes": [],
+            "attachments": [],
+            "providers": [],
+            "sustitutes": [],
+            "alterCodes": [
+                {
+                    "code": "",
+                    "description": ""
+                }
+            ],
+            "priceList": [],
+            "kit": []
+        },
+        "update": {
+            "attributes": [],
+            "attachments": [],
+            "providers": [],
+            "sustitutes": [],
+            "alterCodes": [],
+            "priceList": [],
+            "kit": []
+        },
+        "delete": {
+            "attributes": [],
+            "attachments": [],
+            "providers": [],
+            "sustitutes": [],
+            "alterCodes": [],
+            "priceList": [],
+            "kit": []
+        },
+        "id": Number($("#inputReference").attr("data-id"))
+      }
+
+      updateDataItem(body)
+    }
+
+    const loadDataItem = (data) => {
+      console.log("data item", data)
+      cleanForm();
+
+      $("#inputReference").val(data.code);
+      $("#inputReference").attr("data-id", data.id);
+      $("#inputDescription").val(data.description);
+
+      $("#inputState").val(data.status);
+      $("#inputTax").val(data.id_tax);
+
+      $("#inputPriceCost").val(data.price_cost);
+      $("#inputPriceShop").val(data.price_sale);
+      $("#inputMinAmount").val(data.min_amount_purchase);
+
+      $("#inputMeasure").val(data.id_unity);
+
+      $("#imgProductForm").attr("src", data.image)
+
+      if (data.sustitutes.length) {
+        $("#chekcSustitute").prop('checked', true)
+        $("#navSustitueSection").show();
+      }
+
+      if (data.providers.length) {
+        $("#chekcasign").prop('checked', true)
+        $("#navSuppliersSection").show()
+      }
+
+      if (data.prices_list.length) {
+        for (let i = 0; i < data.prices_list.length; i++) {
+          let el = `
+            <div style="position: relative">
+              <div>
+                <label for="" class="m-0">Codigo de Lista: </label>
+                ${data.prices_list[i].code_list}
+              </div>
+              <div>
+                <label for="" class="m-0">Descripción: </label>
+                ${data.prices_list[i].description}
+              </div>
+              <div>
+                <label for="" class="m-0">Precio: </label>
+                $${data.prices_list[i].price}
+              </div>
+              <i class="fas fa-trash" style="color: red; position: absolute; top: 50%; left: 80%; cursor: pointer"></i>
+            </div>
+            <hr class="horizontal dark">
+          `
+          $("#priceListSectionContent").append(el)
+        }
+
+
+        $("#chekcPriceList").prop('checked', true)
+        $("#navPriceListSection").show()
+      }
+
+      if (data.kit.length) {
+        $("#checkKit").prop('checked', true)
+        $("#navKitSection").show()
+      }
+
+      if (data.alterCodes.length) {
+        $("#chekcAlternCode").prop('checked', true)
+        $("#navCodesSection").show()
+      }
+
+      $('#ProductsCatalogAdministrator').hide(); 
+      $('#formCatalogAdministrator').show()      
+    }
+
+    const cleanForm = () => {
+      $('.sectionformAdmin').hide(); 
+      $('#informationSection').show();
+
+      $("#formNewItemContainer").find("input[type=text]").val("");
+      $("#formNewItemContainer").find("input[type=number]").val("");
+
+      $("#formNewItemContainer").find("input[type=checkbox]").prop('checked', false);
+
+      $("#navPriceListSection").hide();
+      $("#navCodesSection").hide();
+      $("#navSustitueSection").hide();
+      $("#navSuppliersSection").hide();
+      $("#navKitSection").hide();
+
+      $("#priceListSectionContent").html("")
+
+      $("#imgProductForm").attr("src", "");
+    }
+
+    const filterSearchField = () => {
+      valueFilter = $("#filterTableProducts").val();
+      if (valueFilter.length < 2) { 
+        return getData()
+      }
+      getDataFilter(valueFilter)
+    }
+
+    const filterSearchFieldImages = () => {
+      valueFilter = $("#filterTableImages").val();
+      
+      if (valueFilter.length < 2) { 
+        return printImagesCatalog(imagesCatalog)
+      }
+
+      let filteredObject = _.filter(imagesCatalog, o => {
+        if (o.code.toLowerCase().split(' ').join('').indexOf(valueFilter.toLowerCase()) > -1 ) { return o };
+      });
+
+      if (filteredObject.length) {
+        printImagesCatalog(filteredObject)
+      }
+    }
+
+    let tblProductsAdmin;
+    const printTableProducts = (data) => {
+      try {
+        tblProductsAdmin.destroy();
+      } catch (error) {}
+      $("#tableProductsContent").html("")
+
+      for (let i = 0; i < data.length; i++) {
+        let element = `
+          <tr>
+            <td class="text-center">
+              <div class="imgTableCont">
+                <img src="${data[i].image}" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/d/da/Imagen_no_disponible.svg'" alt="" class="imgTable">
+              </div>
+            </td>
+            <td class="text-center">${data[i].code || "-"}</td>
+            <td class="text-center">${data[i].description  || "-"}</td>
+            <td class="text-center" onclick="getDataItem(${data[i].id})" style="cursor: pointer"><i class="fas fa-edit"></i></td>
+          </tr>
+        `;
+        $("#tableProductsContent").append(element)
+      }
+
+      tblProductsAdmin = new simpleDatatables.DataTable("#tableProductsAdmin", {
+        perPageSelect: false,
+        searchable: false
+      });
+
+      $("#preloader").hide();
+    }
+
+    // Input img
+    $("#inputFileLabel").on("click", function (e) {
+      $('#inputDocument').trigger("click");
+      e.stopPropagation(); //Necesary line
+    })
+
+    $("#inputAttachedLabel").on("click", function (e) {
+      if ($("#toggleButtonAutomaticRelate").is(':checked')) {
+        Swal.fire({
+          title: "Recuerda que el nombre de los adjuntos debe tener la siguiente estructura, donde el primer numero representa el código de color, y el segundo su numero de secuencia",
+          html: "0110<strong>-01-1</strong>.jpg,  0110<strong>-01-2</strong>.jpg,  0110<strong>-01-3</strong>.jpg",
+          icon: 'info',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            $('#inputAttached').trigger("click");
+          }
+        })
+      } else {
+        Swal.fire({
+          title: "Recuerda que el nombre de los adjuntos debe coincidir con el código de los productos con el que se relaciona en sus primeros dígitos",
+          html: "Ejemplo:  0110.jpg (<strong>0110</strong>36, <strong>0110</strong>37, <strong>0110</strong>38)",
+          icon: 'info',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            $('#inputAttached').trigger("click");
+          }
+        })
+      }
+
+      // $('#inputAttached').trigger("click");
+      e.stopPropagation(); //Necesary line
+    })
+
+    $("#inputImageLabel").on("click", function (e) {
+      Swal.fire({
+        title: "Recuerda que el nombre de las imágenes debe ser igual al código del producto al que corresponde.",
+        text: "Las imágenes cuyo nombre no coinciden con el código de algún producto serán ignoradas.",
+        icon: 'info',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          $('#inputImages').trigger("click");
+        }
+      })
+
+      e.stopPropagation(); //Necesary line
+    })
+
+    $('#inputDocument').change(function(){
+      $("#fileName").text(this.files[0].name)
+    })
+
+    $('#inputAttached').change(function(){
+      $("#fileNameAttached").text(this.files[0].name)
+    })
+
+    $('#inputImages').change(function(){
+      let name = "";
+      for (let i = 0; i < this.files.length; i++) {
+        if (i === this.files.length - 1) {
+          name += this.files[i].name;
+          continue
+        }
+        name += this.files[i].name + ", "
+      }
+
+      $("#fileNameImage").text(name)
+    })
+
+    $(".navSectionsItemsAdmin>div").on("click", function () {
+      $(".navSectionsItemsAdmin>div").removeClass("activeNavitemAdmin")
+      $(this).addClass("activeNavitemAdmin");
+    })
+    
+    // Eventos checkbox
+    $("#chekcPriceList").on("change", function () {
+      if ($("#chekcPriceList").is(':checked')) {
+        $('#navPriceListSection').show();
+      } else {
+        $('#navPriceListSection').hide();
+      }
+    })
+
+    $("#chekcAlternCode").on("change", function () {
+      if ($("#chekcAlternCode").is(':checked')) {
+        $('#navCodesSection').show();
+      } else {
+        $('#navCodesSection').hide();
+      }
+    })
+
+    $("#chekcasign").on("change", function () {
+      if ($("#chekcasign").is(':checked')) {
+        $('#navSuppliersSection').show();
+      } else {
+        $('#navSuppliersSection').hide();
+      }
+    })
+
+    $("#checkKit").on("change", function () {
+      if ($("#checkKit").is(':checked')) {
+        $('#navKitSection').show();
+      } else {
+        $('#navKitSection').hide();
+      }
+    })
+
+    $("#chekcSustitute").on("change", function () {
+      if ($("#chekcSustitute").is(':checked')) {
+        $('#navSustitueSection').show();
+      } else {
+        $('#navSustitueSection').hide();
+      }
+    })
+
+    $("#toggleButtonAutomaticRelate").on("change", function () {
+      if ($("#toggleButtonAutomaticRelate").is(':checked')) {
+        $('#inputAttachedRelateProducts').parent().show();
+        $('#selectColorToggleContainer').show();
+        $("#toggleButtonSelectColor").prop('checked', false)
+      } else {
+        $('#inputAttachedRelateProducts').parent().hide();
+        $('#selectColorToggleContainer').hide();
+        $("#toggleButtonSelectColor").prop('checked', false)
+      }
+    })
+
+    $("#toggleButtonSelectColor").on("change", function () {
+      if ($("#toggleButtonSelectColor").is(':checked')) {
+        $('#selectColorUploadAttachment').parent().show();
+      } else {
+        $('#selectColorUploadAttachment').parent().hide();
+      }
+    })
+
+
+
+    // Administrador Imagenes
+    $(document).on( "click", "#imgCatalogAdministratorContainer>div", function () {
+
+      let img = $(this).find("img").attr("src");
+      let tags = $(this).find("label").text();
+
+      $("#imgAdminDetail").find("img").attr("src", img)
+
+      $("#imageSelectedTagsAdmin").val("")
+      $("#imageSelectedTagsAdmin").val(tags)
+
+
+      $('#imgAdminUploadForm').hide()
+      $('#imgAdminDateil').show(); 
+    })
+
+    
+    var tagify = new Tagify( document.querySelector('#imageSelectedTagsAdmin'), {
+      duplicates: true,
+      backspace: false,
+      editTags : false, 
+      enforceWhitelist: true,
+      hooks: {
+        beforeRemoveTag : function( tags ){
+          return new Promise((resolve, reject) => {
+            Swal.fire({
+              title: '¿Está seguro de eliminar la referencia ' + tags[0].data.value + '?',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'Sí, eliminar',
+              cancelButtonText: 'Cancelar'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                removeImg(tags[0].data.value)
+                resolve()
+              } else {
+                reject()
+              }
+            })
+          })
+        }
+      }
+    })
+
+    var tagifyAttached = new Tagify( document.querySelector('#inputAttachedRelateProducts'), {
+      duplicates: true,
+      backspace: false,
+      editTags : false, 
+      enforceWhitelist: true
+    })
+
+    tagify.on('dropdown:select', function(e) {
+      let data = {
+        code: e.detail.data.value,
+        imgUrl: $("#imgAdminDetail img").attr("src")
+      }
+      addImage(data)
+    });
+
+    // Buscador Catalogo
+    $(document).on("keyup", "#filterTableProducts", function (e) {
+      if (e.which == 13) {
+        filterSearchField()
+      };
+    })
+
+    $(document).on("keyup", "#filterTableImages", function (e) {
+      if (e.which == 13) {
+        filterSearchFieldImages()
+      };
+    })
+
+    $(document).ready(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+      $("#menuAdministradorCatalogo").addClass("activeNav")
+      
+      getData();
+      getImagesCatalog();
+      getAttachmentsCatalog();
+      getCodesCatalog();
+
+    })
+  </script>
+
+</body>
+</html>

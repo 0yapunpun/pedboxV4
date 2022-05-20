@@ -224,6 +224,15 @@
     }
 
     const addRetentionField = (container) => {
+      if (retencionData.retention.length == 0) {
+        return Swal.fire({
+          icon: 'warning',
+          title: 'No hay retenciones para agregar',
+          confirmButtonText: 'Continuar',
+          timer: 2000,
+        })
+      }
+
       let appliedRetention = [];
       let fieldsRetentionRow = $(container).parent().find(".selectRetention");
 

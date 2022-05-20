@@ -6,6 +6,7 @@ const notificationsController = require('../controller/notificationController.js
 const b2bController = require('../controller/b2bController.js');
 const helpdeskController = require('../controller/helpdeskController.js');
 const agendaController = require('../controller/agendaController.js');
+const dashboardController = require('../controller/dashboardController.js');
 
 //** user
 router.get('/', viewController.login);
@@ -52,6 +53,7 @@ router.post('/usuarios/updateUser', b2bController.updateUser);
 router.get('/facturas', viewController.facturas);
 router.get('/facturas/data', b2bController.facturasData);
 router.get('/facturas/universal_repuestos/:id_factura', b2bController.extranetFacturasUR);
+router.get('/facturas/universal_repuestos/pdf/:id_factura', b2bController.PDFFacturasUR);
 
 router.get('/carrito-compras', viewController.carritoCompras);
 router.get('/carrito-compras/data', b2bController.carritoComprasData);
@@ -73,7 +75,27 @@ router.post('/documentos-usuario/delete', b2bController.deleteDocumentoUsuario);
 
 router.get('/catalogo', viewController.catalogo);
 router.get('/catalogo/top', viewController.catalogoTop);
+router.get('/catalogo/administrador', viewController.catalogoAdministrador);
 router.get('/catalogo/productos', b2bController.catalogoProductos);
+router.get('/catalogo/productos/limit', b2bController.catalogoLimit);
+router.post('/catalogo/productos/filter', b2bController.catalogoFilter);
+router.get('/catalogo/productById/:id_product', b2bController.catalogItem);
+router.post('/catalogo/productUpdate', b2bController.catalogItemUpdate);
+router.get('/catalogo/productsImages', b2bController.catalogImages);
+router.get('/catalogo/productsAttachments', b2bController.catalogAttachments);
+router.get('/catalogo/codes', b2bController.catalogCodes);
+router.get('/catalogo/productsByCode/:code', b2bController.catalogProductsByCode);
+router.get('/catalogo/removeImg/:code', b2bController.catalogRemoveImg);
+router.post('/catalogo/addImg', b2bController.catalogAddImg);
+router.post('/catalogo/relateImageArray', b2bController.catalogAddRelateImageArray);
+
+router.get('/catalogo/getAttributes', b2bController.catalogItemsAtributes);
+
+router.get('/catalogo/imagesAttachment/:string', b2bController.catalogImagesAttachments);
+
+
+
+
 router.get('/catalogo/top/data', b2bController.catalogoTopData);
 router.get('/catalogo/colors', b2bController.catalogColors);
 router.post('/catalogo/img', b2bController.productosImagenes);
@@ -81,6 +103,13 @@ router.get('/catalogo/GyW', b2bController.catalogGyW);
 router.get('/catalogo/GyW/detail/:code', b2bController.catalogDetailGyW); 
 
 //** Herramientas
+router.get('/dashboard', viewController.dashboard);
+router.get('/dashboard/data/:dStart/:dEnd/:user', dashboardController.dashboardData);
+router.get('/dashboard/reportSeller/:dStart/:dEnd/:seller', dashboardController.dashboardReportSeller);
+router.get('/dashboard/clientsSeller/:dStart/:dEnd/:seller', dashboardController.dashboardClientsSeller);
+
+
+
 router.get('/chat', viewController.chat);
 router.get('/chat/chatId/:id', viewController.chatOpenConversation);
 

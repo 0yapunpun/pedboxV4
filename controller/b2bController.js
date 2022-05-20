@@ -2,16 +2,7 @@ const controller = {};
 const userController = require('../controller/usersController.js');
 const service = require('../engine/apiService.js');
 const config = require('../engine/config.js');
-const { nvFormatCash, hasPermission, dataURItoBlob} = require('./helpers.js');
-
-
-// var createObjectURL = require('create-object-url');
-// import { URL } from 'node:url';
-// const URL = require('node:url');
-// const {URL} = require('buffer');
-
-
-
+const { nvFormatCash, hasPermission} = require('./helpers.js');
 const _ = require('underscore');
 const moment = require('moment');
 
@@ -75,6 +66,40 @@ controller.extranetFacturasUR = async(req, res, next) => {
   }
 }
 
+controller.PDFFacturasUR = async(req, res, next) => {  
+  let idFactura = req.params.id_factura;
+  let factura = await service.faturaUR(req.params.id_factura);
+
+  try {
+    factura = factura.result.elements[0].elements[0].elements[0].elements[0].elements[1].elements[0].elements[0].elements;
+    let strB64 = "";
+
+    for (let i = 0; i < factura.length; i++) {
+      if (factura[i].elements) {
+        strB64 += factura[i].elements[0].text
+      }
+    }
+      console.log(strB64)
+      console.log(dataBuffer);
+      var dataBuffer = Buffer.from(strB64, 'base64');
+      //let name = new Date().getTime();
+      let route = "../public/PDFs/"+idFactura+".pdf"
+      require("fs").writeFile(route, dataBuffer, function(err) {
+          if(err){
+              return res.status(500).send({message: err});
+          }else{
+              let pdf = {
+                  "name": idFactura+".pdf",
+                  "route": route
+              }
+              return res.status(200).send(pdf);
+              }
+      });
+  } catch (error) {
+    return res.send({success: false, data: []})
+  }
+}
+
 controller.historialPedidosData = async (req, res, next) => {
   let url_company = req.session.user.dataCompany[0].Url;
   let id_company = req.session.user.id_company;
@@ -127,7 +152,6 @@ controller.historialPedidosDetalle = async (req, res, next) => {
 controller.productosImagenes = async (req, res, next) => {
   let id_company = req.session.user.id_company;
   let products = req.body;
-  console.log(products)
 
   for (let i = 0; i < products.length; i++) {
     let item = await service.detalleProductos(id_company, products[i].codigo);
@@ -207,6 +231,115 @@ controller.catalogoProductos = async (req, res, next) => {
   }
   res.send({"items":items})
 }
+
+controller.catalogoLimit = async (req, res, next) => {
+  let id_company = req.session.user.id_company;
+
+  let products = await service.productosLimit(id_company);
+
+  res.send(products)
+}
+
+controller.catalogoFilter = async (req, res, next) => {
+  let id_company = req.session.user.id_company;
+  let word = req.body.text;
+
+  let products = await service.productosFilter(id_company, word);
+
+  res.send(products)
+}
+
+controller.catalogItem = async (req, res, next) => {
+  let id_product = req.params.id_product;
+
+  let product = await service.productosById(id_product);
+
+  res.send(product)
+}
+
+
+controller.catalogItemUpdate = async (req, res, next) => {
+  let body = req.body;
+
+  let response = await service.productosUpdate(body);
+
+  res.send(response)
+}
+
+controller.catalogImages = async (req, res, next) => {
+  let id_company = req.session.user.id_company;
+
+  let response = await service.imagenesProductosServicePB4(id_company);
+
+  res.send(response)
+}
+
+controller.catalogAttachments = async (req, res, next) => {
+  let id_company = req.session.user.id_company;
+
+  let response = await service.catalogAttachments(id_company);
+
+  res.send(response)
+}
+
+controller.catalogCodes = async (req, res, next) => {
+  let id_company = req.session.user.id_company;
+  let response = await service.getCodesCatalog(id_company);
+
+  res.send(response)
+}
+
+controller.catalogRemoveImg = async (req, res, next) => {
+  let id_company = req.session.user.id_company;
+  let code = req.params.code;
+
+  let response = await service.catalogRemoveImg(code, id_company);
+
+  res.send(response)
+}
+
+controller.catalogAddImg = async (req, res, next) => {
+  let response = await service.catalogAddImg(req.body);
+
+  res.send(response)
+}
+
+controller.catalogAddRelateImageArray = async (req, res, next) => {
+  let response = await service.catalogAddRelateImageArray(req.body);
+
+  res.send(response)
+}
+
+controller.catalogProductsByCode = async (req, res, next) => {
+  let code = req.params.code;
+  let id_company = req.session.user.id_company;
+
+  let response = await service.catalogProductsByCode(code, id_company);
+
+  res.send(response)
+}
+
+controller.catalogItemsAtributes = async (req, res, next) => {
+  let id_company = req.session.user.id_company;
+
+  let response = await service.catalogItemsAtributes(id_company);
+
+  res.send(response)
+}
+
+
+controller.catalogImagesAttachments = async (req, res, next) => {
+  let string = req.params.string;
+
+  let response = await service.catalogImagesAttachment(string);
+
+  res.send(response)
+}
+
+
+
+
+
 
 controller.catalogoTopData = async (req, res, next) => {
   let id_company = req.session.user.id_company;
@@ -325,9 +458,14 @@ controller.updateUser = async(req, res, next) => {
 
 controller.carritoComprasData = async(req, res, next) => {
   let id_person = req.session.user.id_person;
-  let address = await service.informacionVendedor(id_person);
   
-  res.send({"address": address});
+  if (req.session.address) {
+    return res.send({"address": req.session.address});
+  } else {
+    let address = await service.informacionVendedor(id_person);
+    req.session.address = address
+    return res.send({"address": address});
+  }
 }
 
 controller.sendCarritoCompras = async(req, res, next) => {

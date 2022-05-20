@@ -52,6 +52,28 @@
         </a>
       </li>
 
+      <li class="nav-item">
+        <a class="nav-link"  data-bs-toggle="collapse" href="#collapseApp" >
+          <span class="nav-link-text ms-1 indicatorCollapse"> <h6 class="m-0 text-xs font-weight-bolder opacity-6">Home</h6> </span>
+        </a>
+        <div class="collapse show" id="collapseApp">
+          <ul class="navbar-nav">
+
+            <li class="nav-item" id="menuDashboard">
+              <a class="nav-link" href="/dashboard" >
+                <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
+                  <div style="position: relative;">
+                    <i class="fas fa-chart-line" style="color: #252f40; font-size: 12px"></i>
+                  </div>
+                </div>
+                <span class="nav-link-text ms-1 font-weight-bold">Dashboard</span>
+              </a>
+            </li>
+
+          </ul>
+        </div>
+      </li>
+
       <%
       permissionIndex = session.user.permission.map(e => e.code).lastIndexOf("4300_CAN_ACCESS_CHAT");
       permissionIndex2 = session.user.permission.map(e => e.code).lastIndexOf("4000_CAN_ACCESS_HELPDESK");
@@ -362,9 +384,47 @@
                 </a>
               </li>
 
+              <li class="nav-item" id="menuAdministradorCatalogo">
+                <a class="nav-link" href="/catalogo/administrador" >
+                  <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
+                    <i class="fab fa-buromobelexperte" style="color: #252f40; font-size: 12px"></i>
+                  </div>
+                  <span class="nav-link-text ms-1 font-weight-bold">Administrador Catálogo</span>
+                </a>
+              </li>
+
             </ul>
           </div>
         </li>
+      <% } %>
+
+
+      
+      <% 
+        // Para pruebas
+        if (session.user.id == 12790) { 
+      %>
+
+      <li class="nav-item" id="menuAdministradorCatalogo">
+        <a class="nav-link" href="/catalogo/administrador" >
+          <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
+            <i class="fab fa-buromobelexperte" style="color: #252f40; font-size: 12px"></i>
+          </div>
+          <span class="nav-link-text ms-1 font-weight-bold">Administrador Catálogo</span>
+        </a>
+      </li>
+
+      <li class="nav-item" id="menuCatalogo">
+        <a class="nav-link" href="/catalogo" >
+          <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
+            <i class="fas fa-boxes" style="color: #252f40; font-size: 12px"></i>
+          </div>
+          <span class="nav-link-text ms-1 font-weight-bold">
+            <%- (session.user.id_company == 15 || session.user.id_company == 37 ? "Catalogo de Productos" : "Consulta de Inventario") %>
+          </span>
+        </a>
+      </li>
+
       <% } %>
 
 

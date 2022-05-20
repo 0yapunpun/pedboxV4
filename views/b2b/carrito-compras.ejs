@@ -165,14 +165,18 @@
     const IVA = 0.19;
 
     const getData = () => {
+      console.time()
       fetch("/carrito-compras/data")
       .then(res => res.json())
       .then(res => {
+        console.log(res)
+
+
+        console.timeEnd()
         address = res.address;
         seller = res.address.result.result.seller[0]
 
         setAddress(address.result.result)
-        getLocalStorage();
       })
     }
 
@@ -480,6 +484,7 @@
       $("#menuCarritoCompras").addClass("activeNav");
       $('#inputDate').val(new Date().toDateInputValue());
 
+      getLocalStorage();
       getData()
     });
 
