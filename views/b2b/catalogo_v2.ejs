@@ -187,8 +187,73 @@
       margin: 10px auto;
     }
 
+    .sk-chase {
+      width: 15px;
+      height: 15px;
+      position: relative;
+      animation: sk-chase 2.5s infinite linear both;
+    }
+    .sk-chase-dot {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      left: 0;
+      top: 0; 
+      animation: sk-chase-dot 2.0s infinite ease-in-out both; 
+    }
+    .sk-chase-dot:before {
+      content: '';
+      display: block;
+      width: 25%;
+      height: 25%;
+      background-color: black;
+      border-radius: 100%;
+      animation: sk-chase-dot-before 2.0s infinite ease-in-out both; 
+    }
+    .sk-chase-dot:nth-child(1) { animation-delay: -1.1s; }
+    .sk-chase-dot:nth-child(2) { animation-delay: -1.0s; }
+    .sk-chase-dot:nth-child(3) { animation-delay: -0.9s; }
+    .sk-chase-dot:nth-child(4) { animation-delay: -0.8s; }
+    .sk-chase-dot:nth-child(5) { animation-delay: -0.7s; }
+    .sk-chase-dot:nth-child(6) { animation-delay: -0.6s; }
+    .sk-chase-dot:nth-child(1):before { animation-delay: -1.1s; }
+    .sk-chase-dot:nth-child(2):before { animation-delay: -1.0s; }
+    .sk-chase-dot:nth-child(3):before { animation-delay: -0.9s; }
+    .sk-chase-dot:nth-child(4):before { animation-delay: -0.8s; }
+    .sk-chase-dot:nth-child(5):before { animation-delay: -0.7s; }
+    .sk-chase-dot:nth-child(6):before { animation-delay: -0.6s; }
 
+    @keyframes sk-chase {
+      100% { transform: rotate(360deg); } 
+    }
 
+    @keyframes sk-chase-dot {
+      80%, 100% { transform: rotate(360deg); } 
+    }
+
+    @keyframes sk-chase-dot-before {
+      50% {
+        transform: scale(0.4); 
+      } 100%, 0% {
+        transform: scale(1.0); 
+      } 
+    }
+
+    .preloaderProductDetail{
+      position: absolute; 
+      width: 100%; 
+      height: 100%; 
+      border-radius: 1rem; 
+      background-color: white;
+      background-color: rgb(0,0, 0, 0.7)
+    }
+    .preloaderProductDetail .sk-chase-dot:before{
+      background-color: white;
+    }
+    .preloaderProductDetail .sk-chase{
+      width: 20px;
+      height: 20px;
+    }
   </style>
 </head>
 
@@ -321,99 +386,124 @@
       </div>
     </div>
 
+
+
     <!-- Modal detalle  -->
     <div class="modal fade" id="modalDetalle">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Detalle</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: gray; border-radius: 50%;"></button>
+            <div class="w-100 d-flex justify-content-between align-items-center">
+              <h5 class="modal-title" id="exampleModalLabel">Detalle</h5>
+              <div id="loaderImagesDetailProduct" style="display: none;">
+                <div class="d-flex justify-content-center">
+                  <div class="sk-chase">
+                    <div class="sk-chase-dot"></div>
+                    <div class="sk-chase-dot"></div>
+                    <div class="sk-chase-dot"></div>
+                    <div class="sk-chase-dot"></div>
+                    <div class="sk-chase-dot"></div>
+                    <div class="sk-chase-dot"></div>
+                  </div>
+                </div>
+                <span style="color: black; font-size: 12px;" class="mt-1">Cargando Imágenes ...</span>
+              </div>
+              <button type="button" class="btn-close m-0" data-bs-dismiss="modal" aria-label="Close" style="background-color: gray; border-radius: 50%;"></button>
+            </div>
           </div>
           <div class="modal-body">
-            <div class="w-100 d-flex">
-              <div class="w-50 d-flex flex-column justify-content-between">
-                <div id="img-zoomer-box">
-                  <img id="modalDetalleImg" src="https://upload.wikimedia.org/wikipedia/commons/d/da/Imagen_no_disponible.svg" alt="" style="max-width: 100%; max-height: 100%;">
-                  <div id="img-zoom-effect"></div>
+            <div class="w-100 d-flex flex-column">
+
+              <div class="d-flex">
+                <div class="w-50 d-flex flex-column justify-content-between">
+                  <div id="img-zoomer-box">
+                    <img id="modalDetalleImg" src="https://upload.wikimedia.org/wikipedia/commons/d/da/Imagen_no_disponible.svg" alt="" style="max-width: 100%; max-height: 100%;">
+                    <div id="img-zoom-effect"></div>
+                  </div>
+  
                 </div>
-                <hr class="horizontal dark my-1">
-                <div class="splide" aria-label="splideImages">
-                  <div class="splide__track">
-                    <div id="imgsDetailCaontainer" class="imgsDetailCaontainer d-flex gap-2 justify-content-center mt-2 splide__list">
-                      <!-- <div>
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/d/da/Imagen_no_disponible.svg" alt="">
-                      </div> -->
+                <div class="w-50 p-5 pt-1 pe-1 pb-2">
+                  <div>
+                    <div>
+                      <h6 id="modalDetalleN">a</h6>
                     </div>
+                    <div>
+                      <h5 id="modalDetalleP">$ 0,0</h5>
+                    </div>
+  
+                    <div class="d-flex align-items-center justify-content-between gap-1">
+                      <div>
+                        <label for="">Talla</label>
+                        <select name="" id="selectSizeProduct" class="form-control">
+                          <option value="-1" selected>Seleccionar</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label for="">Color</label>
+                        <select name="" id="selectColorProduct" class="form-control">
+                          <option value="-1" selected>Seleccionar</option>
+                        </select>
+                      </div>
+                      <div style="width: 33%;">
+                        <label for="">Cantidad</label>
+                        <input class="form-control" type="number" name="" id="numberProductsD" minlength="1" value="1" style="padding-left: 50px;">
+                      </div>
+                    </div>
+  
+                    <div class="mt-3 d-flex flex-column w-100 align-items-center justify-content-center">
+                      <button onclick="addProductCart()" id="idProductD" class="btn btn-primary m-0 d-flex align-items-center" style="font-size: 10px; height: 39px;" codigo="">
+                        <i class="fas fa-shopping-cart me-1" style="font-size: 20px" title="Carrito de compra" aria-hidden="true"></i><span class="sr-only">Carrito de compra</span>
+                        AGREGAR AL CARRITO
+                      </button>
+                    </div>
+  
+                    <hr>
+                    <div id="datilProductItems">
+                      <div class="d-flex gap-2">
+                        <h6 class="m-0" style="text-transform: capitalize;">grupo: </h6>
+                        <h6 class="text-secondary text-break" id="modalDetalleG">MOTOR</h6>
+                      </div>
+                    
+                      <div class="d-flex gap-2">
+                        <h6 class="m-0" style="text-transform: capitalize;">subgrupo: </h6>
+                        <h6 class="text-secondary text-break" id="modalDetalleG">CADENAS/GUIAS DE CADENA</h6>
+                      </div>
+                    
+                      <div class="d-flex gap-2">
+                        <h6 class="m-0" style="text-transform: capitalize;">linea: </h6>
+                        <h6 class="text-secondary text-break" id="modalDetalleG">MAXTOP</h6>
+                      </div>
+                    
+                      <div class="d-flex gap-2">
+                        <h6 class="m-0" style="text-transform: capitalize;">modelo: </h6>
+                        <h6 class="text-secondary text-break" id="modalDetalleG">LUV - </h6>
+                      </div>
+                    
+                      <div class="d-flex gap-2">
+                        <h6 class="m-0" style="text-transform: capitalize;">marca: </h6>
+                        <h6 class="text-secondary text-break" id="modalDetalleG">CHEVROLET - </h6>
+                      </div>
+                    </div>
+                    <div class="text-end mt-4" style=" font-style: italic;">
+                      <a class="btn btn-primary mb-0" href="#" onclick='window.location.href = "/carrito-compras"'>Ver carrito</a>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <hr class="horizontal dark my-1">
+              <div class="splide my-3" aria-label="splideImages">
+                <div class="splide__track">
+                  <div id="imgsDetailCaontainer" class="imgsDetailCaontainer d-flex gap-2 justify-content-center mt-2 splide__list">
+                    <!-- <div>
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/d/da/Imagen_no_disponible.svg" alt="">
+                    </div> -->
                   </div>
                 </div>
               </div>
-              <div class="w-50 p-5 pt-1 pe-1 pb-2">
-                <div>
-                  <div>
-                    <h6 id="modalDetalleN">a</h6>
-                  </div>
-                  <div>
-                    <h5 id="modalDetalleP">$ 0,0</h5>
-                  </div>
 
-                  <div class="d-flex align-items-center justify-content-between gap-1">
-                    <div>
-                      <label for="">Talla</label>
-                      <select name="" id="selectSizeProduct" class="form-control">
-                        <option value="-1" selected>Seleccionar</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label for="">Color</label>
-                      <select name="" id="selectColorProduct" class="form-control">
-                        <option value="-1" selected>Seleccionar</option>
-                      </select>
-                    </div>
-                    <div style="width: 33%;">
-                      <label for="">Cantidad</label>
-                      <input class="form-control" type="number" name="" id="numberProductsD" minlength="1" value="1" style="padding-left: 50px;">
-                    </div>
-                  </div>
-
-                  <div class="mt-3 d-flex flex-column w-100 align-items-center justify-content-center">
-                    <button onclick="addProductCart()" id="idProductD" class="btn btn-primary m-0 d-flex align-items-center" style="font-size: 10px; height: 39px;" codigo="">
-                      <i class="fas fa-shopping-cart me-1" style="font-size: 20px" title="Carrito de compra" aria-hidden="true"></i><span class="sr-only">Carrito de compra</span>
-                      AGREGAR AL CARRITO
-                    </button>
-                  </div>
-
-                  <hr>
-                  <div id="datilProductItems">
-                    <div class="d-flex gap-2">
-                      <h6 class="m-0" style="text-transform: capitalize;">grupo: </h6>
-                      <h6 class="text-secondary text-break" id="modalDetalleG">MOTOR</h6>
-                    </div>
-                  
-                    <div class="d-flex gap-2">
-                      <h6 class="m-0" style="text-transform: capitalize;">subgrupo: </h6>
-                      <h6 class="text-secondary text-break" id="modalDetalleG">CADENAS/GUIAS DE CADENA</h6>
-                    </div>
-                  
-                    <div class="d-flex gap-2">
-                      <h6 class="m-0" style="text-transform: capitalize;">linea: </h6>
-                      <h6 class="text-secondary text-break" id="modalDetalleG">MAXTOP</h6>
-                    </div>
-                  
-                    <div class="d-flex gap-2">
-                      <h6 class="m-0" style="text-transform: capitalize;">modelo: </h6>
-                      <h6 class="text-secondary text-break" id="modalDetalleG">LUV - </h6>
-                    </div>
-                  
-                    <div class="d-flex gap-2">
-                      <h6 class="m-0" style="text-transform: capitalize;">marca: </h6>
-                      <h6 class="text-secondary text-break" id="modalDetalleG">CHEVROLET - </h6>
-                    </div>
-                  </div>
-                  <div class="text-end mt-4" style=" font-style: italic;">
-                    <a class="btn btn-primary mb-0" href="#" onclick='window.location.href = "/carrito-compras"'>Ver carrito</a>
-                  </div>
-                </div>
-              </div>
+            
             </div>
           </div>
         </div>
@@ -468,12 +558,13 @@
     let otherFilters = session.user.permission.map(e => e.code).lastIndexOf("8045_SHOW_OTHER_RELATED_FILTERS");
 
     let dataProductsComplete;
-    let dataProductsPrint;
+    let dataProductsPrint ;
     let dataSidebar = {};
-    let dataSidebarMaster;
-    let dataTagsObjectName = "grupo";
+    let dataSidebarMaster = {};
+    let dataTagsObjectName = "Sectores";
 
     let colorsProducts;
+    let currentProductDetail = null;
 
 
     const choicesPrice = new Choices($('#selectByPrice')[0]);
@@ -527,7 +618,8 @@
 
     // Modales
     $(document).on("click", ".productCard", async function (e) {
-      
+      appendPreloaderProduct($(this))
+
       $("#modalDetalleT").html("");
       $("#numberProductsD").val(1);
       $("#selectSizeProduct").val(-1);
@@ -535,17 +627,25 @@
 
       let obj = JSON.parse($(this).attr("data-object"))
 
+      currentProductDetail = obj;
+
+      console.log(obj)
+
       let img = obj.imagen || obj.image;
-      let name = obj.descripcion;
+      let name = obj.descripcion || obj.description;
       let price = obj.format_precio;
       let codigo = obj.codep;
 
       $("#imgsDetailCaontainer").html("")
       if (obj.image_array) {
-        let imagesIdString = obj.image_array.slice(1, -1)
+        let imagesIdString = obj.image_array;
+        if (obj.image_array.indexOf("[") != -1) { // I know this code it's shit 
+          imagesIdString = obj.image_array.slice(1, -1)
+        }
 
         let responseService = await fetch("/catalogo/imagesAttachment/"+imagesIdString); 
-            responseService = await responseService.json()
+            responseService = await responseService.json();
+
           
         for (let i = 0; i < responseService.result.length; i++) {
           let el = `
@@ -573,7 +673,7 @@
           let element = `
             <div class="d-flex gap-2">
               <h6 class="m-0" style="text-transform: capitalize;">${key.replace("_", " ").replace("x002F_", " ")}: </h6>
-              <h6 class="text-secondary text-break" id="modalDetalleG">${(obj[key])}</h6>
+              <h6 class="text-secondary text-break" id="modalDetalleG">${(obj[key.toLowerCase()])}</h6>
             </div>
           `;
           $("#datilProductItems").append(element)
@@ -585,17 +685,21 @@
       $("#modalDetalleN").text(name)
       $("#modalDetalleP").text(price)
 
+      $("#idProductD").attr("codigo", codigo)
+
       let codeProduct = $(this).attr("codigo")
       getProductDetail(codeProduct)
 
       $("#modalDetalle").modal("show")
+
+      $(this).find(".preloaderProductDetail").fadeOut().remove();
     })
 
     $(document).on('click',function(e){
       if (e.target.className != 'modalAddedToCart' ) {
         $("#modalAddedToCart").css("display", "none");
       }
-    });
+    }); 
 
     // Paginador
     $(document).on("click", ".addCart", function (e) {
@@ -695,10 +799,69 @@
       style.top = (y - 180) + 'px';
     });
 
+    // Paginador
+    $(document).on("change", "#selectColorProduct",  async function (e) {
+      let codeColor = $("#selectColorProduct option:selected").val();
+      let subsStringProduct = currentProductDetail.codep;
+
+      $("#loaderImagesDetailProduct").show()
+
+      if (codeColor == -1) { return }
+
+      fetch(`/catalogo/imagesItemsByCodeColor/${subsStringProduct}/${codeColor}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data) {
+          printImagesFromArray(data)
+        } else {
+          $("#loaderImagesDetailProduct").hide()
+        }
+      }) 
+      .catch(error => $("#loaderImagesDetailProduct").hide());
+    });
+
     //  *** Funciones
+    const printImagesFromArray = async (data) => {
+      let imagesIdString = data.image_array;
+      if (data.image_array.indexOf("[") != -1) { // I know this code it's shit 
+        imagesIdString = data.image_array.slice(1, -1)
+      }
+
+      let responseService = await fetch("/catalogo/imagesAttachment/"+imagesIdString); 
+          responseService = await responseService.json();
+
+      console.log(responseService)
+
+      $("#imgsDetailCaontainer").html("")
+      for (let i = 0; i < responseService.result.length; i++) {
+        let el = `
+          <div class="splide__slide">
+            <img src="${responseService.result[i]}" alt="">
+          </div>
+        `;
+        $("#imgsDetailCaontainer").append(el)
+      }
+
+      var splide = new Splide( '.splide', {
+        type   : 'loop',
+        perPage: 3,
+        rewind: false,
+        focus  : 'center',
+        pagination: false,
+      } );
+
+      splide.mount();
+
+      $("#modalDetalleImg").attr("src", data.image)
+      $("#img-zoom-effect").attr("style", `background: url('${data.image}') no-repeat #FFF;`)
+
+      $("#loaderImagesDetailProduct").hide()
+    }
+
     const printTags = () => {
       let groups = Object.keys(dataSidebar[dataTagsObjectName])
 
+      $("#tagsContainer").html("")
       for (let i = 0; i < groups.length; i++) {
         let element = `
           <div class="badge tags choices-dark m-1 is-highlighted" key="grupo" value="${groups[i]}">
@@ -756,10 +919,11 @@
     }
 
     const reloadCollapse = () => {
-      for (let i = 0; i < dataProductsComplete.length; i++) {
-        collapseData(dataProductsComplete[i]);
-      }
-      printCollapse();
+      // for (let i = 0; i < dataProductsComplete.length; i++) {
+      //   collapseData(dataProductsComplete[i]);
+      // }
+      // printCollapse();
+      getAttributesCatalog()
     }
 
     const printProducts = (nStart, nEnd)  => {
@@ -768,7 +932,7 @@
       $("#productsContainer").html("")
       for (let i = 0; i < dataPaginated.length; i++) {
         let element = `
-          <div class="card cardItemHover productCard" style="width: 31%" codigo="${dataPaginated[i].codep}" name="${dataPaginated[i].descripcion}" price="${dataPaginated[i].format_precio}" marca="${dataPaginated[i].marca}" grupo="${dataPaginated[i].grupo}" subgrupo="${dataPaginated[i].sub_grupo}" modelo="${dataPaginated[i].modelo_moto}" talla="${dataPaginated[i].talla}" img="${dataPaginated[i].imagen}" data-object='${JSON.stringify(dataPaginated[i])}'>
+          <div class="card cardItemHover productCard" style="width: 31%; position: relative" codigo="${dataPaginated[i].codep}" name="${dataPaginated[i].descripcion}" price="${dataPaginated[i].format_precio}" marca="${dataPaginated[i].marca}" grupo="${dataPaginated[i].grupo}" subgrupo="${dataPaginated[i].sub_grupo}" modelo="${dataPaginated[i].modelo_moto}" talla="${dataPaginated[i].talla}" img="${dataPaginated[i].imagen}" data-object='${JSON.stringify(dataPaginated[i])}'>
             <div style="width: 100%; height: 50%; min-height: 200px; max-height: 200px"><img class="card-img-top" src="${(dataPaginated[i].imagen ? dataPaginated[i].imagen : dataPaginated[i].image)}" alt="" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/d/da/Imagen_no_disponible.svg'" style="max-width: 100%; max-height: 100%; object-fit: scale-down"></div>
             <div class="card-body pb-0 px-1 pt-2">
               <ul class="list-group list-group-flush d-flex h-100" >
@@ -795,6 +959,26 @@
 
       $("#preloader").hide();
     };
+
+    const appendPreloaderProduct = (productCard) => {
+      let el = `
+        <div class="preloaderProductDetail">
+          <div class="d-flex justify-content-center align-items-center flex-column h-100">
+            <div class="sk-chase">
+              <div class="sk-chase-dot"></div>
+              <div class="sk-chase-dot"></div>
+              <div class="sk-chase-dot"></div>
+              <div class="sk-chase-dot"></div>
+              <div class="sk-chase-dot"></div>
+              <div class="sk-chase-dot"></div>
+            </div>
+            <span class="mt-1" style="color: white">Cargando detalle</span>
+          </div>
+        </div>
+      `;
+
+      $(productCard).append(el)
+    }
 
     // Vista Clasica
     const printProductsTable = (nStart, nEnd)  => {
@@ -947,8 +1131,8 @@
       }
 
       dataProductsPrint = _.filter(dataProductsComplete, o => {
-        if (o.descripcion.toLowerCase().split(' ').join('').indexOf(valueFilter.toLowerCase()) > -1 ||
-            o.codigo.toLowerCase().split(' ').join('').indexOf(valueFilter.toLowerCase()) > -1
+        if (o.description.toLowerCase().split(' ').join('').indexOf(valueFilter.toLowerCase()) > -1 ||
+            o.codep.toLowerCase().split(' ').join('').indexOf(valueFilter.toLowerCase()) > -1
         ) return o;
       }); 
 
@@ -957,6 +1141,11 @@
     };
 
     const filterCollapse = (key, value) => {
+      console.log(key, value)
+
+      key = key.toLowerCase();
+      value = value.toLowerCase();
+
       valueFilter = value.replace(/\([^()]*\)/g, '') // Expresion regular para quitar parentesis del string
 
       dataProductsPrint = _.filter(dataProductsPrint, o => {
@@ -1030,15 +1219,14 @@
           confirmButtonText: 'Continuar',
         })
       }
-      
+
       let productSelected = _.findWhere(dataProductsComplete, {"codep": productID});
+      console.log("????",productSelected)
       let productToCar = {
         codep: productSelected.codep,
-        description: productSelected.description
+        description: productSelected.description,
+        imagen: productSelected.image,
       }
-
-      // console.log("l", productToCar)
-      // console.log("ll", productID)
 
       productToCar.qty = numberProducts;
       productToCar.codep = productID + size + color;
@@ -1079,7 +1267,7 @@
               <img src="${products[i].imagen}" alt="" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/d/da/Imagen_no_disponible.svg'" style="max-height: 100%; max-width: 100%; min-height: 100%; min-width: 100%;">
             </div>
             <div class="d-flex flex-column align-items-start ms-2">
-              <h6 class="m-0" style="word-break: break-all; text-align: left; font-weight: 900; font-size: 15px">${products[i].descripcion}</h6>
+              <h6 class="m-0" style="word-break: break-all; text-align: left; font-weight: 900; font-size: 15px">${products[i].descripcion || products[i].description}</h6>
               <h6 class="m-0" style="font-size: 13px;">Cantidad: <span style="font-weight: 400;">${products[i].qty}</span></h6>
             </div>
           </div>
@@ -1099,6 +1287,34 @@
         if (data.success) {
           colorsProducts = data.result;          
         }
+      }) 
+      .catch(error => console.log('Request failed', error));
+    } 
+
+    const getAttributesCatalog = () => {
+      fetch("/catalogo/getAttributes") 
+      .then(response => response.json())
+      .then(data => {
+        let attributes = data.result.data.attributes;
+        let attributesDetail = data.result.data.attributes_detail;
+
+        for (let i = 0; i < attributes.length; i++) {
+          dataSidebarMaster[attributes[i].description] = {};
+        }
+
+        for (let i = 0; i < attributes.length; i++) {
+          let detailAttr = _.where(attributesDetail, {id_attribute: attributes[i].id});
+          dataSidebar[attributes[i].description] = {};
+
+          for (let e = 0; e < detailAttr.length; e++) {
+            dataSidebar[attributes[i].description][detailAttr[e].description] = 1;
+          }
+        }
+        console.log(dataSidebar)
+        console.log(dataSidebarMaster)
+        
+        printTags();
+        printCollapse();
       }) 
       .catch(error => console.log('Request failed', error));
     } 
@@ -1303,13 +1519,106 @@
           getDataFromIndexedDB()
           .then(function (response) {
 
-             xxx = [];
+            xxx = []; // TODO quitar, hice esto para que solo salieran los que tiene imagen
             for (let i = 0; i < response.result.length; i++) {
               if (response.result[i].image != "") {
                 xxx.push(response.result[i])
               }
               
             }
+
+            xxx = [
+              {
+                  "codep": "13001",
+                  "description": "BOTA VENUS",
+                  "image": "http://api.pedbox.co:7777/imagenes_catalogo/20/13001-1.jpg",
+                  "image_array": "[1902,1903,1904]",
+                  "marca": "venus",
+                  "color": "negro",
+                  "sectores": "escolar",
+                  "talla": "36"
+              },
+              {
+                  "codep": "13019",
+                  "description": "ZEUS ALTO NEGRO/BCO",
+                  "image": "http://api.pedbox.co:7777/imagenes_catalogo/20/13019-1.jpg",
+                  "image_array": "2024,2025,2026,2027,2028,2029",
+                  "marca": "venus",
+                  "color": "negro",
+                  "sectores": "industria",
+                  "talla": "36"
+              },
+              {
+                  "codep": "17181",
+                  "description": "TREPADORA NEG",
+                  "image": "http://api.pedbox.co:7777/imagenes_catalogo/20/17181-1.jpg",
+                  "image_array": "[1914,1915,1916]",
+                  "marca": "manisol",
+                  "color": "negro",
+                  "sectores": "industria",
+                  "talla": "37"
+              },
+              {
+                  "codep": "29001",
+                  "description": "BOTA LISA CUELLO CUERO NGR",
+                  "image": "http://api.pedbox.co:7777/imagenes_catalogo/20/29001-1.jpg",
+                  "image_array": "[1917,1918,1919]",
+                  "marca": "multinal",
+                  "color": "negro",
+                  "sectores": "industria",
+                  "talla": "39"
+              },
+              {
+                  "codep": "47023",
+                  "description": "MOCASIN MALLA CORREA CRYSMA NEGRO",
+                  "image": "http://api.pedbox.co:7777/imagenes_catalogo/20/47023-1.jpg",
+                  "image_array": "[1930,1931,1932]",
+                  "marca": "a",
+                  "color": "azul",
+                  "sectores": "industria",
+                  "talla": "42"
+              },
+              {
+                  "codep": "53003",
+                  "description": "SOLDADOR REF 2200 FORRADA NEGRO",
+                  "image": "http://api.pedbox.co:7777/imagenes_catalogo/20/53003-1.jpg",
+                  "image_array": "[1920,1921,1922,1923]",
+                  "marca": "a",
+                  "color": "negro",
+                  "sectores": "industria",
+                  "talla": "36"
+              },
+              {
+                  "codep": "56002",
+                  "description": "ART 080 NEGRO",
+                  "image": "http://api.pedbox.co:7777/imagenes_catalogo/20/56002-1.jpg",
+                  "image_array": "[1911,1912,1913]",
+                  "marca": "evacol",
+                  "color": "negro",
+                  "sectores": "industria",
+                  "talla": "36"
+              },
+              {
+                  "codep": "58003",
+                  "description": "CAMPER OPERARIO COMP M/FIBRA 20222 NEGRO",
+                  "image": "http://api.pedbox.co:7777/imagenes_catalogo/20/58003-1.jpg",
+                  "image_array": "[1924,1925,1926]",
+                  "marca": "a",
+                  "color": "Cafe",
+                  "sectores": "industria",
+                  "talla": "36"
+              },
+              {
+                  "codep": "59003",
+                  "description": "BOTA DAMA 320 Blanco",
+                  "image": "http://api.pedbox.co:7777/imagenes_catalogo/20/59003-1.jpg",
+                  "image_array": "[1927,1928,1929]",
+                  "marca": "multinal",
+                  "color": "blanco",
+                  "sectores": "industria",
+                  "talla": "36"
+              }
+            ]
 
             dataProductsComplete = xxx;
             dataProductsPrint = dataProductsComplete;
@@ -1322,9 +1631,10 @@
       });
 
       getColorsCatalog();
+      getAttributesCatalog();
       setCartIconAmount();
     });
   </script>
 
 </body>
-</html>
+</html> 

@@ -247,7 +247,7 @@
       for (let i = 0; i < data.length; i++) {
         if (!data[i].iva) {
           let iva = data[i].precio * 0.19;
-          data[i].iva = iva;
+          data[i].iva = iva || 0;
         };
       };
       localStorage.setItem(cartName, JSON.stringify(data))
@@ -307,6 +307,7 @@
     }
 
     const loadProducst = (data) => {
+      console.log(data)
       let amount = data.length; 
       $("#amountProducts").text(amount)
 
@@ -343,7 +344,7 @@
                     <img src="${(data[i].imagen.image ? data[i].imagen.image : data[i].imagen )}" alt="" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/d/da/Imagen_no_disponible.svg'" alt="" style="max-height: 100%; max-width: 100%">
                   </div>
                   <div class="px-3 w-100">
-                    <h6> ${data[i].descripcion}</h6>
+                    <h6> ${data[i].descripcion || data[i].description}</h6>
                     <hr>
                     <div class="d-flex justify-content-between">
                       <button type="button" class="btn btn-primary my-0 removeProduct" codigo="${data[i].codigo}">Eliminar del carrito</button>

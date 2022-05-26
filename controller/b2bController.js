@@ -291,6 +291,13 @@ controller.catalogCodes = async (req, res, next) => {
   res.send(response)
 }
 
+controller.catalogCodesSubstring = async (req, res, next) => {
+  let id_company = req.session.user.id_company;
+  let response = await service.getCodesSubstringCatalog(id_company);
+
+  res.send(response)
+}
+
 controller.catalogRemoveImg = async (req, res, next) => {
   let id_company = req.session.user.id_company;
   let code = req.params.code;
@@ -338,10 +345,96 @@ controller.catalogImagesAttachments = async (req, res, next) => {
   res.send(response)
 }
 
+controller.imagesItemsByCodeColor = async (req, res, next) => {
+  let code = req.params.code;
+  let code_color = req.params.code_color;
 
+  let response = await service.catalogItemsByCodeColor(code, code_color);
 
+  if (response.result.success) {
+    if (response.result.result) {
+      return res.send(response.result.result[0])
+    }
+  }
 
+  res.send(false)
+}
 
+controller.catalogItemsAtributesCreate = async (req, res, next) => {
+  let body = req.body;
+  let response = await service.catalogItemsAtributesCreate(body);
+  res.send(response)
+}
+
+controller.catalogItemsAtributesUpdate = async (req, res, next) => {
+  let body = req.body;
+  let response = await service.catalogItemsAtributesUpdate(body);
+  res.send(response)
+}
+
+controller.catalogItemsAtributesDetailCreate = async (req, res, next) => {
+  let body = req.body;
+  let response = await service.catalogItemsAtributesDetailCreate(body);
+  res.send(response)
+}
+
+controller.catalogItemsAtributesDetailUpdate = async (req, res, next) => {
+  let body = req.body;
+  let response = await service.catalogItemsAtributesDetailUpdate(body);
+  res.send(response)
+}
+
+controller.catalogItemsAtributesDelete = async (req, res, next) => {
+  let body = { id: req.params.id_attr}
+
+  let response = await service.catalogItemsAtributesDelete(body);
+
+  res.send(response)
+}
+
+controller.catalogItemsAtributesDetailDelete = async (req, res, next) => {
+  let body = { id: req.params.id_attr}
+
+  let response = await service.catalogItemsAtributesDetailDelete(body);
+
+  res.send(response)
+}
+
+controller.getCodesAssociateToAttribute = async (req, res, next) => {
+  let attribute_id = req.params.id_attr;
+
+  let response = await service.getCodesAssociateToAttribute(attribute_id);
+  res.send(response)
+}
+
+controller.getCodesAssociateToAttribute = async (req, res, next) => {
+  let attribute_id = req.params.id_attr;
+
+  let response = await service.getCodesAssociateToAttribute(attribute_id);
+  res.send(response)
+}
+
+controller.relateAttributesBySubstring = async (req, res, next) => {
+  let response = await service.relateAttributesBySubstring(req.body);
+  res.send(response)
+}
+
+controller.deleteAssociatedAttribute = async (req, res, next) => {
+  let id_attribute = req.params.id_attr;
+  let code = req.params.code;
+  let id_company = req.session.user.id_company;
+
+  let response = await service.deleteCodesAssociatedToAttribute(id_attribute, code, id_company);
+  res.send(response)
+}
+
+controller.deleteAttributeAssociated = async (req, res, next) => {
+  let id_attribute = req.params.id_attr;
+  let id_item = req.params.id_item;
+
+  let response = await service.deleteAttributeAssociated(id_attribute, id_item);
+  res.send(response)
+}
 
 controller.catalogoTopData = async (req, res, next) => {
   let id_company = req.session.user.id_company;

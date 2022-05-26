@@ -126,6 +126,12 @@ service.catalogImagesAttachment = async(string) =>{
   return data;
 }
 
+service.catalogItemsByCodeColor = async(code, codeColor) =>{
+  const url = urlServicePedbox4+'catalog/getItemByCodeColor/'+code+'/'+codeColor;
+  const data =  await makeRequest(url);
+  return data;
+}
+
 service.productos = async(url_company, nit, id_company) => {
   const extranet = (id_company == 39 ? 12 : 10) // El catalogo de "universal de respuestos" es consultado en un extranet diferente
   const url = urlKakashi+'get_extranet?nit='+nit+'&tipo='+extranet+'&url='+url_company+'&id_company='+id_company;
@@ -181,6 +187,36 @@ service.getCodesCatalog = async(id_company) => { // TODO
   return data;
 }
 
+service.getCodesSubstringCatalog = async(id_company) => { // TODO
+  const url = urlServicePedbox4+"catalog/codesSubstring/"+id_company;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.getCodesAssociateToAttribute = async(id_attribute) => { // TODO
+  const url = urlServicePedbox4+"catalog/catalogCodesAssociateToAttribute/"+id_attribute
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.relateAttributesBySubstring = async(body) => { 
+  const url = urlServicePedbox4+"catalog/relateAttributesBySubstring";
+  const data =  await makeRequest(url, options('post', body));
+  return data;
+}
+
+service.deleteCodesAssociatedToAttribute = async(id_attribute, code, id_company) => { 
+  const url = urlServicePedbox4+`catalog/catalogDeleteAttributesByCode/${id_attribute}/${code}/${id_company}`
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.deleteAttributeAssociated = async(id_attribute, id_item) => { 
+  const url = urlServicePedbox4+`catalog/deleteAttributeAssociated/${id_attribute}/${id_item}`
+  const data =  await makeRequest(url);
+  return data;
+}
+
 service.catalogRemoveImg = async(code, id_company) => { 
   const url = urlServicePedbox4+"catalog/removeImages/"+code+"/"+id_company;
   const data =  await makeRequest(url);
@@ -208,6 +244,42 @@ service.catalogProductsByCode = async(code, id_company) => {
 service.catalogItemsAtributes = async(id_company) => { 
   const url = urlKakashi+"items_attributes?id_company="+id_company;
   const data =  await makeRequest(url);
+  return data;
+}
+
+service.catalogItemsAtributesCreate = async(body) => { 
+  const url = urlKakashi+"items_attributes";
+  const data =  await makeRequest(url, options('post', body));
+  return data;
+}
+
+service.catalogItemsAtributesUpdate = async(body) => { 
+  const url = urlKakashi+"items_attributes";
+  const data =  await makeRequest(url, options('put', body));
+  return data;
+}
+
+service.catalogItemsAtributesDetailCreate = async(body) => { 
+  const url = urlKakashi+"items_attributes_detail";
+  const data =  await makeRequest(url, options('post', body));
+  return data;
+}
+
+service.catalogItemsAtributesDetailUpdate = async(body) => { 
+  const url = urlKakashi+"items_attributes_detail";
+  const data =  await makeRequest(url, options('put', body));
+  return data;
+}
+
+service.catalogItemsAtributesDelete = async(body) => { 
+  const url = urlKakashi+"items_attributes";
+  const data =  await makeRequest(url, options('delete', body));
+  return data;
+}
+
+service.catalogItemsAtributesDetailDelete = async(body) => { 
+  const url = urlKakashi+"items_attributes_detail";
+  const data =  await makeRequest(url, options('delete', body));
   return data;
 }
 

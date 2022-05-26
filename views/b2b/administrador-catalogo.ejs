@@ -269,6 +269,10 @@
               <div id="btnModalInform" onclick="$('#ProductsCatalogAdministrator').hide(); $('#attachedFilesAdministrator').show()" class="icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg bntHeader" title="Administrador de Adjuntos" data-toggle="tooltip">
                 <i class="fas fa-file" style="font-size: 15px"></i>
               </div>
+
+              <div id="btnModalInform" onclick="$('#ProductsCatalogAdministrator').hide(); $('#atributesAdministrator').show()" class="icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg bntHeader" title="Administrador de Atributos" data-toggle="tooltip">
+                <i class="fas fa-tag" style="font-size: 15px;"></i>
+              </div>
             </div>
           </div>
 
@@ -364,7 +368,6 @@
 
         <div class="card p-3" >
           <div class="d-flex">
-            <!-- Not enought time to make this, Juan Blame -->
             <div class="flex-fill me-3" style="border-right: solid 2px lightgrey; width: 50%;">
               <h6>Adjuntos</h6>
               <div class="me-2 my-2">
@@ -433,23 +436,6 @@
                     <option value="21">Beige</option>
                   </select>
                 </div>
-                <div class="my-3 mb-4" id="selectColorToggleContainer" style="display: none;">
-                  <div class="form-check form-switch ps-0 d-flex flex-column align-items-center">
-                    <label for="">Seleccionar Color</label>
-                    <div class="d-flex align-items-center gap-2 ms-2">
-                      <div class="d-flex gap-2"> 
-                        <h6  class="m-0 text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Inactivo</h6>
-                      </div>
-                      <div>
-                        <input class="form-check-input m-0 disableToggle" type="checkbox" id="toggleButtonSelectColor" >
-                      </div>
-                      <div class="d-flex gap-2">
-                        <h6 class="m-0 text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Activo</h6>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
 
                 <div class="mt-2 d-flex">
                   <button onclick="uploadAttached()" class="btn btn-primary m-0 btnColor" style="margin: 0 auto !important;"> Añadir </button>
@@ -474,10 +460,101 @@
         </div>
       </div>
 
+      <!-- ** vista administrador de atributos -->
+      <div id="atributesAdministrator" class="p-4" style="display: none;">
+
+        <div class="d-flex">
+          <div onclick="$('#ProductsCatalogAdministrator').show(); $('#atributesAdministrator').hide()" class="backBtn d-flex gap-2 align-items-center mb-2" style="cursor: pointer;">
+            <i class="fas fa-chevron-left" aria-hidden="true"></i>
+            <h6 class="mb-0">Volver al catálogo</h6>
+          </div>
+        </div>
+      
+        <div class="card p-3">
+          <div class="d-flex">
+            <div class="flex-fill me-3" style="border-right: solid 2px lightgrey; width: 50%;">
+              <div class="navSectionsItemsAdmin" style="margin-right: 10px;">
+                <div onclick="$('#atributesFormSection').show();$('#detailAtributeSection').hide(); $('#atributesContainer').show();$('#atributesDetailContainer').hide();" class="activeNavitemAdmin">Atributos</div>
+                <div onclick="$('#detailAtributeSection').show();$('#atributesFormSection').hide(); $('#atributesDetailContainer').show();$('#atributesContainer').hide();" >Detalle Atributos</div>
+              </div>
+
+              <div>
+                <div id="atributesContainer" style="max-height: 60vh; overflow-y: auto;" class="mt-2 ms-4 me-4"> </div>
+                <div id="atributesDetailContainer" style="max-height: 60vh; overflow-y: auto; display: none;" class="navbar-vertical"> </div>
+              </div>
+            </div>
+            <div class="flex-fill" style="width: 50%;">
+              
+              <div id="atributesFormSection">
+                <div id="currentEditingAttributeContainer" style="display: none;">
+                  <div class="d-flex justify-content-between">
+                    <h6 class="text-center">Attributo <span id="currentEditingAttributeLabel">01</span></h6>
+                    <button onclick="$('#currentEditingAttributeContainer').hide(); $('#btnAttributeUpdateForm').hide(); $('#btnAttributeCreateForm').show(); cleanAttrForms()" type="button" class="btn-close rounded-circle me-1 p-1" style="background-color: gray"></button>
+                  </div>
+                </div>
+
+                <div class="d-flex flex-column">
+                  <label for="">Código</label>
+                  <input type="text" class="form-control" id="attrCodeform">
+                  <label for="" class="mt-2">Descripción</label>
+                  <input type="text" class="form-control" id="attrDescForm">
+                  <label for="" class="mt-2">Estado</label>
+                  <select name="" id="attrStateform" class="form-control">
+                    <option value="0">Inactivo</option>
+                    <option value="1">Activo</option>
+                  </select>
+                </div>
+                <div class="mt-2 d-flex">
+                  <button id="btnAttributeCreateForm" onclick="createAttributePetition()" class="btn btn-primary m-0 btnColor" style="margin: 0 auto !important;"> Crear </button>
+                  <button id="btnAttributeUpdateForm" onclick="createAttributePetition(true)" class="btn btn-primary m-0 btnColor" style="margin: 0 auto !important; display: none;"> Actualizar </button>
+                </div>
+              </div>
+
+              <div id="detailAtributeSection" style="display: none;">
+
+                <div id="currentEditingDetailAttributeContainer" style="display: none;">
+                  <div class="d-flex justify-content-between">
+                    <h6 class="text-center">Detalle Atributo <span id="currentEditingDetailAttributeLabel">01</span></h6>
+                    <button onclick="$('#currentEditingDetailAttributeContainer').hide(); $('#btnDetailAttrUpdateForm').hide(); $('#btnDetailAttrCreateForm').show(); $('#attrProductsAsociateForm').val();cleanAttrForms()" type="button" class="btn-close rounded-circle me-1 p-1" style="background-color: gray"></button>
+                  </div>
+                </div>
+
+                <div class="d-flex flex-column">
+                  <label for="" class="">Atributo</label>
+                  <select name="" class="form-control" id="detailAttrParent"> </select>
+                  <label for="" class="mt-2">Código</label>
+                  <input type="text" class="form-control" id="detailAttrCode">
+                  <label for="" class="mt-2">Descripción</label>
+                  <input type="text" class="form-control" id="detailAttrDesc">
+                  <label for="" class="mt-2">Estado</label>
+                  <select name="" class="form-control" id="detailAttrstate">
+                    <option value="0">Inactivo</option>
+                    <option value="1">Activo</option>
+                  </select>
+                  <label for="" class="mt-2">Productos relacionados  </label>
+                  <span id="labelLoadingAttr" style="display: none; font-size: 12px; margin-bottom: 5px; margin-left: 5px;">(Cargando productos relacionados, esto puede tardar un rato ...)</span>
+                  <input type="text" class="form-control" id="attrProductsAsociateForm">
+                </div>
+                <div class="mt-2 d-flex">
+                  <button id="btnDetailAttrCreateForm" onclick="createAttributeDetailPetition()" class="btn btn-primary m-0 btnColor" style="margin: 0 auto !important;"> Crear </button>
+                  <button id="btnDetailAttrUpdateForm" onclick="createAttributeDetailPetition(true)" class="btn btn-primary m-0 btnColor" style="margin: 0 auto !important; display: none;"> Actualizar </button>
+                </div>
+              </div>
+        
+            </div>
+          </div>
+        </div>
+      
+      </div>
+
+
+
+      </div>
+
       <!-- ** Vista formulario producto -->
       <div id="formCatalogAdministrator" class="p-4" style="display: none;">
        <div>
-         <div class="navSectionsItemsAdmin">
+         <div class="navSectionsItemsAdmin" id="navSectionsItemsAdminItem">
            <div onclick="$('.sectionformAdmin').hide(); $('#informationSection').show()" class="activeNavitemAdmin">Información</div>
            <div onclick="$('.sectionformAdmin').hide(); $('#atributesSection').show()">Atributos</div>
            <div onclick="$('.sectionformAdmin').hide(); $('#attachedSection').show()">Adjuntos</div>
@@ -515,7 +592,6 @@
 
               <label for="">Cantidad minima de compra</label>
               <input id="inputMinAmount" type="number" class="form-control">
-  
   
               <label for="">Impuesto</label>
               <select name="" id="inputTax" class="form-control">
@@ -578,35 +654,38 @@
 
         <div id="atributesSection" class="sectionformAdmin" style="display: none;">
           <div class="d-flex">
-            <div class="flex-fill me-3" style="border-right: solid 2px lightgrey;">
+            <div class="flex-fill me-3 w-50" style="border-right: solid 2px lightgrey;">
               <h6>Atributos</h6>
+              <div id="atributesSectionContent">
+
+              </div>
             </div>
-            <div class="flex-fill">
+            <div class="flex-fill w-50">
               <h6>Añadir Atributo</h6>
               <div>
 
                 <label for="" class="mt-3">Atributo</label>
-                <select name="" id="" class="form-control"> 
+                <select name="" id="attributesDetailItem" class="form-control"> 
                   <option value="">1</option>
                   <option value="">2</option>
                   <option value="">3</option>
                 </select>
 
                 <label for="" class="mt-3">Detalle</label>
-                <select name="" id="" class="form-control"> 
+                <select name="" id="attributesDetailFormItem" class="form-control"> 
                   <option value="">1</option>
                   <option value="">2</option>
                   <option value="">3</option>
                 </select>
 
                 <label for="" class="mt-3">Activo</label>
-                <select name="" id="" class="form-control"> 
-                  <option value="">Activo</option>
-                  <option value="">Inactivo</option>
+                <select name="" id="attributesStateFormItem" class="form-control"> 
+                  <option value="0">Inactivo</option>
+                  <option value="1">Activo</option>
                 </select>
 
                 <div class="mt-2 d-flex">
-                  <button onclick="" class="btn btn-primary m-0 btnColor" style="margin: 0 auto !important;"> Añadir </button>
+                  <button onclick="updateNewAttribute()" class="btn btn-primary m-0 btnColor" style="margin: 0 auto !important;"> Añadir </button>
                 </div>
 
               </div>
@@ -684,6 +763,7 @@
           <div class="d-flex">
             <div class="flex-fill me-3" style="border-right: solid 2px lightgrey;">
               <h6>Códigos alternos</h6>
+              <div id="alternCodeSectionContent"></div>
             </div>
             <div class="flex-fill">
               <h6>Añadir Código Alterno</h6>
@@ -846,12 +926,12 @@
     let imagesCatalog = null;
     let attachmentsCatalog = null;
     let codesCatalog = null;
+    let codesSubstringCatalog = null;
 
     const getData = () => {
       fetch("/catalogo/productos/limit")
       .then(res => res.json())
       .then(res => {
-        console.log(res)
         if (res.result.success) {
           printTableProducts(res.result.items)
         }
@@ -876,6 +956,7 @@
       fetch("/catalogo/productById/"+id_product)
       .then(res => res.json())
       .then(res => {
+        console.log(res)
         if (res.result.success) {
           currentProductObj = res.result.items;
           loadDataItem(res.result.items)
@@ -887,7 +968,6 @@
       fetch("/catalogo/productsImages")
       .then(res => res.json())
       .then(res => {
-        console.log(res)
         if (res.result.success) {
           imagesCatalog = res.result.result
           printImagesCatalog(imagesCatalog)
@@ -899,7 +979,6 @@
       fetch("/catalogo/productsAttachments")
       .then(res => res.json())
       .then(res => {
-        console.log("attachments", res)
         if (res.result.success) {
           attachmentsCatalog = res.result.result
           printAttachmentsCatalog(attachmentsCatalog)
@@ -917,8 +996,25 @@
       })
     }
 
-    const updateDataItem = (body) => {
-      fetch("/catalogo/productUpdate", {
+    const getCodesCatalogSubstring = () => {
+      fetch("/catalogo/codesSubstring")
+      .then(res => res.json())
+      .then(res => {
+        codesSubstringCatalog = res.result;
+        tagifyAttributes.whitelist = codesSubstringCatalog;
+      })
+    }
+
+    const relateAttributeToCodeSubstring = (code) => {
+      let body = {
+      "id_company": session.user.id_company,
+      "code_substring": code,
+      "id_detail_attribute": currentDetailAttr,
+      "status": 1,
+      "id_user": session.user.id
+      }
+
+      fetch("/catalogo/relateAttributesBySubstring", {
         method: 'POST',
         headers: { 'Accept': 'application/json', 'Content-Type': 'application/json'},
         body: JSON.stringify(body)
@@ -929,13 +1025,131 @@
       })
     }
 
+    const updateDataItem = (body) => {
+      console.log("body",body)
+      fetch("/catalogo/productUpdate", {
+        method: 'POST',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json'},
+        body: JSON.stringify(body)
+      })
+      .then(res => res.json())
+      .then(res => {
+        console.log("body res",res)
+        getDataItem(currentProductObj.id)
+      })
+    }
+
+    let attributesList = null;
+    let detailAttributes = null;
     const getAttributes = (body) => {
       fetch("/catalogo/getAttributes")
       .then(res => res.json())
       .then(res => {
-        console.log(res)
+        attributesList = res.result.data.attributes;
+        detailAttributes = res.result.data.attributes_detail;
+
+        printAttributes(res.result.data)
       })
     }
+
+    let currentAttr = null;
+    const createAttributePetition = (isUpdate) => {
+      if ($("#attrCodeform").val() == "" || $("#attrDescForm").val() == "") {
+        return Swal.fire({
+          title: 'LLena todos los campos antes de enviar',
+          icon: 'warning',
+          timer: 2500
+        })
+      }
+
+      let body = {
+        code: $("#attrCodeform").val(),
+        created: new Date().toISOString(),
+        description:  $("#attrDescForm").val(),
+        id_company: session.user.id_company,
+        id_user: session.user.id,
+        status: $("#attrStateform").val()
+      }
+
+      if (isUpdate) {
+        body.id = currentAttr;
+        fetch("/catalogo/updateAttribute", {
+          method: 'POST',
+          headers: { 'Accept': 'application/json', 'Content-Type': 'application/json'},
+          body: JSON.stringify(body)
+        })
+        .then(res => res.json())
+        .then(res => {
+          cleanAttrForms();
+          getAttributes();
+        })
+      } else {
+        fetch("/catalogo/createAttribute", {
+          method: 'POST',
+          headers: { 'Accept': 'application/json', 'Content-Type': 'application/json'},
+          body: JSON.stringify(body)
+        })
+        .then(res => res.json())
+        .then(res => {
+          cleanAttrForms();
+          getAttributes();
+        })
+      }
+
+    }
+
+    let currentDetailAttr = null;
+    const createAttributeDetailPetition = (isUpdate) => {
+      if ($("#detailAttrCode").val() == "" || $("#detailAttrDesc").val() == "") {
+        return Swal.fire({
+          title: 'LLena todos los campos antes de enviar',
+          icon: 'warning',
+          timer: 2500
+        })
+      };
+
+      let body = {
+        attachments: [],
+        code: $("#detailAttrCode").val(),
+        created: new Date().toISOString(),
+        delete: [],
+        description: $("#detailAttrDesc").val(),
+        id_attribute: $("#detailAttrParent").val(),
+        id_company: session.user.id_company,
+        id_user: session.user.id,
+        status: $("#detailAttrstate").val(),
+        update: []
+      };
+
+      if (isUpdate) {
+        body.id = currentDetailAttr;
+
+        fetch("/catalogo/updateAttributeDetail", {
+          method: 'POST',
+          headers: { 'Accept': 'application/json', 'Content-Type': 'application/json'},
+          body: JSON.stringify(body)
+        })
+        .then(res => res.json())
+        .then(res => {
+          console.log(res)
+          cleanAttrForms();
+          getAttributes();
+        });
+      } else {
+        fetch("/catalogo/createAttributeDetail", {
+          method: 'POST',
+          headers: { 'Accept': 'application/json', 'Content-Type': 'application/json'},
+          body: JSON.stringify(body)
+        })
+        .then(res => res.json())
+        .then(res => {
+          console.log(res)
+          cleanAttrForms();
+          getAttributes();
+        });
+      };
+    }
+
 
     const uploadAttached = async() => {
       if ($("#toggleButtonAutomaticRelate").is(':checked')) {
@@ -1147,6 +1361,14 @@
       })
     }
 
+    const removeDetailAttribute = (id_attribute, code) => {
+      fetch(`/catalogo/deleteAttributeAssociated/${id_attribute}/${code}`)
+      .then(res => res.json())
+      .then(res => {
+        console.log(res)
+      })
+    }
+
     const addImage = (body) => {
       fetch("/catalogo/addImg", {
         method: 'POST',
@@ -1243,12 +1465,7 @@
             "attachments": [],
             "providers": [],
             "sustitutes": [],
-            "alterCodes": [
-                {
-                    "code": "",
-                    "description": ""
-                }
-            ],
+            "alterCodes": [],
             "priceList": [],
             "kit": []
         },
@@ -1276,8 +1493,103 @@
       updateDataItem(body)
     }
 
+    let infoToAdd = {
+      "attributes": [],
+      "attachments": [],
+      "providers": [],
+      "sustitutes": [],
+      "alterCodes": [],
+      "priceList": [],
+      "kit": []
+    };
+
+    let infoToRemove = {
+      "attributes": [],
+      "attachments": [],
+      "providers": [],
+      "sustitutes": [],
+      "alterCodes": [],
+      "priceList": [],
+      "kit": []
+    };
+
+    let infoToUpdate = {
+      "attributes": [],
+      "attachments": [],
+      "providers": [],
+      "sustitutes": [],
+      "alterCodes": [],
+      "priceList": [],
+      "kit": []
+    };
+
+    const updateSecundayInfoDataHarvest = () => {
+      let body = {
+        "code": $("#inputReference").val(),
+        "description": $("#inputDescription").val(),
+        "ean": currentProductObj.ean,
+        "reference": currentProductObj.reference,
+        "id_unity": Number($("#inputMeasure").val()),
+        "id_tax": Number($("#inputTax").val()),
+        "price_cost": Number($("#inputPriceCost").val()),
+        "price_sale": Number($("#inputPriceShop").val()),
+        "has_list": ($("#chekcPriceList").is(":checked") ? 1 : 0),
+        "image": $("#imgProductForm").attr("src"),
+        "name_file": $("#imgProductForm").attr("src").split("/").slice(-1).pop(),
+        "has_inventory": currentProductObj.has_inventory,
+        "min_amount_purchase": Number($("#inputMinAmount").val()),
+        "discount": currentProductObj.discount,
+        "status": Number($("#inputState").val()),
+        "is_kit": ($("#checkKit").is(":checked") ? 1 : 0),
+        "id_user": session.user.id,
+        "id_company": session.user.id_company,
+        "add": JSON.parse(JSON.stringify(infoToAdd)), // JSON stringify to creatre new reference
+        "update": JSON.parse(JSON.stringify(infoToUpdate)),
+        "delete": JSON.parse(JSON.stringify(infoToRemove)),
+        "id": Number($("#inputReference").attr("data-id"))
+      }
+
+      infoToAdd = {
+        "attributes": [],
+        "attachments": [],
+        "providers": [],
+        "sustitutes": [],
+        "alterCodes": [],
+        "priceList": [],
+        "kit": []
+      };
+      infoToRemove = { // Delete API is not working
+        "attributes": [],
+        "attachments": [],
+        "providers": [],
+        "sustitutes": [],
+        "alterCodes": [],
+        "priceList": [],
+        "kit": []
+      };
+      infoToUpdate = {
+        "attributes": [],
+        "attachments": [],
+        "providers": [],
+        "sustitutes": [],
+        "alterCodes": [],
+        "priceList": [],
+        "kit": []
+      };
+
+      updateDataItem(body)
+    }
+
+    const updateNewAttribute = () => {
+      infoToAdd.attributes.push({
+        id_detail_attribute: Number($("#attributesDetailFormItem").val()),
+        status: Number($("#attributesStateFormItem").val())
+      })
+
+      updateSecundayInfoDataHarvest();
+    }
+
     const loadDataItem = (data) => {
-      console.log("data item", data)
       cleanForm();
 
       $("#inputReference").val(data.code);
@@ -1305,6 +1617,7 @@
         $("#navSuppliersSection").show()
       }
 
+      $("#priceListSectionContent").html("")
       if (data.prices_list.length) {
         for (let i = 0; i < data.prices_list.length; i++) {
           let el = `
@@ -1333,15 +1646,65 @@
         $("#navPriceListSection").show()
       }
 
+
+      $("#atributesSectionContent").html("")
+      if (data.attributes.length) {
+        for (let i = 0; i < data.attributes.length; i++) {
+          let detailAttr = _.where(detailAttributes, {id: data.attributes[i].id_detail_attribute});
+          let detailAttributeParent = _.where(attributesList, {id: detailAttr[0].id_attribute});
+
+          let el = `
+            <div style="position: relative">
+              <div>
+                <label for="" class="m-0">Atributo: </label>
+                ${detailAttributeParent[0].description}
+              </div>
+              <div>
+                <label for="" class="m-0">Detalle: </label>
+                ${detailAttr[0].description}
+              </div>
+              <div>
+                <label for="" class="m-0">Estado: </label>
+                ${data.attributes[i].status == 1 ? "Activo" : "Inactivo"}
+              </div>
+              <i data-id="${detailAttr[0].id}"" class="fas fa-trash deleteParticularAttribute" style="color: red; position: absolute; top: 50%; left: 80%; cursor: pointer"></i>
+            </div>
+            <hr class="horizontal dark">
+          `;
+          $("#atributesSectionContent").append(el)
+        };
+      }
+
       if (data.kit.length) {
         $("#checkKit").prop('checked', true)
         $("#navKitSection").show()
       }
 
       if (data.alterCodes.length) {
+        for (let i = 0; i < data.alterCodes.length; i++) {
+          let el = `
+            <div style="position: relative">
+              <div>
+                <label for="" class="m-0">Código Alterno: </label>
+                ${data.alterCodes[i].code}
+              </div>
+              <div>
+                <label for="" class="m-0">Descripción: </label>
+                ${data.alterCodes[i].description}
+              </div>
+              <i data-id="${data.alterCodes[i].id}"" class="fas fa-trash deleteAlterCode" style="color: red; position: absolute; top: 50%; left: 80%; cursor: pointer"></i>
+            </div>
+            <hr class="horizontal dark">
+          `;
+          
+          $("#alternCodeSectionContent").append(el)
+        }
         $("#chekcAlternCode").prop('checked', true)
         $("#navCodesSection").show()
       }
+
+      $(".navSectionsItemsAdmin>div").removeClass("activeNavitemAdmin")
+      $("#navSectionsItemsAdminItem>div:first").addClass("activeNavitemAdmin")
 
       $('#ProductsCatalogAdministrator').hide(); 
       $('#formCatalogAdministrator').show()      
@@ -1422,6 +1785,90 @@
       $("#preloader").hide();
     }
 
+    const printAttributes = (data) => {
+      // Attributes
+
+      $("#atributesContainer").html("")
+      for (let i = 0; i < data.attributes.length; i++) {
+        let el = `
+          <div class="mt-2 d-flex w-100 justify-content-between align-items-center" data-stauts="${data.attributes[i].status}">
+            <h6 class="mb-0"> ${data.attributes[i].code} -  <span> ${data.attributes[i].description} </span></h6>
+            <div class="d-flex gap-3">
+              <i data-id="${data.attributes[i].id}" class="fas fa-trash deleteAttribute" style="color: red; cursor: pointer"></i>
+              <i data-id="${data.attributes[i].id}" data-code="${data.attributes[i].code}" data-desc="${data.attributes[i].description}" class="fas fa-edit editAttributeBtn" style="cursor: pointer"></i>
+            </div>
+          </div>
+        `;
+        $("#atributesContainer").append(el)
+      }
+
+      // Detail attributes
+      $("#atributesDetailContainer").html("")
+      for (let i = 0; i < data.attributes.length; i++) {
+        let el = `
+          <a class="nav-link"  data-bs-toggle="collapse" href="#collapseAttribute${data.attributes[i].id}" >
+            <h6 class="m-0 indicatorCollapse"> - ${data.attributes[i].description} </h6> 
+          </a>
+          <div class="collapse show" id="collapseAttribute${data.attributes[i].id}">
+            <ul class="navbar-nav mx-4"> </ul>
+          </div>
+        `;
+        $("#atributesDetailContainer").append(el);
+
+        let detailAttribute = _.where(data.attributes_detail, {id_attribute: data.attributes[i].id});
+        for (let e = 0; e < detailAttribute.length; e++) {
+          let el = `
+            <div class="mt-2 d-flex w-100 justify-content-between align-items-center" data-stauts="${detailAttribute[e].status}">
+              <h6 class="mb-0"> ${detailAttribute[e].code} -  <span> ${detailAttribute[e].description} </span></h6>
+              <div class="d-flex gap-3">
+                <i data-id="${detailAttribute[e].id}" class="fas fa-trash deleteAttributeDetail" style="color: red; cursor: pointer"></i>
+                <i data-id="${detailAttribute[e].id}" data-code="${detailAttribute[e].code}" data-desc="${detailAttribute[e].description}" data-idAttr="${detailAttribute[e].id_attribute}" class="fas fa-edit editDetailAttrBtn" style="cursor: pointer"></i>
+              </div>
+            </div>
+          `;
+          $("#atributesDetailContainer>div:last").find("ul").append(el);
+        }
+      }
+
+      // Attributes Master
+      $("#detailAttrParent").html("")
+      for (let i = 0; i < data.attributes.length; i++) {
+        let el = `
+          <option value="${data.attributes[i].id}">${data.attributes[i].code} - ${data.attributes[i].description}</option>
+        `;
+        $("#detailAttrParent").append(el)
+      }
+
+      $("#attributesDetailItem").html("")
+      for (let i = 0; i < data.attributes.length; i++) {
+        let el = `
+          <option value="${data.attributes[i].id}">${data.attributes[i].code} - ${data.attributes[i].description}</option>
+        `;
+        $("#attributesDetailItem").append(el)
+      }
+
+      let detailAttribute = _.where(detailAttributes, {id_attribute: Number($("#attributesDetailItem option:selected").val())});
+      $("#attributesDetailFormItem").html("")
+      for (let i = 0; i < detailAttribute.length; i++) {
+        let el = `
+          <option value="${detailAttribute[i].id}">${detailAttribute[i].code} - ${detailAttribute[i].description}</option>
+        `;
+        $("#attributesDetailFormItem").append(el)
+      }
+    }
+
+    const cleanAttrForms = () => {
+      $("#attrCodeform").val("")
+      $("#attrDescForm").val("")
+      $("#attrStateform").val(1)
+
+      $("#detailAttrParent").val(1)
+      $("#detailAttrCode").val("")
+      $("#detailAttrDesc").val("")
+      $("#detailAttrstate").val(1)
+    }
+
+    // ** Events
     // Input img
     $("#inputFileLabel").on("click", function (e) {
       $('#inputDocument').trigger("click");
@@ -1539,28 +1986,13 @@
     $("#toggleButtonAutomaticRelate").on("change", function () {
       if ($("#toggleButtonAutomaticRelate").is(':checked')) {
         $('#inputAttachedRelateProducts').parent().show();
-        $('#selectColorToggleContainer').show();
-        $("#toggleButtonSelectColor").prop('checked', false)
       } else {
         $('#inputAttachedRelateProducts').parent().hide();
-        $('#selectColorToggleContainer').hide();
-        $("#toggleButtonSelectColor").prop('checked', false)
       }
     })
-
-    $("#toggleButtonSelectColor").on("change", function () {
-      if ($("#toggleButtonSelectColor").is(':checked')) {
-        $('#selectColorUploadAttachment').parent().show();
-      } else {
-        $('#selectColorUploadAttachment').parent().hide();
-      }
-    })
-
-
 
     // Administrador Imagenes
     $(document).on( "click", "#imgCatalogAdministratorContainer>div", function () {
-
       let img = $(this).find("img").attr("src");
       let tags = $(this).find("label").text();
 
@@ -1609,12 +2041,43 @@
       enforceWhitelist: true
     })
 
+    var tagifyAttributes = new Tagify( document.querySelector('#attrProductsAsociateForm'), {
+      duplicates: true,
+      backspace: false,
+      editTags : false, 
+      enforceWhitelist: true,
+      hooks: {
+        beforeRemoveTag : function( tags ){
+          return new Promise((resolve, reject) => {
+            Swal.fire({
+              title: '¿Está seguro de eliminar este atributo de los productos con codigo ' + tags[0].data.value + '?',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'Sí, eliminar',
+              cancelButtonText: 'Cancelar'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                removeDetailAttribute(currentDetailAttr, tags[0].data.value)
+                resolve()
+              } else {
+                reject()
+              }
+            })
+          })
+        }
+      }
+    })
+
     tagify.on('dropdown:select', function(e) {
       let data = {
         code: e.detail.data.value,
         imgUrl: $("#imgAdminDetail img").attr("src")
       }
       addImage(data)
+    });
+
+    tagifyAttributes.on('dropdown:select', function(e) {
+      relateAttributeToCodeSubstring(e.detail.data.value)
     });
 
     // Buscador Catalogo
@@ -1630,6 +2093,128 @@
       };
     })
 
+    // Atributos
+    $(document).on("click", ".editAttributeBtn", function () {
+      let code = $(this).attr("data-code");
+      let desc = $(this).attr("data-desc");
+      let state = $(this).parent().parent().attr("data-stauts");
+
+      currentAttr = $(this).attr("data-id");
+
+      $("#attrCodeform").val(code)
+      $("#attrDescForm").val(desc)
+      $("#attrStateform").val(state)
+
+      $("#btnAttributeCreateForm").hide()
+      $("#btnAttributeUpdateForm").show()
+
+      $("#currentEditingAttributeLabel").text(code)
+      $("#currentEditingAttributeContainer").show()
+    });
+
+    $(document).on("click", ".editDetailAttrBtn", function () {
+      $("#labelLoadingAttr").show();
+      $("#attrProductsAsociateForm").val("")
+
+      let code = $(this).attr("data-code");
+      let desc = $(this).attr("data-desc");
+      let state = $(this).parent().parent().attr("data-stauts");
+      let idAttr = $(this).attr("data-idAttr");
+
+      currentDetailAttr = $(this).attr("data-id");
+
+      $("#detailAttrParent").val(idAttr)
+      $("#detailAttrCode").val(code);
+      $("#detailAttrDesc").val(desc);
+      $("#detailAttrstate").val(state);
+      
+      $("#btnDetailAttrCreateForm").hide();
+      $("#btnDetailAttrUpdateForm").show();
+
+      $("#currentEditingDetailAttributeLabel").text(code);
+      $("#currentEditingDetailAttributeContainer").show();
+
+
+      fetch("/catalogo/getCodesAssociateToAttribute/"+Number(currentDetailAttr))
+      .then(res => res.json())
+      .then(res => {
+        $("#labelLoadingAttr").hide()
+
+        tagifyAttributes.addTags(res.result)
+      })
+    });
+
+    $(document).on("click", ".deleteAttribute", function () {
+      let id = $(this).attr("data-id")
+      Swal.fire({
+        title: "¿Está seguro de eliminar este atributo?",
+        icon: 'question',
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          fetch("/catalogo/deleteAttributes/"+id)
+          .then(res => res.json())
+          .then(res => {
+            getAttributes();
+          })
+
+        } 
+      })
+    })
+
+    $(document).on("click", ".deleteAttributeDetail", function () {
+      let id = $(this).attr("data-id")
+      Swal.fire({
+        title: "¿Está seguro de eliminar este detalle de atributo?",
+        icon: 'question',
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar',
+      }).then((result) => {
+        if (result.isConfirmed) {          
+          fetch("/catalogo/deleteAttributesDetail/"+id)
+          .then(res => res.json())
+          .then(res => {
+            getAttributes();
+          })
+        } 
+      })
+    })
+
+    $(document).on("change", "#attributesDetailItem", function () {
+      let detailAttribute = _.where(detailAttributes, {id_attribute: Number($("#attributesDetailItem option:selected").val())});
+      console.log(detailAttribute)
+      $("#attributesDetailFormItem").html("")
+      for (let i = 0; i < detailAttribute.length; i++) {
+        let el = `
+          <option value="${detailAttribute[i].id}">${detailAttribute[i].code} - ${detailAttribute[i].description}</option>
+        `;
+        $("#attributesDetailFormItem").append(el)
+      }
+    })
+
+    $(document).on("click", ".deleteParticularAttribute", function () {
+      let id_item = currentProductObj.id;
+      let id_detailAttribute = $(this).attr("data-id");
+
+      Swal.fire({
+        title: "¿Está seguro de eliminar este atributo?",
+        icon: 'question',
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar',
+      }).then((result) => {
+        if (result.isConfirmed) {          
+          fetch(`/catalogo/deleteAttributeAssociated/${id_detailAttribute}/${id_item}`)
+          .then(res => res.json())
+          .then(res => {
+            console.log(res)
+          })
+        } 
+      })
+
+      $(this).parent().remove();
+    })
+
     $(document).ready(function () {
       $('[data-toggle="tooltip"]').tooltip()
       $("#menuAdministradorCatalogo").addClass("activeNav")
@@ -1638,6 +2223,8 @@
       getImagesCatalog();
       getAttachmentsCatalog();
       getCodesCatalog();
+      getCodesCatalogSubstring();
+      getAttributes();
 
     })
   </script>

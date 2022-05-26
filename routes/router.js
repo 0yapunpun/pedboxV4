@@ -84,16 +84,30 @@ router.post('/catalogo/productUpdate', b2bController.catalogItemUpdate);
 router.get('/catalogo/productsImages', b2bController.catalogImages);
 router.get('/catalogo/productsAttachments', b2bController.catalogAttachments);
 router.get('/catalogo/codes', b2bController.catalogCodes);
+router.get('/catalogo/codesSubstring', b2bController.catalogCodesSubstring);
 router.get('/catalogo/productsByCode/:code', b2bController.catalogProductsByCode);
 router.get('/catalogo/removeImg/:code', b2bController.catalogRemoveImg);
 router.post('/catalogo/addImg', b2bController.catalogAddImg);
 router.post('/catalogo/relateImageArray', b2bController.catalogAddRelateImageArray);
 
 router.get('/catalogo/getAttributes', b2bController.catalogItemsAtributes);
+router.post('/catalogo/createAttribute', b2bController.catalogItemsAtributesCreate);
+router.post('/catalogo/updateAttribute', b2bController.catalogItemsAtributesUpdate);
+router.post('/catalogo/createAttributeDetail', b2bController.catalogItemsAtributesDetailCreate);
+router.post('/catalogo/updateAttributeDetail', b2bController.catalogItemsAtributesDetailUpdate);
+router.get('/catalogo/deleteAttributes/:id_attr', b2bController.catalogItemsAtributesDelete);
+router.get('/catalogo/deleteAttributesDetail/:id_attr', b2bController.catalogItemsAtributesDetailDelete);
+
+router.get('/catalogo/deleteAttributeAssociated/:id_attr/:id_item', b2bController.deleteAttributeAssociated); //HERE
+
+router.get('/catalogo/getCodesAssociateToAttribute/:id_attr', b2bController.getCodesAssociateToAttribute);
+router.post('/catalogo/relateAttributesBySubstring', b2bController.relateAttributesBySubstring);
+router.get('/catalogo/deleteAttributeAssociated/:id_attr/:code', b2bController.deleteAssociatedAttribute);
+
+
 
 router.get('/catalogo/imagesAttachment/:string', b2bController.catalogImagesAttachments);
-
-
+router.get('/catalogo/imagesItemsByCodeColor/:code/:code_color', b2bController.imagesItemsByCodeColor);
 
 
 router.get('/catalogo/top/data', b2bController.catalogoTopData);
