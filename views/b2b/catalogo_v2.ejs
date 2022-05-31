@@ -1365,7 +1365,7 @@
     }
 
     const getCalogGyW = () => {
-      fetch("http://localhost:7777/catalog/GyW/prueba") // Optener todos los objetos del catalogo
+      fetch("/catalogo/GyW") // Optener todos los objetos del catalogo
       .then(response => response.json())
       .then(async (response) => { 
 

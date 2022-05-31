@@ -145,8 +145,14 @@ service.catalogColors = async(id_company) => {
   return data;
 }
 
+// service.getCatalogGyW = async() => {
+//   const url = urlServicePedbox4+'catalog/GyW'
+//   const data =  await makeRequest(url);
+//   return data;
+// }
+
 service.getCatalogGyW = async() => {
-  const url = urlServicePedbox4+'catalog/GyW'
+  const url = urlServicePedbox4+'catalog/GyW/prueba'
   const data =  await makeRequest(url);
   return data;
 }
