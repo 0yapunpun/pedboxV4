@@ -103,8 +103,7 @@ router.get('/catalogo/deleteAttributeAssociated/:id_attr/:id_item', b2bControlle
 router.get('/catalogo/getCodesAssociateToAttribute/:id_attr', b2bController.getCodesAssociateToAttribute);
 router.post('/catalogo/relateAttributesBySubstring', b2bController.relateAttributesBySubstring);
 router.get('/catalogo/deleteAttributeAssociated/:id_attr/:code', b2bController.deleteAssociatedAttribute);
-
-
+router.get('/catalogo/deleteAttachmentDetailAttribute/:id_image/:id_attribute', b2bController.deleteAttachmentDetailAttribute);
 
 router.get('/catalogo/imagesAttachment/:string', b2bController.catalogImagesAttachments);
 router.get('/catalogo/imagesItemsByCodeColor/:code/:code_color', b2bController.imagesItemsByCodeColor);
@@ -115,6 +114,11 @@ router.get('/catalogo/colors', b2bController.catalogColors);
 router.post('/catalogo/img', b2bController.productosImagenes);
 router.get('/catalogo/GyW', b2bController.catalogGyW); 
 router.get('/catalogo/GyW/detail/:code', b2bController.catalogDetailGyW); 
+
+router.get('/catalogo/GyW/attrItem/:id', b2bController.getAttrItemById); 
+
+
+
 
 //** Herramientas
 router.get('/dashboard', viewController.dashboard);

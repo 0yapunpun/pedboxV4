@@ -479,7 +479,7 @@
               </div>
 
               <div>
-                <div id="atributesContainer" style="max-height: 60vh; overflow-y: auto;" class="mt-2 ms-4 me-4"> </div>
+                <div id="atributesContainer" style="max-height: 80vh; overflow-y: auto;" class="mt-2 ms-4 me-4"> </div>
                 <div id="atributesDetailContainer" style="max-height: 60vh; overflow-y: auto; display: none;" class="navbar-vertical"> </div>
               </div>
             </div>
@@ -515,7 +515,7 @@
                 <div id="currentEditingDetailAttributeContainer" style="display: none;">
                   <div class="d-flex justify-content-between">
                     <h6 class="text-center">Detalle Atributo <span id="currentEditingDetailAttributeLabel">01</span></h6>
-                    <button onclick="$('#currentEditingDetailAttributeContainer').hide(); $('#btnDetailAttrUpdateForm').hide(); $('#btnDetailAttrCreateForm').show(); $('#attrProductsAsociateForm').val();cleanAttrForms()" type="button" class="btn-close rounded-circle me-1 p-1" style="background-color: gray"></button>
+                    <button onclick="$('#currentEditingDetailAttributeContainer').hide(); $('#btnDetailAttrUpdateForm').hide(); $('#btnDetailAttrCreateForm').show(); $('#attrProductsAsociateForm').val();  $('#attributesAttachmentsSection').hide(); $('#inputAttachedAttr').val(''); cleanAttrForms()" type="button" class="btn-close rounded-circle me-1 p-1" style="background-color: gray"></button>
                   </div>
                 </div>
 
@@ -531,6 +531,18 @@
                     <option value="0">Inactivo</option>
                     <option value="1">Activo</option>
                   </select>
+
+                  <div id="attributesAttachmentsSection" style="display: none;">
+                    <form action="" enctype="multipart/form-data" id="f-upload-attached-attr">
+                      <input type="file" name="attachment" id="inputAttachedAttr"  accept="image/*, application/pdf" hidden>   
+                    </form>
+                    <label for="" class="mt-2">
+                      Adjuntos
+                      <i id="inputAttrAttachedLabel" class="fas fa-plus-circle ms-s" title="Agregar adjunto" data-toggle="tooltip" style="cursor: pointer;"></i>
+                    </label>
+                    <div id="attributesAttachmentsSectionContent" class="p-3 d-flex gap-2"></div>
+                  </div>
+
                   <label for="" class="mt-2">Productos relacionados  </label>
                   <span id="labelLoadingAttr" style="display: none; font-size: 12px; margin-bottom: 5px; margin-left: 5px;">(Cargando productos relacionados, esto puede tardar un rato ...)</span>
                   <input type="text" class="form-control" id="attrProductsAsociateForm">
@@ -696,7 +708,8 @@
         <div id="attachedSection" class="sectionformAdmin" style="display: none;">
           <div class="d-flex">
             <div class="flex-fill me-3" style="border-right: solid 2px lightgrey;">
-              <h6>Archivos Adjuntos</h6>
+              <h6>Adjuntos Por Atributo</h6>
+              <div id="attachedSectionContent" class="ms-3"></div>
             </div>
             <div class="flex-fill">
               <h6>Subir Archivo</h6>
@@ -1124,6 +1137,8 @@
       if (isUpdate) {
         body.id = currentDetailAttr;
 
+        console.log(body)
+
         fetch("/catalogo/updateAttributeDetail", {
           method: 'POST',
           headers: { 'Accept': 'application/json', 'Content-Type': 'application/json'},
@@ -1148,6 +1163,59 @@
           getAttributes();
         });
       };
+    }
+
+    const uploadAttachedDetailAttribute = async() => {
+      if ($("#inputAttachedAttr")[0].files.length == 0) {
+        return Swal.fire({
+          title: 'Seleccione los adjuntos antes de enviar',
+          icon: 'warning',
+          timer: 2500
+        })
+      }
+
+      let formData = new FormData();
+          formData.append("attachment", $("#inputAttachedAttr")[0].files[0])
+
+      let response = await fetch(`https://api.pedbox.co:8590/upload`, { method: 'POST', body: formData });
+          response = await response.json();
+
+      console.log(response)
+
+      if (!response.success) { return }
+
+      let attachmentData = [{
+        description: response.original_name,
+        in_quotation: 0,
+        name_file: response.original_name,
+        type: response.type,
+        url: "https://api.pedbox.co:8590"+ response.url_file.split("/public")[1]
+      }];
+
+      let body = {
+        attachments: attachmentData,
+        code: currentDetailAttribute.code,
+        delete: [],
+        description: currentDetailAttribute.description,
+        id: currentDetailAttribute.id,
+        id_attribute: currentDetailAttribute.id_attribute,
+        id_company: session.user.id_company,
+        id_user: session.user.id,
+        status: "1",
+        update: []
+      }
+
+      let responseUpdate = await fetch("/catalogo/updateAttributeDetail", {
+        method: 'POST',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json'},
+        body: JSON.stringify(body)
+      })
+      responseUpdate = await responseUpdate.json();
+
+      console.log(responseUpdate)
+
+      cleanAttrForms();
+      getAttributes();
     }
 
 
@@ -1641,7 +1709,6 @@
           $("#priceListSectionContent").append(el)
         }
 
-
         $("#chekcPriceList").prop('checked', true)
         $("#navPriceListSection").show()
       }
@@ -1671,7 +1738,24 @@
             </div>
             <hr class="horizontal dark">
           `;
-          $("#atributesSectionContent").append(el)
+          $("#atributesSectionContent").append(el);
+
+          if (detailAttr[0].attachments.length) {
+            for (let e = 0; e < detailAttr[0].attachments.length; e++) {
+              let el = `
+                <div class="d-flex align-items-center gap-3">
+                  <a href="${detailAttr[0].attachments[e].url}" target="_blank">
+                    <i class="fas fa-file" style="font-size: 25px; cursor: pointer;"></i>
+                  </a>
+                  <div>
+                    <h6 class="m-0"> ${detailAttr[0].attachments[e].description} </h6>
+                    <label for="" class="m-0 text-secondary">  <span> ${detailAttributeParent[0].description} </span> -  <span> ${detailAttr[0].description} </span></label>
+                  </div>
+                </div>
+              `;
+              $("#attachedSectionContent").append(el)
+            }
+          }
         };
       }
 
@@ -1822,7 +1906,7 @@
               <h6 class="mb-0"> ${detailAttribute[e].code} -  <span> ${detailAttribute[e].description} </span></h6>
               <div class="d-flex gap-3">
                 <i data-id="${detailAttribute[e].id}" class="fas fa-trash deleteAttributeDetail" style="color: red; cursor: pointer"></i>
-                <i data-id="${detailAttribute[e].id}" data-code="${detailAttribute[e].code}" data-desc="${detailAttribute[e].description}" data-idAttr="${detailAttribute[e].id_attribute}" class="fas fa-edit editDetailAttrBtn" style="cursor: pointer"></i>
+                <i data-id="${detailAttribute[e].id}"  data-attch='${JSON.stringify(detailAttribute[e].attachments)}' data-code="${detailAttribute[e].code}" data-desc="${detailAttribute[e].description}" data-idAttr="${detailAttribute[e].id_attribute}" class="fas fa-edit editDetailAttrBtn" style="cursor: pointer"></i>
               </div>
             </div>
           `;
@@ -1866,6 +1950,9 @@
       $("#detailAttrCode").val("")
       $("#detailAttrDesc").val("")
       $("#detailAttrstate").val(1)
+      $('#inputAttachedAttr').val("")
+      $("#attrProductsAsociateForm").val("")
+      $("#attributesAttachmentsSectionContent").html("")
     }
 
     // ** Events
@@ -1915,6 +2002,17 @@
 
       e.stopPropagation(); //Necesary line
     })
+
+    $("#inputAttrAttachedLabel").on("click", function (e) {
+      $('#inputAttachedAttr').trigger("click");
+      e.stopPropagation(); //Necesary line
+    })
+
+    $('#inputAttachedAttr').on("change", function () {
+      if ($("#inputAttachedAttr")[0].files[0]) {
+        uploadAttachedDetailAttribute()
+      }
+    });
 
     $('#inputDocument').change(function(){
       $("#fileName").text(this.files[0].name)
@@ -2045,7 +2143,7 @@
       duplicates: true,
       backspace: false,
       editTags : false, 
-      enforceWhitelist: true,
+      enforceWhitelist: false,
       hooks: {
         beforeRemoveTag : function( tags ){
           return new Promise((resolve, reject) => {
@@ -2077,7 +2175,7 @@
     });
 
     tagifyAttributes.on('dropdown:select', function(e) {
-      relateAttributeToCodeSubstring(e.detail.data.value)
+      relateAttributeToCodeSubstring(e.detail.data.value.split(" ")[0].trim())
     });
 
     // Buscador Catalogo
@@ -2112,14 +2210,60 @@
       $("#currentEditingAttributeContainer").show()
     });
 
+    let currentDetailAttribute = {};
     $(document).on("click", ".editDetailAttrBtn", function () {
       $("#labelLoadingAttr").show();
+      $("#attributesAttachmentsSection").show()
       $("#attrProductsAsociateForm").val("")
 
       let code = $(this).attr("data-code");
       let desc = $(this).attr("data-desc");
       let state = $(this).parent().parent().attr("data-stauts");
       let idAttr = $(this).attr("data-idAttr");
+      let id = $(this).attr("data-id");
+
+      currentDetailAttribute = {
+        code: code,
+        description: desc,
+        id_attribute: idAttr,
+        id: id
+      };
+
+      let attch = $(this).attr("data-attch");
+      $("#attributesAttachmentsSectionContent").html("");
+
+      if (attch != "[]") {
+        attch = JSON.parse(attch);
+        console.log(attch)
+        
+        for (let i = 0; i < attch.length; i++) {
+          let el;
+          if (attch[i].type == "image/png") {
+            el = `
+              <div style="width: 150px; height: 150px; position: relative; display: flex; flex-direction: column; align-items: center;">
+                <img src="${attch[i].url}" alt="" style="max-width: 100%; max-height: 100%; width: 100%; object-fit: cover;">
+                <label for="" class="m-0">${attch[i].description}</label>
+                <div data-imageId="${attch[i].id}" data-attributeId="${attch[i].id_attribute_detail}" class="removeAttachedAttrAdmin" style="position: absolute; top: -5%; left: -5%; border:solid 1px lightgray; border-radius: 50%; height: 20px; width: 20px; display: flex; justify-content: center; align-items: center; cursor: pointer; background-color: white;">X</div>
+              </div>
+            `;
+          } else {
+            el = `
+              <div style="position: relative; display: flex; flex-direction: column; align-items: center;">
+                <a href="${attch[i].url}" target="_blank">
+                  <i class="fas fa-file" style="font-size: 120px; cursor: pointer;"></i>
+                </a>
+                <label for="" class="m-0">${attch[i].description}</label>
+                <div data-imageId="${attch[i].id}" data-attributeId="${attch[i].id_attribute_detail}" class="removeAttachedAttrAdmin" style="position: absolute; top: -5%; left: -5%; border:solid 1px lightgray; border-radius: 50%; height: 20px; width: 20px; display: flex; justify-content: center; align-items: center; cursor: pointer; background-color: white;">X</div>
+              </div>
+            `;
+          }
+
+          $("#attributesAttachmentsSectionContent").append(el)
+        }
+
+      } else {
+        $("#attributesAttachmentsSectionContent").append($("#attributesAttachmentsSectionContent").append(`<span style="display: none; font-size: 12px; margin-bottom: 5px; margin-left: 5px;">Sin adjuntos relacionados</span>`))
+      }
 
       currentDetailAttr = $(this).attr("data-id");
 
@@ -2140,6 +2284,7 @@
       .then(res => {
         $("#labelLoadingAttr").hide()
 
+        $("#attrProductsAsociateForm").val("")
         tagifyAttributes.addTags(res.result)
       })
     });
@@ -2213,6 +2358,27 @@
       })
 
       $(this).parent().remove();
+    })
+
+    $(document).on("click", ".removeAttachedAttrAdmin", function () {
+      let id_image = $(this).attr("data-imageId");
+      let id_attribute = $(this).attr("data-attributeId");
+
+      Swal.fire({
+        title: "¿Está seguro de eliminar este adjunto?",
+        icon: 'question',
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar',
+      }).then((result) => {
+        if (result.isConfirmed) {  
+          fetch(`/catalogo/deleteAttachmentDetailAttribute/${id_image}/${id_attribute}`)
+          .then(res => res.json())
+          .then(res => {
+            console.log(res)
+            $(this).parent().remove();
+          })
+        } 
+      })
     })
 
     $(document).ready(function () {

@@ -436,6 +436,14 @@ controller.deleteAttributeAssociated = async (req, res, next) => {
   res.send(response)
 }
 
+controller.deleteAttachmentDetailAttribute = async (req, res, next) => {
+  let id_image = req.params.id_image;
+  let id_attribute = req.params.id_attribute;
+
+  let response = await service.deleteAttachmentDetailAttribute(id_image, id_attribute);
+  res.send(response)
+}
+
 controller.catalogoTopData = async (req, res, next) => {
   let id_company = req.session.user.id_company;
   let url_company = req.session.user.dataCompany[0].Url;
@@ -488,6 +496,13 @@ controller.catalogGyW = async(req, res, next) => {
   let catalog = await service.getCatalogGyW();
   res.send(catalog.result);
 }
+
+controller.getAttrItemById = async(req, res, next) => {
+  let catalog = await service.getAttrItemById(req.params.id);
+  res.send(catalog.result);
+}
+
+
 
 controller.catalogDetailGyW = async(req, res, next) => {
   let code = req.params.code;

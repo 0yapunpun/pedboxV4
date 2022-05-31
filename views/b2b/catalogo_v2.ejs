@@ -254,6 +254,9 @@
       width: 20px;
       height: 20px;
     }
+    #paginator li{
+      cursor: pointer;
+    }
   </style>
 </head>
 
@@ -591,7 +594,7 @@
         dataProductsPrint = dataProductsComplete;
         selectView(0, 8)
         printPaginator();
-        reloadCollapse()
+        getAttributesCatalog();
       } else {
         getSelectedFilters()
         selectView(0, 8)
@@ -629,15 +632,14 @@
 
       currentProductDetail = obj;
 
-      console.log(obj)
-
       let img = obj.imagen || obj.image;
       let name = obj.descripcion || obj.description;
       let price = obj.format_precio;
-      let codigo = obj.codep;
+      let codigo = obj.codep || obj.code;
 
       $("#imgsDetailCaontainer").html("")
       if (obj.image_array) {
+
         let imagesIdString = obj.image_array;
         if (obj.image_array.indexOf("[") != -1) { // I know this code it's shit 
           imagesIdString = obj.image_array.slice(1, -1)
@@ -645,7 +647,6 @@
 
         let responseService = await fetch("/catalogo/imagesAttachment/"+imagesIdString); 
             responseService = await responseService.json();
-
           
         for (let i = 0; i < responseService.result.length; i++) {
           let el = `
@@ -670,10 +671,11 @@
       $("#datilProductItems").html("")
       for (const key in dataSidebarMaster) {
         if (obj[key] != "") {
+          if (key == "Color" || key == "Talla") { continue }
           let element = `
             <div class="d-flex gap-2">
               <h6 class="m-0" style="text-transform: capitalize;">${key.replace("_", " ").replace("x002F_", " ")}: </h6>
-              <h6 class="text-secondary text-break" id="modalDetalleG">${(obj[key.toLowerCase()])}</h6>
+              <h6 class="text-secondary text-break" id="modalDetalleG">${(obj[key]) || " -"}</h6>
             </div>
           `;
           $("#datilProductItems").append(element)
@@ -802,7 +804,7 @@
     // Paginador
     $(document).on("change", "#selectColorProduct",  async function (e) {
       let codeColor = $("#selectColorProduct option:selected").val();
-      let subsStringProduct = currentProductDetail.codep;
+      let subsStringProduct = currentProductDetail.codep || currentProductDetail.code;
 
       $("#loaderImagesDetailProduct").show()
 
@@ -874,16 +876,47 @@
     }
 
     // Calcular la cantidad de elementos en el filtro
-    const collapseData = (data) => {
-      for (const key in dataSidebar) {
-        if (data[key] != "") {
-          if (data[key] in dataSidebar[key]) {
-            dataSidebar[key][data[key]] = dataSidebar[key][data[key]] + 1;
-          } else {
-            dataSidebar[key][data[key]] = 1;
+    const filterCollapseData = () => {
+      dataSidebar = JSON.parse(JSON.stringify(dataSidebarMaster));
+
+      for (let o = 0; o < dataProductsPrint.length; o++) {
+        let data = dataProductsPrint[o];
+
+        for (const key in dataSidebar) {
+          if (key == "Color" || key == "Talla") {
+            if (key == "Color") {
+              for (let i = 0; i < data.color_array.length; i++) {
+                let colorObj = _.findWhere(colorsProducts, {cod_color: data.color_array[i]});
+                if (colorObj == undefined) {continue}
+
+                if (!(colorObj.color in dataSidebar[key])) {
+                  dataSidebar[key][colorObj.color] = 1;
+                }
+              }
+            }
+            if (key == "Talla") {
+              for (let i = 0; i < data.talla_array.length; i++) {
+                if (!(data.talla_array[i] in dataSidebar[key])) {
+                  dataSidebar[key][data.talla_array[i]] = 1;
+                }
+              }
+            }
+            continue
+          }
+          
+          if (data[key] != "" && data[key] != undefined) {
+            if (data[key] in dataSidebar[key]) {
+              dataSidebar[key][data[key]] = dataSidebar[key][data[key]] + 1;
+            } else {
+              dataSidebar[key][data[key]] = 1;
+            }
           }
         }
+        
       }
+
+      printCollapse();
+      printTags();
     }
 
     const printCollapse = () => {
@@ -910,20 +943,13 @@
         for (const key in collapseElements) {
           let elementCollapse = `
             <div class="collapseProduct d-flex justify-content-between align-items-center ms-1" style="cursor: pointer" value="${dataSidebarElements[i]}">
-              <p class="m-0 font-weight-bold" style="font-size: 14px; word-break: break-all;">${key} <span>(${collapseElements[key]})</span></p>
+              <p class="m-0 font-weight-bold" style="font-size: 14px; word-break: break-all;">${key} </p>
             </div>
           `;
           $(`#collapse${dataSidebarElements[i]}`).append(elementCollapse);
         }
-      }
-    }
-
-    const reloadCollapse = () => {
-      // for (let i = 0; i < dataProductsComplete.length; i++) {
-      //   collapseData(dataProductsComplete[i]);
-      // }
-      // printCollapse();
-      getAttributesCatalog()
+      };
+      fixOrderCollapse();
     }
 
     const printProducts = (nStart, nEnd)  => {
@@ -932,12 +958,12 @@
       $("#productsContainer").html("")
       for (let i = 0; i < dataPaginated.length; i++) {
         let element = `
-          <div class="card cardItemHover productCard" style="width: 31%; position: relative" codigo="${dataPaginated[i].codep}" name="${dataPaginated[i].descripcion}" price="${dataPaginated[i].format_precio}" marca="${dataPaginated[i].marca}" grupo="${dataPaginated[i].grupo}" subgrupo="${dataPaginated[i].sub_grupo}" modelo="${dataPaginated[i].modelo_moto}" talla="${dataPaginated[i].talla}" img="${dataPaginated[i].imagen}" data-object='${JSON.stringify(dataPaginated[i])}'>
+          <div class="card cardItemHover productCard" style="width: 31%; position: relative" codigo="${dataPaginated[i].codep || dataPaginated[i].code}" name="${dataPaginated[i].descripcion}" price="${dataPaginated[i].format_precio}" marca="${dataPaginated[i].marca}" grupo="${dataPaginated[i].grupo}" subgrupo="${dataPaginated[i].sub_grupo}" modelo="${dataPaginated[i].modelo_moto}" talla="${dataPaginated[i].talla}" img="${dataPaginated[i].imagen}" data-object='${JSON.stringify(dataPaginated[i])}'>
             <div style="width: 100%; height: 50%; min-height: 200px; max-height: 200px"><img class="card-img-top" src="${(dataPaginated[i].imagen ? dataPaginated[i].imagen : dataPaginated[i].image)}" alt="" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/d/da/Imagen_no_disponible.svg'" style="max-width: 100%; max-height: 100%; object-fit: scale-down"></div>
             <div class="card-body pb-0 px-1 pt-2">
               <ul class="list-group list-group-flush d-flex h-100" >
                 <li class="list-group-item flex-fill p-0 pb-2 ps-2 bg-transparent d-flex flex-column justify-content-between" >
-                  <h6 class="card-title "><span style="font-weight: 400"> ${dataPaginated[i].codep} </span>- ${dataPaginated[i].description}</h6>
+                  <h6 class="card-title "><span style="font-weight: 400"> ${dataPaginated[i].codep || dataPaginated[i].code} </span>- ${dataPaginated[i].description}</h6>
                   <p class="card-text"> ${dataPaginated[i].format_precio || "<span style='font-style: italic'>Precio no disponible</span>"}</p>
                 </li>
                 <li class="list-group-item d-flex justify-content-between mx-1 my-1 bg-transparent">
@@ -1132,7 +1158,7 @@
 
       dataProductsPrint = _.filter(dataProductsComplete, o => {
         if (o.description.toLowerCase().split(' ').join('').indexOf(valueFilter.toLowerCase()) > -1 ||
-            o.codep.toLowerCase().split(' ').join('').indexOf(valueFilter.toLowerCase()) > -1
+            o.code.toLowerCase().split(' ').join('').indexOf(valueFilter.toLowerCase()) > -1
         ) return o;
       }); 
 
@@ -1141,22 +1167,40 @@
     };
 
     const filterCollapse = (key, value) => {
-      console.log(key, value)
+      valueFilter = value.replace(/\([^()]*\)/g, '').trim() // Remove parentesis
+      dataFiltered = [];
+      if (key == "Color" || key == "Talla") {
+        if (key == "Talla") {
+          for (let i = 0; i < dataProductsPrint.length; i++) {
+            if (dataProductsPrint[i].talla_array.includes(valueFilter)) {
+              dataFiltered.push(dataProductsPrint[i])
+            }
+          }
+        }
+        if (key == "Color") {
+          let colorMaster = _.findWhere(colorsProducts, {color: valueFilter});
+          if (colorMaster) {
+            for (let i = 0; i < dataProductsPrint.length; i++) {
+              if (dataProductsPrint[i].color_array.includes(colorMaster.cod_color)) {
+                dataFiltered.push(dataProductsPrint[i])
+              }
+            }
+          }
+        }
+      } else {
+        for (let i = 0; i < dataProductsPrint.length; i++) {
+          if (!(key in dataProductsPrint[i])) {  continue }
+  
+          if (dataProductsPrint[i][key] == valueFilter) {
+            dataFiltered.push(dataProductsPrint[i])
+          }
+        }
+      }
 
-      key = key.toLowerCase();
-      value = value.toLowerCase();
-
-      valueFilter = value.replace(/\([^()]*\)/g, '') // Expresion regular para quitar parentesis del string
-
-      dataProductsPrint = _.filter(dataProductsPrint, o => {
-        if (o[key].toLowerCase().split(' ').join('').indexOf(valueFilter.toLowerCase().split(' ').join('')) > -1 ) return o;
-      }); 
+      dataProductsPrint = dataFiltered;
 
       // Reload collapse
-      dataSidebar = JSON.parse(JSON.stringify(dataSidebarMaster)) 
-      for (let i = 0; i < dataProductsPrint.length; i++) {
-        collapseData(dataProductsPrint[i]);
-      }
+      filterCollapseData();
 
       let element = `
           <div class="badge tags choices-dark m-1 is-highlighted" key="${key}" value="${valueFilter}">
@@ -1167,7 +1211,6 @@
       $("#appliedFilters").append(element);
       $("#appliedFiltersContainer").fadeIn("fast");
 
-      printCollapse()
       selectView(0, 8)
       printPaginator()
     };
@@ -1188,11 +1231,7 @@
         if (o[key].toLowerCase().split(' ').join('').indexOf(valueFilter.toLowerCase().split(' ').join('')) > -1 ) return o;
       }); 
 
-      dataSidebar = JSON.parse(JSON.stringify(dataSidebarMaster)) 
-      for (let i = 0; i < dataProductsPrint.length; i++) {
-        collapseData(dataProductsPrint[i]);
-      }
-      printCollapse()
+      filterCollapseData();
     }
 
     const addProductCart = (idProduct, amount) => {
@@ -1220,16 +1259,15 @@
         })
       }
 
-      let productSelected = _.findWhere(dataProductsComplete, {"codep": productID});
-      console.log("????",productSelected)
+      let productSelected = _.findWhere(dataProductsComplete, {"code": productID});
       let productToCar = {
-        codep: productSelected.codep,
+        code: productSelected.code,
         description: productSelected.description,
         imagen: productSelected.image,
       }
 
       productToCar.qty = numberProducts;
-      productToCar.codep = productID + size + color;
+      productToCar.code = productID + size + color;
 
       saveLocalStorage(productToCar);
     }
@@ -1240,7 +1278,7 @@
       } else {
         let localObject = JSON.parse(localStorage.getItem(cartName));
 
-        let productExist = _.findWhere(localObject, {"codep": product.codep});
+        let productExist = _.findWhere(localObject, {"code": product.code});
         if (productExist) {
           return Swal.fire({
           title: 'El producto ya fue agregado al carrito',
@@ -1310,22 +1348,71 @@
             dataSidebar[attributes[i].description][detailAttr[e].description] = 1;
           }
         }
-        console.log(dataSidebar)
-        console.log(dataSidebarMaster)
         
-        printTags();
-        printCollapse();
+        filterCollapseData();
       }) 
       .catch(error => console.log('Request failed', error));
     } 
 
+    const fixOrderCollapse = ()  => {
+      let items = $("#collapseContainer>div")
+      let newOrder = [items[2], items[0], items[1], items[3]]; 
+
+      $("#collapseContainer").html("");
+      for (let i = 0; i < newOrder.length; i++) {
+        $("#collapseContainer").append(newOrder[i]);
+      }
+    }
+
     const getCalogGyW = () => {
-      fetch("/catalogo/GyW") 
+      fetch("http://localhost:7777/catalog/GyW/prueba") // Optener todos los objetos del catalogo
       .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          createIndexedDB(data.result)
+      .then(async (response) => { 
+
+        let item = [];
+        for (let i = 0; i < response.result.length; i++) {
+          if (!item.filter(e => e.code == response.result[i].code.substring(0, 5)).length > 0) { // Filtrar y agrupar por primeros digitos del codigo
+            let objItem = {              
+              idItem: response.result[i].id,
+              code: response.result[i].code.substring(0, 5),
+              description: response.result[i].description,
+              image: response.result[i].image,
+              image_array: response.result[i].image_array,
+              talla_array: [response.result[i].code.substring(5, 7)], // Array de tallas
+              color_array: [response.result[i].code.substring(7, 9)], // Array de colores
+            }
+            
+           let responseAttr = await fetch(`/catalogo/GyW/attrItem/${response.result[i].id}`); // Optener filtro productos, en caso de que los tenga
+               responseAttr = await responseAttr.json();
+            
+            if (responseAttr.success) {
+              for (let e = 0; e < responseAttr.data.length; e++) {
+                let key = Object.keys(responseAttr.data[e])[0];
+                let value = responseAttr.data[e][key];
+
+                objItem[key] = value;
+              }
+            }
+
+            item.push(objItem)
+          } else { // Optener tallas y colores disponibles por producto
+            let index = item.findIndex(object => {return object.code === response.result[i].code.substring(0, 5)});
+
+            if (!item[index].talla_array.includes(response.result[i].code.substring(5, 7))) {
+              item[index].talla_array.push(response.result[i].code.substring(5, 7))
+            }
+
+            if (!item[index].color_array.includes(response.result[i].code.substring(7, 9))) {
+              item[index].color_array.push(response.result[i].code.substring(7, 9))
+            }
+          }
+
+          
         }
+
+        console.log(response)
+        console.log(item)
+        createIndexedDB(item)
       }) 
       .catch(error => console.log('Request failed', error));
     }
@@ -1345,7 +1432,7 @@
     } 
 
     const getProductDetail = (code) => { // Tallas y colores
-    fetch("/catalogo/GyW/detail/"+code) 
+      fetch("/catalogo/GyW/detail/"+code) 
       .then(response => response.json())
       .then(data => {
         if (data.success) {
@@ -1377,7 +1464,6 @@
           $("#selectColorProduct").html("")
           for (let i = 0; i < colors.length; i++) {
             let colorObj = _.findWhere(colorsProducts, {cod_color: colors[i]});
-
             if (colorObj == undefined) {return}
 
             let el = `
@@ -1409,17 +1495,17 @@
         $("#iconSelectView").parent().hide();
       };
 
-      permissionIndex = permissions.map(e => e.code).lastIndexOf( "8005_CAN_PAY_INVOICES_EXTRANET");
-      if (permissionIndex  == -1 || permissions[permissionIndex].content == "N") {
-        $("#iconCarritoFacturas").hide();
-      };
+      // permissionIndex = permissions.map(e => e.code).lastIndexOf( "8005_CAN_PAY_INVOICES_EXTRANET");
+      // if (permissionIndex  == -1 || permissions[permissionIndex].content == "N") {
+      //   $("#iconCarritoFacturas").hide();
+      // };
 
-      permissionIndex = permissions.map(e => e.code).lastIndexOf( "8065_VIEW_ECOMMERCE");
-      if (permissionIndex  == -1 || permissions[permissionIndex].content == "N") {
-        currentView = "tabla"
-        $("#catalogview").hide()
-        $("#tableView").show()
-      };
+      // permissionIndex = permissions.map(e => e.code).lastIndexOf( "8065_VIEW_ECOMMERCE");
+      // if (permissionIndex  == -1 || permissions[permissionIndex].content == "N") {
+      //   currentView = "tabla"
+      //   $("#catalogview").hide()
+      //   $("#tableView").show()
+      // };
     };
 
     const isItGreaterThan = (date1, date2, days) => { 
@@ -1509,118 +1595,15 @@
       )
     };
 
-    var xxx; // TODO cambiar esto
     $( document ).ready(function() {
-      // handlePermissions(); 
+      handlePermissions(); 
       $("#menuCatalogo").addClass("activeNav");
 
       databaseExists(catalogName, function (state) {
         if (state) {
           getDataFromIndexedDB()
           .then(function (response) {
-
-            xxx = []; // TODO quitar, hice esto para que solo salieran los que tiene imagen
-            for (let i = 0; i < response.result.length; i++) {
-              if (response.result[i].image != "") {
-                xxx.push(response.result[i])
-              }
-              
-            }
-
-            xxx = [
-              {
-                  "codep": "13001",
-                  "description": "BOTA VENUS",
-                  "image": "http://api.pedbox.co:7777/imagenes_catalogo/20/13001-1.jpg",
-                  "image_array": "[1902,1903,1904]",
-                  "marca": "venus",
-                  "color": "negro",
-                  "sectores": "escolar",
-                  "talla": "36"
-              },
-              {
-                  "codep": "13019",
-                  "description": "ZEUS ALTO NEGRO/BCO",
-                  "image": "http://api.pedbox.co:7777/imagenes_catalogo/20/13019-1.jpg",
-                  "image_array": "2024,2025,2026,2027,2028,2029",
-                  "marca": "venus",
-                  "color": "negro",
-                  "sectores": "industria",
-                  "talla": "36"
-              },
-              {
-                  "codep": "17181",
-                  "description": "TREPADORA NEG",
-                  "image": "http://api.pedbox.co:7777/imagenes_catalogo/20/17181-1.jpg",
-                  "image_array": "[1914,1915,1916]",
-                  "marca": "manisol",
-                  "color": "negro",
-                  "sectores": "industria",
-                  "talla": "37"
-              },
-              {
-                  "codep": "29001",
-                  "description": "BOTA LISA CUELLO CUERO NGR",
-                  "image": "http://api.pedbox.co:7777/imagenes_catalogo/20/29001-1.jpg",
-                  "image_array": "[1917,1918,1919]",
-                  "marca": "multinal",
-                  "color": "negro",
-                  "sectores": "industria",
-                  "talla": "39"
-              },
-              {
-                  "codep": "47023",
-                  "description": "MOCASIN MALLA CORREA CRYSMA NEGRO",
-                  "image": "http://api.pedbox.co:7777/imagenes_catalogo/20/47023-1.jpg",
-                  "image_array": "[1930,1931,1932]",
-                  "marca": "a",
-                  "color": "azul",
-                  "sectores": "industria",
-                  "talla": "42"
-              },
-              {
-                  "codep": "53003",
-                  "description": "SOLDADOR REF 2200 FORRADA NEGRO",
-                  "image": "http://api.pedbox.co:7777/imagenes_catalogo/20/53003-1.jpg",
-                  "image_array": "[1920,1921,1922,1923]",
-                  "marca": "a",
-                  "color": "negro",
-                  "sectores": "industria",
-                  "talla": "36"
-              },
-              {
-                  "codep": "56002",
-                  "description": "ART 080 NEGRO",
-                  "image": "http://api.pedbox.co:7777/imagenes_catalogo/20/56002-1.jpg",
-                  "image_array": "[1911,1912,1913]",
-                  "marca": "evacol",
-                  "color": "negro",
-                  "sectores": "industria",
-                  "talla": "36"
-              },
-              {
-                  "codep": "58003",
-                  "description": "CAMPER OPERARIO COMP M/FIBRA 20222 NEGRO",
-                  "image": "http://api.pedbox.co:7777/imagenes_catalogo/20/58003-1.jpg",
-                  "image_array": "[1924,1925,1926]",
-                  "marca": "a",
-                  "color": "Cafe",
-                  "sectores": "industria",
-                  "talla": "36"
-              },
-              {
-                  "codep": "59003",
-                  "description": "BOTA DAMA 320 Blanco",
-                  "image": "http://api.pedbox.co:7777/imagenes_catalogo/20/59003-1.jpg",
-                  "image_array": "[1927,1928,1929]",
-                  "marca": "multinal",
-                  "color": "blanco",
-                  "sectores": "industria",
-                  "talla": "36"
-              }
-            ]
-
-            dataProductsComplete = xxx;
+            dataProductsComplete = response.result;
             dataProductsPrint = dataProductsComplete;
             printPaginator();
             selectView(0, 8);

@@ -129,10 +129,9 @@ controller.documentosUsuario = async(req, res, next) => {
 
 controller.catalogo = async (req, res, next) => {
   if (!req.session.login) { return res.redirect('/login'); }
-  // if (!(hasPermission(req.session.user.permission ,"8045_CAN_VIEW_SHOPPING_CAR"))) {return res.redirect('/no-permission');}
+  // if (!(hasPermission(req.session.user.permission ,"8045_CAN_VIEW_SHOPPING_CAR"))) {return res.redirect('/no-permission');} // TODO comentado por desarrollo GyW
 
-  let isGyW = true; // TODO remplazar por id company GyW cuando ya tengan permisos para el catalogo 
-  if (req.session.user.id == 12790) { 
+  if (req.session.user.id == 12790) { // TODO desarrollo GyW
     res.render('b2b/catalogo_v2', {'session': req.session});
   } else {
     res.render('b2b/catalogo', {'session': req.session});

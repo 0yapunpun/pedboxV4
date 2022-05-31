@@ -188,7 +188,7 @@ service.getCodesCatalog = async(id_company) => { // TODO
 }
 
 service.getCodesSubstringCatalog = async(id_company) => { // TODO
-  const url = urlServicePedbox4+"catalog/codesSubstring/"+id_company;
+  const url = urlServicePedbox4+"catalog/codesSubstringDesc/"+id_company;
   const data =  await makeRequest(url);
   return data;
 }
@@ -213,6 +213,18 @@ service.deleteCodesAssociatedToAttribute = async(id_attribute, code, id_company)
 
 service.deleteAttributeAssociated = async(id_attribute, id_item) => { 
   const url = urlServicePedbox4+`catalog/deleteAttributeAssociated/${id_attribute}/${id_item}`
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.deleteAttachmentDetailAttribute = async(id_image, id_attribute) => { 
+  const url = urlServicePedbox4+`catalog/deleteAttachmentDetailAttribute/${id_image}/${id_attribute}`
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.getAttrItemById = async(id) => { 
+  const url = urlServicePedbox4+`catalog/catalogAttributesByIdItem/${id}`
   const data =  await makeRequest(url);
   return data;
 }
