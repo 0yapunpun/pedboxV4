@@ -1368,51 +1368,7 @@
       fetch("/catalogo/GyW") // Optener todos los objetos del catalogo
       .then(response => response.json())
       .then(async (response) => {
-        console.log("Cargando Cátalogo ...")
-        console.time()
-
-        let item = [];
-        for (let i = 0; i < response.result.length; i++) {
-          console.log(i)
-          if (!item.filter(e => e.code == response.result[i].code.substring(0, 5)).length > 0) { // Filtrar y agrupar por primeros digitos del codigo
-            let objItem = {              
-              idItem: response.result[i].id,
-              code: response.result[i].code.substring(0, 5),
-              description: response.result[i].description,
-              image: response.result[i].image,
-              image_array: response.result[i].image_array,
-              talla_array: [response.result[i].code.substring(5, 7)], // Array de tallas
-              color_array: [response.result[i].code.substring(7, 9)], // Array de colores
-            }
-            
-           let responseAttr = await fetch(`/catalogo/GyW/attrItem/${response.result[i].id}`); // Optener filtro productos, en caso de que los tenga
-               responseAttr = await responseAttr.json();
-            
-            if (responseAttr.success) {
-              for (let e = 0; e < responseAttr.data.length; e++) {
-                let key = Object.keys(responseAttr.data[e])[0];
-                let value = responseAttr.data[e][key];
-
-                objItem[key] = value;
-              }
-            }
-
-            item.push(objItem)
-          } else { // Optener tallas y colores disponibles por producto
-            let index = item.findIndex(object => {return object.code === response.result[i].code.substring(0, 5)});
-
-            if (!item[index].talla_array.includes(response.result[i].code.substring(5, 7))) {
-              item[index].talla_array.push(response.result[i].code.substring(5, 7))
-            }
-
-            if (!item[index].color_array.includes(response.result[i].code.substring(7, 9))) {
-              item[index].color_array.push(response.result[i].code.substring(7, 9))
-            }
-          }
-        }
-
-        console.timeEnd()
-        createIndexedDB(item)
+        createIndexedDB(response)
       }) 
       .catch(error => console.log('Request failed', error));
     }
@@ -1612,7 +1568,6 @@
             dataProductsPrint = dataProductsComplete;
             printPaginator();
             selectView(0, 8);
-
 
             getColorsCatalog();
             getAttributesCatalog();

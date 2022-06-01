@@ -217,6 +217,12 @@ service.deleteAttributeAssociated = async(id_attribute, id_item) => {
   return data;
 }
 
+service.deleteAttachmentsByIdItem = async(id_item, id_company) => { 
+  const url = urlServicePedbox4+`catalog/deleteAttachmentsByIdItem/${id_company}/${id_item}`
+  const data =  await makeRequest(url);
+  return data;
+}
+
 service.deleteAttachmentDetailAttribute = async(id_image, id_attribute) => { 
   const url = urlServicePedbox4+`catalog/deleteAttachmentDetailAttribute/${id_image}/${id_attribute}`
   const data =  await makeRequest(url);

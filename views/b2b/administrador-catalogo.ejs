@@ -309,7 +309,7 @@
               <h6>Imágenes Productos</h6>
               <div class="me-2 my-2">
                 <div class="" style="position: relative;">
-                  <input id="filterTableImages" type="text" class="form-control" placeholder="Buscar" style="padding-left: 35px;">
+                  <input id="filterImagesSection" type="text" class="form-control" placeholder="Buscar" style="padding-left: 35px;">
                   <i class="fas fa-search" style="position: absolute; top: 30%; left: 2%; cursor: pointer;"></i>
                 </div>
               </div>
@@ -372,7 +372,7 @@
               <h6>Adjuntos</h6>
               <div class="me-2 my-2">
                 <div class="" style="position: relative;">
-                  <input id="" type="text" class="form-control" placeholder="Buscar" style="padding-left: 35px;"> 
+                  <input id="filterAttachmentsSection" type="text" class="form-control" placeholder="Buscar" style="padding-left: 35px;"> 
                   <i class="fas fa-search" style="position: absolute; top: 30%; left: 2%; cursor: pointer;"></i>
                 </div>
               </div>
@@ -1218,7 +1218,6 @@
       getAttributes();
     }
 
-
     const uploadAttached = async() => {
       if ($("#toggleButtonAutomaticRelate").is(':checked')) {
         relateUnautomatic();
@@ -1349,6 +1348,8 @@
       if ($("#inputAttached")[0].files[0].name.indexOf("-") != -1) {
         fileName = $("#inputAttached")[0].files[0].name.split("-")[0] + $("#inputAttached")[0].files[0].name.split("-")[1]  
       }
+
+      await fetch(`/catalogo/deleteAttachmentsByIdItem/${fileName}`); // Delete attachments with same id_item to avoid repeat attachments
 
       for (let i = 0; i < $("#inputAttached")[0].files.length; i++) {
         let sequence = $("#inputAttached")[0].files[i].name.split(".")[0].split("-")[$("#inputAttached")[0].files[i].name.split(".")[0].split("-").length -1];
@@ -1822,8 +1823,24 @@
       getDataFilter(valueFilter)
     }
 
+    const filterSearchFieldAttachments = () => {
+      valueFilter = $("#filterAttachmentsSection").val();
+
+      if (valueFilter.length < 2) { 
+        return printAttachmentsCatalog(attachmentsCatalog)
+      }
+
+      let filteredObject = _.filter(attachmentsCatalog, o => {
+        if (o.id_item.toString().split(' ').join('').indexOf(valueFilter.toLowerCase()) > -1 ) { return o };
+      });
+
+      if (filteredObject.length) {
+        printAttachmentsCatalog(filteredObject)
+      }
+    }
+
     const filterSearchFieldImages = () => {
-      valueFilter = $("#filterTableImages").val();
+      valueFilter = $("#filterImagesSection").val();
       
       if (valueFilter.length < 2) { 
         return printImagesCatalog(imagesCatalog)
@@ -2185,9 +2202,15 @@
       };
     })
 
-    $(document).on("keyup", "#filterTableImages", function (e) {
+    $(document).on("keyup", "#filterImagesSection", function (e) {
       if (e.which == 13) {
         filterSearchFieldImages()
+      };
+    })
+
+    $(document).on("keyup", "#filterAttachmentsSection", function (e) {
+      if (e.which == 13) {
+        filterSearchFieldAttachments()
       };
     })
 

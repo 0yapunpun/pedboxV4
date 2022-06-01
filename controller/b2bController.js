@@ -284,6 +284,15 @@ controller.catalogAttachments = async (req, res, next) => {
   res.send(response)
 }
 
+controller.deleteAttachmentsByIdItem = async (req, res, next) => {
+  let id_item = req.params.id_item;
+  let id_company = req.session.user.id_company;
+
+  let response = await service.deleteAttachmentsByIdItem(id_item, id_company);
+
+  res.send(response)
+}
+
 controller.catalogCodes = async (req, res, next) => {
   let id_company = req.session.user.id_company;
   let response = await service.getCodesCatalog(id_company);

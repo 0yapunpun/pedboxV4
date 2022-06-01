@@ -98,12 +98,13 @@ router.post('/catalogo/updateAttributeDetail', b2bController.catalogItemsAtribut
 router.get('/catalogo/deleteAttributes/:id_attr', b2bController.catalogItemsAtributesDelete);
 router.get('/catalogo/deleteAttributesDetail/:id_attr', b2bController.catalogItemsAtributesDetailDelete);
 
-router.get('/catalogo/deleteAttributeAssociated/:id_attr/:id_item', b2bController.deleteAttributeAssociated); //HERE
+router.get('/catalogo/deleteAttributeAssociated/:id_attr/:id_item', b2bController.deleteAttributeAssociated); 
 
 router.get('/catalogo/getCodesAssociateToAttribute/:id_attr', b2bController.getCodesAssociateToAttribute);
 router.post('/catalogo/relateAttributesBySubstring', b2bController.relateAttributesBySubstring);
 router.get('/catalogo/deleteAttributeAssociated/:id_attr/:code', b2bController.deleteAssociatedAttribute);
 router.get('/catalogo/deleteAttachmentDetailAttribute/:id_image/:id_attribute', b2bController.deleteAttachmentDetailAttribute);
+router.get('/catalogo/deleteAttachmentsByIdItem/:id_item', b2bController.deleteAttachmentsByIdItem);
 
 router.get('/catalogo/imagesAttachment/:string', b2bController.catalogImagesAttachments);
 router.get('/catalogo/imagesItemsByCodeColor/:code/:code_color', b2bController.imagesItemsByCodeColor);
