@@ -108,16 +108,12 @@ router.get('/catalogo/deleteAttachmentDetailAttribute/:id_image/:id_attribute', 
 router.get('/catalogo/imagesAttachment/:string', b2bController.catalogImagesAttachments);
 router.get('/catalogo/imagesItemsByCodeColor/:code/:code_color', b2bController.imagesItemsByCodeColor);
 
-
 router.get('/catalogo/top/data', b2bController.catalogoTopData);
 router.get('/catalogo/colors', b2bController.catalogColors);
 router.post('/catalogo/img', b2bController.productosImagenes);
 router.get('/catalogo/GyW', b2bController.catalogGyW); 
 router.get('/catalogo/GyW/detail/:code', b2bController.catalogDetailGyW); 
-
 router.get('/catalogo/GyW/attrItem/:id', b2bController.getAttrItemById); 
-
-
 
 
 //** Herramientas

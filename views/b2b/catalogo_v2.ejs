@@ -1367,10 +1367,13 @@
     const getCalogGyW = () => {
       fetch("/catalogo/GyW") // Optener todos los objetos del catalogo
       .then(response => response.json())
-      .then(async (response) => { 
+      .then(async (response) => {
+        console.log("Cargando Cátalogo ...")
+        console.time()
 
         let item = [];
         for (let i = 0; i < response.result.length; i++) {
+          console.log(i)
           if (!item.filter(e => e.code == response.result[i].code.substring(0, 5)).length > 0) { // Filtrar y agrupar por primeros digitos del codigo
             let objItem = {              
               idItem: response.result[i].id,
@@ -1406,12 +1409,9 @@
               item[index].color_array.push(response.result[i].code.substring(7, 9))
             }
           }
-
-          
         }
 
-        console.log(response)
-        console.log(item)
+        console.timeEnd()
         createIndexedDB(item)
       }) 
       .catch(error => console.log('Request failed', error));
@@ -1572,8 +1572,13 @@
         .then(function (response) {
           dataProductsComplete = response.result;
           dataProductsPrint = dataProductsComplete;
+
           printPaginator();
           selectView(0, 8);
+
+          getColorsCatalog();
+          getAttributesCatalog();
+          setCartIconAmount();
         })
       };
     };
@@ -1607,15 +1612,16 @@
             dataProductsPrint = dataProductsComplete;
             printPaginator();
             selectView(0, 8);
+
+
+            getColorsCatalog();
+            getAttributesCatalog();
+            setCartIconAmount();
           })
         } else {
           getCalogGyW();
         }
       });
-
-      getColorsCatalog();
-      getAttributesCatalog();
-      setCartIconAmount();
     });
   </script>
 
