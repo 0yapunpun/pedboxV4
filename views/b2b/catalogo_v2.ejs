@@ -421,7 +421,7 @@
                 <div class="w-50 d-flex flex-column justify-content-between">
                   <div id="img-zoomer-box">
                     <img id="modalDetalleImg" src="https://upload.wikimedia.org/wikipedia/commons/d/da/Imagen_no_disponible.svg" alt="" style="max-width: 100%; max-height: 100%;">
-                    <div id="img-zoom-effect"></div>
+                    <!-- <div id="img-zoom-effect"></div> -->
                   </div>
   
                 </div>
@@ -779,33 +779,33 @@
     })
 
     // zoom effec detail
-    $(document).on('mousemove','#img-zoomer-box',function(e){
-      let original = document.querySelector('#modalDetalleImg'),
-          magnified = document.querySelector('#img-zoom-effect'),
-          style = magnified.style,
-          x = e.pageX - this.offsetLeft,
-          y = e.pageY - this.offsetTop,
-          imgWidth = original.offsetWidth,
-          imgHeight = original.offsetHeight,
-          xperc = ((x/imgWidth) * 100),
-          yperc = ((y/imgHeight) * 100);
+    // $(document).on('mousemove','#img-zoomer-box',function(e){
+    //   let original = document.querySelector('#modalDetalleImg'),
+    //       magnified = document.querySelector('#img-zoom-effect'),
+    //       style = magnified.style,
+    //       x = e.pageX - this.offsetLeft,
+    //       y = e.pageY - this.offsetTop,
+    //       imgWidth = original.offsetWidth,
+    //       imgHeight = original.offsetHeight,
+    //       xperc = ((x/imgWidth) * 100),
+    //       yperc = ((y/imgHeight) * 100);
 
-      //lets user scroll past right edge of image
-      if(x > (.01 * imgWidth)) {
-        xperc += (.15 * xperc);
-      };
+    //   //lets user scroll past right edge of image
+    //   if(x > (.01 * imgWidth)) {
+    //     xperc += (.15 * xperc);
+    //   };
 
-      //lets user scroll past bottom edge of image
-      if(y >= (.01 * imgHeight)) {
-        yperc += (.15 * yperc);
-      };
+    //   //lets user scroll past bottom edge of image
+    //   if(y >= (.01 * imgHeight)) {
+    //     yperc += (.15 * yperc);
+    //   };
 
-      style.backgroundPositionX = (xperc - 80) + '%';
-      style.backgroundPositionY = (yperc - 30) + '%';
+    //   style.backgroundPositionX = (xperc - 80) + '%';
+    //   style.backgroundPositionY = (yperc - 30) + '%';
 
-      style.left = (x - 180) + 'px';
-      style.top = (y - 180) + 'px';
-    });
+    //   style.left = (x - 180) + 'px';
+    //   style.top = (y - 180) + 'px';
+    // });
 
     // Paginador
     $(document).on("change", "#selectColorProduct",  async function (e) {
@@ -830,40 +830,40 @@
 
     //  *** Funciones
     const printImagesFromArray = async (data) => {
-      let imagesIdString = data.image_array;
-      if (data.image_array.indexOf("[") != -1) { // I know this code it's shit 
-        imagesIdString = data.image_array.slice(1, -1)
-      }
+      // let imagesIdString = data.image_array;
+      // if (data.image_array.indexOf("[") != -1) { // I know this code it's shit 
+      //   imagesIdString = data.image_array.slice(1, -1)
+      // }
 
-      let responseService = await fetch("/catalogo/imagesAttachment/"+imagesIdString); 
-          responseService = await responseService.json();
+      // let responseService = await fetch("/catalogo/imagesAttachment/"+imagesIdString); 
+      //     responseService = await responseService.json();
 
-      console.log(responseService)
+      // console.log(responseService)
 
-      $("#imgsDetailCaontainer").html("")
-      for (let i = 0; i < responseService.result.length; i++) {
-        let el = `
-          <div class="splide__slide">
-            <img src="${responseService.result[i]}" alt="">
-          </div>
-        `;
-        $("#imgsDetailCaontainer").append(el)
-      }
+      // $("#imgsDetailCaontainer").html("")
+      // for (let i = 0; i < responseService.result.length; i++) {
+      //   let el = `
+      //     <div class="splide__slide">
+      //       <img src="${responseService.result[i]}" alt="">
+      //     </div>
+      //   `;
+      //   $("#imgsDetailCaontainer").append(el)
+      // }
 
-      var splide = new Splide( '.splide', {
-        type   : 'loop',
-        perPage: 3,
-        rewind: false,
-        focus  : 'center',
-        pagination: false,
-      } );
+      // var splide = new Splide( '.splide', {
+      //   type   : 'loop',
+      //   perPage: 3,
+      //   rewind: false,
+      //   focus  : 'center',
+      //   pagination: false,
+      // } );
 
-      splide.mount();
+      // splide.mount();
 
-      $("#modalDetalleImg").attr("src", data.image)
-      $("#img-zoom-effect").attr("style", `background: url('${data.image}') no-repeat #FFF;`)
+      // $("#modalDetalleImg").attr("src", data.image)
+      // $("#img-zoom-effect").attr("style", `background: url('${data.image}') no-repeat #FFF;`)
 
-      $("#loaderImagesDetailProduct").hide()
+      // $("#loaderImagesDetailProduct").hide()
     }
 
     const printTags = () => {
