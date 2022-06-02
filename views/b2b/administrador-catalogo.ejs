@@ -1378,6 +1378,7 @@
 
       $("#inputAttached")[0].value = null;
       $("#fileNameAttached").text("Seleccione Adjuntos");
+      $("#inputAttachedRelateProducts").val("")
 
       succesUpload();
       getAttachmentsCatalog();
@@ -2127,6 +2128,9 @@
       backspace: false,
       editTags : false, 
       enforceWhitelist: true,
+      dropdown : {
+        closeOnSelect : false,          
+      },
       hooks: {
         beforeRemoveTag : function( tags ){
           return new Promise((resolve, reject) => {
@@ -2153,7 +2157,10 @@
       duplicates: true,
       backspace: false,
       editTags : false, 
-      enforceWhitelist: true
+      enforceWhitelist: true,
+      dropdown : {
+        closeOnSelect : false,          
+      }
     })
 
     var tagifyAttributes = new Tagify( document.querySelector('#attrProductsAsociateForm'), {
@@ -2161,6 +2168,9 @@
       backspace: false,
       editTags : false, 
       enforceWhitelist: false,
+      dropdown : {
+        closeOnSelect : false,          
+      },
       hooks: {
         beforeRemoveTag : function( tags ){
           return new Promise((resolve, reject) => {
@@ -2197,19 +2207,35 @@
 
     // Buscador Catalogo
     $(document).on("keyup", "#filterTableProducts", function (e) {
+      valueFilter = $("#filterTableProducts").val();      
       if (e.which == 13) {
+        filterSearchField()
+      };
+      if (valueFilter.length == 0) {
         filterSearchField()
       };
     })
 
     $(document).on("keyup", "#filterImagesSection", function (e) {
+      valueFilter = $("#filterTableProducts").val();    
+      
       if (e.which == 13) {
+        filterSearchFieldImages()
+      };
+
+      if (valueFilter.length == 0) {
         filterSearchFieldImages()
       };
     })
 
     $(document).on("keyup", "#filterAttachmentsSection", function (e) {
+      valueFilter = $("#filterTableProducts").val();    
+
       if (e.which == 13) {
+        filterSearchFieldAttachments()
+      };
+
+      if (valueFilter.length == 0) {
         filterSearchFieldAttachments()
       };
     })

@@ -604,7 +604,13 @@
 
     // Buscador
     $(document).on("keyup", "#searchField", function (e) {
+      valueFilter = $("#searchField").val();    
+
       if (e.which == 13) {
+        filterSearchField()
+      };
+
+      if (valueFilter.length == 0) {
         filterSearchField()
       };
     })
