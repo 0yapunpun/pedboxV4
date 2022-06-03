@@ -123,8 +123,6 @@ router.get('/dashboard/data/:dStart/:dEnd/:user', dashboardController.dashboardD
 router.get('/dashboard/reportSeller/:dStart/:dEnd/:seller', dashboardController.dashboardReportSeller);
 router.get('/dashboard/clientsSeller/:dStart/:dEnd/:seller', dashboardController.dashboardClientsSeller);
 
-
-
 router.get('/chat', viewController.chat);
 router.get('/chat/chatId/:id', viewController.chatOpenConversation);
 

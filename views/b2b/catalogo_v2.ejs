@@ -28,7 +28,6 @@
 
   <!-- Color Page -->
   <%- include('./partials/colors.ejs') %> 
-  
 
   <style>
     .tags {
@@ -172,20 +171,12 @@
       display: block;
       transition: opacity .2s;
     }
-    #img-zoomer-box:hover #img-zoom-effect, #img-zoomer-box:active #img-zoom-effect {
-      opacity: 1;
-    }
-    #img-zoomer-box:hover, #img-zoomer-box:active {
-      cursor: zoom-in;
-      display: block;
-    }
 
-    #img-zoomer-box {
-      max-width: 500px;
-      height: auto;
-      position: relative;
-      margin: 10px auto;
-    }
+    /* .js-image-zoom__zoomed-image{
+      z-index: 3000;
+      max-width: 200px;
+      max-height: 200px;
+    } */
 
     .sk-chase {
       width: 15px;
@@ -419,9 +410,12 @@
 
               <div class="d-flex">
                 <div class="w-50 d-flex flex-column justify-content-between">
-                  <div id="img-zoomer-box">
-                    <img id="modalDetalleImg" src="https://upload.wikimedia.org/wikipedia/commons/d/da/Imagen_no_disponible.svg" alt="" style="max-width: 100%; max-height: 100%;">
-                    <!-- <div id="img-zoom-effect"></div> -->
+                  <div id="img-zoomer-box" style="max-height: 300px">
+
+                    <img id="modalDetalleImg" src="https://cdn.pixabay.com/photo/2020/03/21/19/27/sea-4955005_960_720.jpg" alt="" style="max-width: 100%; max-height: 100%;">
+
+                    <!-- <img id="modalDetalleImg" src="https://upload.wikimedia.org/wikipedia/commons/d/da/Imagen_no_disponible.svg" alt="" style="max-width: 100%; max-height: 100%;"> -->
+
                   </div>
   
                 </div>
@@ -548,7 +542,8 @@
   <script src="/js/menu.js"></script>
   <script src="/js/splide.min.js"></script>
   <script src="/js/sweetalert2.all.min.js"></script>
-  
+  <script src="/js/plugins/jquery.zoom.min.js"></script>
+
   <script>
     let cartName = "storeCart" + session.user.id;
     let cartInvoiceName = "storeInvoice" + session.user.id;
@@ -701,6 +696,8 @@
       $("#modalDetalle").modal("show")
 
       $(this).find(".preloaderProductDetail").fadeOut().remove();
+
+      $('#img-zoomer-box').zoom();
     })
 
     $(document).on('click',function(e){
@@ -776,36 +773,8 @@
     $(document).on("click", ".imgsDetailCaontainer img", function () {
       $("#modalDetalleImg").attr("src", $(this).attr("src"))
       $("#img-zoom-effect").attr("style", `background: url('${$(this).attr("src")}') no-repeat #FFF;`)
+      $('#img-zoomer-box').zoom();
     })
-
-    // zoom effec detail
-    $(document).on('mousemove','#img-zoomer-box',function(e){
-      let original = document.querySelector('#modalDetalleImg'),
-          magnified = document.querySelector('#img-zoom-effect'),
-          style = magnified.style,
-          x = e.pageX - this.offsetLeft,
-          y = e.pageY - this.offsetTop,
-          imgWidth = original.offsetWidth,
-          imgHeight = original.offsetHeight,
-          xperc = ((x/imgWidth) * 100),
-          yperc = ((y/imgHeight) * 100);
-
-      //lets user scroll past right edge of image
-      if(x > (.01 * imgWidth)) {
-        xperc += (.15 * xperc);
-      };
-
-      //lets user scroll past bottom edge of image
-      if(y >= (.01 * imgHeight)) {
-        yperc += (.15 * yperc);
-      };
-
-      style.backgroundPositionX = (xperc - 80) + '%';
-      style.backgroundPositionY = (yperc - 30) + '%';
-
-      style.left = (x - 180) + 'px';
-      style.top = (y - 180) + 'px';
-    });
 
     // Paginador
     $(document).on("change", "#selectColorProduct",  async function (e) {
@@ -837,8 +806,6 @@
 
       let responseService = await fetch("/catalogo/imagesAttachment/"+imagesIdString); 
           responseService = await responseService.json();
-
-      console.log(responseService)
 
       $("#imgsDetailCaontainer").html("")
       for (let i = 0; i < responseService.result.length; i++) {
@@ -1403,7 +1370,6 @@
           let sizes = [];
           let colors = [];
           for (let i = 0; i < data.length; i++) {
-            console.log(data[i])
             if (!sizes.includes(data[i].size)) {
               sizes.push(data[i].size)
             }
@@ -1411,8 +1377,6 @@
               colors.push(data[i].color)
             }
           };
-
-          console.log(colors)
 
           $("#selectSizeProduct").html("")
           for (let i = 0; i < sizes.length; i++) {
