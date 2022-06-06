@@ -122,6 +122,11 @@ router.get('/dashboard', viewController.dashboard);
 router.get('/dashboard/data/:dStart/:dEnd/:user', dashboardController.dashboardData);
 router.get('/dashboard/reportSeller/:dStart/:dEnd/:seller', dashboardController.dashboardReportSeller);
 router.get('/dashboard/clientsSeller/:dStart/:dEnd/:seller', dashboardController.dashboardClientsSeller);
+router.get('/dashboard/detailClient/:dStart/:dEnd/:seller', dashboardController.dashboardClientsDocuments);
+router.get('/dashboard/detailOrder/:pedido/:tipo', dashboardController.dashboardOrderDetail);
+
+
+
 
 router.get('/chat', viewController.chat);
 router.get('/chat/chatId/:id', viewController.chatOpenConversation);

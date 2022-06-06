@@ -57,10 +57,10 @@
       if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
       %>
         <li class="nav-item">
-          <a class="nav-link"  data-bs-toggle="collapse" href="#collapseApp" >
+          <a class="nav-link"  data-bs-toggle="collapse" href="#collapseHome" >
             <span class="nav-link-text ms-1 indicatorCollapse"> <h6 class="m-0 text-xs font-weight-bolder opacity-6">Home</h6> </span>
           </a>
-          <div class="collapse show" id="collapseApp">
+          <div class="collapse show" id="collapseHome">
             <ul class="navbar-nav">
             
               <%
@@ -406,25 +406,25 @@
         if (session.user.id == 12790) { 
       %>
 
-      <li class="nav-item" id="menuAdministradorCatalogo">
-        <a class="nav-link" href="/catalogo/administrador" >
-          <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
-            <i class="fab fa-buromobelexperte" style="color: #252f40; font-size: 12px"></i>
-          </div>
-          <span class="nav-link-text ms-1 font-weight-bold">Administrador Catálogo</span>
-        </a>
-      </li>
+        <li class="nav-item" id="menuAdministradorCatalogo">
+          <a class="nav-link" href="/catalogo/administrador" >
+            <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
+              <i class="fab fa-buromobelexperte" style="color: #252f40; font-size: 12px"></i>
+            </div>
+            <span class="nav-link-text ms-1 font-weight-bold">Administrador Catálogo</span>
+          </a>
+        </li>
 
-      <li class="nav-item" id="menuCatalogo">
-        <a class="nav-link" href="/catalogo" >
-          <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
-            <i class="fas fa-boxes" style="color: #252f40; font-size: 12px"></i>
-          </div>
-          <span class="nav-link-text ms-1 font-weight-bold">
-            Catalogo de Productos
-          </span>
-        </a>
-      </li>
+        <li class="nav-item" id="menuCatalogo">
+          <a class="nav-link" href="/catalogo" >
+            <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
+              <i class="fas fa-boxes" style="color: #252f40; font-size: 12px"></i>
+            </div>
+            <span class="nav-link-text ms-1 font-weight-bold">
+              Catalogo de Productos
+            </span>
+          </a>
+        </li>
 
       <% } %>
 

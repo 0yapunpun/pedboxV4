@@ -71,10 +71,10 @@
     }
 
     .selectVer .choices__list--single {
-      padding-left: 35px;
+      padding-left: 20%;
     }
     .selectOrdenar .choices__list--single {
-      padding-left: 75px;
+      padding-left: 40%;
     }
 
     .iconsHover{
@@ -848,6 +848,20 @@
       }
     }
 
+    function isPositiveInteger(str) {
+      if (typeof str !== 'string') {
+        return false;
+      }
+
+      const num = Number(str);
+
+      if (Number.isInteger(num) && num > 0) {
+        return true;
+      }
+
+      return false;
+    }
+
     // Calcular la cantidad de elementos en el filtro
     const filterCollapseData = () => {
       dataSidebar = JSON.parse(JSON.stringify(dataSidebarMaster));
@@ -870,7 +884,11 @@
             if (key == "Talla") {
               for (let i = 0; i < data.talla_array.length; i++) {
                 if (!(data.talla_array[i] in dataSidebar[key])) {
-                  dataSidebar[key][data.talla_array[i]] = 1;
+                  if (isPositiveInteger(data.talla_array[i])) { // Evitar tallas que no sean números
+                    if (Number(data.talla_array[i]) > 21 && Number(data.talla_array[i]) < 47) { // Evitar tallas fuera del rango
+                      dataSidebar[key][data.talla_array[i]] = 1;
+                    }
+                  }
                 }
               }
             }

@@ -140,16 +140,23 @@
                 $('#btn-f').show();
                 loginActive = false;
               } else if(result.result == 'ok') {
-                switch (result.user.type_user) {
-                  case "CL":
-                    window.location.href = '/catalogo';
-                    break;
-                  case "U":
-                    window.location.href = '/dashboard';
-                    break;
-                  default:
-                    window.location.href = '/agenda';
+                let permissionIndexLogin;
+
+                permissionIndexLogin = result.user.permission.map(e => e.code).lastIndexOf("6200_CAN_ACCESS_DASHBOARD")
+                if (permissionIndexLogin != -1 && result.user.permission[permissionIndexLogin].content != "N") { 
+                  window.location.href = '/dashboard';
                 }
+
+                permissionIndexLogin = result.user.permission.map(e => e.code).lastIndexOf("4500_CAN_ACCESS_CALENDAR")
+                if (permissionIndexLogin != -1 && result.user.permission[permissionIndexLogin].content != "N") { 
+                  window.location.href = '/agenda';
+                }
+
+                permissionIndexLogin = result.user.permission.map(e => e.code).lastIndexOf("8045_CAN_VIEW_SHOPPING_CAR")
+                if (permissionIndexLogin != -1 && result.user.permission[permissionIndexLogin].content != "N") { 
+                  window.location.href = '/catalogo';
+                }
+                
               }
             })
           } else {

@@ -661,8 +661,11 @@ service.dashboardReportProducts = async(id_company, dateS, dateE, seller) => {
   return data;
 }
 
-
-
+service.dashboardOrderDetail = async(id_company, pedido, tipo) => { 
+  const url = urlPedbox1+"dashboardorderdetail?id_empresa="+id_company+"&pedido="+pedido+"&tipo="+tipo;
+  const data =  await makeRequest(url);
+  return data;
+}
 
 
 const makeRequest = async (url, options) => {
