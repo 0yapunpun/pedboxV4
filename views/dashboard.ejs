@@ -532,6 +532,7 @@
               <div id="tableDetailOrderModal">
                 <table id="tDetailOrderModal">
                   <thead style="table-layout: fixed;">
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Producto</th>
                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Descripción</th>
                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Cantidad</th>
                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Precio</th>
@@ -629,8 +630,6 @@
       .then(res => res.json())
       .then(res => {
         if (!res.result.success) return
-
-        console.log(res)
         
         printTableClientsModal(res.result.report);
 
@@ -654,7 +653,6 @@
     }
 
     let getDocumentClient = (nit, name) => { //TODO
-      console.log(nit, name) 
       fetch(`/dashboard/detailClient/${startDateDashboard}/${endDateDashboard}/${nit}`)
       .then(res => res.json())
       .then(res => {
@@ -662,7 +660,8 @@
         
         printTableDetailDocumentClient(res.result.report);
 
-        $("#modalTitleDetailClient").html(nit + (name == "-" ? " - " + name : ""))
+        $("#modalTitleDetailClient").html(nit + (name == "-" ? ""  : " - "+name))
+        // $("#modalTablesClients").modal("hide")
         $("#modalTableDetailClient").modal("show")
       })
     }
@@ -700,8 +699,8 @@
                 ${user.name_person}
               </div>  
             </td>
-            <td class="text-center detailRow" onclick="getClientsSeller(${data[i].nit}, '${user.name_person}')">${data[i].clientes || "-"}</td>
-            <td class="text-center detailRow" onclick="getDocumentsSeller(${data[i].nit}, '${user.name_person}')">${data[i].cantidad || "-"}</td>
+            <td class="text-center detailRow" onclick="getClientsSeller('${data[i].nit}', '${user.name_person}')">${data[i].clientes || "-"}</td>
+            <td class="text-center detailRow" onclick="getDocumentsSeller('${data[i].nit}', '${user.name_person}')">${data[i].cantidad || "-"}</td>
             <td class="text-center">${data[i].bodega || "-"}</td>
             <td class="text-center">${nvFormatCash(data[i].valor).split(".")[0] || "-"}</td>
           </tr>
@@ -761,7 +760,7 @@
           <tr>
             <td class="text-center">${user.name_person}</td>
             <td class="text-center">${data[i].cliente || "-"}</td>
-            <td class="text-center">${data[i].documento}</td>
+            <td onclick="getDocumentDetail('${data[i].documento}', '${data[i].cliente}')"  class="text-center detailRow">${data[i].documento}</td>
             <td class="text-center">${data[i].valor || "-"}</td>
             <td class="text-center">${new Date(data[i].fecha).toLocaleString() || "-"}</td>
             <td class="text-center">${data[i].tipo_doc}</td>
@@ -790,7 +789,7 @@
           <tr>
             <td class="text-center">${data[i].nit}</td>
             <td class="text-center">${data[i].cliente || "-"}</td>
-            <td class="text-center">${data[i].documentos}</td>
+            <td onclick="getDocumentClient('${data[i].nit}', '${data[i].cliente ? data[i].cliente : "-"}')" class="text-center detailRow">${data[i].documentos}</td>
             <td class="text-center">${nvFormatCash(data[i].total).split(".")[0]  || "-"}</td>
           </tr>
         `;
@@ -809,9 +808,12 @@
       } catch (error) {}
       $("#tBodyDetailModal").html("")
 
+      console.log("xxx",data)
+
       for (let i = 0; i < data.length; i++) {
         let el = `
           <tr>
+            <td class="text-center">${data[i].producto}</td>
             <td class="text-center">${data[i].descripcion}</td>
             <td class="text-center">${data[i].cantidad || "-"}</td>
             <td class="text-center">${nvFormatCash(data[i].precio).split(".")[0]}</td>
@@ -840,7 +842,7 @@
         let el = `
           <tr>
             <td class="text-center">${data[i].nombre_vendedor}</td>
-            <td class="text-center">${data[i].documento}</td>
+            <td onclick="getDocumentDetail('${data[i].documento}', '${data[i].cliente}')" class="text-center detailRow">${data[i].documento}</td>
             <td class="text-center">${nvFormatCash(data[i].valor).split(".")[0]}</td>
             <td class="text-center">${data[i].fecha_pedido.split("T")[0]}</td>
             <td class="text-center">${data[i].fecha.split("T")[0]}</td>
@@ -868,7 +870,7 @@
           <tr>
             <td class="text-center">${data[i].nit || "-"}</td>
             <td class="text-center">${data[i].cliente || "-"}</td>
-            <td onclick="getDocumentClient(${data[i].nit}, '${data[i].cliente ? data[i].cliente : "-"}')" class="text-center detailRow">${data[i].documentos  || "-"}</td>
+            <td onclick="getDocumentClient('${data[i].nit}', '${data[i].cliente ? data[i].cliente : "-"}')" class="text-center detailRow">${data[i].documentos  || "-"}</td>
             <td class="text-center">${nvFormatCash(data[i].total).split(".")[0] || "-"}</td>
           </tr>
         `;
