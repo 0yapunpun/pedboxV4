@@ -227,19 +227,19 @@
 
           <div class="w-50 nav-wrapper position-relative end-0">
             <ul class="nav nav-pills nav-fill p-1 bg-transparent" role="tablist">
-              <li class="nav-item">
+              <li onclick="$('.sectionDashboard').hide(); $('#sectionTablesDashboard').show()" class="nav-item">
                 <a class="nav-link mb-0 px-0 py-1 active " data-bs-toggle="tab" href="javascript:;" role="tab" aria-selected="true">
                   <i class="fas fa-table"></i>
                   <span class="ms-1">Tablas</span>
                 </a>
               </li>
-              <li class="nav-item">
+              <li onclick="$('.sectionDashboard').hide(); $('#sectionGraphicsDashboard').show()" class="nav-item">
                 <a class="nav-link mb-0 px-0 py-1 " data-bs-toggle="tab" href="javascript:;" role="tab" aria-selected="false">
                   <i class="fas fa-chart-bar"></i>
                   <span class="ms-1">Gráficas</span>
                 </a>
               </li>
-              <li class="nav-item">
+              <li onclick="$('.sectionDashboard').hide(); $('#sectionMapsDashboard').show()" class="nav-item">
                 <a class="nav-link mb-0 px-0 py-1 " data-bs-toggle="tab" href="javascript:;" role="tab" aria-selected="false">
                   <i class="fas fa-map-marked"></i>
                   <span class="ms-1">Mapas</span>
@@ -250,147 +250,181 @@
           </div>
         </div>
 
-        <div id="cardsContainerDashboard" class="d-flex">
-          <div class="d-flex gap-3 justify-content-center px-1">
-            <div class="card flex-fill " style="width: 25%; cursor: pointer">
-              <div class=" h-100">
-                <div onclick="$('#tablesDashboard>div').hide(); $('#tableDocuments').show()" class="card-header p-3 pb-0 cardDocumentsHover">
-                  <div class="d-flex justify-content-between">
-                    <h6 class="mb-0">Ventas</h6>
-                  </div>
-                  <div class="text-center">
-                    <h2 style="color: #03A9F4"> <span id="dsboardVentas">0</span></h2>
-                    <h4>Total</h4>
-                  </div> 
-                </div>
-                <div class="card-body p-3 py-1 d-flex justify-content-center align-items-center flex-column"  >
-                  <div style="width: 100%; margin-top: 20px" >   
-                    <div onclick="$('#tablesDashboard>div').hide(); $('#tableVisits').show()" class="border-top cardVisitedClientsHover" style="padding: 5px 10px">   
-                      <p class="mt-1">Clientes visitados:  <span id="dsboardClientesVisitados" class="dashboardNumberStyle">0</span> </p>
+        <div id="sectionTablesDashboard" class="sectionDashboard">
+          <div id="cardsContainerDashboard" class="d-flex">
+            <div class="d-flex gap-3 justify-content-center px-1">
+              <div class="card flex-fill " style="width: 25%; cursor: pointer">
+                <div class=" h-100">
+                  <div onclick="$('#tablesDashboard>div').hide(); $('#tableDocuments').show()" class="card-header p-3 pb-0 cardDocumentsHover">
+                    <div class="d-flex justify-content-between">
+                      <h6 class="mb-0">Ventas</h6>
                     </div>
-                    <div onclick="$('#tablesDashboard>div').hide(); $('#tableProducts').show()" class="border-top cardProductClient" style="padding: 5px 10px">    
-                      <p class="mt-1">Productos:  <span id="dsboardProducts" class="dashboardNumberStyle">0</span> </p>
+                    <div class="text-center">
+                      <h2 style="color: #03A9F4"> <span id="dsboardVentas">0</span></h2>
+                      <h4>Total</h4>
+                    </div> 
+                  </div>
+                  <div class="card-body p-3 py-1 d-flex justify-content-center align-items-center flex-column"  >
+                    <div style="width: 100%; margin-top: 20px" >   
+                      <div onclick="$('#tablesDashboard>div').hide(); $('#tableVisits').show()" class="border-top cardVisitedClientsHover" style="padding: 5px 10px">   
+                        <p class="mt-1">Clientes visitados:  <span id="dsboardClientesVisitados" class="dashboardNumberStyle">0</span> </p>
+                      </div>
+                      <div onclick="$('#tablesDashboard>div').hide(); $('#tableProducts').show()" class="border-top cardProductClient" style="padding: 5px 10px">    
+                        <p class="mt-1">Productos:  <span id="dsboardProducts" class="dashboardNumberStyle">0</span> </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            <div onclick="$('#tablesDashboard>div').hide(); $('#tableRanking').show()" class="d-flex gap-3 justify-content-center px-1">
+              <div class="card flex-fill  cardsButtons" style="width: 25%; cursor: pointer">
+                <div class=" h-100">
+                  <div class="card-header p-3 pb-0" style="background-color: transparent">
+                    <div class="d-flex justify-content-between">
+                      <h6 class="mb-0">Vendedores</h6>
+                    </div>
+                    <div class="text-center">
+                      <h2 style="color: #388E3C"> <span id="dsboardVendedores">0</span></h2>
+                      <h4>Activos</h4>
+                    </div> 
+                  </div>
+                  <div class="card-body p-3 py-1 d-flex justify-content-center align-items-center flex-column"  >
+                    <div style="width: 100%; margin-top: 20px" >   
+                      <div class="border-top" style="padding: 5px 10px">   
+                        <p class="mt-1">Registrados:  <span id="dsboardRegistered" class="dashboardNumberStyle">0</span> </p>
+                      </div>
+  
+                      <div class="border-top" style="padding: 5px 10px">    
+                        <p class="mt-1">Total ventas:  <span id="dsboardPromedioVentas" class="dashboardNumberStyle">0</span> </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            <div onclick="$('#tablesDashboard>div').hide(); $('#tableDocuments').show()" class="d-flex gap-3 justify-content-center px-1">
+              <div class="card flex-fill  cardsButtons" style="width: 25%; cursor: pointer">
+                <div class=" h-100">
+                  <div class="card-header p-3 pb-0" style="background-color: transparent">
+                    <div class="d-flex justify-content-between">
+                      <h6 class="mb-0">Documentos</h6>
+                    </div>
+                    <div class="text-center">
+                      <h2 style="color: #FF9801"> <span id="dsboardDocuments">0</span></h2>
+                      <h4>Cantidad</h4>
+                    </div> 
+                  </div>
+                  <div class="card-body p-3 py-1 d-flex justify-content-center align-items-center flex-column"  >
+                    <div style="width: 100%; margin-top: 20px" >   
+                      <div class="border-top" style="padding: 5px 10px">   
+                        <p class="mt-1">Pedidos:  <span id="dsboardPedidos" class="dashboardNumberStyle">0</span> </p>
+                      </div>
+                      <div class="border-top" style="padding: 5px 10px">    
+                        <p class="mt-1">Facturas:  <span id="dsboardFacturas" class="dashboardNumberStyle">0</span> </p>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-
-          <div onclick="$('#tablesDashboard>div').hide(); $('#tableRanking').show()" class="d-flex gap-3 justify-content-center px-1">
-            <div class="card flex-fill  cardsButtons" style="width: 25%; cursor: pointer">
-              <div class=" h-100">
-                <div class="card-header p-3 pb-0" style="background-color: transparent">
-                  <div class="d-flex justify-content-between">
-                    <h6 class="mb-0">Vendedores</h6>
-                  </div>
-                  <div class="text-center">
-                    <h2 style="color: #388E3C"> <span id="dsboardVendedores">0</span></h2>
-                    <h4>Activos</h4>
-                  </div> 
-                </div>
-                <div class="card-body p-3 py-1 d-flex justify-content-center align-items-center flex-column"  >
-                  <div style="width: 100%; margin-top: 20px" >   
-                    <div class="border-top" style="padding: 5px 10px">   
-                      <p class="mt-1">Registrados:  <span id="dsboardRegistered" class="dashboardNumberStyle">0</span> </p>
-                    </div>
-
-                    <div class="border-top" style="padding: 5px 10px">    
-                      <p class="mt-1">Promedio ventas:  <span id="dsboardPromedioVentas" class="dashboardNumberStyle">0</span> </p>
-                    </div>
-                  </div>
-                </div>
+  
+          <div class="card mt-2 p-2">
+            <div id="tablesDashboard">
+  
+              <div id="tableRanking">
+                <h6 class="mb-0 ms-2">Ranking Vendedores</h6>
+                <table id="tRanking">
+                  <thead style="table-layout: fixed;">
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder"></th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Nombres</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Clientes</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Documentos</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Bodega</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Total</th>
+                  </thead>
+                  <tbody id="tBodyRanking"></tbody>
+                </table>
               </div>
-            </div>
-          </div>
-
-          <div onclick="$('#tablesDashboard>div').hide(); $('#tableDocuments').show()" class="d-flex gap-3 justify-content-center px-1">
-            <div class="card flex-fill  cardsButtons" style="width: 25%; cursor: pointer">
-              <div class=" h-100">
-                <div class="card-header p-3 pb-0" style="background-color: transparent">
-                  <div class="d-flex justify-content-between">
-                    <h6 class="mb-0">Documentos</h6>
-                  </div>
-                  <div class="text-center">
-                    <h2 style="color: #FF9801"> <span id="dsboardDocuments">0</span></h2>
-                    <h4>Cantidad</h4>
-                  </div> 
-                </div>
-                <div class="card-body p-3 py-1 d-flex justify-content-center align-items-center flex-column"  >
-                  <div style="width: 100%; margin-top: 20px" >   
-                    <div class="border-top" style="padding: 5px 10px">   
-                      <p class="mt-1">Pedidos:  <span id="dsboardPedidos" class="dashboardNumberStyle">0</span> </p>
-                    </div>
-                    <div class="border-top" style="padding: 5px 10px">    
-                      <p class="mt-1">Facturas:  <span id="dsboardFacturas" class="dashboardNumberStyle">0</span> </p>
-                    </div>
-                  </div>
-                </div>
+  
+              <div id="tableDocuments" style="display: none;">
+                <h6 class="mb-0 ms-2">Documentos</h6>
+                <table id="tDocuments" >
+                  <thead style="table-layout: fixed;">
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Vendedor</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Cliente</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Documento</th>
+                    <th id="tableDocumentsPrice" class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Valor</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Fecha</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Tipo</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Nota</th>
+                  </thead>
+                  <tbody id="tBodyDocuments"></tbody>
+                </table>
               </div>
+  
+              <div id="tableVisits" style="display: none;">
+                <h6 class="mb-0 ms-2">Clientes Visitados</h6>
+                <table id="tVisits">
+                  <thead style="table-layout: fixed;">
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Nit</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Cliente</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Documentos</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Total</th>
+                  </thead>
+                  <tbody id="tBodyVisits"></tbody>
+                </table>
+              </div>
+  
+              <div id="tableProducts" style="display: none;">
+                <h6 class="mb-0 ms-2">Productos</h6>
+                <table id="tProducts">
+                  <thead style="table-layout: fixed;">
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Producto</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Descripción</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Cantidad</th>
+                  </thead>
+                  <tbody id="tBodyProducts"></tbody>
+                </table>
+              </div>
+  
             </div>
           </div>
         </div>
 
-        <div class="card mt-2 p-2">
-          <div id="tablesDashboard">
+        <div id="sectionGraphicsDashboard" class="sectionDashboard" style="display: none;">
 
-            <div id="tableRanking">
-              <h6 class="mb-0 ms-2">Ranking Vendedores</h6>
-              <table id="tRanking">
-                <thead style="table-layout: fixed;">
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder"></th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Nombres</th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Clientes</th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Documentos</th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Bodega</th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Total</th>
-                </thead>
-                <tbody id="tBodyRanking"></tbody>
-              </table>
+            <div class="card my-1 p-2">
+              <h6 class="ms-1">Top 10 Vendedores</h6>
+              <div style="height: 300px;" class="p-2">
+                <canvas id="chartRanking" width="400" height="120"></canvas>
+              </div>
             </div>
 
-            <div id="tableDocuments" style="display: none;">
-              <h6 class="mb-0 ms-2">Documentos</h6>
-              <table id="tDocuments" >
-                <thead style="table-layout: fixed;">
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Vendedor</th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Cliente</th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Documento</th>
-                  <th id="tableDocumentsPrice" class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Valor</th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Fecha</th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Tipo</th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Nota</th>
-                </thead>
-                <tbody id="tBodyDocuments"></tbody>
-              </table>
+            <div class="d-flex gap-2">
+
+              <div class="card my-1 p-2 w-50">
+                <h6 class="ms-1">Top 10 Productos</h6>
+                <div style="position: relative; height: 400px; width:400px; margin: 0 auto">
+                  <canvas id="chartProducts" width="100%" height="100%"></canvas>
+                </div>
+              </div>
+  
+              <div class="card my-1 p-2 w-50">
+                <h6 class="ms-1">Total Documentos</h6>
+                <div style="position: relative; height: 400px; width:400px; margin: 0 auto">
+                  <canvas id="chartTotalDocuments" width="100%" height="100%"></canvas>
+                </div>
+              </div>
             </div>
 
-            <div id="tableVisits" style="display: none;">
-              <h6 class="mb-0 ms-2">Clientes Visitados</h6>
-              <table id="tVisits">
-                <thead style="table-layout: fixed;">
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Nit</th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Cliente</th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Documentos</th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Total</th>
-                </thead>
-                <tbody id="tBodyVisits"></tbody>
-              </table>
-            </div>
+        </div>
 
-            <div id="tableProducts" style="display: none;">
-              <h6 class="mb-0 ms-2">Productos</h6>
-              <table id="tProducts">
-                <thead style="table-layout: fixed;">
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Producto</th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Descripción</th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Cantidad</th>
-                </thead>
-                <tbody id="tBodyProducts"></tbody>
-              </table>
-            </div>
-
-          </div>
+        <div id="sectionMapsDashboard" class="sectionDashboard" style="display: none;">
+          <h1>Mapas</h1>
         </div>
 
       </div>
@@ -560,10 +594,17 @@
         dataSellersVisits = res[4];
 
         printDataReports(dataDashboard.result.report[0])
+
+        // Tablas
         printTableRanking(dataDashboard.result.detail)
         printTableDocuments(dataSellers.result.report)
         printTablevisits(dataSellersVisits.result.report)
         printTableProducts(dataProducts.result.report)
+
+        // Graficas
+        printChartRanking();
+        printChartProducts();
+        printChartDocuments();
 
         $("#editViewDateContainer").show();
         $("#loadingViewDateContainer").hide();
@@ -632,7 +673,7 @@
       $("#dsboardProducts").html(numberWithCommas(data.productos))
       $("#dsboardVendedores").html(data.vendedores)
       $("#dsboardRegistered").html(data.registrados)
-      $("#dsboardPromedioVentas").html(nvFormatCash(data.ventas).split(".")[0]) // TODO calcular promedio, de momento este es el total
+      $("#dsboardPromedioVentas").html(nvFormatCash(data.ventas).split(".")[0]) 
       $("#dsboardDocuments").html(data.documentos)
       $("#dsboardPedidos").html(data.pedidos)
       $("#dsboardFacturas").html(data.facturas)
@@ -967,6 +1008,123 @@
         return getData();
       }
     }
+
+    let generatePastelColor = () => {
+      let R = Math.floor((Math.random() * 127) + 127);
+      let G = Math.floor((Math.random() * 127) + 127);
+      let B = Math.floor((Math.random() * 127) + 127);
+      
+      let rgb = (R << 16) + (G << 8) + B;
+      return `#${rgb.toString(16)}`;      
+    }
+
+    let charRanking;
+    const printChartRanking = () => {
+      let data = dataDashboard.result.detail;
+          data = _.sortBy(data, function(o) { return o.valor; }).reverse();
+
+      let usersLabels = [];
+      let usersData = [];
+      let colors = [];
+
+      for (let i = 0; i < data.length; i++) {
+        usersLabels.push(data[i].vendedor)
+        usersData.push(data[i].valor)
+        colors.push(generatePastelColor())
+      }
+
+      try { // Cuando se intenta crear una grafica que ya existe arroja error, en ese caso se actualizan los datos
+        charRanking = new Chart(document.getElementById('chartRanking').getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: usersLabels,
+            datasets: [{
+              label: 'Ranking Vendedores',
+              data: usersData,
+              backgroundColor: colors,
+            }]
+          }
+        })
+      } catch (error) {
+        charRanking.data.labels = usersLabels;
+        charRanking.data.datasets[0].data = usersData;
+        charRanking.data.datasets[0].backgroundColor = colors;
+        charRanking.update();
+      }
+    }
+
+    let charProducts;
+    const printChartProducts = () => {
+      let data = dataProducts.result.report;
+
+      let productLabel = [];
+      let productData = [];
+      let colors = [];
+
+      for (let i = 0; i < 10; i++) {
+        productLabel.push(data[i].descripcion)
+        productData.push(data[i].cantidad)
+        colors.push(generatePastelColor())
+      }
+
+      try {
+        charProducts = new Chart(document.getElementById('chartProducts').getContext('2d'), {
+          type: 'pie',
+          data: {
+            labels: productLabel,
+            datasets: [{
+              label: 'Ranking Productos',
+              data: productData,
+              backgroundColor: colors,
+            }]
+          },
+          options: { plugins: { legend: { display: true, position: 'right' }}}
+        })
+      } catch (error) {
+        charProducts.data.labels = productLabel;
+        charProducts.data.datasets[0].data = productData;
+        charProducts.data.datasets[0].backgroundColor = colors;
+        charProducts.update();
+      }
+    };
+
+    let chartDocuments
+    const printChartDocuments = () => {
+      let data = dataDashboard.result.detail;
+          data = _.sortBy(data, function(o) { return o.valor; }).reverse();
+
+      let usersLabels = [];
+      let usersData = [];
+      let colors = [];
+
+      for (let i = 0; i < data.length; i++) {
+        usersLabels.push(data[i].vendedor)
+        usersData.push(data[i].valor)
+        colors.push(generatePastelColor())
+      }
+
+      try {
+        chartDocuments = new Chart(document.getElementById('chartTotalDocuments').getContext('2d'), {
+          type: 'pie',
+          data: {
+            labels: usersLabels,
+            datasets: [{
+              label: 'Ranking Productos',
+              data: usersData,
+              backgroundColor: colors,
+            }]
+          },
+          options: { plugins: { legend: {  display: true, position: 'right' } }
+          }
+        })
+      } catch (error) {
+        chartDocuments.data.labels = usersLabels;
+        chartDocuments.data.datasets[0].data = usersData;
+        chartDocuments.data.datasets[0].backgroundColor = colors;
+        chartDocuments.update();
+      }
+    }
+
 
     $(document).ready(function () {
       $('[data-toggle="tooltip"]').tooltip();
