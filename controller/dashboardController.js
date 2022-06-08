@@ -71,6 +71,16 @@ controller.dashboardReportProducts = async(req, res, next) => {
   res.send(data);
 }
 
+controller.dashboardSellersMap = async(req, res, next) => {
+  let id_company = req.session.user.id_company
+  let type_person = 5;
+  let sellers = req.params.sellers;
+
+  let data = await service.getPersonsMap(id_company, type_person, sellers);
+  
+  res.send(data);
+}
+
 
 
 

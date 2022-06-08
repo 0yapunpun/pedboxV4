@@ -1,10 +1,9 @@
   <!-- 
   TODO
-  - Faltan algunas tablas por hipervinculo
-  - Estilos link columna documentos y clientes
-  - Todo lo relacionado con graficas y mapas
-  - Selección de fecha
-  - Funcionalidad exportar dashboard
+    - Obtener informaciòn marcadores
+    - Marcadores de ventas
+    - Pasar de marcadores de vendedores a marcadores de ventas
+    - Implementar cluster marcadores
  -->
 
 
@@ -159,6 +158,31 @@
         transform: scale(1.0); 
       } 
     }
+
+
+    .navSectionsItemsAdmin{
+      display: flex;
+      background-color: #F8F9FA;
+      flex-wrap: wrap;
+      border-radius: 0.5rem;      
+    }
+    .navSectionsItemsAdmin>div{
+      margin: 5px;
+      padding: 5px;
+      border-radius: 0.5rem;
+      text-align: center;
+      flex-grow: 1;
+      flex-basis: 0;
+      min-width: 0;
+      font-weight: 600;
+      cursor: pointer;
+      width: min-content;
+    }
+    .activeNavitemAdmin{
+      transition: 0.3s;
+      background-color: white;
+      box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+    }
   </style>
 </head>
 
@@ -245,7 +269,6 @@
                   <span class="ms-1">Mapas</span>
                 </a>
               </li>
-
             </ul>
           </div>
         </div>
@@ -424,7 +447,15 @@
         </div>
 
         <div id="sectionMapsDashboard" class="sectionDashboard" style="display: none;">
-          <h1>Mapas</h1>
+          <div class="card p-3">
+
+            <div class="navSectionsItemsAdmin mb-2 w-50" style="margin: auto;">
+              <div id="navMapsSeller" onclick="" class="activeNavitemAdmin">Vendedores</div>
+              <div id="navMapsSales" onclick="" >Ventas</div>
+            </div>
+
+            <div id="geolocalizacion_bb" style="width: 100%; height: 600px; position: relative; overflow: hidden;"></div>
+          </div>
         </div>
 
       </div>
@@ -488,6 +519,7 @@
           </div>
         </div>
       </div>
+
 
       <div id="modalTableDetailClient" class="modal fade" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-lg" role="document" style="min-width: 80vw !important;">
@@ -572,6 +604,9 @@
   <script src="/js/menu.js"></script>
   <script src="/js/sweetalert2.all.min.js"></script>
 
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBTBRrWPJMw8oEnVWZATb0Xmr7hIeS99iE" async defer></script>
+
+
   <script>
     let startDateDashboard = new Date().toISOString().split("T")[0].replaceAll("-", "");
     let endDateDashboard = new Date().toISOString().split("T")[0].replaceAll("-", "");
@@ -581,12 +616,14 @@
     let personsCompany;
     let dataSellersVisits;
 
+    let mapLoaded = false;
+
     const getData = (user) => {
       let userID = user || 0;
       fetch(`/dashboard/data/${startDateDashboard}/${endDateDashboard}/${userID}`)
       .then(res => res.json())
       .then(res => {
-        console.log(res)
+        console.log("x", res)
 
         dataDashboard = res[0];
         dataSellers = res[1];
@@ -607,6 +644,13 @@
         printChartProducts();
         printChartDocuments();
 
+        // Mapas
+        getDocumentsMap();
+        if (!mapLoaded) { // Mapa de vendedores no se actualiza con el cambio de rango de fehcas
+          getGeolocalisationData();
+          mapLoaded = true;
+        }
+
         $("#editViewDateContainer").show();
         $("#loadingViewDateContainer").hide();
       })
@@ -622,6 +666,22 @@
 
         $("#modalTitleDocuments").html("Documentos realizados por "+name)
         $("#modalTablesDocuments").modal("show")
+      })
+    }
+
+    let mapSalesInfo = null;
+    let getDocumentsMap = () => { // documents = sale
+      fetch(`/dashboard/reportSeller/${startDateDashboard}/${endDateDashboard}/0`)
+      .then(res => res.json())
+      .then(res => {
+        if (!res.result.success) return
+
+        mapSalesInfo = res.result.report
+
+        if ($("#navMapsSales").hasClass("activeNavitemAdmin")){ // Actualizar marcadores si la opción de ventas está seleccionada
+          clearMarkers();
+          showMarkersSales(mapSalesInfo);
+        }
       })
     }
 
@@ -1126,7 +1186,129 @@
         chartDocuments.update();
       }
     }
+    
+    let mapSellersInfo = null;
+    const getGeolocalisationData = () => {
+      let usersId = [];
+      for (let i = 0; i < personsCompany.length; i++) {
+        if (personsCompany[i].status == 1 && personsCompany[i].id_type_user == "2") {
+          usersId.push(personsCompany[i].num_identification)
+        }
+      };
 
+      fetch(`/dashboard/sellersMap/${usersId.toString()}`)
+      .then(res => res.json())
+      .then(res => {
+        if (!res.result.success) return
+
+        mapSellersInfo = res.result.persons;
+        showMarkersSellers(mapSellersInfo);
+      })
+    }
+
+    var map;
+    var drawMap = function() {
+      var styles = [{
+        "stylers": [
+          { "saturation": -100 },
+          { "gamma": 1.07 }
+        ]}
+      ];
+      // End Styles
+      var mapa = new google.maps.LatLng(5.2445497,-72.4879592);
+      var styledMap = new google.maps.StyledMapType(styles,{name: "Styled Map"});
+      var mapOptions = {
+        zoom: 6,
+        center: mapa,
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        mapTypeControlOptions: {
+          mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'map_style']
+        }
+      }
+
+      map = new google.maps.Map($("#geolocalizacion_bb")[0], mapOptions);
+      map.mapTypes.set('map_style', styledMap);
+      map.setMapTypeId('map_style');
+
+      var currentPlace = null;
+      var info = $('#placeDetails');
+      infowindow = new google.maps.InfoWindow();
+    };
+
+    let markers = [];
+    var showMarkersSellers = function(data) {
+      markers = [];
+      for (let i = 0; i < data.length; i++) {
+        let detail = `
+          <div class="d-flex flex-column justify-content-center">
+            <h6 class="mb-0">Geolocalización de ${data[i].name_person}</h6>
+            <span class="text-center">Ultimo registro: ${data[i].last_location || data[i].date_last_connection}</span>
+            <span class="text-center"><a href="" style="pointer-events: none">Ver recorrido</a></span>
+          </div>
+        `;
+
+        marker = new google.maps.Marker({
+          position: new google.maps.LatLng(data[i].latitude, data[i].longitude),
+          map: map,
+          icon: "https://app.pedbox.co/assets/images/avatars/profile-maps.png",
+        });
+        markers.push(marker);
+        bindInfoWindow(marker, map, detail);
+      };
+    };
+
+    var showMarkersSales = function(data) {
+      markers = [];
+      for (let i = 0; i < data.length; i++) {
+        if (!data[i].latitud || !data[i].longitud) continue
+
+        let detail = `
+          <div class="d-flex flex-column justify-content-center">
+            <h6 class="mb-0">Vendedor ${data[i].nombre_vendedor} </h6>
+            <label class="m-0">Documento: <span style="color: #6c757d">${data[i].documento} </span></label>
+            <label class="m-0">Cliente: <span style="color: #6c757d">${data[i].cliente || " - "} </span></label>
+            <label class="m-0">Tipo: <span style="color: #6c757d">${data[i].tipo_doc} </span></label>
+            <label class="m-0">Valor: <span style="color: #6c757d">${nvFormatCash(data[i].valor)} </span></label>
+            <label class="m-0">Fecha Pedido: <span style="color: #6c757d">${nvFormatDate(data[i].fecha_pedido, "mmmm DD del YYYY")} </span></label>
+          </div>
+        `;
+
+        marker = new google.maps.Marker({
+          position: new google.maps.LatLng(data[i].latitud, data[i].longitud),
+          map: map,
+          icon: "https://app.pedbox.co/assets/images/icons-maps/shopping-cart.png",
+        });
+        markers.push(marker);
+        bindInfoWindow(marker, map, detail);
+      };
+    }
+
+    var bindInfoWindow = function(marker, map, description) {
+      google.maps.event.addListener(marker, 'click', function() {
+        infowindow.setContent(description);
+        infowindow.open(map, marker);
+      });
+    };
+
+    var clearMarkers = function() {
+      for (var i = 0; i < markers.length; i++ ) {
+        markers[i].setMap(null);
+      }
+      markers = [];
+    };
+
+    $(".navSectionsItemsAdmin>div").on("click", function () {
+      $(".navSectionsItemsAdmin>div").removeClass("activeNavitemAdmin")
+      $(this).addClass("activeNavitemAdmin");
+
+      clearMarkers();
+
+      if ($(this).attr("id") == "navMapsSeller") {
+        showMarkersSellers(mapSellersInfo);
+      } else {
+        showMarkersSales(mapSalesInfo)        
+      }
+    })
 
     $(document).ready(function () {
       $('[data-toggle="tooltip"]').tooltip();
@@ -1135,7 +1317,8 @@
       $("#date2").attr("max", new Date().toISOString().split("T")[0]); // Limit date to custom date range
       $("#currentViewDate").html(nvFormatDate(new Date(), "mmmm DD del YYYY"));
 
-      getData()
+      getData();
+      drawMap();
     })
   </script>
 

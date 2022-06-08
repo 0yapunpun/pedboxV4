@@ -537,6 +537,12 @@ service.getPersonsCompany = async(id_company, type_person) => {
   return data;
 }
 
+service.getPersonsMap = async(id_company, type_person, sellers) => { 
+  const url = urlKakashi+`get_person?id_company=${id_company}&type_person=${type_person}&type_user=2,6&seller=${sellers}`;
+  const data =  await makeRequest(url);
+  return data;
+}
+
 service.getUsersCompany = async(id_company, Status) => { 
   const url = urlKakashi+"get_userscompany?id_company="+id_company+"&status="+Status;
   const data =  await makeRequest(url);

@@ -124,8 +124,7 @@ router.get('/dashboard/reportSeller/:dStart/:dEnd/:seller', dashboardController.
 router.get('/dashboard/clientsSeller/:dStart/:dEnd/:seller', dashboardController.dashboardClientsSeller);
 router.get('/dashboard/detailClient/:dStart/:dEnd/:seller', dashboardController.dashboardClientsDocuments);
 router.get('/dashboard/detailOrder/:pedido/:tipo', dashboardController.dashboardOrderDetail);
-
-
+router.get('/dashboard/sellersMap/:sellers', dashboardController.dashboardSellersMap);
 
 
 router.get('/chat', viewController.chat);
