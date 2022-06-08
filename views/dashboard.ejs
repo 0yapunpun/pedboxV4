@@ -159,7 +159,6 @@
       } 
     }
 
-
     .navSectionsItemsAdmin{
       display: flex;
       background-color: #F8F9FA;
@@ -201,6 +200,7 @@
 
         <div id="headerDashboard" class="card mb-2 flex-row align-items-center" style="background-color: transparent; box-shadow: none;"> 
           <div class="w-50 ms-3 d-flex">
+            
             <div>
               <div >
                 <span id="currentViewDate" class="font-weight-bold" style="color: #344767; font-style: italic;"></span>
@@ -218,8 +218,8 @@
                   <div class="sk-chase-dot"></div>
                 </div>
               </div>
-              <div id="editViewDateContainer" style="position: relative" class="dropdown" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar fecha">
-                <i class="fas fa-pen ms-3 dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" ></i>
+              <div id="editViewDateContainer" style="position: relative" class="dropdown" data-bs-toggle="tooltip" data-bs-placement="top" title="Filtrar fecha">
+                <i class="fas fa-filter ms-3 dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" ></i>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="left: -20px;">
                   <li onclick="dateFilter(0)"><a class="dropdown-item" href="#">Hoy</a></li>
                   <li onclick="dateFilter(-1)"><a class="dropdown-item" href="#">Ayer</a></li>
@@ -246,7 +246,7 @@
               </div>
             </div>
 
-            <i class="fas fa-download ms-3" data-toggle="tooltip" title="Exportar Dashboard" style="display: flex; align-items: center;"></i>
+            <i id="exportdashboardBtn" class="fas fa-download ms-3" data-toggle="tooltip" title="Exportar Dashboard" style="display: flex; align-items: center;"></i>
           </div>
 
           <div class="w-50 nav-wrapper position-relative end-0">
@@ -623,7 +623,6 @@
       fetch(`/dashboard/data/${startDateDashboard}/${endDateDashboard}/${userID}`)
       .then(res => res.json())
       .then(res => {
-        console.log("x", res)
 
         dataDashboard = res[0];
         dataSellers = res[1];
@@ -699,7 +698,6 @@
     }
 
     let getDocumentDetail = (pedido, name) => {
-      console.log(pedido, name)
       fetch(`/dashboard/detailOrder/${pedido}/P`)
       .then(res => res.json())
       .then(res => {
@@ -842,8 +840,6 @@
       } catch (error) {}
       $("#tBodyClientsModal").html("")
 
-      console.log(data)
-
       for (let i = 0; i < data.length; i++) {
         let element = `
           <tr>
@@ -867,8 +863,6 @@
         tblDetailOrderModal.destroy();
       } catch (error) {}
       $("#tBodyDetailModal").html("")
-
-      console.log("xxx",data)
 
       for (let i = 0; i < data.length; i++) {
         let el = `
@@ -1308,6 +1302,10 @@
       } else {
         showMarkersSales(mapSalesInfo)        
       }
+    })
+
+    $("#exportdashboardBtn").on("click", function () {
+      window.open(`https://pedbox.co:8531/dashboardexportar?id_company=${session.user.id_company}&date_begin=${startDateDashboard}&date_end=${endDateDashboard}&user=0`);
     })
 
     $(document).ready(function () {
