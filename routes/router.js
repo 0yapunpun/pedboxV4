@@ -7,6 +7,7 @@ const b2bController = require('../controller/b2bController.js');
 const helpdeskController = require('../controller/helpdeskController.js');
 const agendaController = require('../controller/agendaController.js');
 const dashboardController = require('../controller/dashboardController.js');
+const mapsController = require('../controller/mapsController.js');
 
 //** user
 router.get('/', viewController.login);
@@ -89,7 +90,6 @@ router.get('/catalogo/productsByCode/:code', b2bController.catalogProductsByCode
 router.get('/catalogo/removeImg/:code', b2bController.catalogRemoveImg);
 router.post('/catalogo/addImg', b2bController.catalogAddImg);
 router.post('/catalogo/relateImageArray', b2bController.catalogAddRelateImageArray);
-
 router.get('/catalogo/getAttributes', b2bController.catalogItemsAtributes);
 router.post('/catalogo/createAttribute', b2bController.catalogItemsAtributesCreate);
 router.post('/catalogo/updateAttribute', b2bController.catalogItemsAtributesUpdate);
@@ -97,18 +97,14 @@ router.post('/catalogo/createAttributeDetail', b2bController.catalogItemsAtribut
 router.post('/catalogo/updateAttributeDetail', b2bController.catalogItemsAtributesDetailUpdate);
 router.get('/catalogo/deleteAttributes/:id_attr', b2bController.catalogItemsAtributesDelete);
 router.get('/catalogo/deleteAttributesDetail/:id_attr', b2bController.catalogItemsAtributesDetailDelete);
-
 router.get('/catalogo/deleteAttributeAssociated/:id_attr/:id_item', b2bController.deleteAttributeAssociated); 
-
 router.get('/catalogo/getCodesAssociateToAttribute/:id_attr', b2bController.getCodesAssociateToAttribute);
 router.post('/catalogo/relateAttributesBySubstring', b2bController.relateAttributesBySubstring);
 router.get('/catalogo/deleteAttributeAssociated/:id_attr/:code', b2bController.deleteAssociatedAttribute);
 router.get('/catalogo/deleteAttachmentDetailAttribute/:id_image/:id_attribute', b2bController.deleteAttachmentDetailAttribute);
 router.get('/catalogo/deleteAttachmentsByIdItem/:id_item', b2bController.deleteAttachmentsByIdItem);
-
 router.get('/catalogo/imagesAttachment/:string', b2bController.catalogImagesAttachments);
 router.get('/catalogo/imagesItemsByCodeColor/:code/:code_color', b2bController.imagesItemsByCodeColor);
-
 router.get('/catalogo/top/data', b2bController.catalogoTopData);
 router.get('/catalogo/colors', b2bController.catalogColors);
 router.post('/catalogo/img', b2bController.productosImagenes);
@@ -117,7 +113,7 @@ router.get('/catalogo/GyW/detail/:code', b2bController.catalogDetailGyW);
 router.get('/catalogo/GyW/attrItem/:id', b2bController.getAttrItemById); 
 
 
-//** Herramientas
+//** Dashboard
 router.get('/dashboard', viewController.dashboard);
 router.get('/dashboard/data/:dStart/:dEnd/:user', dashboardController.dashboardData);
 router.get('/dashboard/reportSeller/:dStart/:dEnd/:seller', dashboardController.dashboardReportSeller);
@@ -126,10 +122,11 @@ router.get('/dashboard/detailClient/:dStart/:dEnd/:seller', dashboardController.
 router.get('/dashboard/detailOrder/:pedido/:tipo', dashboardController.dashboardOrderDetail);
 router.get('/dashboard/sellersMap/:sellers', dashboardController.dashboardSellersMap);
 
-
+//** Chat
 router.get('/chat', viewController.chat);
 router.get('/chat/chatId/:id', viewController.chatOpenConversation);
 
+// ** Helpdesk
 router.get('/helpdesk', viewController.helpdesk);
 router.get('/helpdesk/data', helpdeskController.helpdeskData);
 router.get('/helpdesk/indicators', helpdeskController.helpdeskIndicators);
@@ -148,6 +145,7 @@ router.post('/helpdesk/formatPut', helpdeskController.helpdeskUpdateFormat);
 router.post('/helpdesk/startWorkflow', helpdeskController.helpdeskStartWorkflow);
 router.post('/helpdesk/continueWorkflow', helpdeskController.helpdeskContinueWorkflow);
 
+//** Agenda
 router.get('/agenda', viewController.agenda);
 router.get('/agenda/data/:date', agendaController.agendaData);
 router.post('/agenda/createEvent', agendaController.agendaCreateEvent);
@@ -157,12 +155,24 @@ router.get('/agenda/deleteEvent/:id', agendaController.agendaDeleteEvent);
 router.get('/agenda/getData/:date_begin/:date_end', agendaController.agendaGetData);
 router.post('/agenda/eventState', agendaController.agendaChangeEventState);
 
-//**  Notifications
+//**  Notificaciones
 router.get('/getNotifications/:id_user', notificationsController.getNotification);
 router.get('/removeNotificationByKind/:id_user/:kind', notificationsController.removeNotificationByKind);
 router.post('/createNotification', notificationsController.createNotification);
 
-// ** pendiente
+//** Mapas
+router.get('/maps/recorridos', viewController.recorridos);
+router.get('/maps/recorridos/sellers/:id_user', mapsController.sellersList);
+router.get('/maps/dataModuleRecorridos/:date/:sellers', mapsController.getDataModuleRecorridos);
+router.get('/maps/recorridos/recorridosByDate/:date/:sellers', mapsController.getDataRecorridosByDate);
+router.get('/maps/recorridos/informeByDate/:dateS/:dateE', mapsController.getInformeByDate);
+router.get('/maps/recorridos/detailRecorrido/:id_seller/:id_user/:date', mapsController.getDetailRecorrido);
+
+// 
+
+
+
+//** Pendiente de integración
 router.get('/crm', viewController.crm);
 
 

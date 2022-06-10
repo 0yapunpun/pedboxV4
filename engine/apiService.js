@@ -3,8 +3,8 @@ const xml_json = require('xml-js')
 const { showLog } = require('./helpers');
 const service = {};
 const urlPedbox = 'http://api.pedbox.co:5037/';
-// const urlServicePedbox4 = 'http://localhost:7777/';
-const urlServicePedbox4 = 'http://api.pedbox.co:7777/'; 
+const urlServicePedbox4 = 'http://localhost:7777/';
+// const urlServicePedbox4 = 'http://api.pedbox.co:7777/'; 
 const urlPedbox1 = 'https://pedbox.co:8531/';
 const urlKakashi = 'https://api.pedbox.co:8590/';
 const urlCalidosos = 'https://loscalidosos.com/';
@@ -539,6 +539,36 @@ service.getPersonsCompany = async(id_company, type_person) => {
 
 service.getPersonsMap = async(id_company, type_person, sellers) => { 
   const url = urlKakashi+`get_person?id_company=${id_company}&type_person=${type_person}&type_user=2,6&seller=${sellers}`;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.getSellersList = async(id_company, id_user) => { 
+  const url = urlKakashi+`getDateUser?id=${id_user}&type_user=U&id_company=${id_company}`;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.getPersonsMapByDate = async(id_company, date, sellers) => { 
+  const url = urlKakashi+`get_person?id_company=${id_company}&date=${date}&type_person=5&type_user=2,6&seller=${sellers}`;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.getSellersManagment = async(id_company, dateS, dateE) => { 
+  const url = urlKakashi+`getReporSellermanagement?id_empresa=${id_company}&inicio=${dateS}&fin=${dateE}&nit=0&tipo_usuario=U`;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.getSellerHistoryRecorrido = async(id_company, id_seller, dateS, dateE) => { //TODO
+  const url = urlKakashi+`get_history_seller?id_company=${id_company}&id_seller=${id_seller}&date_begin=${dateS}&date_end=${dateE}`;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.getSellerClients = async(id_company, id_seller) => { //TODO
+  const url = urlKakashi+`get_person?id_company=${id_company}&seller=${id_seller}&type_person=3`;
   const data =  await makeRequest(url);
   return data;
 }

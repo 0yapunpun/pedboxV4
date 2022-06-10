@@ -337,7 +337,6 @@
                 </li>
               <% } %>
 
-              <!-- TODO: Integrar modulo -->
               <li class="nav-item" id="menuDocumentosUsuario" style="display: none;">
                 <a class="nav-link" href="/documentos-usuario" >
                   <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
@@ -399,13 +398,45 @@
         </li>
       <% } %>
 
+      <%
+      permissionIndex = session.user.permission.map(e => e.code).lastIndexOf("9000_CAN_ACCESS_ROUTES");
+      if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
+      %>
+        <li class="nav-item">
+          <a class="nav-link"  data-bs-toggle="collapse" href="#collapseMaps" >
+            <span class="nav-link-text ms-1 indicatorCollapse"> <h6 class="m-0 text-xs font-weight-bolder opacity-6">Mapas</h6> </span>
+          </a>
+          <div class="collapse show" id="collapseMaps">
+            <ul class="navbar-nav">
+            
+              <%
+              permissionIndex = session.user.permission.map(e => e.code).lastIndexOf("9000_CAN_ACCESS_ROUTES");
+              if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
+              %>
+                <li class="nav-item" id="menuRecorridos">
+                  <a class="nav-link" href="/maps/recorridos" >
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
+                      <div style="position: relative;">
+                        <i class="fas fa-route" style="color: #252f40; font-size: 12px"></i>
+                      </div>
+                    </div>
+                    <span class="nav-link-text ms-1 font-weight-bold">Recorrido Vendedores</span>
+                  </a>
+                </li>
+              <% } %>
+
+            </ul>
+          </div>
+        </li>
+      <% } %>
+
 
       
       <% 
-        // Para pruebas
+        // Seciones agregadas para desarrollo GyW 
         if (session.user.id == 12790) { 
       %>
-
+        <hr class="horizontal dark my-3">
         <li class="nav-item" id="menuAdministradorCatalogo">
           <a class="nav-link" href="/catalogo/administrador" >
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">

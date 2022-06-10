@@ -1,11 +1,7 @@
-  <!-- 
+<!-- 
   TODO
-    - Obtener informaciòn marcadores
-    - Marcadores de ventas
-    - Pasar de marcadores de vendedores a marcadores de ventas
-    - Implementar cluster marcadores
+  - Implementar cluster marcadores
  -->
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -606,7 +602,6 @@
 
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBTBRrWPJMw8oEnVWZATb0Xmr7hIeS99iE" async defer></script>
 
-
   <script>
     let startDateDashboard = new Date().toISOString().split("T")[0].replaceAll("-", "");
     let endDateDashboard = new Date().toISOString().split("T")[0].replaceAll("-", "");
@@ -909,8 +904,6 @@
         perPageSelect: false
       });
     };
-
-    
 
     let tblvisits;
     const printTablevisits = (data) => {

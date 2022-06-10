@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" type="image/x-icon" href="https://app.pedbox.co/assets/logos/logo_blanco.png"/>
+  <title> Recorrido Vendedores </title>
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <link href="/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <link id="pagestyle" href="/css/soft-ui-dashboard.css?v=1.0.3" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/jquery-ui.min.css">
+  <link rel="stylesheet" href="/css/reports.css">
+
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.0/socket.io.js" integrity="sha512-+l9L4lMTFNy3dEglQpprf7jQBhQsQ3/WvOnjaN/+/L4i0jOstgScV0q2TjfvRF4V+ZePMDuZYIQtg5T4MKr+MQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="/js/jquery.js"></script>
+  <script src="/js/helpers.js"></script>
+
+  <!-- Color Page -->
+  <%- include('./partials/colors.ejs') %> 
+
+  <style>
+    tr th a{
+      text-align: center !important;
+    }
+    .dataTable-sorter::before {
+      display: none !important;
+    }
+    .dataTable-sorter::after {
+      display: none !important;
+    }
+    .detailRow{
+      text-decoration: underline;
+      color: #344767;
+      cursor: pointer;
+    }
+    .dropdown-menu{
+      box-shadow: 0 20px 27px 0 rgb(0 0 0 / 10%);
+      top: -10px;
+    }
+
+    #dropdownMenuButton::after{
+      display: none;
+    }
+    #selectRangeDate{
+      top: 35px !important;
+    }
+    #optionMap{
+      position: absolute;
+      top: 15%;
+      right: 25px;
+      background-color: white;
+      padding: 10px;
+      border-radius: 0.5rem;
+    }
+  </style>
+</head>
+
+<body class="g-sidenav-show bg-gray-100">
+
+  <!-- Menu -->
+  <%- include('./partials/menu.ejs') %> 
+
+  <main class="main-content max-height-vh-100 h-100">
+
+    <!-- Cabecera -->
+    <%- include('./partials/header.ejs') %>
+  
+      <!-- Cotent -->
+      <div class="p-4">
+
+        <div id="headerDashboard" class="card mb-2 flex-row align-items-center" style="background-color: transparent; box-shadow: none;"> 
+          <div class="w-50 ms-3 d-flex">
+            <div>
+              <span id="currentViewDate" class="font-weight-bold" style="color: #344767; font-style: italic;">Febrero 20, 2022</span>
+            </div>
+
+            <div id="filterRecorridos" style="position: relative; display: flex;">
+              <i onclick="$('#selectFilterRecorridos').show()" class="fas fa-filter ms-3" data-bs-toggle="tooltip" data-bs-placement="top" title="Filtrar Fecha" style="display: flex; align-items: center; cursor: pointer;"></i>
+              <div id="selectFilterRecorridos" class="px-3 py-1 pt-2" style="background-color: white; position: absolute; right: 0; top:30px; border-radius: 10px; box-shadow: 0 20px 27px 0 rgb(0 0 0 / 15%); display: none; z-index: 301111110;">
+                <div class="d-flex gap-2">  
+                  <div style="margin: 0 auto;">
+                    <input class="form-control w-100" id="dateRecorridos" type="date" >
+                  </div>
+                </div>
+                <div class="mt-3  gap-2 d-flex justify-content-end align-items-center">
+                  <button onclick="$('#selectFilterRecorridos').hide()" class="btn bg-gradient-secondary">Cancelar</button>
+                  <button onclick="getDataRecorridos()" class="btn bg-gradient-primary">Enviar</button>
+                </div>
+              </div>
+            </div>
+
+            <div id="filterInformes" style="display: none;">
+              <div id="editViewDateContainer" style="position: relative" class="dropdown" data-bs-toggle="tooltip" data-bs-placement="top" title="Filtrar fecha">
+                <i class="fas fa-filter ms-3 dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="margin-top: 5px;"></i>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="left: -20px;">
+                  <li onclick="dateFilter(0)"><a class="dropdown-item" href="#">Hoy</a></li>
+                  <li onclick="dateFilter(-1)"><a class="dropdown-item" href="#">Ayer</a></li>
+                  <li onclick="dateFilter(30)"><a class="dropdown-item" href="#">Este mes</a></li>
+                  <li onclick="dateFilter(-30)"><a class="dropdown-item" href="#">Mes anterior</a></li>
+                  <li onclick="dateFilter('x')"><a class="dropdown-item" href="#">Personalizado</a></li>
+                </ul>
+                <div id="selectRangeDate" class="px-3 py-1" style="background-color: white; position: absolute; right: 0; top:55px; border-radius: 10px; box-shadow: 0 20px 27px 0 rgb(0 0 0 / 15%); display: none; z-index: 301111110;">
+                  <div class="d-flex gap-2">  
+                    <div>
+                      <label for="date1">Desde</label> 
+                      <input class="form-control" id="date1" type="date">
+                    </div>
+                    <div>
+                      <label for="date2">Hasta</label> 
+                      <input class="form-control"  id="date2" type="date">
+                    </div>
+                  </div>
+                  <div class="mt-3  gap-2 d-flex justify-content-end align-items-center">
+                    <button onclick="$('#selectRangeDate').hide()" class="btn bg-gradient-secondary">Cancelar</button>
+                    <button onclick="dateRangeFilter()" class="btn bg-gradient-primary">Enviar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <i id="exportdashboardBtn" class="fas fa-download ms-3" data-bs-toggle="tooltip" title="Exportar Dashboard" style="display: flex; align-items: center;"></i>
+          </div>
+
+          <div class="w-50 nav-wrapper position-relative end-0">
+            <ul class="nav nav-pills nav-fill p-1 bg-transparent" role="tablist">
+              <li onclick="$('#sectionRecorridos').show(); $('#sectionInform').hide(); $('#filterInformes').hide(); $('#filterRecorridos').show(); $('#currentViewDate').html(nvFormatDate($('#dateRecorridos').val(), 'mmmm DD del YYYY'))" class="nav-item">
+                <a class="nav-link mb-0 px-0 py-1 active " data-bs-toggle="tab" href="javascript:;" role="tab" aria-selected="true">
+                  <i class="fas fa-route"></i>
+                  <span class="ms-1">Recorridos</span>
+                </a>
+              </li>
+              <li onclick="$('#sectionRecorridos').hide(); $('#sectionInform').show(); $('#filterInformes').show(); $('#filterRecorridos').hide()" class="nav-item">
+                <a class="nav-link mb-0 px-0 py-1 " data-bs-toggle="tab" href="javascript:;" role="tab" aria-selected="false">
+                  <i class="far fa-file-alt"></i>
+                  <span class="ms-1">Informes</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <section id="sectionRecorridos">
+          <div class="card p-2">
+            <div id="tableRecorridos">
+              <h6 class="mb-0 ms-2">Recorridos de los vendedores</h6>
+              <table id="tRecorridos">
+                <thead style="table-layout: fixed;">
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder"></th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Nit</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Vendedor</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Última Ubicación</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Primer Punto</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Último Punto</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Cantidad Puntos</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder"></th>
+                </thead>
+                <tbody id="tBodyRecorridos"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="sectionInform" style="display: none;">
+          <div class="card p-2">
+            <div id="tableInformSales">
+              <h6 class="mb-0 ms-2">Informe Ventas</h6>
+              <table id="tInformSales">
+                <thead style="table-layout: fixed;">
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Nit</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Vendedor</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Tipo</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Clientes Asignados</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Gestión Cliente</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Clientes Pedidos</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Documentos</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Gestión Prospectos</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Efectividad</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Facturas por día</th>
+                </thead>
+                <tbody id="tBodyInformSales"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Modales -->
+      <div id="modalMap" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document" style="min-width: 80vw !important;">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="modalMapTitle"></h5>
+              <div class="d-flex justify-content-center align-items-center gap-2">
+                <button onclick="$('#modalMap').modal('hide')" type="button" class="btn-close rounded-circle me-1" style="background-color: gray"></button>
+              </div>
+            </div>
+            <div class="modal-body" style="position: relative;">
+              
+              <div id="geolocalizacion_bb" style="width: 100%; height: 550px; position: relative; overflow: hidden;"></div>
+
+              <div id="optionMap" style="position: absolute;">
+
+                <div class="form-check form-switch" data-bs-toggle="tooltip" data-bs-placement="top" title="Puntos">
+                  <input class="form-check-input" type="checkbox" id="" checked="">
+                  <i class="fas fa-broadcast-tower"></i>
+                </div>
+
+                <div class="form-check form-switch" data-bs-toggle="tooltip" data-bs-placement="top" title="Documentos">
+                  <input class="form-check-input" type="checkbox" id="toggleViewSales" checked="">
+                  <i class="fas fa-shopping-cart"></i>
+                </div>
+                
+                <div class="form-check form-switch" data-bs-toggle="tooltip" data-bs-placement="top" title="Visitas">
+                  <input class="form-check-input" type="checkbox" id="" checked="">
+                  <i class="fas fa-home"></i>
+                </div>
+
+                <div class="form-check form-switch" data-bs-toggle="tooltip" data-bs-placement="top" title="Cotizaciones">
+                  <input class="form-check-input" type="checkbox" id="" checked="">
+                  <i class="fas fa-dollar-sign"></i>
+                </div>
+
+                <div class="form-check form-switch" data-bs-toggle="tooltip" data-bs-placement="top" title="Formatos">
+                  <input class="form-check-input" type="checkbox" id="" checked="">
+                  <i class="fas fa-file-alt"></i>
+                </div>
+
+                <div class="form-check form-switch" data-bs-toggle="tooltip" data-bs-placement="top" title="Ruta">
+                  <input class="form-check-input" type="checkbox" id="" checked="">
+                  <i class="fas fa-car"></i>
+                </div>
+
+                <div class="form-check form-switch mt-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Clientes">
+                  <input class="form-check-input" type="checkbox" id="toggleViewClients" checked="">
+                  <i class="fas fa-user"></i>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+
+      <!-- preloader -->
+      <%- include('./partials/preloader.ejs') %> 
+      
+  </main>
+
+  <!-- Scripts -->
+  <script src="/js/core/popper.min.js"></script>
+  <script src="/js/core/bootstrap.min.js"></script>
+  <script src="/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="/js/plugins/choices.min.js"></script>
+  <script src="/js/soft-ui-dashboard.min.js?v=1.0.3"></script>
+  <script src="/js/plugins/dragula/dragula.min.js"></script>
+  <script src="/js/plugins/jkanban/jkanban.js"></script>
+  <script src="/js/jquery-ui.min.js"></script>
+  <script src="/js/plugins/datatables.js"></script>
+  <script src="/js/plugins/chartjs.min.js"></script>
+  <script src="/js/underscore-min.js"></script>
+  <script src="/js/sweetalert2.all.min.js"></script>
+  <script src="/js/menu.js"></script>
+
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBTBRrWPJMw8oEnVWZATb0Xmr7hIeS99iE" async defer></script>
+    
+  <script>
+    let sellersList = [];
+    let recorridosList = null;
+    let salesList = null;
+    let startDateGlobal = new Date().toISOString().split("T")[0];
+    let endDateGlobal = new Date().toISOString().split("T")[0];
+
+    const getData = (user) => {
+      fetch(`/maps/recorridos/sellers/${session.user.id}`)
+      .then(res => res.json())
+      .then(res => {
+        if (!res.result.success) {return}
+
+        let list = res.result.user[0].sellers
+        for (let i = 0; i < list.length; i++) {
+          sellersList.push(list[i].nit)
+        }
+
+        fetch(`/maps/dataModuleRecorridos/${startDateGlobal}/${sellersList.join()}`)
+        .then(res2 => res2.json())
+        .then(res2 => {
+          recorridosList = res2[0].result.persons || [];
+          salesList = res2[1].result.reportSeller || [];
+
+          printTableRecorridos(recorridosList)
+          printTableSales(salesList)
+
+          $("#preloader").hide();
+        })
+      })
+    };
+
+    const getDataRecorridos = () => {
+      let date = $("#dateRecorridos").val();
+      $("#currentViewDate").html(nvFormatDate(date, "mmmm DD del YYYY"));
+      fetch(`/maps/recorridos/recorridosByDate/${date}/${sellersList.join()}`)
+      .then(res => res.json())
+      .then(res => {
+        if (!res.result.success) {return}
+
+        recorridosList = res.result.persons || [];
+        printTableRecorridos(recorridosList)
+      })
+
+      $('#selectFilterRecorridos').hide()
+    }
+
+    let currentRouteSeller = null;
+    let currentRouteSales = null;
+    let currentClientsSeller = null;
+    const getDetailRecorrido = (id_seller, id_user, name_seller) => {
+      $("#modalMapTitle").html(`Pedidos Realizados ${name_seller} - ${nvFormatDate($("#dateRecorridos").val(), "mmmm DD del YYYY")}`)
+      fetch(`/maps/recorridos/detailRecorrido/${id_seller}/${id_user}/${$("#dateRecorridos").val()}`)
+      .then(res => res.json())
+      .then(res => {
+        if (!res[0].result.result.length) {
+          return Swal.fire({
+            title: 'No fue posible calcular la ruta',
+            confirmButtonText: 'Continuar',
+            icon: 'error',
+          })
+        }
+
+        console.log(res)
+
+        let x = res[0].result.result
+        for (let i = 0; i < x.length; i++) {
+          if (x[i].amount != "") {
+            console.log(x[i])
+          }
+        }
+
+        currentRouteSeller = res[0].result.result;
+        showRoute(currentRouteSeller);
+        printSalesMarkers(res[0].result.result)
+        printClientsMarkes(res[1].result.persons);
+      })
+    }
+
+    const getDataInformes = (dateS, dateE) => {
+      fetch(`/maps/recorridos/informeByDate/${dateS}/${dateE}`)
+      .then(res => res.json())
+      .then(res => {
+        if (!res.result.success) {return}
+
+        salesList = res.result.reportSeller || [];
+        printTableSales(salesList)
+      })
+
+      $("#selectRangeDate").hide();
+    }
+
+    const dateRangeFilter = () => {
+      let dateStart = $("#date1").val();
+      let dateEnd = $("#date2").val();
+
+      $("#currentViewDate").html(nvFormatDate(dateStart, "mmmm DD del YYYY")+ " - " + nvFormatDate(dateEnd, "mmmm DD del YYYY"));
+
+      if (!dateStart || !dateEnd) {
+        $("#selectRangeDate").fadeOut("fast");
+        return Swal.fire({
+          title: 'Seleccione rango de fechas antes de enviar',
+          confirmButtonText: 'Continuar',
+        })
+      }
+      getDataInformes(dateStart, dateEnd);
+    }
+
+    let tblRecorridos = null;
+    const printTableRecorridos = (data) => {
+      try {
+        tblRecorridos.destroy();
+      } catch (error) {}
+      $("#tBodyRecorridos").html("")
+
+      for (let i = 0; i < data.length; i++) {
+        let element = `
+          <tr>
+            <td class="text-center">
+              <div style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
+                <img src="${data[i].photo || 'https://app.pedbox.co/assets/images/avatars/profile.jpg'}" alt="" style="width: 40px; height: 40px; max-width: 40px; border-radius: 50%;">
+              </div>
+            </td>
+            <td class="text-center">${data[i].num_identification || "-"}</td>
+            <td class="text-center">${data[i].name_person || "-"}</td>
+            <td class="text-center">${data[i].last_location || "-"}</td>
+            <td class="text-center">${data[i].first_location || "-"}</td>
+            <td class="text-center">${data[i].date_last_connection || "-"}</td>
+            <td class="text-center">${data[i].quantity_points || "-"}</td>
+            <td class="text-center"><i onclick="getDetailRecorrido(${data[i].id_user}, ${data[i].id}, '${data[i].name_person}')" class="fas fa-eye" style="cursor: pointer" title="Ver Recorrido"></i></td>
+          </tr>
+        `;
+        $("#tBodyRecorridos").append(element)
+      }
+
+      tblRecorridos = new simpleDatatables.DataTable("#tRecorridos", { perPageSelect: false });
+    };
+
+    let tblSales = null;
+    const printTableSales = (data) => {
+      try {
+        tblSales.destroy();
+      } catch (error) {}
+      $("#tBodyInformSales").html("")
+
+      for (let i = 0; i < data.length; i++) {
+        let element = `
+          <tr>
+            <td class="text-center">${data[i].nit_vendedor || "-"}</td>
+            <td class="text-center">${data[i].vendedor || "-"}</td>
+            <td class="text-center">${data[i].tipo || "-"}</td>
+            <td class="text-center">${data[i].clientes || "-"}</td>
+            <td class="text-center">${data[i].cliente || "-"}</td>
+            <td class="text-center">${data[i].cantidad_clientes || "-"}</td>
+            <td class="text-center">${data[i].cantidad_documentos || "-"}</td>
+            <td class="text-center">${data[i].prospecto || "-"}</td>
+            <td class="text-center">${data[i].efectividad + "%" || "-"}</td>
+            <td class="text-center">${data[i].facturas_por_dia || "-"}</td>
+          </tr>
+        `;
+        $("#tBodyInformSales").append(element)
+      }
+
+      tblSales = new simpleDatatables.DataTable("#tInformSales", { perPageSelect: false });
+    }
+
+    const dateFilter = function (date) {
+      let dateS, dateE;
+
+      if (date == "x") { // Rango de fechas
+        $("#selectRangeDate").fadeIn("fast");
+        return
+      }
+
+      if (date == 0) { // Hoy
+        dateS = new Date().toISOString().split("T")[0];
+        dateE = new Date().toISOString().split("T")[0];
+        
+        $("#currentViewDate").html(nvFormatDate(new Date(), "mmmm DD del YYYY"));
+
+        // $("#loadingViewDateContainer").show();
+        return getDataInformes(dateS, dateE);
+      }
+
+      if (date == -1) { // Ayer
+        s = new Date();
+        s.setDate(s.getDate() - 1);
+
+        $("#currentViewDate").html(nvFormatDate(s, "mmmm DD del YYYY"));
+
+        s = s.toISOString().split("T")[0];
+
+        dateS = s;
+        dateE = s;
+        
+        // $("#loadingViewDateContainer").show();
+        return getDataInformes(dateS, dateE);
+      }
+
+      if (date == 30) { // Este mes
+        s = new Date();
+        currentMonth = s.getMonth() + 1;
+        firstDayMont = s.getFullYear() + "/" + (currentMonth < 10 ? "0"+currentMonth : currentMonth) + "/01";
+        
+        $("#currentViewDate").html(nvFormatDate(firstDayMont, "mmmm DD del YYYY")+ " - " + nvFormatDate(new Date(), "mmmm DD del YYYY"));
+
+        dateS = firstDayMont.replaceAll("/", "");
+        dateE = new Date().toISOString().split("T")[0];
+    
+        // $("#loadingViewDateContainer").show();
+        return getDataInformes(dateS, dateE);
+      }
+
+      if (date == -30) { // Mes anterior
+        s = new Date();
+        let currentMonth = s.getMonth() + 1;
+        let currentYear = s.getFullYear();
+
+        if (currentMonth == 1) {
+          currentMonth = 12;
+          currentYear = currentYear - 1;
+        } else {
+          currentMonth = currentMonth - 1;
+        }
+
+        currentMonth = currentMonth < 10 ? "0"+currentMonth : currentMonth;
+
+        dateS = currentYear + "-" + currentMonth + "-01";
+        dateE = currentYear + "-" + currentMonth + "-31";
+
+        let startDateDashboardF = currentYear + "/" + currentMonth + "/01";
+        let endDateDashboardF = currentYear + "/" + currentMonth + "/31";
+
+        $("#currentViewDate").html(nvFormatDate(startDateDashboardF, "mmmm DD del YYYY")+ " - " + nvFormatDate(endDateDashboardF, "mmmm DD del YYYY"));
+        
+        // $("#loadingViewDateContainer").show();
+        return getDataInformes(dateS, dateE);
+      }
+    }
+
+    var map;
+    var directionsService;
+    var directionsRenderer;
+    var drawMap = function() {
+      directionsService = new google.maps.DirectionsService();
+      directionsRenderer = new google.maps.DirectionsRenderer();
+
+      var styles = [{
+        "stylers": [
+          { "saturation": -100 },
+          { "gamma": 1.07 }
+        ]}
+      ];
+
+      let mapOptions = {
+        zoom: 6,
+        center: new google.maps.LatLng(5.2445497,-72.4879592),
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        mapTypeControlOptions: {
+          mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'map_style']
+        }
+      }
+
+      map = new google.maps.Map($("#geolocalizacion_bb")[0], mapOptions);
+      map.mapTypes.set('map_style', new google.maps.StyledMapType(styles,{name: "Styled Map"}));
+      map.setMapTypeId('map_style');
+      directionsRenderer.setMap(map);
+
+      infowindow = new google.maps.InfoWindow();
+    };
+
+    var showRoute = async function(data) {
+      let routeComplete = [];
+      let flightPlanCoordinates = [];
+
+      for (let i = 0; i < data.length; i += 20) { // Dividir array en porciones de maximo 20 posiciones pera evitar la limitación de google maps de  waypoints
+        const chunk = data.slice(i, i + 20);
+
+        let start = new google.maps.LatLng(chunk[0].latitude, chunk[0].longitude);
+        let end = new google.maps.LatLng(chunk[chunk.length -1].latitude, chunk[chunk.length -1].longitude);
+        let calcWaypoints = [];
+
+        for (let e = 1; e < chunk.length; e++) { // El loop comienza en 1 y termina en -1 para que solo se agregen como waypoints los puntos intermedios
+          if (e == chunk.length) continue
+          calcWaypoints.push({
+            location: new google.maps.LatLng(chunk[e].latitude, chunk[e].longitude),
+            stopover: true
+          })
+        }
+
+        var request = {
+          origin: start,
+          destination: end,
+          travelMode: 'WALKING',
+          waypoints: calcWaypoints
+        };
+
+        let routePortion = await directionsService.route(request);
+        if (routePortion.status != "OK") { continue }
+        routeComplete = [...routeComplete, ...routePortion.routes[0].overview_path]
+      }
+
+      for (let value of routeComplete) {
+        flightPlanCoordinates.push({
+          lat: value.lat(),
+          lng: value.lng()
+        });
+      };
+
+      displayRouteLine(flightPlanCoordinates)
+    }
+
+    let lineRoute;
+    let displayRouteLine = (route) => {
+      try {
+        lineRoute.setMap(null);
+      } catch (error) {}
+
+      let lineSymbol = {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 8,
+        strokeColor: "#393",
+      };
+
+      lineRoute = new google.maps.Polyline({
+        path: route,
+        geodesic: true,
+        strokeColor: '#302828',
+        strokeOpacity: 1.0,
+        strokeWeight: 2,
+        zIndex: 999,
+        icons: [{
+          icon: lineSymbol,
+          offset: '100%'
+        }]
+      });
+      
+      lineRoute.setMap(map);
+      animateCircle(lineRoute);
+
+      map.setCenter(new google.maps.LatLng(route[0].lat, route[0].lng));
+      map.setZoom(9);
+      $("#modalMap").modal("show");
+    }
+
+    function animateCircle(line) {
+      let count = 0;
+      window.setInterval(() => {
+        count = (count + 1) % 200;
+        const icons = line.get("icons");
+        icons[0].offset = count / 2 + "%";
+        line.set("icons", icons);
+      }, 100);
+    }
+
+    let markersSales = [];
+    let printSalesMarkers = (data) => {
+      let salesData = [];
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].amount != "") {
+          salesData.push(data[i])
+        }
+      }
+
+      currentRouteSales = salesData;
+      showSalesMarkers()
+    }
+
+    let markersClients = [];
+    let printClientsMarkes = (data) => {
+      let clientLocated = [];
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].latitude && data[i].longitude) {
+          clientLocated.push(data[i])
+        }
+      }
+
+      currentClientsSeller = clientLocated;
+      showClientMarkers()
+    };
+
+    var showSalesMarkers = function() {
+      salesLocated = currentRouteSales;
+      markersSales = [];
+      for (let i = 0; i < salesLocated.length; i++) {
+        let detail = `
+          <div class="d-flex flex-column justify-content-center">
+            <h6 class="mb-0">Pedido - ${salesLocated[i].bussiness_name} </h6>
+            <label class="m-0">Cliente: <span style="color: #6c757d">${salesLocated[i].customer || " - "} </span></label>
+            <label class="m-0">Tipo: <span style="color: #6c757d"> Pedido </span></label>
+            <label class="m-0">Valor: <span style="color: #6c757d">${ nvFormatCash(salesLocated[i].amount).split(".")[0]  } </span></label>
+            <label class="m-0">Fecha: <span style="color: #6c757d">${nvFormatDate(salesLocated[i].date, "mmmm DD del YYYY")} </span></label>
+          </div>
+        `;
+
+        marker = new google.maps.Marker({
+          position: new google.maps.LatLng(salesLocated[i].latitude, salesLocated[i].longitude),
+          map: map,
+          icon: "https://app.pedbox.co/assets/images/icons-maps/shopping-cart.png",
+        });
+        markersSales.push(marker);
+        bindInfoWindow(marker, map, detail);
+      };
+    };
+
+    var showClientMarkers = function() {
+      clientLocated = currentClientsSeller;
+      markersClients = [];
+      for (let i = 0; i < clientLocated.length; i++) {
+        let detail = `
+          <div class="d-flex flex-column justify-content-center">
+            <h6 class="mb-0">Cliente - ${clientLocated[i].bussiness_name} </h6>
+            <label class="m-0">Identificación: <span style="color: #6c757d">${clientLocated[i].num_identification || " - "} </span></label>
+            <label class="m-0">Teléfono: <span style="color: #6c757d">${clientLocated[i].cellphone || " - "} </span></label>
+            <label class="m-0">Dirección: <span style="color: #6c757d">${clientLocated[i].address || " - "} </span></label>
+            <label class="m-0">Ciudad: <span style="color: #6c757d">${clientLocated[i].city || " - "} </span></label>
+          </div>
+        `;
+
+        marker = new google.maps.Marker({
+          position: new google.maps.LatLng(clientLocated[i].latitude, clientLocated[i].longitude),
+          map: map,
+          icon: "https://app.pedbox.co/assets/images/icons-maps/btn-info.png",
+        });
+        markersClients.push(marker);
+        bindInfoWindow(marker, map, detail);
+      };
+    };
+
+    var hideClientsMarkers = function() {
+      for (var i = 0; i < markersClients.length; i++ ) {
+        markersClients[i].setMap(null);
+      }
+      markersClients = [];
+    };
+
+    var hideSalesMarkers = function() {
+      for (var i = 0; i < markersSales.length; i++ ) {
+        markersSales[i].setMap(null);
+      }
+      markersSales = [];
+    };
+
+    var bindInfoWindow = function(marker, map, description) {
+      google.maps.event.addListener(marker, 'click', function() {
+        infowindow.setContent(description);
+        infowindow.open(map, marker);
+      });
+    };
+
+    $("#toggleViewClients").on("change", function () {
+      if($("#toggleViewClients").is(':checked')){
+        showClientMarkers();
+      } else {
+        hideClientsMarkers();
+      }
+    })
+
+    $("#toggleViewSales").on("change", function () {
+      if($("#toggleViewSales").is(':checked')){
+        showSalesMarkers();
+      } else {
+        hideSalesMarkers();
+      }
+    })
+
+    $('#modalMap').on('hidden.bs.modal', function () { // Clean map on modal close
+      lineRoute.setMap(null);
+    })
+
+    $(document).ready(function () {
+      $("#menuRecorridos").addClass("activeNav")
+
+      $("#currentViewDate").html(nvFormatDate(new Date(), "mmmm DD del YYYY"));
+      $("#date2").attr("max", new Date().toISOString().split("T")[0]); // Limit date to custom date range
+      $("#dateRecorridos").attr("max", new Date().toISOString().split("T")[0]); // Limit date to custom date range
+      $("#dateRecorridos").val(new Date().toISOString().split("T")[0]); 
+
+      getData();
+      drawMap();
+    });
+  </script>
+
+</body>
+</html>

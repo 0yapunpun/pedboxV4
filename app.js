@@ -19,7 +19,8 @@ app.use(compression());
 app.set('view engine', 'ejs');
 app.set('views', [path.join(__dirname, 'views'),
                   path.join(__dirname, 'views/elements'),
-                  path.join(__dirname, 'views/b2b')]);
+                  path.join(__dirname, 'views/b2b'),
+                  path.join(__dirname, 'views/maps')]);
 
 //Midleware para  configurar el server para permitir cross domain
 var allowCrossDomain = function (req, res, next) {

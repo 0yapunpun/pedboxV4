@@ -131,7 +131,7 @@ controller.catalogo = async (req, res, next) => {
   if (!req.session.login) { return res.redirect('/login'); }
   // if (!(hasPermission(req.session.user.permission ,"8045_CAN_VIEW_SHOPPING_CAR"))) {return res.redirect('/no-permission');} // TODO comentado por desarrollo GyW
 
-  if (req.session.user.id == 12790) { // TODO desarrollo GyW
+  if (req.session.user.id == 12790) { // TODO usuario vpareja acceso catalogo GyW
     res.render('b2b/catalogo_v2', {'session': req.session});
   } else {
     res.render('b2b/catalogo', {'session': req.session});
@@ -190,6 +190,13 @@ controller.agenda = async(req, res, next) => {
   if (!(hasPermission(req.session.user.permission ,"4500_CAN_ACCESS_CALENDAR"))) {return res.redirect('/no-permission');}
 
   res.render('agenda', {'session': req.session});
+}
+
+controller.recorridos = async(req, res, next) => {
+  if (!req.session.login) { return res.redirect('/login'); }
+  if (!(hasPermission(req.session.user.permission ,"9000_CAN_ACCESS_ROUTES"))) {return res.redirect('/no-permission');}
+
+  res.render('maps/recorridos', {'session': req.session});
 }
 
 //** Vistas no integradas
