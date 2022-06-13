@@ -144,17 +144,17 @@
 
                 permissionIndexLogin = result.user.permission.map(e => e.code).lastIndexOf("6200_CAN_ACCESS_DASHBOARD")
                 if (permissionIndexLogin != -1 && result.user.permission[permissionIndexLogin].content != "N") { 
-                  window.location.href = '/dashboard';
+                  return window.location.href = '/dashboard';
                 }
 
                 permissionIndexLogin = result.user.permission.map(e => e.code).lastIndexOf("4500_CAN_ACCESS_CALENDAR")
                 if (permissionIndexLogin != -1 && result.user.permission[permissionIndexLogin].content != "N") { 
-                  window.location.href = '/agenda';
+                  return window.location.href = '/agenda';
                 }
 
                 permissionIndexLogin = result.user.permission.map(e => e.code).lastIndexOf("8045_CAN_VIEW_SHOPPING_CAR")
                 if (permissionIndexLogin != -1 && result.user.permission[permissionIndexLogin].content != "N") { 
-                  window.location.href = '/catalogo';
+                  return window.location.href = '/catalogo';
                 }
                 
               }
