@@ -207,7 +207,7 @@
               <div id="optionMap" style="position: absolute;">
 
                 <div class="form-check form-switch" data-bs-toggle="tooltip" data-bs-placement="top" title="Puntos">
-                  <input class="form-check-input" type="checkbox" id="" checked="">
+                  <input class="form-check-input" type="checkbox" id="toggleViewPoints" >
                   <i class="fas fa-broadcast-tower"></i>
                 </div>
 
@@ -232,7 +232,7 @@
                 </div>
 
                 <div class="form-check form-switch" data-bs-toggle="tooltip" data-bs-placement="top" title="Ruta">
-                  <input class="form-check-input" type="checkbox" id="" checked="">
+                  <input class="form-check-input" type="checkbox" id="toggleRouteMarker" checked="">
                   <i class="fas fa-car"></i>
                 </div>
 
@@ -628,6 +628,11 @@
       }, 100);
     }
 
+    let markersPoints = []; // Punto de localización
+    let printPointsMarkers = (data) => {
+      showPointsMarkers(data)
+    }
+
     let markersSales = [];
     let printSalesMarkers = (data) => {
       let salesData = [];
@@ -636,7 +641,6 @@
           salesData.push(data[i])
         }
       }
-
       currentRouteSales = salesData;
       showSalesMarkers()
     }
@@ -649,12 +653,37 @@
           clientLocated.push(data[i])
         }
       }
-
       currentClientsSeller = clientLocated;
       showClientMarkers()
     };
 
-    var showSalesMarkers = function() {
+    var showRouteMarker = function() {
+      lineRoute.setMap(map);
+    };
+
+    let showPointsMarkers = function() {
+      pointsLocanted = currentRouteSeller;
+      markersPoints = [];
+      for (let i = 0; i < pointsLocanted.length; i++) {
+        let detail = `
+          <div class="d-flex flex-column justify-content-center">
+            <h6 class="mb-0">Punto Geolocalizado </h6>
+            <label class="m-0">Fecha: <span style="color: #6c757d">${pointsLocanted[i].date.split(" ")[0] || " - "} </span></label>
+            <label class="m-0">Hora: <span style="color: #6c757d">${pointsLocanted[i].date.split(" ")[1] || " - "} </span></label>
+          </div>
+        `;
+
+        marker = new google.maps.Marker({
+          position: new google.maps.LatLng(pointsLocanted[i].latitude, pointsLocanted[i].longitude),
+          map: map,
+          icon: "https://app.pedbox.co/assets/images/icons-maps/settings-input-antenna.png",
+        });
+        markersPoints.push(marker);
+        bindInfoWindow(marker, map, detail);
+      };
+    };
+
+    let showSalesMarkers = function() {
       salesLocated = currentRouteSales;
       markersSales = [];
       for (let i = 0; i < salesLocated.length; i++) {
@@ -678,7 +707,7 @@
       };
     };
 
-    var showClientMarkers = function() {
+    let showClientMarkers = function() {
       clientLocated = currentClientsSeller;
       markersClients = [];
       for (let i = 0; i < clientLocated.length; i++) {
@@ -702,6 +731,17 @@
       };
     };
 
+    var hidePointsMarker = function() {
+      for (var i = 0; i < markersPoints.length; i++ ) {
+        markersPoints[i].setMap(null);
+      }
+      markersPoints = [];
+    };
+
+    var hideRouteMarker = function() {
+      lineRoute.setMap(null);
+    };
+
     var hideClientsMarkers = function() {
       for (var i = 0; i < markersClients.length; i++ ) {
         markersClients[i].setMap(null);
@@ -723,6 +763,7 @@
       });
     };
 
+    // Toggle buttons map
     $("#toggleViewClients").on("change", function () {
       if($("#toggleViewClients").is(':checked')){
         showClientMarkers();
@@ -736,6 +777,22 @@
         showSalesMarkers();
       } else {
         hideSalesMarkers();
+      }
+    })
+
+    $("#toggleRouteMarker").on("change", function () {
+      if($("#toggleRouteMarker").is(':checked')){
+        showRouteMarker();
+      } else {
+        hideRouteMarker();
+      }
+    })
+
+    $("#toggleViewPoints").on("change", function () {
+      if($("#toggleViewPoints").is(':checked')){
+        showPointsMarkers();
+      } else {
+        hidePointsMarker();
       }
     })
 
