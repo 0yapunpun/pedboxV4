@@ -552,6 +552,7 @@
             <div class="modal-header">
               <h5 class="modal-title" id="modalTitleTableDetailOrder">a</h5>
               <div class="d-flex justify-content-center align-items-center gap-2">
+                <div id="mailDocument" class="me-2 d-flex"> <i class="fas fa-envelope" style="font-size: 26px; cursor: pointer;" data-toggle="tooltip" title="Enviar Correo del Documento" ></i> </div>
                 <button onclick="$('#modalTableDetailOrder').modal('hide')" type="button" class="btn-close rounded-circle me-1" style="background-color: gray"></button>
               </div>
             </div>
@@ -692,7 +693,12 @@
       })
     }
 
+    let currentDocument = null;
+    let currentClient = null;
     let getDocumentDetail = (pedido, name) => {
+      currentDocument = pedido;
+      currentClient = name;
+
       fetch(`/dashboard/detailOrder/${pedido}/P`)
       .then(res => res.json())
       .then(res => {
@@ -1299,6 +1305,22 @@
 
     $("#exportdashboardBtn").on("click", function () {
       window.open(`https://pedbox.co:8531/dashboardexportar?id_company=${session.user.id_company}&date_begin=${startDateDashboard}&date_end=${endDateDashboard}&user=0`);
+    })
+
+    $("#mailDocument").on("click", function () {
+      Swal.fire({
+        title: `¿Desea enviar el correo del documento ${currentDocument} al cliente ${currentClient}?`,
+        showDenyButton: true,
+        confirmButtonText: 'Aceptar',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          fetch(`https://api.pedbox.co:8590/mail/order?path=orders/mail.order1&id_company=${session.user.id_company}&order=${currentDocument}`)
+          .then(res => res.json())
+          .then(res => {
+            console.log(res)
+          })
+        }
+      })
     })
 
     $(document).ready(function () {
