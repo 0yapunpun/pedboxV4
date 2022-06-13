@@ -167,9 +167,7 @@ router.get('/maps/dataModuleRecorridos/:date/:sellers', mapsController.getDataMo
 router.get('/maps/recorridos/recorridosByDate/:date/:sellers', mapsController.getDataRecorridosByDate);
 router.get('/maps/recorridos/informeByDate/:dateS/:dateE', mapsController.getInformeByDate);
 router.get('/maps/recorridos/detailRecorrido/:id_seller/:id_user/:date', mapsController.getDetailRecorrido);
-
-// 
-
+router.post('/maps/informRecorridos', mapsController.getExportSellersLocation);
 
 
 //** Pendiente de integración

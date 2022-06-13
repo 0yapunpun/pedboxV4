@@ -3,8 +3,8 @@ const xml_json = require('xml-js')
 const { showLog } = require('./helpers');
 const service = {};
 const urlPedbox = 'http://api.pedbox.co:5037/';
-// const urlServicePedbox4 = 'http://localhost:7777/';
-const urlServicePedbox4 = 'http://api.pedbox.co:7777/'; 
+const urlServicePedbox4 = 'http://localhost:7777/';
+// const urlServicePedbox4 = 'http://api.pedbox.co:7777/'; 
 const urlPedbox1 = 'https://pedbox.co:8531/';
 const urlKakashi = 'https://api.pedbox.co:8590/';
 const urlCalidosos = 'https://loscalidosos.com/';
@@ -558,6 +558,12 @@ service.getPersonsMapByDate = async(id_company, date, sellers) => {
 service.getSellersManagment = async(id_company, dateS, dateE) => { 
   const url = urlKakashi+`getReporSellermanagement?id_empresa=${id_company}&inicio=${dateS}&fin=${dateE}&nit=0&tipo_usuario=U`;
   const data =  await makeRequest(url);
+  return data;
+}
+
+service.getExportSellersLocation = async(body) => { 
+  const url = urlKakashi+`exportSellerLastLocation`;
+  const data =  await makeRequest(url, options('post', body));
   return data;
 }
 

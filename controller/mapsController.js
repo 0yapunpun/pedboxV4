@@ -52,5 +52,10 @@ controller.getDetailRecorrido = async(req, res, next) => {
   res.send([r1, r2]);
 }
 
+controller.getExportSellersLocation = async(req, res, next) => {
+  let response = await service.getExportSellersLocation(req.body);
+
+  res.send(response);
+}
 
 module.exports = controller

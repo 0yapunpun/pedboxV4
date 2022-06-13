@@ -80,10 +80,10 @@
             </div>
 
             <div id="filterRecorridos" style="position: relative; display: flex;">
-              <i onclick="$('#selectFilterRecorridos').show()" class="fas fa-filter ms-3" data-bs-toggle="tooltip" data-bs-placement="top" title="Filtrar Fecha" style="display: flex; align-items: center; cursor: pointer;"></i>
+              <i id="filterIcon" onclick="$('#selectFilterRecorridos').show()" class="fas fa-filter ms-3" data-bs-toggle="tooltip" data-bs-placement="top" title="Filtrar Fecha" style="display: flex; align-items: center; cursor: pointer;"></i>
               <div id="selectFilterRecorridos" class="px-3 py-1 pt-2" style="background-color: white; position: absolute; right: 0; top:30px; border-radius: 10px; box-shadow: 0 20px 27px 0 rgb(0 0 0 / 15%); display: none; z-index: 301111110;">
                 <div class="d-flex gap-2">  
-                  <div style="margin: 0 auto;">
+                  <div style="display:  flex; width: 100%;">
                     <input class="form-control w-100" id="dateRecorridos" type="date" >
                   </div>
                 </div>
@@ -102,7 +102,7 @@
                   <li onclick="dateFilter(-1)"><a class="dropdown-item" href="#">Ayer</a></li>
                   <li onclick="dateFilter(30)"><a class="dropdown-item" href="#">Este mes</a></li>
                   <li onclick="dateFilter(-30)"><a class="dropdown-item" href="#">Mes anterior</a></li>
-                  <li onclick="dateFilter('x')"><a class="dropdown-item" href="#">Personalizado</a></li>
+                  <li  onclick="dateFilter('x')"><a class="dropdown-item" href="#">Personalizado</a></li>
                 </ul>
                 <div id="selectRangeDate" class="px-3 py-1" style="background-color: white; position: absolute; right: 0; top:55px; border-radius: 10px; box-shadow: 0 20px 27px 0 rgb(0 0 0 / 15%); display: none; z-index: 301111110;">
                   <div class="d-flex gap-2">  
@@ -123,18 +123,19 @@
               </div>
             </div>
 
-            <i id="exportdashboardBtn" class="fas fa-download ms-3" data-bs-toggle="tooltip" title="Exportar Dashboard" style="display: flex; align-items: center;"></i>
+            <i id="exportRecorridos" onclick="exportDataRecorridos()" class="fas fa-download ms-3" data-bs-toggle="tooltip" title="Exportar Recorridos" style="margin-top: 5px; cursor: pointer;"></i>
+            <i id="exportInform" onclick="exportDataInforme()" class="fas fa-download ms-3" data-bs-toggle="tooltip" title="Exportar Informes" style="margin-top: 5px; display: none; cursor: pointer"></i>
           </div>
 
           <div class="w-50 nav-wrapper position-relative end-0">
             <ul class="nav nav-pills nav-fill p-1 bg-transparent" role="tablist">
-              <li onclick="$('#sectionRecorridos').show(); $('#sectionInform').hide(); $('#filterInformes').hide(); $('#filterRecorridos').show(); $('#currentViewDate').html(nvFormatDate($('#dateRecorridos').val(), 'mmmm DD del YYYY'))" class="nav-item">
+              <li onclick="$('#sectionRecorridos').show(); $('#sectionInform').hide(); $('#filterInformes').hide(); $('#filterRecorridos').show(); $('#exportRecorridos').show(); $('#exportInform').hide(); $('#currentViewDate').html(nvFormatDate($('#dateRecorridos').val(), 'mmmm DD del YYYY'))" class="nav-item">
                 <a class="nav-link mb-0 px-0 py-1 active " data-bs-toggle="tab" href="javascript:;" role="tab" aria-selected="true">
                   <i class="fas fa-route"></i>
                   <span class="ms-1">Recorridos</span>
                 </a>
               </li>
-              <li onclick="$('#sectionRecorridos').hide(); $('#sectionInform').show(); $('#filterInformes').show(); $('#filterRecorridos').hide()" class="nav-item">
+              <li onclick="$('#sectionRecorridos').hide(); $('#sectionInform').show(); $('#filterInformes').show(); $('#filterRecorridos').hide(); $('#exportRecorridos').hide(); $('#exportInform').show()" class="nav-item">
                 <a class="nav-link mb-0 px-0 py-1 " data-bs-toggle="tab" href="javascript:;" role="tab" aria-selected="false">
                   <i class="far fa-file-alt"></i>
                   <span class="ms-1">Informes</span>
@@ -205,7 +206,6 @@
               <div id="geolocalizacion_bb" style="width: 100%; height: 550px; position: relative; overflow: hidden;"></div>
 
               <div id="optionMap" style="position: absolute;">
-
                 <div class="form-check form-switch" data-bs-toggle="tooltip" data-bs-placement="top" title="Puntos">
                   <input class="form-check-input" type="checkbox" id="toggleViewPoints" >
                   <i class="fas fa-broadcast-tower"></i>
@@ -240,15 +240,26 @@
                   <input class="form-check-input" type="checkbox" id="toggleViewClients" checked="">
                   <i class="fas fa-user"></i>
                 </div>
+              </div>
 
+              <div id="dateMap" style="position: absolute; width: 150px; right: 25px; top: 55%;" >
+                <input type="date" name="" id="selectDateMap" class="form-control">
+              </div>
+
+              <div id="documentsListMap" style="position: absolute; top: 15%; left: 25px;">
+
+                <div class="dropdown">
+                  <a href="javascript:;" class="btn bg-gradient-dark dropdown-toggle " data-bs-toggle="dropdown" id="navbarDropdownMenuLink2">
+                    Documentos
+                  </a>
+                  <ul id="dropDownContent" class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink2"></ul>
+                </div>
               </div>
 
             </div>
           </div>
         </div>
       </div>
-
-      
 
       <!-- preloader -->
       <%- include('./partials/preloader.ejs') %> 
@@ -323,9 +334,18 @@
     let currentRouteSeller = null;
     let currentRouteSales = null;
     let currentClientsSeller = null;
-    const getDetailRecorrido = (id_seller, id_user, name_seller) => {
-      $("#modalMapTitle").html(`Pedidos Realizados ${name_seller} - ${nvFormatDate($("#dateRecorridos").val(), "mmmm DD del YYYY")}`)
-      fetch(`/maps/recorridos/detailRecorrido/${id_seller}/${id_user}/${$("#dateRecorridos").val()}`)
+    let currentIdSeller = null;
+    let currentIdUser = null;
+    let currentIdName = null;
+    const getDetailRecorrido = (id_seller, id_user, name_seller, date) => {
+      currentIdSeller = id_seller;
+      currentIdUser = id_user;
+      currentIdName = name_seller;
+
+      let dateFormat = (date ? date : $("#dateRecorridos").val())
+      $("#modalMapTitle").html(`Pedidos Realizados ${name_seller} - ${dateFormat}`)
+
+      fetch(`/maps/recorridos/detailRecorrido/${id_seller}/${id_user}/${date ? date :  $("#dateRecorridos").val()}`)
       .then(res => res.json())
       .then(res => {
         if (!res[0].result.result.length) {
@@ -336,15 +356,12 @@
           })
         }
 
-        console.log(res)
-
         let x = res[0].result.result
         for (let i = 0; i < x.length; i++) {
           if (x[i].amount != "") {
             console.log(x[i])
           }
         }
-
         currentRouteSeller = res[0].result.result;
         showRoute(currentRouteSeller);
         printSalesMarkers(res[0].result.result)
@@ -591,10 +608,15 @@
         lineRoute.setMap(null);
       } catch (error) {}
 
-      let lineSymbol = {
-        path: google.maps.SymbolPath.CIRCLE,
-        scale: 8,
-        strokeColor: "#393",
+      let carSymbol = {
+        path: "M17.402,0H5.643C2.526,0,0,3.467,0,6.584v34.804c0,3.116,2.526,5.644,5.643,5.644h11.759c3.116,0,5.644-2.527,5.644-5.644 V6.584C23.044,3.467,20.518,0,17.402,0z M22.057,14.188v11.665l-2.729,0.351v-4.806L22.057,14.188z M20.625,10.773 c-1.016,3.9-2.219,8.51-2.219,8.51H4.638l-2.222-8.51C2.417,10.773,11.3,7.755,20.625,10.773z M3.748,21.713v4.492l-2.73-0.349 V14.502L3.748,21.713z M1.018,37.938V27.579l2.73,0.343v8.196L1.018,37.938z M2.575,40.882l2.218-3.336h13.771l2.219,3.336H2.575z M19.328,35.805v-7.872l2.729-0.355v10.048L19.328,35.805z",
+        scale: .7,
+        strokeColor: 'white',
+        strokeWeight: .10,
+        fillOpacity: 1,
+        fillColor: '#404040',
+        offset: '5%',
+        anchor: new google.maps.Point(10, 25)
       };
 
       lineRoute = new google.maps.Polyline({
@@ -605,7 +627,7 @@
         strokeWeight: 2,
         zIndex: 999,
         icons: [{
-          icon: lineSymbol,
+          icon: carSymbol,
           offset: '100%'
         }]
       });
@@ -614,7 +636,7 @@
       animateCircle(lineRoute);
 
       map.setCenter(new google.maps.LatLng(route[0].lat, route[0].lng));
-      map.setZoom(9);
+      map.setZoom(12);
       $("#modalMap").modal("show");
     }
 
@@ -642,7 +664,8 @@
         }
       }
       currentRouteSales = salesData;
-      showSalesMarkers()
+      showSalesMarkers();
+      printDocumentsResume();
     }
 
     let markersClients = [];
@@ -689,7 +712,7 @@
       for (let i = 0; i < salesLocated.length; i++) {
         let detail = `
           <div class="d-flex flex-column justify-content-center">
-            <h6 class="mb-0">Pedido - ${salesLocated[i].bussiness_name} </h6>
+            <h6 class="mb-0">Documento - ${salesLocated[i].bussiness_name} </h6>
             <label class="m-0">Cliente: <span style="color: #6c757d">${salesLocated[i].customer || " - "} </span></label>
             <label class="m-0">Tipo: <span style="color: #6c757d"> Pedido </span></label>
             <label class="m-0">Valor: <span style="color: #6c757d">${ nvFormatCash(salesLocated[i].amount).split(".")[0]  } </span></label>
@@ -763,6 +786,96 @@
       });
     };
 
+    var exportDataRecorridos = function() {
+      let rows = [];
+
+      for (let i = 0; i < recorridosList.length; i++) {
+        if (recorridosList[i].type_user == "V" || recorridosList[i].type_user == "T") {
+          let location = "";
+          if (recorridosList[i].latitude && recorridosList[i].longitude) {
+            location = 'https://www.google.com.co/maps/place/'+recorridosList[i].latitude+','+recorridosList[i].longitude;
+          } 
+          
+          let el = {
+            "bDateLastConnection": ((recorridosList[i].date_last_connection) ? recorridosList[i].date_last_connection : "No disponible"),
+            "date_last_connection": ((recorridosList[i].date_last_connection) ? recorridosList[i].date_last_connection : "No disponible"),
+            "id": recorridosList[i].id,
+            "id_user": recorridosList[i].id_user,
+            "name_person": recorridosList[i].name_person,
+            "nit": recorridosList[i].num_identification,
+            "photo": recorridosList[i].photo,
+            "user": recorridosList[i].user,
+            "urlLocation": location,
+            "first_location": recorridosList[i].first_location,
+            "last_location": recorridosList[i].last_location,
+            "quantity_points": recorridosList[i].quantity_points,
+            "info": recorridosList[i]
+          }
+          rows.push(el)
+        }
+      };
+
+      let body = {
+        rows: rows,
+        title: "Inf. Ubicación vendedores"
+      }
+
+      fetch("/maps/informRecorridos", {
+        method:"POST",
+        body: JSON.stringify(body),
+        headers: {"Content-type": "application/json"}
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (!res.result.success) {return}
+        
+        window.open("https://api.pedbox.co:8590"+res.result.data.url, "_blank");
+      })
+    };
+
+    var exportDataInforme = function() {
+      window.open(`https://api.pedbox.co:8590/getReporSellermanagement?export=true&id_empresa=${session.user.id_company}&inicio=${startDateGlobal}&fin=${endDateGlobal}&nit=0`, "_blank");
+    }
+
+    var cleanMapsMarkersAndRoute = function() {
+      try {
+        lineRoute.setMap(null);
+        hideSalesMarkers();
+        hideClientsMarkers();
+        hideRouteMarker();
+        hidePointsMarker();       
+        
+        $("#dropDownContent").html("")
+      } catch (error) {}
+    }
+
+    var printDocumentsResume = function() {
+      for (let i = 0; i < currentRouteSales.length; i++) {
+        let el = `
+          <li class="detailDocument" data-lat="${currentRouteSales[i].latitude}" data-lon="${currentRouteSales[i].longitude}">
+            <div class="d-flex">
+              <div class="d-flex align-items-center justify-content-center ms-3"> 
+                <i class="fas fa-map-marker-alt"></i>
+              </div>
+              <a class="dropdown-item d-flex flex-column" href="javascript:;">
+                <h6 class="m-0">Documento: ${currentRouteSales[i].number}</h6>
+                <label class="m-0">Cliente: <span style="color: #6c757d"> ${currentRouteSales[i].customer || "-"} </span></label>
+                <label class="m-0">Tipo: <span style="color: #6c757d"> Pedido </span></label>
+                <label class="m-0">Valor: <span style="color: #6c757d"> ${nvFormatCash(currentRouteSales[i].amount).split(".")[0]} </span></label>
+                <label class="m-0">Fecha: <span style="color: #6c757d"> ${currentRouteSales[i].date} </span></label>
+              </a>
+            </div>
+          </li>
+          <hr class="horizontal dark my-3">
+        `
+        $("#dropDownContent").append(el);
+      }
+
+      if (currentRouteSales.length == 0) {
+        $("#dropDownContent").append(`<h6 class="m-0 text-center">Sin Documentos</h6>`);
+      }
+    }
+
     // Toggle buttons map
     $("#toggleViewClients").on("change", function () {
       if($("#toggleViewClients").is(':checked')){
@@ -796,8 +909,34 @@
       }
     })
 
+    $(document).on("click", ".detailDocument", function () { // Zoom map on click detail document
+      let lat = $(this).attr("data-lat");
+      let lon = $(this).attr("data-lon");
+
+      map.setCenter(new google.maps.LatLng(lat, lon));
+      map.setZoom(17);
+    })
+
+    $(document).on("click", function (e) { // Control de ventanas flotantes control de fechas
+      if (!$("#selectFilterRecorridos").is(e.target) && $("#selectFilterRecorridos").has(e.target).length === 0) {
+        if ($("#selectFilterRecorridos").is(":visible") && e.target.id != "filterIcon") {
+          $("#selectFilterRecorridos").hide();
+        }
+      }
+
+      if (!$("#selectRangeDate").is(e.target) && $("#selectRangeDate").has(e.target).length === 0) {
+        if ($("#selectRangeDate").is(":visible") && e.target.className != "dropdown-item") {
+          $("#selectRangeDate").hide();
+        }
+      }
+    })
+
+    $("#selectDateMap").on("change", function () {
+      getDetailRecorrido(currentIdSeller, currentIdUser, currentIdName, $("#selectDateMap").val())
+    })
+
     $('#modalMap').on('hidden.bs.modal', function () { // Clean map on modal close
-      lineRoute.setMap(null);
+      cleanMapsMarkersAndRoute();
     })
 
     $(document).ready(function () {
@@ -805,8 +944,11 @@
 
       $("#currentViewDate").html(nvFormatDate(new Date(), "mmmm DD del YYYY"));
       $("#date2").attr("max", new Date().toISOString().split("T")[0]); // Limit date to custom date range
+      
       $("#dateRecorridos").attr("max", new Date().toISOString().split("T")[0]); // Limit date to custom date range
       $("#dateRecorridos").val(new Date().toISOString().split("T")[0]); 
+      $("#selectDateMap").attr("max", new Date().toISOString().split("T")[0]); // Limit date to custom date range
+      $("#selectDateMap").val(new Date().toISOString().split("T")[0]); 
 
       getData();
       drawMap();
