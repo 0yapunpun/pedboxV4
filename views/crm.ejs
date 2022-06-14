@@ -14,19 +14,22 @@
   <link rel="shortcut icon" type="image/x-icon" href="https://app.pedbox.co/assets/logos/logo_blanco.png"/>
   <title>CRM</title>
 
-  <!-- Fonts and icons -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
-  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
   <link href="/css/nucleo-svg.css" rel="stylesheet" />
   <link href="/css/nucleo-icons.css" rel="stylesheet" />
   <link href="/css/nucleo-svg.css" rel="stylesheet" />
-  <!-- CSS Files -->
   <link id="pagestyle" href="/css/soft-ui-dashboard.css?v=1.0.3" rel="stylesheet" />
-  <!-- JQUERY UI -->
   <link rel="stylesheet" href="/css/jquery-ui.min.css">
-  <!-- REPORTS CSS -->
   <link rel="stylesheet" href="/css/reports.css">
-  <link rel="stylesheet" href="" id="colorBrand">
+
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.0/socket.io.js" integrity="sha512-+l9L4lMTFNy3dEglQpprf7jQBhQsQ3/WvOnjaN/+/L4i0jOstgScV0q2TjfvRF4V+ZePMDuZYIQtg5T4MKr+MQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="/js/jquery.js"></script>
+  <script src="/js/helpers.js"></script>
+
+  <!-- Color Page -->
+  <%- include('./partials/colors.ejs') %> 
+
 
   <style>
     /* Clases Menu */
@@ -45,6 +48,13 @@
     .navbar-vertical .navbar-nav .nav-link[data-bs-toggle="collapse"]:after{
       color: white !important;
     }
+
+    #sidebarPage::-webkit-scrollbar{
+      display: none;
+    }
+    #buttonsHover>div{
+      cursor: pointer;
+    }
   </style>
 </head>
  
@@ -59,17 +69,71 @@
   <%- include('./partials/header.ejs') %>
 
     <!-- Header CRM -->
-    <div class="d-flex gap-1" style="position: fixed; top: 10%; left: 83%; width: 150px; z-index: 300">
+    <!-- <div class="d-flex gap-1" style="position: fixed; top: 22%; left: 83%; width: 150px; z-index: 300">
       <div onclick="backButtonCRM()" id="backButton" class="buttonsAbsolute iconsHover" style="visibility: hidden;" >
         <i class="fas fa-chevron-left" data-bs-toggle="tooltip" data-bs-placement="top" title="Regresar a Vendedores"></i>
       </div>
       <div class="buttonsAbsolute iconsHover" >
         <i class="fas fa-file-download iconsHover"  data-bs-toggle="tooltip" data-bs-placement="top" title="Exportar CRM"></i>
       </div>
-      <div onclick="showSidebar(1)" class="buttonsAbsolute iconsHover" style="cursor: pointer;">
+      <div onclick="showSidebarCRM(1)" class="buttonsAbsolute iconsHover" style="cursor: pointer;">
         <i class="fas fa-wrench"  data-bs-toggle="tooltip" data-bs-placement="top" title="Configuración"></i>
       </div>
+    </div> -->
+
+    <div class="p-4 pt-1">
+
+      <div class="d-flex gap-1 buttonsVendedores" id="buttonsHover">
+
+        <div id="" onclick='' class="icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg bntHeader" title="Exportar CRM" data-bs-toggle="tooltip">
+          <i class="fas fa-file-download" style="font-size: 15px" ></i>
+        </div>
+
+        <div id="" onclick='showSidebar()' class="icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg bntHeader" title="Configuración" data-bs-toggle="tooltip">
+          <i class="fas fa-wrench" style="font-size: 15px" ></i>
+        </div>
+
+        <div id="" onclick='toggleChart()' class="icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg bntHeader" title="Ocultar Gráfica" data-bs-toggle="tooltip">
+          <i class="fas fa-chart-bar" style="font-size: 15px" ></i>
+        </div>
+
+
+        <div id="" onclick='filterEmptySellers()' class="icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg bntHeader" title="Ocultar Gráfica" data-bs-toggle="tooltip">
+          <i class="fas fa-border-all filterSellers1" style="font-size: 15px"></i>
+          <i class="fas fa-border-none filterSellers2" style="display: none; font-size: 15px"></i>
+        </div>
+
+        <div style="position: relative;" class="icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg bntHeader" class="dropdown" data-bs-toggle="tooltip" data-bs-placement="top" title="Rango de fechas" >
+          <i class="fas fa-calendar dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"  style="font-size: 15px;"></i>
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="left: -20px;">
+            <li onclick="dateFilter(0)"><a class="dropdown-item" href="#">Hoy</a></li>
+            <li onclick="dateFilter(-1)"><a class="dropdown-item" href="#">Ayer</a></li>
+            <li onclick="dateFilter(30)"><a class="dropdown-item" href="#">Este mes</a></li>
+            <li onclick="dateFilter(-30)"><a class="dropdown-item" href="#">Mes anterior</a></li>
+            <li onclick="dateFilter('x')"><a class="dropdown-item" href="#">Personalizado</a></li>
+          </ul>
+          <div id="selectRangeDate" class="px-3 py-1" style="background-color: white; position: absolute; right: 0; top:55px; border-radius: 10px; box-shadow: 0 20px 27px 0 rgb(0 0 0 / 15%); display: none; z-index: 300;">
+            <div class="d-flex gap-2">  
+              <div>
+                <label for="date1">Desde</label> 
+                <input class="form-control" id="date1" type="date">
+              </div>
+              <div>
+                <label for="date2">Hasta</label> 
+                <input class="form-control"  id="date2" type="date">
+              </div>
+            </div>
+            <div class="mt-3  gap-2 d-flex justify-content-end align-items-center">
+              <button onclick="dateRange(1)" class="btn bg-gradient-secondary">Cancelar</button>
+              <button onclick="dateRange(2)" class="btn bg-gradient-primary">Enviar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
+
+
 
     <div class="d-flex flex-column gap-2 justify-content-center">
       <div id="graphCRM">
@@ -81,7 +145,7 @@
             </div>
           </div>
           <!-- Indicadores Derecha -->
-          <div class="d-flex gap-1 buttonsVendedores" style="position: fixed; top: 15%; left: 83%; width: 150px;">
+          <!-- <div class="d-flex gap-1 buttonsVendedores" style="position: fixed; top: 15%; left: 83%; width: 150px;">
             <div id="chartButton" class="buttonsCircle iconsHover" onclick="toggleChart()" title="Ocultar gráfica" data-bs-toggle="tooltip" data-bs-placement="top" title="Ocultar gráfica">
               <i class="fas fa-chart-bar" ></i>
             </div>
@@ -115,7 +179,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
 
@@ -239,9 +303,9 @@
       </div>
 
       <!-- Contenedor Tablas -->
-      <div class="mb-4 mt-5">
+      <div class="mb-4">
         <div class="card w-95 text-center " id="tableContainerMargin" style="margin: 0 auto">
-          <div id="tableContainerCRM" style="overflow: scroll"></div>
+          <div id="tableContainerCRM"></div>
           <button onclick="loadCRMyCartera()" class="btn bg-gradient-primary mx-auto my-1 mb-3" style="max-width: 300px;" id="buttonTable" disabled>Ver CRM y Cartera</button>
         </div>
       </div>
@@ -249,18 +313,15 @@
     
   </main>
 
-  <!-- Sidebar configuración masters-->
-  <div id="sidebarCRM" class="sidebarCRM rounded" sidebarState="closed">
+
+  <!-- Sidebar -->
+  <div id="sidebarPage" class="sidebarPage rounded" sidebarState="closed" style="overflow-x: hidden;">
     <div class="d-flex justify-content-center my-3" style="position: relative; margin-bottom: 40px !important">
-      <div class="float-end mt-5" style="position: absolute; left: 5%; top: -90%;">
-        <button class="btn btn-link text-dark p-0 fixed-plugin-close-button">
-          <i class="fa fa-close" style="font-size: 20px;" onclick="showSidebar()"></i>
-        </button>
-      </div>
-      <h3 class="mt-3 mb-0">Configuración</h3>
+      <h5 id="sidebarFilterTitle" class="mt-2 mb-0" style="font-weight: 800;">Configuración</h5>
     </div>
-    <hr class="horizontal dark">
-    <div class="iconsSidebar">
+
+    <div id="sidebarContentResume">
+
       <div class="list-group-item" style="border: none;">
         <div class="d-flex justify-content-between" style="margin-bottom: 5px;">
           <a class="" data-bs-toggle="collapse" href="#collapsePlazo" role="button" aria-expanded="false"
@@ -427,6 +488,7 @@
           </div>
         </div>
       </div>
+
     </div>
   </div>
 
@@ -645,18 +707,14 @@
   <script src="/js/soft-ui-dashboard.min.js?v=1.0.3"></script>
   <script src="/js/plugins/dragula/dragula.min.js"></script>
   <script src="/js/plugins/jkanban/jkanban.js"></script>
-  <script src="/js/jquery.js"></script>
   <script src="/js/jquery-ui.min.js"></script>
   <script src="/js/plugins/datatables.js"></script>
   <script src="/js/plugins/chartjs.min.js"></script>
   <script src="/js/underscore-min.js"></script>
-  <script src="/js/helpers.js"></script>
   <script src="/js/menu.js"></script>
-
+  <script src="/js/sweetalert2.all.min.js"></script>
 
   <script>
-    // let session = `<%- JSON.stringify(session) %>`;
-    // console.log(JSON.parse(session).user)
 
     let tableDataGeneralScope;
     const loadCRM = function (data) {
@@ -1073,10 +1131,9 @@
     const filterEmptySellers = function () {
       if (filterSellersEmptyState == 0) {
         $(".filterSellers1").css("display", "none")
-        $(".filterSellers2").css("display", "block")
+        $(".filterSellers2").css("display", "inline")
 
-        let tableFilter = [],
-            x;
+        let tableFilter = [], x;
         for (let i = 0; i < tableDataGeneralScope.sellers.length; i++) {
           x = tableDataGeneralScope.sellers[i];
           if (!(x.prospectos == 0 && x.cotizaciones == 0 && x.gestion == 0 )) {
@@ -1090,7 +1147,7 @@
       }
 
       if (filterSellersEmptyState = 1) {
-        $(".filterSellers1").css("display", "block")
+        $(".filterSellers1").css("display", "inline")
         $(".filterSellers2").css("display", "none")
 
         loadTable("tablaVendedores", tableDataGeneralScope.sellers)
@@ -1104,13 +1161,11 @@
     const toggleChart = function () {
       if (chartState === 0) {
         $("#hideChart").fadeOut("fast");
-        $("#tableContainerMargin").css("margin", "25px auto ")
         chartState = 1;
         return
       }
       if (chartState === 1) {
         $("#hideChart").fadeIn("slow");
-        $("#tableContainerMargin").css("margin-top", "0 auto" )
         chartState = 0;
         return
       }
@@ -1379,7 +1434,7 @@
     });
 
     // Sidebar Maestros
-    const showSidebar = function (x) {
+    const showSidebarCRM = function (x) { // TODO sidebar
       let state = $("#sidebarCRM").attr("sidebarState");
 
       if (state == "closed") {
@@ -1665,12 +1720,10 @@
       };
     }
 
-    const getCRM = async function () {
-      let idCompany = objSession.user[0].id_company;
-      const rawResponse = await fetch('https://api.pedbox.co:8590/get_master_crm?id_company='+idCompany);
+    const getCrmMasters = async function () {
+      const rawResponse = await fetch("/crm/master");
       const response = await rawResponse.json();
-      return response.master[0].master;
-      // console.log(response)
+      loadMastersSidebar(response.result.master[0].master)
     }
 
     const getDataUser = async function () {
@@ -1678,23 +1731,35 @@
       let dateInit = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
       let dateEnd = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
 
-      let idUser = objSession.user[0].id;
-      let typeUser = objSession.user[0].type_user;
-      let idCompany = objSession.user[0].id_company;
-
-      let url = "https://api.pedbox.co:8590/getDateUser?id="+idUser+"&type_user="+typeUser+"&id_company=" +idCompany+"&date_begin="+dateInit+"&date_end"+dateEnd+"&crm="+1;
-
-      const rawResponse = await fetch(url)
+      const rawResponse = await fetch(`/crm/data/${dateInit}/${dateEnd}`)
       const response = await rawResponse.json();
-      return response.user[0]
+
+      loadCRM(response.result.user[0])
     }
 
-    $( document ).ready(function() {
-      getCRM()
-        .then((data) => {loadMastersSidebar(data)})
+    // Sidebar
+    $(document).on('click', function(e) { // Cerrar sidebar 
+      if ($("#sidebarPage").attr("sidebarState") == "open") {
+        if ((e.target.id == "thirdsWindow" || $(e.target).parents("#thirdsWindow").length)) { // En este caso no se cierra porque se esta seleccionando los usuarios para el filtro
+          return
+        }
+        if ($(e.target).hasClass("badge") || $(e.target).hasClass("userSelectedImg")){ // Evitar que se cierra el sidebaar cuando de eliminar usuarios seleccionados para el filtro
+          return
+        }
+        if (!(e.target.id == "sidebarPage" || $(e.target).parents("#sidebarPage").length)) { // si el click no fue en el sidebar o en uno de sus hijos
+          $("#sidebarPage").attr("sidebarState", "closed");
+          $("#sidebarPage" ).hide("slide", { direction: "right" }, 300);
+        }
+      }
+    });
 
+    $('[data-toggle="tooltip"]').tooltip()
+
+    $( document ).ready(function() {
+      $("#menuCRM").addClass("activeNav")
+
+      getCrmMasters()
       getDataUser()
-        .then((data) => {loadCRM(data)})
       
       handlePermissions(objSession);
     });
@@ -11718,7 +11783,7 @@
           "cerrados": 0
       }
     }
-</script>
+  </script>
 
 
 </body>

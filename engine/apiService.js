@@ -672,6 +672,12 @@ service.getMastersCrm = async(id_company) => {
   return data;
 }
 
+service.getDataCrm = async(idUser, typeUser, idCompany, dateS, dateE) => { 
+  const url = urlKakashi+"getDateUser?id="+idUser+"&type_user="+typeUser+"&id_company=" +idCompany+"&date_begin="+dateS+"&date_end"+dateE+"&crm="+1
+  const data =  await makeRequest(url);
+  return data;
+}
+
 service.getSellersReportsCrm = async(id_company, dateS, dateE) => { 
   const url = urlKakashi+"sellersCalendarCrmReport?id_company="+id_company+"&date_begin="+dateS+"&date_end="+dateE
   const data =  await makeRequest(url);

@@ -196,7 +196,14 @@ controller.recorridos = async(req, res, next) => {
   if (!req.session.login) { return res.redirect('/login'); }
   if (!(hasPermission(req.session.user.permission ,"9000_CAN_ACCESS_ROUTES"))) {return res.redirect('/no-permission');}
 
-  res.render('maps/recorridos', {'session': req.session});
+  res.render('maps/recorridos', {'session': req.session, 'seller_id': false});
+}
+
+controller.recorridoSeller = async(req, res, next) => { // Open specific route
+  if (!req.session.login) { return res.redirect('/login'); }
+  if (!(hasPermission(req.session.user.permission ,"9000_CAN_ACCESS_ROUTES"))) {return res.redirect('/no-permission');}
+
+  res.render('maps/recorridos', {'session': req.session, 'seller_id': req.params.id_seller});
 }
 
 //** Vistas no integradas

@@ -8,6 +8,7 @@ const helpdeskController = require('../controller/helpdeskController.js');
 const agendaController = require('../controller/agendaController.js');
 const dashboardController = require('../controller/dashboardController.js');
 const mapsController = require('../controller/mapsController.js');
+const crmController = require('../controller/crmController.js');
 
 //** user
 router.get('/', viewController.login);
@@ -162,6 +163,7 @@ router.post('/createNotification', notificationsController.createNotification);
 
 //** Mapas
 router.get('/maps/recorridos', viewController.recorridos);
+router.get('/maps/recorrido/:id_seller', viewController.recorridoSeller);
 router.get('/maps/recorridos/sellers/:id_user', mapsController.sellersList);
 router.get('/maps/dataModuleRecorridos/:date/:sellers', mapsController.getDataModuleRecorridos);
 router.get('/maps/recorridos/recorridosByDate/:date/:sellers', mapsController.getDataRecorridosByDate);
@@ -169,9 +171,11 @@ router.get('/maps/recorridos/informeByDate/:dateS/:dateE', mapsController.getInf
 router.get('/maps/recorridos/detailRecorrido/:id_seller/:id_user/:date', mapsController.getDetailRecorrido);
 router.post('/maps/informRecorridos', mapsController.getExportSellersLocation);
 
-
-//** Pendiente de integración
+//** CRM
 router.get('/crm', viewController.crm);
+router.get('/crm/master', crmController.getMasgerCrm);
+router.get('/crm/data/:dateS/:dateE', crmController.getDataCrm);
+
 
 
 module.exports = router;

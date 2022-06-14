@@ -1,8 +1,3 @@
-<!-- 
-  TODO
-  - Implementar cluster marcadores
- -->
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -450,7 +445,25 @@
               <div id="navMapsSales" onclick="" >Ventas</div>
             </div>
 
-            <div id="geolocalizacion_bb" style="width: 100%; height: 600px; position: relative; overflow: hidden;"></div>
+            <div style="position: relative;">
+              <div id="geolocalizacion_bb" style="width: 100%; height: 600px; position: relative; overflow: hidden;"></div>
+
+              <div style="position: absolute; top: 12%; left: 10px">
+
+                <button id="searchSellersBtn" type="button" class="btn btn-primary">Vendedores</button>
+
+                <div id="searchSellersMapContainer" class="card p-3" style="min-width: 220px; max-width: 400px; min-height: 250px; max-height: 350px; display: none;">
+                  <div class="d-flex align-items-center mb-2" >
+                    <div class="input-group" style="border: solid 1px lightgray;">
+                      <input type="text" class="form-control border-0" placeholder="Buscar..." id="search-sellers">
+                      <span onclick="filterSellersList()" class="input-group-text text-body border-0" style="cursor: pointer"><i class="fas fa-search" aria-hidden="true"></i></span>
+                    </div>
+                  </div>
+                  <div id="searchSellersMapContent" style="overflow-y: auto;"></div>
+                </div>
+
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1098,7 +1111,8 @@
               data: usersData,
               backgroundColor: colors,
             }]
-          }
+          },
+          options: {maintainAspectRatio: false}
         })
       } catch (error) {
         charRanking.data.labels = usersLabels;
@@ -1196,6 +1210,7 @@
 
         mapSellersInfo = res.result.persons;
         showMarkersSellers(mapSellersInfo);
+        showListSellers(mapSellersInfo)
       })
     }
 
@@ -1236,7 +1251,7 @@
           <div class="d-flex flex-column justify-content-center">
             <h6 class="mb-0">Geolocalización de ${data[i].name_person}</h6>
             <span class="text-center">Ultimo registro: ${data[i].last_location || data[i].date_last_connection}</span>
-            <span class="text-center"><a href="" style="pointer-events: none">Ver recorrido</a></span>
+            <span class="text-center"><a href="/maps/recorrido/${data[i].id}" >Ver recorrido</a></span>
           </div>
         `;
 
@@ -1321,6 +1336,69 @@
           })
         }
       })
+    })
+
+    $("#searchSellersBtn").on("click", function () {
+      if ($("#searchSellersMapContainer").is(":visible")) {
+        $("#searchSellersMapContainer").hide()
+      } else {
+        $("#searchSellersMapContainer").show()
+      }
+    })
+
+    let showListSellers = (data) => {
+      $("#searchSellersMapContent").html("")
+      for (let i = 0; i < data.length; i++) {
+        let el = `
+          <div>
+            <div class="d-flex gap-2 my-2 sellerSearchCard" style="cursor: pointer" data-lat="${data[i].latitude}" data-lon="${data[i].longitude}">
+              <div style="width: 50px; height: 50%; border-radius: 50%; overflow: hidden;">
+                <img src="${data[i].photo ? data[i].photo : 'https://app.pedbox.co/assets/images/avatars/profile.jpg'} " alt="" style="max-width: 100%; max-height: 100%; object-fit: cover;">
+              </div>
+              <div>
+                <h6 class="m-0 nameSellerDiv"> ${data[i].name_person} </h6>
+                <label for="">${data[i].latitude ? 'Geolocalizado' : 'Sin Geolocalizar'}</label>
+              </div>
+            </div>
+          </div>
+        `;
+        $("#searchSellersMapContent").append(el)
+      }
+
+      console.log("sellerList", data)
+    }
+
+    let filterSellersList = () => {
+      let valueFilter = $("#search-sellers").val(); 
+      let listSellerDOM = $("#searchSellersMapContent>div")
+      for (let i = 0; i < listSellerDOM.length; i++) {
+        let name = $(listSellerDOM[i]).find(".nameSellerDiv").text().toLowerCase().split(' ').join('')
+        if (!name.includes(valueFilter.toLowerCase().split(' ').join(''))) {
+          $(listSellerDOM[i]).hide();
+        }
+      }
+    }
+
+    $(document).on("click", ".sellerSearchCard", function () {
+      let lat = $(this).attr("data-lat");
+      let lon = $(this).attr("data-lon");
+
+      if (lat && lon) {
+        map.setCenter(new google.maps.LatLng(lat, lon));
+        map.setZoom(18);
+
+        $("#searchSellersMapContainer").hide()
+      }
+    })
+
+    $(document).on("keyup", "#search-sellers", function (e) {
+      let valueFilter = $("#search-sellers").val();      
+      if (e.which == 13) {
+        filterSellersList();
+      };
+      if (valueFilter.length == 0) {
+        $("#searchSellersMapContent>div").show();
+      };
     })
 
     $(document).ready(function () {

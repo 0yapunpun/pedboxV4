@@ -84,10 +84,11 @@
         </li>
       <% } %>
 
-      <%
+      <% // Check three diferent permission to show apps module
       permissionIndex = session.user.permission.map(e => e.code).lastIndexOf("4300_CAN_ACCESS_CHAT");
       permissionIndex2 = session.user.permission.map(e => e.code).lastIndexOf("4000_CAN_ACCESS_HELPDESK");
-      if ((permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") || (permissionIndex2 != -1 && session.user.permission[permissionIndex2].content != "N")) { 
+      permissionIndex3 = session.user.permission.map(e => e.code).lastIndexOf("6000_CAN_ACCESS_CRM");
+      if ((permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") || (permissionIndex2 != -1 && session.user.permission[permissionIndex2].content != "N") || (permissionIndex3 != -1 && session.user.permission[permissionIndex3].content != "N")) { 
       %>
         <li class="nav-item">
           <a class="nav-link"  data-bs-toggle="collapse" href="#collapseApp" >
@@ -140,30 +141,22 @@
                   </a>
                 </li>
               <% } %>
-              <!-- <li class="nav-item">
-                <a class="nav-link" href="../Generales/widgets.html" >
-                  <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
-                    <i class="far fa-hand-pointer" style="color: #252f40; font-size: 12px"></i>
-                  </div>
-                  <span class="nav-link-text ms-1 font-weight-bold">Widgets</span>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#" >
-                  <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
-                    <i class="far fa-calendar" style="color: #252f40; font-size: 12px"></i>
-                  </div>
-                  <span class="nav-link-text ms-1 font-weight-bold">Agenda</span>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#" >
-                  <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
-                    <i class="fas fa-comment-alt" style="color: #252f40; font-size: 12px"></i>
-                  </div>
-                  <span class="nav-link-text ms-1 font-weight-bold">Chat</span>
-                </a>
-              </li> -->
+
+              <%
+              permissionIndex = session.user.permission.map(e => e.code).lastIndexOf("6000_CAN_ACCESS_CRM");
+              if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
+              %>
+                <li class="nav-item" id="menuCRM">
+                  <a class="nav-link" href="/crm" >
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
+                      <i class="fas fa-id-badge" style="color: #252f40; font-size: 12px"></i>
+                    </div>
+                    <span class="nav-link-text ms-1 font-weight-bold">CRM</span>
+                  </a>
+                </li>
+              <% } %>
+
+
             </ul>
           </div>
         </li>

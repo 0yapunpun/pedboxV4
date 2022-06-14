@@ -129,7 +129,7 @@
 
           <div class="w-50 nav-wrapper position-relative end-0">
             <ul class="nav nav-pills nav-fill p-1 bg-transparent" role="tablist">
-              <li onclick="$('#sectionRecorridos').show(); $('#sectionInform').hide(); $('#filterInformes').hide(); $('#filterRecorridos').show(); $('#exportRecorridos').show(); $('#exportInform').hide(); $('#currentViewDate').html(nvFormatDate($('#dateRecorridos').val(), 'mmmm DD del YYYY'))" class="nav-item">
+              <li onclick="$('#sectionRecorridos').show(); $('#sectionInform').hide(); $('#filterInformes').hide(); $('#filterRecorridos').show(); $('#exportRecorridos').show(); $('#exportInform').hide(); $('#currentViewDate').html(nvFormatDate($('#dateRecorridos').val() + 'T00:00:00.00Z', 'mmmm DD del YYYY'))" class="nav-item">
                 <a class="nav-link mb-0 px-0 py-1 active " data-bs-toggle="tab" href="javascript:;" role="tab" aria-selected="true">
                   <i class="fas fa-route"></i>
                   <span class="ms-1">Recorridos</span>
@@ -286,8 +286,10 @@
     
   <script>
     let sellersList = [];
+    let sellersListComplete = null;
     let recorridosList = null;
     let salesList = null;
+    let seller_id = null;
     let startDateGlobal = new Date().toISOString().split("T")[0];
     let endDateGlobal = new Date().toISOString().split("T")[0];
 
@@ -297,6 +299,7 @@
       .then(res => {
         if (!res.result.success) {return}
 
+        sellersListComplete = res.result.user[0].sellers
         let list = res.result.user[0].sellers
         for (let i = 0; i < list.length; i++) {
           sellersList.push(list[i].nit)
@@ -308,16 +311,21 @@
           recorridosList = res2[0].result.persons || [];
           salesList = res2[1].result.reportSeller || [];
 
-          printTableRecorridos(recorridosList)
-          printTableSales(salesList)
+          printTableRecorridos(recorridosList);
+          printTableSales(salesList);
 
           $("#preloader").hide();
+
+          if (seller_id) {
+            let sellerInfo = _.findWhere(sellersListComplete, {id_person: seller_id});
+            getDetailRecorrido(sellerInfo.id, sellerInfo.id_person, sellerInfo.nombre)
+          }
         })
       })
     };
 
     const getDataRecorridos = () => {
-      let date = $("#dateRecorridos").val();
+      let date = $("#dateRecorridos").val() + "T00:00:00.00Z"; // Concat "T00:00:00.00Z" to fix function result. if it not included the result give a day less
       $("#currentViewDate").html(nvFormatDate(date, "mmmm DD del YYYY"));
       fetch(`/maps/recorridos/recorridosByDate/${date}/${sellersList.join()}`)
       .then(res => res.json())
@@ -386,7 +394,7 @@
       let dateStart = $("#date1").val();
       let dateEnd = $("#date2").val();
 
-      $("#currentViewDate").html(nvFormatDate(dateStart, "mmmm DD del YYYY")+ " - " + nvFormatDate(dateEnd, "mmmm DD del YYYY"));
+      $("#currentViewDate").html(nvFormatDate(dateStart + "T00:00:00.00Z", "mmmm DD del YYYY")+ " - " + nvFormatDate(dateEnd + "T00:00:00.00Z", "mmmm DD del YYYY"));
 
       if (!dateStart || !dateEnd) {
         $("#selectRangeDate").fadeOut("fast");
@@ -850,6 +858,8 @@
     }
 
     var printDocumentsResume = function() {
+      $("#dropDownContent").html("");
+
       for (let i = 0; i < currentRouteSales.length; i++) {
         let el = `
           <li class="detailDocument" data-lat="${currentRouteSales[i].latitude}" data-lon="${currentRouteSales[i].longitude}">
@@ -917,7 +927,7 @@
       map.setZoom(17);
     })
 
-    $(document).on("click", function (e) { // Control de ventanas flotantes control de fechas
+    $(document).on("click", function (e) { // Control de ventanas flotantes selector de fechas
       if (!$("#selectFilterRecorridos").is(e.target) && $("#selectFilterRecorridos").has(e.target).length === 0) {
         if ($("#selectFilterRecorridos").is(":visible") && e.target.id != "filterIcon") {
           $("#selectFilterRecorridos").hide();
@@ -940,6 +950,9 @@
     })
 
     $(document).ready(function () {
+      seller_id = `<%- JSON.parse(JSON.stringify(seller_id)) %>`;
+      seller_id = Number(seller_id)   
+
       $("#menuRecorridos").addClass("activeNav")
 
       $("#currentViewDate").html(nvFormatDate(new Date(), "mmmm DD del YYYY"));
