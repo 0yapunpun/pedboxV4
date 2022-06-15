@@ -220,7 +220,7 @@
 
               <% 
                 permissionIndex = session.user.permission.map(e => e.code).lastIndexOf( "8028_CAN_ACCESS_TO_CALIDOSOS");
-                if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
+                if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N" && session.user.id_company == 36) { 
               %>
                 <li class="nav-item" id="menuCalidosos">
                   <a class="nav-link" href="/calidosos" >

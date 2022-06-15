@@ -58,7 +58,7 @@
             <tbody id="tableBody"></tbody>
           </table>
           <div style="text-align: center; display: none;" id="emptyResponse">
-            <span >Historial de transacciones no disponible</span>
+            <span >No hay transacciones</span>
           </div>
         </div>
       </div>
@@ -92,7 +92,13 @@
       .then(res => res.json())
       .then(res => {
         historial = res.historial.result
-        printTable(historial.data)
+
+        if (historial) {
+          printTable(historial.data)
+        } else {
+          $("#emptyResponse").show();
+        }
+
         $("#preloader").hide();
       })
     }

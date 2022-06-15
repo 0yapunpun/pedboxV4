@@ -39,7 +39,7 @@ controller.agenda = async(req, res, next) => {
 //** B2B - Extranet
 controller.calidosos = async (req, res, next) => {
   if (!req.session.login) { return res.redirect('/login');}
-  if (!(hasPermission(req.session.user.permission ,"8028_CAN_ACCESS_TO_CALIDOSOS"))) {return res.redirect('/no-permission');}
+  if (!(hasPermission(req.session.user.permission ,"8028_CAN_ACCESS_TO_CALIDOSOS")) && req.session.user.id_company != 36) {return res.redirect('/no-permission');}
 
   res.render('b2b/calidosos', {'session': req.session});
 }
@@ -131,7 +131,7 @@ controller.catalogo = async (req, res, next) => {
   if (!req.session.login) { return res.redirect('/login'); }
   // if (!(hasPermission(req.session.user.permission ,"8045_CAN_VIEW_SHOPPING_CAR"))) {return res.redirect('/no-permission');} // TODO comentado por desarrollo GyW
 
-  if (req.session.user.id == 12790) { // TODO usuario vpareja acceso catalogo GyW
+  if (req.session.user.id_company == 20) { // Usuarios de GyW tienen acceso al catalogo_v2
     res.render('b2b/catalogo_v2', {'session': req.session});
   } else {
     res.render('b2b/catalogo', {'session': req.session});

@@ -344,7 +344,7 @@
         facturas = res.facturas.result.extranet;
         vendedor = res.vendedor.result;
 
-        loadCartera(facturas.Table[0]);
+        loadCartera(facturas);
         handlePermissions(session.user.permission)
 
         $("#preloader").hide();

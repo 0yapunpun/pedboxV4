@@ -130,8 +130,10 @@
       .then(res => {
         facturas = res.facturas.result.extranet;
 
-        loadCartera(facturas.Table[0]);
-        loadTablePedidoRepetido(facturas.Table1);
+        if (facturas.length) {
+          loadCartera(facturas);
+          loadTablePedidoRepetido(facturas.Table1);
+        }
 
         $("#preloader").hide();
       })

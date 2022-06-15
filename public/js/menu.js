@@ -59,6 +59,10 @@ const showSidebar = function (x) {
 }
 
 const loadCartera = (data) => {
+  try {
+    data = data.Table[0]
+  } catch (error) {return}
+
   let cupoCredito = Number(data.cupo);
   let saldoVencido = Number(data.Vr_Vencido_1_a_15) + Number(data.Vr_Vencido_16_a_30) + Number(data.Vr_Vencido_31_a_45) + Number(data.Vr_Vencido_46_a_60) + Number(data.Vr_Vencido_61_a_90) + Number(data.Vr_Vencido_91_a_120) + Number(data.Vr_Vencido_Mas_120);
   let saldoTotal = saldoVencido + Number(data.Vr_Saldo_Sin_Vencer);

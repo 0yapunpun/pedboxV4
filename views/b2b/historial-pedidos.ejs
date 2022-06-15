@@ -431,8 +431,10 @@
         facturas = res.facturas.result.extranet;
         pedidos = res.pedidos.result.extranet;
 
+        console.log(res)
+
         handlePermissions(session.user.permission)
-        loadCartera(facturas.Table[0]);
+        loadCartera(facturas);
 
         $("#preloader").hide();
       })
@@ -728,7 +730,7 @@
           tableContent+= `<tr>`;
           tableContent+= `<td class="text-center">${body[i].numero}</td>`;
           tableContent+= `<td class="text-center">${nvFormatDate(body[i].fecha, "dddd DD de mmmm de YYYY")}</td>`;
-          tableContent+= `<td class="text-center">${nvFormatCash(body[i].valor_total)}</td>`; 
+          tableContent+= `<td class="text-center">${nvFormatCash(body[i].valor_total).split(".")[0]}</td>`; 
           tableContent+= `<td class="text-center pedidoDetail" id="${body[i].numero}" style="cursor: pointer"><i class="fas fa-plus"></i></td>`;
           tableContent+= '</tr>';
         };

@@ -174,7 +174,17 @@ router.post('/maps/informRecorridos', mapsController.getExportSellersLocation);
 //** CRM
 router.get('/crm', viewController.crm);
 router.get('/crm/master', crmController.getMasgerCrm);
+router.post('/crm/master/create', crmController.createCrmMaster);
+router.post('/crm/master/update', crmController.updateCrmMaster);
+router.post('/crm/master/delete', crmController.deleteCrmMaster);
 router.get('/crm/data/:dateS/:dateE', crmController.getDataCrm);
+router.get('/crm/detail/:dateS/:dateE/:persons', crmController.getCrmDetailMonitoring);
+router.get('/crm/detailActivity/:dateS/:dateE/:persons/:id_activity', crmController.getCrmActivityMonitoring);
+
+router.post('/crm/data/cartera', crmController.getCrmDetailCartera);
+router.post('/crm/export/cartera', crmController.getCrmDetailCarteraExport);
+
+
 
 
 

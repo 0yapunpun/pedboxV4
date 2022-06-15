@@ -989,7 +989,7 @@
       }
 
       if (date == -1) { // Ayer
-        s = new Date();
+        let s = new Date();
         s.setDate(s.getDate() - 1);
 
         $("#currentViewDate").html(nvFormatDate(s, "mmmm DD del YYYY"));
@@ -1005,7 +1005,7 @@
       }
 
       if (date == 30) { // Este mes
-        s = new Date();
+        let s = new Date();
         currentMonth = s.getMonth() + 1;
         firstDayMont = s.getFullYear() + "/" + (currentMonth < 10 ? "0"+currentMonth : currentMonth) + "/01";
         
@@ -1020,7 +1020,7 @@
       }
 
       if (date == -30) { // Mes anterior
-        s = new Date();
+        let s = new Date();
         let currentMonth = s.getMonth() + 1;
         let currentYear = s.getFullYear();
 
@@ -1072,7 +1072,6 @@
 
         $("#editViewDateContainer").hide();
         $("#loadingViewDateContainer").show();
-
         return getData();
       }
     }

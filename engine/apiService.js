@@ -673,7 +673,8 @@ service.getMastersCrm = async(id_company) => {
 }
 
 service.getDataCrm = async(idUser, typeUser, idCompany, dateS, dateE) => { 
-  const url = urlKakashi+"getDateUser?id="+idUser+"&type_user="+typeUser+"&id_company=" +idCompany+"&date_begin="+dateS+"&date_end"+dateE+"&crm="+1
+  const url = urlKakashi+"getDateUser?id="+idUser+"&type_user="+typeUser+"&id_company=" +idCompany+"&date_begin="+dateS+"&date_end="+dateE+"&crm="+1
+  console.log(url)
   const data =  await makeRequest(url);
   return data;
 }
@@ -681,6 +682,48 @@ service.getDataCrm = async(idUser, typeUser, idCompany, dateS, dateE) => {
 service.getSellersReportsCrm = async(id_company, dateS, dateE) => { 
   const url = urlKakashi+"sellersCalendarCrmReport?id_company="+id_company+"&date_begin="+dateS+"&date_end="+dateE
   const data =  await makeRequest(url);
+  return data;
+}
+
+service.getCrmDetailMonitoring = async(id_company, dateS, dateE, persons) => { 
+  const url = urlKakashi+`get_count_monitoring?id_company=${id_company}&date_begin=${dateS}&date_end=${dateE}&id_person=${persons}`;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.getCrmActivityMonitoring = async(id_activity, id_company, dateS, dateE, persons) => { 
+  const url = urlKakashi+`get_activity_monitoring?id_company=${id_company}&id_activity=${id_activity}&date_begin=${dateS}&date_end=${dateE}&id_person=${persons}`;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.getCrmDetailCartera = async(url_client, seller) => { 
+  const url = urlKakashi+`get_purse_seller?url_client=${url_client}?wsdl&vendedor=${seller}&export=false`;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.getCrmDetailCarteraExport = async(url_client, seller, logoUrl) => { 
+  const url = urlKakashi+`get_purse_seller?url_client=${url_client}?wsdl&vendedor=${seller}&export=true&type=xls&hideNit=false&url_logo=${logoUrl}`;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.createCrmMaster = async(body) => { 
+  const url = urlKakashi+"setup_master";
+  const data =  await makeRequest(url, options('post', body));
+  return data;
+}
+
+service.updateCrmMaster = async(body) => { 
+  const url = urlKakashi+"setup_master";
+  const data =  await makeRequest(url, options('put', body));
+  return data;
+}
+
+service.deleteCrmMaster = async(body) => { 
+  const url = urlKakashi+"setup_master";
+  const data =  await makeRequest(url, options('delete', body));
   return data;
 }
 

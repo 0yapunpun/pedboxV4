@@ -133,11 +133,13 @@
       fetch("/historial-facturas/data")
       .then(res => res.json())
       .then(res => {
+        console.log(res)
+
         facturas = res.facturas.result.extranet;
         recibos = res.recibos.result.extranet;
         notas = res.notas.result.extranet;
 
-        loadCartera(facturas.Table[0]);
+        loadCartera(facturas);
         loadTable("tablaFacturas", facturas.Table1);
 
         $("#preloader").hide();
@@ -227,11 +229,12 @@
             </thead>  
             `;
         try {
+          console.log("tabla recibos",body)
           for(let i = 0; i < body.length; i++){
             tableContent+= '<tr >';
             tableContent+= `<td class="text-center">${body[i].numero}</td>`;
             tableContent+= `<td class="text-center">${nvFormatDate(body[i].fecha, "dddd DD de mmmm de YYYY")}</td>`;
-            tableContent+= `<td class="text-center">$${numberWithCommas(body[i].valor_total)}</td>`;
+            tableContent+= `<td class="text-center">$${numberWithCommas(body[i].valor_total).split(".")[0]}</td>`;
             tableContent+= '</tr>';
           };
         } catch (error) {
@@ -251,7 +254,10 @@
           </thead>  
           `;
         try {
+          console.log("notas", body)
+
           for(let i = 0; i < body.length; i++){
+            let fecha = body[i].fecha;
             tableContent+= '<tr >';
             tableContent+= `<td class="text-center">${body[i].numero}</td>`;
             tableContent+= `<td class="text-center">${body[i].descripcion}</td>`;
