@@ -40,7 +40,7 @@ service.historialTransacciones = async(id_company, nit) => {
 }
 
 service.historialFacturas = async(url_company, nit, id_company) => {
-  const url = urlKakashi+'get_extranet?nit='+nit+'&tipo=1&url='+url_company+'&id_company='+id_company;
+  const url = urlKakashi+'get_extranet?nit='+nit+'&tipo=4&url='+url_company+'&id_company='+id_company;
   const data =  await makeRequest(url);
   return data;
 }

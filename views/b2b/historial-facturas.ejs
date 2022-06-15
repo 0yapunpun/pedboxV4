@@ -140,7 +140,7 @@
         notas = res.notas.result.extranet;
 
         loadCartera(facturas);
-        loadTable("tablaFacturas", facturas.Table1);
+        loadTable("tablaFacturas", facturas.Table);
 
         $("#preloader").hide();
       })
@@ -179,6 +179,8 @@
       let tableContent = '<tbody id="tableBody" class="mb-2">';
       
       if (tableNombre == "tablaFacturas") {
+        console.log(body)
+      
         tableHead = `
           <thead>
             <tr id="tableHead">
@@ -195,9 +197,9 @@
           for(let i = 0; i < body.length; i++){
             let pdf;
             if (canSeePdf) {
-              pdf = `<a onclick="openModalPdf('${pdfLink}')" href="#"> <i class="fas fa-file-pdf me-1"></i>  <br> ${body[i].Numero_Documento}</a>`
+              pdf = `<a onclick="openModalPdf('${pdfLink}')" href="#"> <i class="fas fa-file-pdf me-1"></i>  <br> ${body[i].Numero_Documento || body[i].numero }</a>`
             } else {
-              pdf = `<a href="${body[i].Url_fe}" target="_blank"> <i class="fas fa-file-pdf me-1"></i>  <br> ${body[i].Numero_Documento} </a>`
+              pdf = `<a href="${body[i].Url_fe}" target="_blank"> <i class="fas fa-file-pdf me-1"></i>  <br> ${body[i].Numero_Documento || body[i].numero } </a>`
             }
 
             if (session.user.id_company == 39) {
@@ -206,11 +208,11 @@
   
             tableContent+= '<tr >';
             tableContent+= `<td class="text-center" style="cursor: pointer"> ${pdf} </td>`;
-            tableContent+= `<td class="text-center">${body[i].Fecha_Emision}</td>`;
-            tableContent+= `<td class="text-center">$${numberWithCommas(body[i].Subtotal)}</td>`;
-            tableContent+= `<td class="text-center">$${numberWithCommas(body[i].Iva)}</td>`;
-            tableContent+= `<td class="text-center">$${numberWithCommas(body[i].Descuento)}</td>`;
-            tableContent+= `<td class="text-center">$${numberWithCommas(body[i].Valor_Documento)}</td>`;
+            tableContent+= `<td class="text-center">${body[i].Fecha_Emision || body[i].fecha}</td>`;
+            tableContent+= `<td class="text-center">$${numberWithCommas(body[i].Subtotal || body[i].subtotal).split(".")[0]}</td>`;
+            tableContent+= `<td class="text-center">$${numberWithCommas(body[i].Iva || body[i].iva).split(".")[0]}</td>`;
+            tableContent+= `<td class="text-center">$${numberWithCommas(body[i].Descuento || body[i].descuento).split(".")[0]}</td>`;
+            tableContent+= `<td class="text-center">$${numberWithCommas(body[i].Valor_Documento || body[i].valor_total).split(".")[0]}</td>`;
             tableContent+= '</tr>';
           };
         } catch (error) {
@@ -254,8 +256,6 @@
           </thead>  
           `;
         try {
-          console.log("notas", body)
-
           for(let i = 0; i < body.length; i++){
             let fecha = body[i].fecha;
             tableContent+= '<tr >';
