@@ -377,6 +377,10 @@
             </ul>
           </nav>
         </div>
+
+        <div class="d-flex">
+          <i id="repairCatalog" class="fas fa-hammer" style="margin-left: auto; cursor: pointer;" data-bs-toggle="tooltip" data-bs-placement="top" title="¿No puede ver el cátalogo?" ></i>
+        </div>
       </div>
     </div>
 
@@ -1543,6 +1547,22 @@
         }
       )
     };
+
+    $("#repairCatalog").on("click", function () {
+      Swal.fire({
+        title: '¿Está seguro de reparar y recargar el cátalogo?',
+        confirmButtonText: 'Aceptar',
+        showDenyButton: true,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          let dbDelete = window.indexedDB.deleteDatabase(catalogName);
+          dbDelete.onsuccess = function(event) {
+            location.reload();
+
+          };
+        }
+      })
+    })
 
     $( document ).ready(function() {
       handlePermissions(); 
