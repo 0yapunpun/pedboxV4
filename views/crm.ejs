@@ -134,6 +134,23 @@
     .navWrapper li{
       cursor: pointer;
     }
+
+    .nav-item{
+      transition: 0.3s;
+      border-radius: 10px;
+    }
+    .nav-item:hover{
+      background-color: white;
+    }
+    .navCustomCrm a:hover{
+      color: inherit;
+    }
+    .rowDetail{
+      cursor: pointer;
+    }
+    .rowDetail:hover{
+      background-color: rgb(233, 236, 239);;
+    }
   </style>
 </head>
  
@@ -197,7 +214,13 @@
             </div>
           </div>
 
-          <i id="exportdashboardBtn" class="fas fa-download ms-3" data-bs-toggle="tooltip" title="Exportar Dashboard" style="display: flex; align-items: center;"></i>
+          <div style="display: flex; align-items: center;">
+            <i id="exportdashboardBtn" class="fas fa-download ms-3" data-bs-toggle="tooltip" title="Exportar CRM" style="cursor: pointer;"></i>
+          </div>
+
+          <div style="display: flex; align-items: center;">
+            <i id="exportdashboarDetaildBtn" class="fas fa-download ms-3" data-bs-toggle="tooltip" title="Exportar Detalle CRM" style="cursor: pointer; display: none;"></i>     
+          </div>
         </div>
 
         <div id="optionsCrm" style="margin-left: auto;">
@@ -210,15 +233,15 @@
               <i class="fas fa-chart-bar" style="font-size: 15px" ></i>
             </div>
     
-            <div id="" onclick='filterEmptySellers()' class="icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg bntHeader" title="Ocultar Gráfica" data-bs-toggle="tooltip">
-              <i class="fas fa-border-all filterSellers1" style="font-size: 15px"></i>
-              <i class="fas fa-border-none filterSellers2" style="display: none; font-size: 15px"></i>
+            <div id="" onclick='filterEmptySellers()' class="icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg bntHeader">
+              <i class="fas fa-border-none filterSellers1" style="font-size: 15px" title="Ocultar Vendedores Sin Movimiento" data-bs-toggle="tooltip"></i>
+              <i class="fas fa-border-all filterSellers2" style="display: none; font-size: 15px" title="Mostrar Vendedores Sin Movimiento" data-bs-toggle="tooltip"></i>
             </div>
           </div>
         </div>
         <div id="backBtnCrm" style="display: none; margin-left: auto;">
           <div class="d-flex gap-2 justify-content-end">
-            <div id="" onclick='backBtnCrm()' class="icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg bntHeader" title="Configuración" data-bs-toggle="tooltip">
+            <div id="" onclick='backBtnCrm()' class="icon icon-shape icon-sm bg-gradient-primary shadow text-center border-radius-lg bntHeader" title="Página Principal" data-bs-toggle="tooltip">
               <i class="fas fa-angle-left" style="font-size: 15px" ></i>
             </div>
           </div>
@@ -241,13 +264,13 @@
         <!-- Paginador sección 2 -->
         <div id="widgetsCRM" style="display: none"> 
           <div class="position-relative end-0 mb-3">
-            <ul class="p-1 bg-transparent mb-3 navWrapper" role="tablist" >
-              <li onclick="paginatorCrmDetail(1)" class="nav-item nav-item1 navCustom" style="width: 50%" >
+            <ul class="p-1 bg-transparent mb-3 navWrapper navCustomCrm gap-2" role="tablist" >
+              <li onclick="paginatorCrmDetail(1)" class="nav-item nav-item1 navCustom flex-fill"  >
                 <a class="nav-link mb-0 px-0 py-1 active" >
                 Eventos y Actividades
                 </a>
               </li>
-              <li onclick="paginatorCrmDetail(2)" class="nav-item nav-item2" style="width: 50%" id="carteraButton">
+              <li onclick="paginatorCrmDetail(2)" class="nav-item nav-item2 flex-fill" id="carteraButton">
                 <a class="nav-link mb-0 px-0 py-1 " >
                 Cartera
                 </a>
@@ -307,9 +330,9 @@
                 </div>
               </div>
   
-              <div class="card flex-fill cardsCrm" style="cursor: inherit;">
+              <div class="card flex-fill cardsCrm cardsButtons"  onclick="printTablePQR()">
                 <div class=" h-100">
-                  <div class="card-header p-3">
+                  <div class="card-header p-3" style="background-color: transparent">
                     <div class="d-flex justify-content-between">
                       <h6 class="mb-0">PQR</h6>
                     </div>
@@ -358,9 +381,7 @@
           </div>
         </div>
   
-
         <div class="mb-4">
-
           <div id="sellerTableContainer" class="crmTableContainer">
             <div class="card text-center p-2" id="tableContainerMargin">
               <div>
@@ -394,23 +415,21 @@
             <div class="card text-center p-2" id="tableContainerMargin">
               <div>
                 <h6 class="mb-0 ms-2">Cotizaciones</h6>
-                <table id="tCotización">
-                  <thead style="table-layout: fixed;">
-                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">#</th>
+                <table id="tCotización" style="table-layout: fixed;">
+                  <thead>
+                    <th width="80" class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">#</th>
                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Vendedor</th>
                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Tipo</th>
                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Cédula</th>
                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Persona</th>
                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Remitente</th>
-                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder"></th>
+                    <th width="50" class="text-center text-uppercase text-secondary text-xxs font-weight-bolder"></th>
                   </thead>
                   <tbody id="tBodyCotización"></tbody>
                 </table>
               </div>
             </div>
           </div>
-
-          
 
           <div id="recordatorioTableContainer" style="display: none" class="crmTableContainer">
             <div class="card text-center p-2" id="tableContainerMargin">
@@ -456,11 +475,31 @@
             </div>
           </div>
 
+          <div id="pqrTableContainer" style="display: none" class="crmTableContainer">
+            <div class="card text-center p-2" id="tableContainerMargin">
+              <div>
+                <h6 class="mb-0 ms-2">PQR</h6>
+                <table id="tPQR" style="table-layout: fixed;">
+                  <thead style="table-layout: fixed;">
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Vendedor</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Tipo</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Cedula / Nit</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Nota</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Descripción</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Remitente</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Persona / Empresa</th>
+                  </thead>
+                  <tbody id="tBodyPQR"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
           <div id="correosTableContainer" style="display: none" class="crmTableContainer">
             <div class="card text-center p-2" id="tableContainerMargin">
               <div>
                 <h6 class="mb-0 ms-2">Correos</h6>
-                <table id="tCorreos">
+                <table id="tCorreos" style="table-layout: fixed;">
                   <thead style="table-layout: fixed;">
                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Vendedor</th>
                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Tipo</th>
@@ -483,7 +522,7 @@
             <div class="card text-center p-2" id="tableContainerMargin">
               <div>
                 <h6 class="mb-0 ms-2">Llamadas</h6>
-                <table id="tLlamadas">
+                <table id="tLlamadas" style="table-layout: fixed;">
                   <thead style="table-layout: fixed;">
                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Vendedor</th>
                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Tipo</th>
@@ -504,8 +543,8 @@
               <select name="" id="selectUsersCartera" class="form-control">
               </select>
               <div class="d-flex align-items-center gap-2">
-                <i  data-bs-toggle="tooltip" title="Exportar Cartera"class="fas fa-file-download" style="font-size: 20px; cursor: pointer;"></i>
-                <i  data-bs-toggle="tooltip" title="Exportar Cartera Como PDF" class="fas fa-file-pdf" style="font-size: 20px; cursor: pointer;"></i>
+                <i id="exportCartera" data-bs-toggle="tooltip" title="Exportar Cartera"class="fas fa-file-download" style="font-size: 20px; cursor: pointer;"></i>
+                <i id="exportCarteraPdf" data-bs-toggle="tooltip" title="Exportar Cartera Como PDF" class="fas fa-file-pdf" style="font-size: 20px; cursor: pointer;"></i>
               </div>
             </div>
 
@@ -517,14 +556,8 @@
                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Vendedor</th>
                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Nit</th>
                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Cliente</th>
-                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Sin Vencer</th>
-                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">1 a 15</th>
-                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">16 a 30</th>
-                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">31 a 45</th>
-                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">46 a 60</th>
-                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">61 a 90</th>
-                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">91 a 120</th>
-                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Más de 120</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Saldo sin Vencer</th>
+                    <th width="300" class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Saldo Vencido</th>
                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Total</th>
                   </thead>
                   <tbody id="tBodyCartera"></tbody>
@@ -561,11 +594,8 @@
 
         </div>
       </div>
-
     </div>
 
-
-    <!-- ** Modales, Ventanas, Sidebar -->
     <!-- Sidebar -->
     <div id="sidebarPage" class="sidebarPage rounded" sidebarState="closed" style="overflow-x: hidden;">
       <div class="d-flex justify-content-center my-3" style="position: relative; margin-bottom: 40px !important">
@@ -744,185 +774,17 @@
       </div>
     </div>
 
-    <!-- Ventana selector de terceros -->
-    <div id="thirdsWindow" class="bg-gray-100" style="position: fixed; height: 50vh; width: 100%; bottom: 0; z-index: 10000; display: none; box-shadow: 0 20px 27px 60px rgb(0 0 0 / 5%); overflow: auto;">
-      <div class="d-flex justify-content-between align-items-center p-5 pb-1">
-        <h4>Buscar tercero</h4>
-        <div class="d-flex gap-4">
-          <div onclick='console.log("cosas pasan")' style="cursor: pointer;">
-            <i class="fas fa-check" style="font-size: 30px"></i>
-          </div>
-          <div onclick='$("#thirdsWindow").hide( "slow" )' style="cursor: pointer;">
-            <i class="fas fa-times" style="font-size: 30px"></i>
-          </div>
-        </div>
-      </div>
-      <div id="thirdsWindowTable" class="p-5">
-        <table id="tableThirds" class="table align-items-center mb-1 table-hover" style="table-layout: fixed;">
-          <thead>
-            <tr id="tableHeadThirds" >
-            <th  width="5%" class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 noSorter"></th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Identificación</th>
-            <th  width="60%" class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tipo</th>
-            </tr> 
-          </thead>  
-          <tbody id="tableBodyThirds" class="mb-2">
-          </tbody>
-        </table>
-      </div>
-    </div>
-
     <!-- Modal Info Row -->
     <div class="modal" id="modalInfo" tabindex="-1" role="dialog"  aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" >Información de <span>Recordatorios</span></h5>
+            <h5 class="modal-title" >Información de <span id="modalDetalKind"></span></h5>
           </div>
           <div class="modal-body p-4" id="modalInfoBody">
           </div>
           <div class="text-end mx-3">
             <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Cerrar</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal crear/editar eventos-->
-    <div class="modal" id="modalEventos" tabindex="-1" role="dialog"  aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" > Editar</h5>
-          </div>
-          <div class="modal-body p-4" id="modalEventosBody">
-            <!-- Visita/Gestion -->
-            <div id="modalEventosGestion" style="display: none;">
-              <div class="d-flex gap-3 my-2"> 
-                <div class="flex-fill">
-                  <label for="dateModalEvents">Fecha Visita *</label> <br>
-                  <input class="form-control" placeholder="0000-00-00" type="date" name="" id="dateModalEvents" readonly>
-                </div>
-                <div class="flex-fill">
-                  <label for="timeInicio">Hora Inicio *</label> <br>
-                  <input class="form-control" type="time" name="" id="timeInicio" readonly>
-                </div>
-                <div class="flex-fill">
-                  <label for="timeFin">Hora Fin *</label> <br>
-                  <input class="form-control" type="time" name="" id="timeFin" readonly>
-                </div>
-              </div>
-              <div class="d-flex flex-column justify-content-center align-items-center y-2">
-                <label for="motivoModalEvents">Motivo de la Visita *</label>
-                <input class="form-control" type="text" name="" id="motivoModalEvents" readonly>
-              </div>
-              <div class="d-flex flex-column justify-content-center align-items-center my-2">
-                <label for="textAreaModalEventsVisita">Nota *</label> 
-                <textarea class="form-control" name="" id="textAreaModalEventsVisita" maxlength="250" cols="30" rows="10" style="resize: none;height: 100px" readonly></textarea>
-              </div>
-            </div>
-            <!-- Recordatorio -->
-            <div id="modalEventosRecordatorio" style="display: none;">
-              <div class="d-flex flex-column justify-content-center align-items-center my-2">
-                <label for="textAreaModalEventsReminder">Nota *</label> 
-                <textarea class="form-control" name="" id="textAreaModalEventsReminder" maxlength="250" cols="30" rows="10" style="resize: none; height: 100px" readonly></textarea>
-              </div>
-              <div class="d-flex justify-content-center">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="" id="checkboxModalEventos" checked="" disabled>
-                  <label class="custom-control-label" for="checkboxModalEventos">Notificar</label>
-                </div>
-              </div>
-              <div class="flex-fill d-flex flex-column justify-content-center align-items-center mt-2">
-                <label for="dateModalRecordatorio">Fecha de vencimiento *</label>
-                <input class="form-control w-30" placeholder="0000-00-00" type="date" name="" id="dateModalRecordatorio" readonly>
-              </div>
-            </div>
-            <!-- PQR, Aparentement no se va a utilizar, pendiente de quitar-->
-            <!-- <div id="modalEventosPQR" style="display: none;">
-              <div class="d-flex">
-                <div class="d-flex flex-column justify-content-center align-items-center y-2 flex-fill">
-                  <label for="pqrSelectModalEvents1">Tipo de PQR *</label>
-                  <select class="form-control w-50" id="pqrSelectModalEvents1" disabled>
-                    <option value="volvo">Volvo</option>
-                    <option value="saab">Saab</option>
-                    <option value="mercedes">Mercedes</option>
-                    <option value="audi">Audi</option>
-                  </select>
-                </div>
-                <div class="d-flex flex-column justify-content-center align-items-center y-2 flex-fill">
-                  <label for="pqrSelectModalEvents2">Motivo de la Visita *</label>
-                  <select class="form-control w-50" id="pqrSelectModalEvents2" disabled>
-                    <option value="volvo">Volvo</option>
-                    <option value="saab">Saab</option>
-                    <option value="mercedes">Mercedes</option>
-                    <option value="audi">Audi</option>
-                  </select>
-                </div>
-              </div>
-              <div class="d-flex flex-column justify-content-center align-items-center my-2">
-                <label for="textAreaModalEventsVisita">Nota *</label> 
-                <textarea class="form-control" name="" id="textAreaModalEventsVisita" maxlength="250" cols="30" rows="10" style="resize: none; height: 100px" readonly></textarea>
-              </div>
-            </div> -->
-            <!-- Correo -->
-            <div id="modalEventosCorreo" style="display: none;">
-              <div style="display: none">
-                <div class="d-flex flex-column justify-content-center align-items-center my-2">
-                  <label for="textAreaModalEventsCorreo">Nota *</label> 
-                  <textarea class="form-control" name="" id="textAreaModalEventsCorreo" maxlength="250" cols="30" rows="10" style="resize: none; height: 100px"></textarea>
-                </div>
-              </div>
-              <div>
-                <div class="text-center">
-                  <div onclick="$('#modalEventosCorreoP1').show(), $('#modalEventosCorreoP2').hide()" class="btn bg-gradient-secondary">Información</div>
-                  <div onclick="$('#modalEventosCorreoP2').show(), $('#modalEventosCorreoP1').hide()" class="btn bg-gradient-secondary">Adjuntos</div>
-                </div>
-                <div id="modalEventosCorreoP1">
-                  <div class="d-flex flex-column justify-content-center align-items-center my-2">
-                    <label for="inputModalEventsCorreo">Para *</label>
-                    <input class="form-control" type="text" id="inputModalEventsCorreo" readonly>
-                  </div>
-                  <div class="d-flex flex-column justify-content-center align-items-center my-2">
-                    <label for="inputModalEventsCorreo1">CC</label>
-                    <input class="form-control" type="text" id="inputModalEventsCorreo1" readonly>
-                  </div>
-                  <div class="d-flex flex-column justify-content-center align-items-center my-2">
-                    <label for="inputModalEventsCorreo3">Asunto *</label>
-                    <input class="form-control" type="text" id="inputModalEventsCorreo3" readonly>
-                  </div>
-                  <div class="d-flex flex-column justify-content-center align-items-center my-2">
-                    <label for="textAreaModalEventsCorreo2">Nota *</label> 
-                    <textarea class="form-control" name="" id="textAreaModalEventsCorreo2" maxlength="250" cols="30" rows="10" style="resize: none; height: 100px" readonly></textarea>
-                  </div>
-                </div> 
-                <div id="modalEventosCorreoP2" style="display: none">
-                  <h6 class="text-center">En esta sección aparecen los archivos adjuntos que han sido añadidos</h6>
-                  <div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- Terceros Vinculados  -->
-            <hr class="horizontal dark">
-            <div>
-              <div class="d-flex flex-column align-items-center ">
-                <label>Persona Vinculada *</label>
-                <div class="d-flex gap-1">
-                  <div style="width: 50px; height: 50px; border-radius: 50%; background-color: gray;"></div>
-                </div>
-                <div onclick="loadThirds(tercerosJSON)" class="my-2 iconsHover" style="cursor: pointer" data-bs-toggle="tooltip" data-bs-placement="top" title="Vincular Persona">
-                  <i class="fas fa-user-plus" style="font-size: 35px;"></i>
-                </div>
-              </div>
-            </div>
-
-          </div>
-          <div class="text-end mx-3">
-            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Cerrar</button>
-            <button type="button" class="btn bg-gradient-primary" data-bs-dismiss="modal">Guardar</button>
-            <button type="button" class="btn bg-gradient-primary" data-bs-dismiss="modal">Crear</button>
           </div>
         </div>
       </div>
@@ -1010,7 +872,6 @@
       $("#preloader").hide();
     }
 
-    //Gráfica
     const loadGrafica = function () {
       let arrayChart = [dataChart.countProspectos, dataChart.countCotizaciones, dataChart.countVisitas, dataChart.countCorreos, dataChart.countLlamadas, dataChart.countRecordatorios];
       let arrayColors = [];
@@ -1049,8 +910,14 @@
     }
 
     let tblSellers;
-    const printTableSellers = () => {
-      let data = completeDataCrm.sellers;
+    const printTableSellers = (dataFiltered) => {
+      let data = null;
+      if (dataFiltered) {
+        data = dataFiltered;
+      } else {
+        data = completeDataCrm.sellers;
+      }
+
       try {
         tblSellers.destroy();
       } catch (error) {}
@@ -1081,6 +948,8 @@
 
     let tblCotizaciones;
     const printTableCotizaciones = async() => {      
+      $('#preloader').show()
+
       let id_activity = 5; // Cotizaciones
       let response= await fetch(`/crm/detailActivity/${startDateCrm}/${endDateCrm}/${personsString}/${id_activity}`);
           response = await response.json();
@@ -1094,7 +963,7 @@
 
       for (let i = 0; i < data.length; i++) {
         let el = `
-          <tr>
+          <tr class='rowDetail' data-kind='cotizacion' data-row='${JSON.stringify(data[i])}'>
             <td class="text-center"> ${ data[i].num_quotation } </td>
             <td class="text-center"> ${ data[i].usuario }</td>
             <td class="text-center"> Cliente </td>
@@ -1118,17 +987,18 @@
       $("#cardTableCotizaciones").css("backgroundColor", "#e9ecef;");
       $(".crmTableContainer").hide();
       $("#cotizaciónTableContainer").show();
+      $('#preloader').hide()
     };
 
     let tblRecordatorio;
-    const printTableRecordatorio = async() => {      
+    const printTableRecordatorio = async() => {    
+      $('#preloader').show()
+      
       let id_activity = 4; // Cotizaciones
       let response= await fetch(`/crm/detailActivity/${startDateCrm}/${endDateCrm}/${personsString}/${id_activity}`);
           response = await response.json();
 
       let data = response.result.monitoring;
-
-      console.log("record", data)
 
       try {
         tblRecordatorio.destroy();
@@ -1137,7 +1007,7 @@
 
       for (let i = 0; i < data.length; i++) {
         let el = `
-          <tr>
+          <tr class='rowDetail' data-kind='recordatorio' data-row='${JSON.stringify(data[i])}'>
             <td class="text-center"> ${ data[i].task || "-"} </td>
             <td class="text-center"> Cliente </td>
             <td class="text-center"> ${ data[i].nit_client || "-"}</td>
@@ -1157,17 +1027,18 @@
       $("#cardTableRecordatorio").css("backgroundColor", "#e9ecef;");
       $(".crmTableContainer").hide();
       $("#recordatorioTableContainer").show();
+      $('#preloader').hide()
     };
 
     let tblGestion;
-    const printTableGestion = async() => {      
+    const printTableGestion = async() => {     
+      $('#preloader').show()
+
       let id_activity = 3; // Gestion
       let response= await fetch(`/crm/detailActivity/${startDateCrm}/${endDateCrm}/${personsString}/${id_activity}`);
           response = await response.json();
 
       let data = response.result.monitoring;
-
-      console.log("gestion", data)
 
       try {
         tblGestion.destroy();
@@ -1176,7 +1047,7 @@
 
       for (let i = 0; i < data.length; i++) {
         let el = `
-          <tr>
+          <tr class='rowDetail' data-kind='gestion' data-row='${JSON.stringify(data[i])}'>
             <td class="text-center"> ${ data[i].usuario || "-"} </td>
             <td class="text-center"> Cliente </td>
             <td class="text-center"> ${ data[i].nit_client || "-"}</td>
@@ -1198,17 +1069,33 @@
       $("#cardTableGestion").css("backgroundColor", "#e9ecef;");
       $(".crmTableContainer").hide();
       $("#gestionTableContainer").show();
+      $('#preloader').hide()
     };
 
+    let btlPQR;
+    const printTablePQR = () => {
+      try {
+        btlPQR.destroy();
+      } catch (error) {}
+      $("#tBodyPQR").html("")
+
+      btlPQR = new simpleDatatables.DataTable("#tPQR", {
+        perPageSelect: false
+      });
+
+      $(".crmTableContainer").hide();
+      $("#pqrTableContainer").show();
+    }
+    
     let tblCorreos;
-    const printTableCorreos = async() => {      
+    const printTableCorreos = async() => {   
+      $('#preloader').show()
+
       let id_activity = 1; // Correos
       let response= await fetch(`/crm/detailActivity/${startDateCrm}/${endDateCrm}/${personsString}/${id_activity}`);
           response = await response.json();
 
       let data = response.result.monitoring;
-
-      console.log("correos", data)
 
       try {
         tblCorreos.destroy();
@@ -1217,7 +1104,7 @@
 
       for (let i = 0; i < data.length; i++) {
         let el = `
-          <tr>
+          <tr class='rowDetail' data-kind='correo' data-row='${JSON.stringify(data[i])}'>
             <td class="text-center"> ${ data[i].usuario || "-"} </td>
             <td class="text-center"> Cliente </td>
             <td class="text-center"> ${ data[i].nit_client || "-"}</td>
@@ -1240,17 +1127,18 @@
       $("#cardTableCorreos").css("backgroundColor", "#e9ecef;");
       $(".crmTableContainer").hide();
       $("#correosTableContainer").show();
+      $('#preloader').hide()
     };
 
     let tblLlamadas;
-    const printTableCalls = async() => {      
+    const printTableCalls = async() => {     
+      $('#preloader').show()
+
       let id_activity = 2; // Llamadas
       let response= await fetch(`/crm/detailActivity/${startDateCrm}/${endDateCrm}/${personsString}/${id_activity}`);
           response = await response.json();
 
       let data = response.result.monitoring;
-
-      console.log("llamadas", data)
 
       try {
         tblLlamadas.destroy();
@@ -1259,7 +1147,7 @@
 
       for (let i = 0; i < data.length; i++) {
         let el = `
-          <tr>
+          <tr class='rowDetail' data-kind='llamada' data-row='${JSON.stringify(data[i])}'>
             <td class="text-center"> ${ data[i].usuario || "-"} </td>
             <td class="text-center"> Cliente </td>
             <td class="text-center"> ${ data[i].nit_client || "-"}</td>
@@ -1278,6 +1166,7 @@
       $("#cardTableCalls").css("backgroundColor", "#e9ecef;");
       $(".crmTableContainer").hide();
       $("#llamadasTableContainer").show();
+      $('#preloader').hide()
     };
 
     let prepareDataCartera = async() => {
@@ -1321,20 +1210,31 @@
       $("#tBodyCartera").html("")
 
       for (let i = 0; i < data.length; i++) {
+        let calcTotal = Number(data[i].Vr_Saldo_Sin_Vencer) +
+                        Number(data[i].Vr_Vencido_1_a_15) +
+                        Number(data[i].Vr_Vencido_16_a_30) +
+                        Number(data[i].Vr_Vencido_31_a_45) +
+                        Number(data[i].Vr_Vencido_46_a_60) +
+                        Number(data[i].Vr_Vencido_61_a_90) +
+                        Number(data[i].Vr_Vencido_91_a_120) +
+                        Number(data[i].Vr_Vencido_Mas_120);
+
         let el = `
           <tr class="rowTableCartera" data-nit="${data[i].Codigo_Cliente}">
             <td class="text-center"> ${ data[i].Nombre_Vendedor || "-"} </td>
             <td class="text-center"> ${ data[i].Codigo_Cliente || "-"}</td>
             <td class="text-center"> ${ data[i].Nombre_del_Cliente || "-"}</td>
-            <td class="text-center"> ${ data[i].Vr_Saldo_Sin_Vencer || "-"}</td>
-            <td class="text-center"> ${ data[i].Vr_Vencido_1_a_15 || "-" }</td>
-            <td class="text-center"> ${ data[i].Vr_Vencido_16_a_30 || "-" }</td>
-            <td class="text-center"> ${ data[i].Vr_Vencido_31_a_45 || "-" }</td>
-            <td class="text-center"> ${ data[i].Vr_Vencido_46_a_60 || "-" }</td>
-            <td class="text-center"> ${ data[i].Vr_Vencido_61_a_90 || "-" }</td>
-            <td class="text-center"> ${ data[i].Vr_Vencido_91_a_120 || "-" }</td>
-            <td class="text-center"> ${ data[i].Vr_Vencido_Mas_120 || "-" }</td>
-            <td class="text-center"> calcular </td>
+            <td class="text-center"> ${ nvFormatCash(data[i].Vr_Saldo_Sin_Vencer).split('.')[0]  || "-"}</td>
+            <td class="text-center"> 
+              <div> <span class='text-secondary font-weight-bolder'>1 a 15 días: </span> ${ nvFormatCash(data[i].Vr_Vencido_1_a_15).split('.')[0] || "-" }</div>
+              <div> <span class='text-secondary font-weight-bolder'>16 a 30 días: </span> ${ nvFormatCash(data[i].Vr_Vencido_16_a_30).split('.')[0] || "-" }</div>
+              <div> <span class='text-secondary font-weight-bolder'>31 a 45 días: </span> ${ nvFormatCash(data[i].Vr_Vencido_31_a_45).split('.')[0] || "-" }</div>
+              <div> <span class='text-secondary font-weight-bolder'>46 a 60 días: </span> ${ nvFormatCash(data[i].Vr_Vencido_46_a_60).split('.')[0]  || "-" }</div>
+              <div> <span class='text-secondary font-weight-bolder'>61 a 90 días:</span> ${ nvFormatCash(data[i].Vr_Vencido_61_a_90).split('.')[0] || "-" }</div>
+              <div> <span class='text-secondary font-weight-bolder'>91 a 120 días: </span>${ nvFormatCash(data[i].Vr_Vencido_91_a_120).split('.')[0] || "-" }</div>
+              <div> <span class='text-secondary font-weight-bolder'>Más de 120: </span>${ nvFormatCash(data[i].Vr_Vencido_Mas_120).split('.')[0] || "-" }</div>
+            </td>
+            <td class="text-center"> ${nvFormatCash(calcTotal).split('.')[0]} </td>
           </tr>
         `;
         $("#tBodyCartera").append(el)
@@ -1346,6 +1246,7 @@
 
       $(".crmTableContainer").hide();
       $("#carteraTableContainer").show();
+      $("#preloader").hide();
     };
 
     let tblDetailCartera;
@@ -1358,15 +1259,15 @@
       for (let i = 0; i < data.length; i++) {
         let el = `
           <tr>
-            <td class="text-center"> <i class="fas fa-sticky-note"></i> </td>
+            <td class="text-center"> <i class="fas fa-sticky-note" style='cursor: pointer'></i> </td>
             <td class="text-center"> ${ data[i].Tipo_Documento || "-"}</td>
             <td class="text-center"> ${ data[i].Numero_Documento || "-"}</td>
             <td class="text-center"> ${ data[i].Fecha_Emision || "-"}</td>
             <td class="text-center"> ${ data[i].Fecha_Vencimiento || "-" }</td>
             <td class="text-center"> ${ data[i].Fecha_de_Corte || "-" }</td>
-            <td class="text-center"> ${ data[i].Valor_Saldo || "-" }</td>
-            <td class="text-center"> ${ data[i].Valor_Documento || "-" }</td>
-            <td class="text-center"> ${ data[i].Valor_Aplicado || "-" }</td>
+            <td class="text-center"> ${ data[i].Valor_Saldo.split('.')[0] || "-" }</td>
+            <td class="text-center"> ${ data[i].Valor_Documento.split('.')[0] || "-" }</td>
+            <td class="text-center"> ${ data[i].Valor_Aplicado.split('.')[0] || "-" }</td>
             <td class="text-center"> ${ data[i].Nro_Dias_Vencidos || "-" }</td>
           </tr>
         `;
@@ -1381,327 +1282,6 @@
       $("#carteraDetalleTableContainer").show();
     };
 
-
-    // Tablas
-    let loadTable = function (tableNombre, body) {
-      // style table overflow:scroll
-      // style table table-layout: fixed
-      let table = `<table id="${tableNombre}" class="table align-items-center mb-1 table-hover" style="overflow:scroll"></table>`;
-      let tableHead;
-
-      $("#tableContainerCRM").hide("slide", { direction: "right" }, 300);
-      $("#tableContainerCRM").html("");
-      $("#tableContainerCRM").append(table)
-
-      let tableContent = '<tbody id="tableBody" class="mb-2">';
-        
-      // Vendedores
-      if (tableNombre == "tablaVendedores") {
-        tableHead = `
-          <thead>
-            <tr id="tableHead">
-            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 iconCheck" > <i class="fas fa-check-double" style="font-size: 26px" ></i> </th>
-            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nit &nbsp;&nbsp;&nbsp</th>
-            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre</th>
-            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Prospectos &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Cotizaciones  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Visitas   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Correos  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Llamadas  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Recordatorios   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total Gestión   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            </tr> 
-          </thead>  
-          `;
-        for(let i = 0; i < body.length; i++){
-            tableContent+= '<tr >';
-            tableContent+= '<td class="text-start"><input type="checkbox" class="checkboxTable"></td>';
-            tableContent+= '<td class="text-start" value="'+body[i].id+'"">' + body[i].nit + '</td>';
-            tableContent+= '<td class="text-start text-wrap">' + body[i].nombre + '</td>';
-            tableContent+= '<td class="text-center">' + body[i].prospectos + '</td>';
-            tableContent+= '<td class="text-center">' + body[i].cotizaciones + '</td>';
-            tableContent+= '<td class="text-center">' + body[i].visitas + '</td>';
-            tableContent+= '<td class="text-center">' + body[i].correos + '</td>';
-            tableContent+= '<td class="text-center">' + body[i].llamadas + '</td>';
-            tableContent+= '<td class="text-center">' + body[i].recordatorios + '</td>';
-            tableContent+= '<td class="text-center">' + body[i].gestion + '</td>';
-            tableContent+= '</tr>';
-        };
-      }
-
-      // Cotizacion
-      if (tableNombre == "tablaCotizacion") {
-        tableHead = `
-          <thead>
-            <tr id="tableHead">
-            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">#</th>
-            <th class="text-left text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Vendedor  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tipo</th>
-            <th class="text-start text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Cédula / Nit</th>
-            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Persona/Empresa</th>
-            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Remitente</th>
-            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 noSorter"></th>
-            </tr> 
-          </thead>  
-          `;
-        for(let i = 0; i < body.length; i++){
-            tableContent+= '<tr Vendedor="'+body[i].usuario+'" Numero="'+body[i].num_quotation+'" Nota="'+body[i].task+'" Remitente="'+body[i].sender+'" Empresa="'+body[i].bussiness_name+'">';
-            tableContent+= '<td class="infoRowTable text-start ">' + body[i].num_quotation + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].usuario + '</td>';
-            tableContent+= '<td class="infoRowTable text-start">Quemado</td>';
-            tableContent+= '<td class="infoRowTable text-start">' + body[i].nit_client + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].bussiness_name + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].sender + '</td>';
-            tableContent+= '<td class="text-center" style="cursor: pointer"><i class="fas fa-file-pdf"></i></td>';
-            tableContent+= '</tr>';
-        };
-      }
-
-      // Recordatorio
-      if (tableNombre == "tablaRecordatorio") {
-        tableHead = `
-          <thead>
-            <tr id="tableHead">
-            <th class="text-left text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nota</th>
-            <th class="text-left text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tipo</th>
-            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Cédula / Nit &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th class="text-start text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Vendedor / Nit</th>
-            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Identifiación &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Persona &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Empresa</th>
-            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 noSorter"></th>
-            </tr> 
-          </thead>  
-          `;
-        
-        for(let i = 0; i < body.length; i++){
-            tableContent+= '<tr  Vendedor="'+body[i].usuario+'" Nota="'+body[i].task+'" NumeroIden="'+body[i].id+'" Empresa="'+body[i].bussiness_name+'">';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].task + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">Quemado</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].id + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].usuario + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].id + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + (body[i].name_person ? body[i].name_person : "") + ' </td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].bussiness_name + '</td>';
-            tableContent+= '<td class="openModalEvent text-center" objIndex="'+i+'" objName="RecordatoriosJsonPrueba"><i class="fas fa-eye" style="cursor: pointer"></i></td>';
-            tableContent+= '</tr>';
-        };
-      }
-
-      // PQR (Tabla no utilizada, Pendiente de eliminar)
-      if (tableNombre == "tabla6") {
-        tableHead = `
-          <thead>
-            <tr id="tableHead">
-            <th  class="text-left text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Vendedor</th>
-            <th  class="text-left text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tipo</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Cédula/Nit  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th  class="text-start text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nota</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Descripción  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Remietente</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Persona</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 noSorter"></th>
-            </tr> 
-          </thead>  
-          `;
-        
-        for(let i = 0; i < body.length; i++){
-            tableContent+= '<tr>';
-            tableContent+= '<td class="text-start text-wrap">' + body[i].task + '</td>';
-            tableContent+= '<td class="text-start text-wrap">Quemado</td>';
-            tableContent+= '<td class="text-start text-wrap">' + body[i].id + '</td>';
-            tableContent+= '<td class="text-start text-wrap">' + body[i].usuario + '</td>';
-            tableContent+= '<td class="text-start text-wrap">' + body[i].id + '</td>';
-            tableContent+= '<td class="text-start text-wrap">' + (body[i].name_person ? body[i].name_person : "") + ' </td>';
-            tableContent+= '<td class="text-start text-wrap">' + body[i].bussiness_name + '</td>';
-            tableContent+= '<td class="openModalEvent text-center" objIndex="'+i+'" objName="PQRjson"><i class="fas fa-eye" style="cursor: pointer"></i></td>';
-            tableContent+= '</tr>';
-        };
-      }
-
-      // Gestión
-      if (tableNombre == "tablaGestion") {
-        tableHead = `
-          <thead>
-            <tr id="tableHead">
-            <th  class="text-left text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Vendedor</th>
-            <th  class="text-left text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tipo</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Cédula/Nit</th>
-            <th  class="text-start text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Persona / Empresa</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nota</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">descripción</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Hora Inicio  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Hora Fin</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Fecha Visita  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 noSorter"></th>
-            </tr> 
-          </thead>  
-          `;
-        
-        for(let i = 0; i < body.length; i++){
-            tableContent+= '<tr Vendedor="'+body[i].usuario+'" Nota="'+body[i].task+'" Empresa="'+body[i].bussiness_name+'" Description='+body[i].description+' HoraI='+body[i].hour_ini +' HoraF='+body[i].hour_fin+' HoraV='+body[i].date_visit+'>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].usuario + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">Quemado</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].num_identification + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].bussiness_name + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].task + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].description + ' </td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].hour_ini + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].hour_fin + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].date_visit + '</td>';
-            tableContent+= '<td class="openModalEvent text-center" objIndex="'+i+'" objName="gestionJsonPrueba"><i class="fas fa-eye" style="cursor: pointer"></i></td>';
-            tableContent+= '</tr>';
-        };
-      };
-
-      // Correos
-      if (tableNombre == "tablaCorreos") {
-        tableHead = `
-          <thead>
-            <tr id="tableHead">
-            <th class="text-left text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Vendedor</th>
-            <th  class="text-left text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tipo</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Cédula/Nit &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th  class="text-start text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Asunto</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Descripción &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Remitente</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Identificación</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Persona/Empresa &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Fecha</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 noSorter"></th>
-            </tr> 
-          </thead>  
-          `;
-        
-        for(let i = 0; i < body.length; i++){
-            tableContent+= '<tr  Vendedor="'+body[i].usuario+'" Nota="'+body[i].task+'" Fecha="'+body[i].date_creation+'" Empresa="'+body[i].bussiness_name+'">';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].usuario + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">Quemado</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].num_identification + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].task + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].description + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].sender + ' </td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].nit_client + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].bussiness_name + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].date_creation + '</td>';
-            tableContent+= '<td class="openModalEvent text-center" objIndex="'+i+'" objName="correosJSONprueba"><i class="fas fa-eye" style="cursor: pointer"></i></td>';
-            tableContent+= '</tr>';
-        };
-      }
-
-      // Llamadas
-      if (tableNombre == "tablaLlamadas") {
-        tableHead = `
-          <thead>
-            <tr id="tableHead" >
-            <th class="text-left text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Vendedor</th>
-            <th  class="text-left text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tipo</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Cédula / Nit  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th  class="text-start text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Duración  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Persona / Empresa</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Fecha</th>
-            </tr> 
-          </thead>  
-          `;
-        
-        for(let i = 0; i < body.length; i++){
-            tableContent+= '<tr Vendedor="'+body[i].usuario+'" Phone="'+body[i].call_number+'"  HoraI='+body[i].hour_ini +' HoraF='+body[i].hour_fin+' Fecha="'+body[i].date_creation+'"  Duracion="' + body[i].duration + '" Identificacion="' + body[i].num_identification + '" Empresa="'+body[i].bussiness_name+'">';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].usuario + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">Quemado</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].num_identification + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].duration + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].bussiness_name + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].date_creation.split(' ')[0]  + ' </td>';
-            tableContent+= '</tr>';
-        };
-      }
-
-      // Cartera
-      if (tableNombre == "tablaCartera") {
-        tableHead = `
-          <thead>
-            <tr id="tableHead" >
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Vendedor</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nit</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Cliente</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sin Vencer</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">1 a 15 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">16 a 30 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">31 a 45 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">46 a 60 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">61 a 90 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">91 a 120 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Más de 120</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total</th>
-            </tr> 
-          </thead>  
-          `;
-        
-        for(let i = 0; i < body.length; i++){
-            let totalSum = parseFloat(body[i].Vr_Saldo_Sin_Vencer)+parseFloat(body[i].Vr_Vencido_1_a_15)+parseFloat(body[i].Vr_Vencido_16_a_30)+parseFloat(body[i].Vr_Vencido_31_a_45)+parseFloat(body[i].Vr_Vencido_46_a_60)+parseFloat(body[i].Vr_Vencido_61_a_90)+parseFloat(body[i].Vr_Vencido_91_a_120)+parseFloat(body[i].Vr_Vencido_Mas_120);
-            tableContent+= '<tr class="rowCartera">';
-            tableContent+= '<td class=" text-start text-wrap">' + body[i].Nombre_Vendedor + '</td>';
-            tableContent+= '<td class=" text-start text-wrap">' + body[i].Codigo_Vendedor + '</td>';
-            tableContent+= '<td class=" text-start text-wrap">' + body[i].Nombre_del_Cliente + '</td>';
-            tableContent+= '<td class=" text-start text-wrap">' + body[i].Vr_Saldo_Sin_Vencer + '</td>';
-            tableContent+= '<td class=" text-start text-wrap">' + body[i].Vr_Vencido_1_a_15 + '</td>';
-            tableContent+= '<td class=" text-start text-wrap">' + body[i].Vr_Vencido_16_a_30 + '</td>';
-            tableContent+= '<td class=" text-start text-wrap">' + body[i].Vr_Vencido_31_a_45 + '</td>';
-            tableContent+= '<td class=" text-start text-wrap">' + body[i].Vr_Vencido_46_a_60 + '</td>';
-            tableContent+= '<td class=" text-start text-wrap">' + body[i].Vr_Vencido_61_a_90 + '</td>';
-            tableContent+= '<td class=" text-start text-wrap">' + body[i].Vr_Vencido_91_a_120 + '</td>';
-            tableContent+= '<td class=" text-start text-wrap">' + body[i].Vr_Vencido_Mas_120 + '</td>';
-            tableContent+= '<td class=" text-start text-wrap">'+ totalSum +'</td>';
-            tableContent+= '</tr>';
-        };
-      } 
-      
-      // Cartera, detalle factura
-      if (tableNombre == "tablaFactura") {
-        tableHead = `
-          <thead>
-            <tr id="tableHead" >
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 noSorter"></th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tip Doc &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nro Doc</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Fecha Emisión</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">fecha Vencimiento &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Fecha de corte &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Saldo</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Valor</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Valor Aplicado &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Días Vencidos &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-            </tr> 
-          </thead>  
-          `;
-        
-        for(let i = 0; i < body.length; i++){
-            tableContent+= '<tr>';
-            tableContent+= '<td class="infoRowTable text-center text-wrap"><i class="fas fa-sticky-note"></i></td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].Tipo_Documento + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].Numero_Documento + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].Fecha_Emision + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].Fecha_Vencimiento + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].Fecha_de_Corte + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].Valor_Saldo + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].Valor_Documento + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].Valor_Aplicado + '</td>';
-            tableContent+= '<td class="infoRowTable text-start text-wrap">' + body[i].Nro_Dias_Vencidos + '</td>';
-            tableContent+= '</tr>';
-        };
-      }
-
-      tableContent+='</tbody>';
-
-      $("#"+tableNombre).append(tableHead);
-      $("#"+tableNombre).append(tableContent);
-      $("#tableContainerCRM").show();
-      $('body,html').animate({scrollTop: 0}, 100); 
-
-      const tableObj = new simpleDatatables.DataTable("#"+tableNombre, {});
-    }
-
-    // Ocultar vendedores sin movimiento
     let filterSellersEmptyState = 0;
     const filterEmptySellers = function () {
       if (filterSellersEmptyState == 0) {
@@ -1716,7 +1296,7 @@
           }
         }
         
-        loadTable("tablaVendedores",tableFilter);
+        printTableSellers(tableFilter);
         filterSellersEmptyState = 1;
         return
       }
@@ -1725,13 +1305,12 @@
         $(".filterSellers1").css("display", "inline")
         $(".filterSellers2").css("display", "none")
 
-        loadTable("tablaVendedores", completeDataCrm.sellers)
+        printTableSellers();
         filterSellersEmptyState = 0;
         return
       }
     }
 
-    // Ver-Esconder gráfica
     let chartState = 0;
     const toggleChart = function () {
       if (chartState === 0) {
@@ -1797,8 +1376,6 @@
         s = new Date();
         s.setDate(s.getDate() - 1);
 
-        console.log(s)
-
         $("#currentViewDate").html(nvFormatDate(s, "mmmm DD del YYYY"));
 
         s = s.toISOString().split("T")[0];
@@ -1849,9 +1426,173 @@
         $("#loadingViewDateContainer").show();
         return getDataCrm();
       }
+    };
+
+    const loadCards = function(data){
+      $("#cotizacionesNumber").html(data.cotizacion);
+      $("#recordatorioNumber").html(data.tarea.tarea);
+      $("#pendienteNumber").html(data.tarea.pendientes);
+      $("#completadoNumber").html(data.tarea.completadas);
+
+      $("#pqrNumber").html(data.pqr.pqr);
+      $("#pqrPendienteNumber").html(data.pqr.pendiente);
+      $("#pqrCerradoNumber").html(data.pqr.cerrados);
+
+      $("#gestionNumber").html(data.visita);
+      $("#correoNumber").html(data.llamada);
+      $("#llamadaNumber").html(data.correo);
+
     }
 
-    // Checkbox input tabla
+    // CRM sección 2 (Cartera)
+    const paginatorCrmDetail = function (state) {
+      switch (state) {
+        case 1:
+          $(".nav-item2").removeClass("navCustom");
+          $(".nav-item1").addClass("navCustom");
+
+          $("#indicatorsCRM").fadeIn();
+          printTableCotizaciones();
+          break
+        case 2:
+          $(".nav-item1").removeClass("navCustom");
+          $(".nav-item2").addClass("navCustom");
+
+          $("#indicatorsCRM").fadeOut();
+          $("#preloader").show();
+          prepareDataCartera();
+          break
+      }
+    }
+
+    // Sidebar Maestros
+    const showSidebarCRM = function (x) { // TODO sidebar
+      let state = $("#sidebarCRM").attr("sidebarState");
+
+      if (state == "closed") {
+        $("#sidebarCRM").attr("sidebarState", "open");
+        $("#sidebarCRM" ).css('right', 0); 
+        $("#sidebarCRM" ).show("slide", { direction: "right" }, 400);
+      }
+      if (state == "open") {
+        $("#sidebarCRM").attr("sidebarState", "closed");
+        $("#sidebarCRM" ).hide("slide", { direction: "right" }, 400);
+      }
+    }
+
+    const loadMastersSidebar = function (master) {
+      for (let i = 1; i <= 10; i++) {
+        for (let e = 0; e < master.length; e++) {
+          if (master[e].id_crm_master == i) {
+            let element = `
+              <div Mcode="${master[e].code}" Mdesc="${master[e].description}" Mid="${master[e].id}" Mcomp="${master[e].id_company}" Mcrm="${master[e].id_crm_master}"  class="d-flex justify-content-between w-100">
+                <div class="masterEdit"><span class="stringP1"> ${master[e].code}</span> - <span class="stringP2">${master[e].description}</span> </div>
+                <div class="deleteMaster ms-1"><i class="fas fa-trash mt-1"></i></div>
+              </div>
+            `;
+            $(`[idMaster='${i}']`).append(element);
+            // Referencias para el boton de crear
+            var masterRef = master[e].id_company;
+            var crmRef = master[e].id_crm_master;
+          }
+          // Añadir boton crear final
+          if (e === master.length - 1) {
+            button = `<button Mcomp="${masterRef}" Mcrm="${crmRef}" class="btn btn-outline-primary createMaster" style="width: 100px; margin: 0 auto">Crear</button>`;
+            $(`[idMaster='${i}']`).append(button);
+          }
+        }
+      }
+    }
+
+    const getCrmMasters = async function () {
+      const rawResponse = await fetch("/crm/master");
+      const response = await rawResponse.json();
+      loadMastersSidebar(response.result.master[0].master)
+    }
+
+    const getDataCrm = async function () {
+      const rawResponse = await fetch(`/crm/data/${startDateCrm}/${endDateCrm}`)
+      const response = await rawResponse.json();
+
+      loadCRM(response.result.user[0]);
+
+      $("#editViewDateContainer").show();
+      $("#loadingViewDateContainer").hide();
+    }
+
+    // Modal información rows
+    const modalInfoRow = function (elements, kind) {
+      $("#modalInfoBody").html("")
+      $('#modalDetalKind').html(kind)
+
+      let claves = Object.keys(elements);
+      for(let i=0; i< claves.length; i++){
+
+        let clave = claves[i];
+        if (!elements[clave] == "") {
+
+          infoCampo = `
+            <div class="border-bottom my-3">
+              <span class="fw-bold" style="color: #344767">${clave.replaceAll('_', ' ')}</span> <br>
+              <span class="fs-5">${elements[clave]}</span>
+            </div>
+          `;
+          $("#modalInfoBody").append(infoCampo)
+        }
+      }
+      $("#modalInfo").modal("show")
+    }
+
+    let personsString = null;
+    const loadCrmDetail = async function () {
+      personsString = dataCheckboxTable.join(",")
+
+      if (personsString == "") {
+        return Swal.fire({
+          title: 'Seleccione vendedores antes de buscar',
+          confirmButtonText: 'Continuar',
+        })
+      }
+
+      let response = await fetch(`/crm/detail/${startDateCrm}/${endDateCrm}/${personsString}`);
+          response = await response.json();
+
+      loadCards(response.result.monitoring);
+      printTableCotizaciones();
+
+      $(".cardsButtons").css("backgroundColor", "");
+      $(".nav-item2").removeClass("navCustom");
+      $(".nav-item1").addClass("navCustom");
+      $("#indicatorsCRM").show();
+
+      $("#optionsCrm").hide();
+      $("#chartCrm").hide();
+      
+      $("#widgetsCRM").show();
+      $("#backBtnCrm").show();
+
+      $(".crmTableContainer").hide();
+      $("#cotizaciónTableContainer").show();
+
+      $('#exportdashboardBtn').hide();
+      $('#exportdashboarDetaildBtn').show();
+    }
+
+    const backBtnCrm = function () {
+      $("#widgetsCRM").hide();
+      $("#backBtnCrm").hide();
+      
+      $("#chartCrm").show();
+      $("#optionsCrm").show();
+
+      $(".crmTableContainer").hide();
+      $("#sellerTableContainer").show();
+
+      $('#exportdashboardBtn').show();
+      $('#exportdashboarDetaildBtn').hide();
+    }
+
+    // Checkbox tabla vendedores
     let dataCheckboxTable = [];
     $(document).on( "click", ".checkboxTable", function(){
       // JSON response
@@ -1911,249 +1652,12 @@
       console.log({dataCheckboxTable})
     });
 
-    // CRM sección 1
-    let personsString = null;
-    const loadCrmDetail = async function () {
-      personsString = dataCheckboxTable.join(",")
-
-      if (personsString == "") {
-        return Swal.fire({
-          title: 'Seleccione vendedores antes de buscar',
-          confirmButtonText: 'Continuar',
-        })
-      }
-
-      let response = await fetch(`/crm/detail/${startDateCrm}/${endDateCrm}/${personsString}`);
-          response = await response.json();
-
-      loadCards(response.result.monitoring);
-      printTableCotizaciones();
-
-      $("#optionsCrm").hide();
-      $("#chartCrm").hide();
-      
-      $("#widgetsCRM").show();
-      $("#backBtnCrm").show();
-
-      $(".crmTableContainer").hide();
-      $("#cotizaciónTableContainer").show();
-    }
-
-    const backBtnCrm = function () {
-      $("#widgetsCRM").hide();
-      $("#backBtnCrm").hide();
-      
-      $("#chartCrm").show();
-      $("#optionsCrm").show();
-
-      $(".crmTableContainer").hide();
-      $("#sellerTableContainer").show();
-    }
-
-    // Modal información rows
-    const modalInfoRow = function (elements) {
-      $("#modalInfoBody").html("")
-
-      let claves = Object.keys(elements);
-      for(let i=0; i< claves.length; i++){
-
-        let clave = claves[i];
-        if (!elements[clave] == "") {
-
-          infoCampo = `
-            <div class="border-bottom my-3">
-              <span class="fw-bold" style="color: #344767">${clave}</span> <br>
-              <span class="fs-5">${elements[clave]}</span>
-            </div>
-          `;
-          $("#modalInfoBody").append(infoCampo)
-        }
-      }
-      $("#modalInfo").modal("show")
-    }
-
-    // Logica agregada en la seccion de permisos
-    // $(document).on( "click", ".infoRowTable", function(){
-    //   listsElements = {};
-    //   listsElements.Vendedor = $(this).parent().attr("Vendedor");
-    //   listsElements.Número = $(this).parent().attr("Numero");
-    //   listsElements.Nota = $(this).parent().attr("Nota");
-    //   listsElements.Remitente = $(this).parent().attr("Remitente");
-    //   listsElements.Empresa = $(this).parent().attr("Empresa");
-    //   listsElements.NúmeroIdentificación = $(this).parent().attr("NumeroIden");
-    //   listsElements.Descripción = $(this).parent().attr("Description");
-    //   listsElements.HoraInicio = $(this).parent().attr("HoraI");
-    //   listsElements.HoraFinal = $(this).parent().attr("HoraF");
-    //   listsElements.FechaVisita = $(this).parent().attr("HoraV");
-    //   listsElements.Fecha = $(this).parent().attr("Fecha");
-    //   listsElements.Duración = $(this).parent().attr("Duracion");
-    //   listsElements.Celular = $(this).parent().attr("Phone");
-
-    //   modalInfoRow(listsElements);
-    // });
-
-    // Ventana selección de terceros
-    const loadThirds = function(body){
-      let tableContent;
-      for(let i = 0; i < body.length; i++){ 
-          let name, iden;
-          if (body[i].namePerson == " " && body[i].info.bussiness_name == " "){ name = "N/A" } else {name = body[i].namePerson};
-          if (body[i].numIdentification == "no nit" || body[i].numIdentification == ""){ iden = "N/A" } else {iden = body[i].numIdentification };
-          if (name.length < 4){ name = "N/A"};
-
-          tableContent+= '<tr>';
-          tableContent+= '<td class="text-center text-wrap"> <input class="form-check-input border" type="radio" name="flexRadioDefault" ></td>';
-          tableContent+= '<td class="text-start text-wrap">' + iden + '</td>';
-          tableContent+= '<td class="text-start text-wrap">' + name + '</td>';
-          tableContent+= '<td class="text-start text-wrap">' + body[i].type + '</td>';
-          tableContent+= '</tr>';
-      };   
-
-      $("#tableBodyThirds").empty();
-      $("#tableBodyThirds").append(tableContent);
-
-      const tableObj = new simpleDatatables.DataTable("#tableThirds", {
-        fixedHeight: true,
-        paging: false
-      });
-
-      $("#thirdsWindow").show( "slow" )
-    }
-
-
-    // Modal información evento
-    $(document).on( "click", ".openModalEvent", function(){
-      // objecto e indice se almacena en dos atributos "objName" y "objIndex"
-      // esta información se envia al servicio para obtener la información y cargar los datos del modal
-      objectNameString = $(this).attr("objName");
-      objectName = eval($(this).attr("objName"));
-      objectIndex = eval($(this).attr("objIndex"));
-      row = objectName[objectIndex];
-
-      $("#modalEventosCorreo").hide();
-      $("#modalEventosGestion").hide();
-      $("#modalEventosRecordatorio").hide();
-      $("#modalEventosPQR").hide();
-
-      switch (objectNameString) {
-        case 'correosJSONprueba': // Correos
-          // $("#textAreaModalEventsCorreo").val((row. ? row.  : ""));
-
-          $("#inputModalEventsCorreo").val((row.sender ? row.sender  : ""));
-          $("#inputModalEventsCorreo1").val((row.num_identification ? row.num_identification : ""));
-          $("#inputModalEventsCorreo3").val((row.task ? row.task : ""));
-          $("#textAreaModalEventsCorreo2").val((row.description ? row.description : ""));
-
-          $("#modalEventosCorreo").show();
-          break;
-
-        case 'gestionJsonPrueba': //Gestion
-          console.log(row)
-          $("#dateModalEvents").val((row.date_visit ? row.date_visit  : ""));
-          $("#timeInicio").val((row.hour_ini ? row.hour_ini  : ""));
-          $("#timeFin").val((row.hour_fin ? row.hour_fin  : ""));
-          $("#motivoModalEvents").val((row.description ? row.description  : ""));
-          $("#textAreaModalEventsVisita").val((row.task ? row.task  : ""));
-
-          $("#modalEventosGestion").show();
-          break;
-
-        case 'RecordatoriosJsonPrueba': // Recordatorio
-          $("#textAreaModalEventsReminder").val((row.task ? row.task  : ""));
-          // $("#checkboxModalEventos").val((row. ? row.  : ""));
-          // $("#dateModalRecordatorio").val((row. ? row.  : ""));
-
-          $("#modalEventosRecordatorio").show();
-          break;
-      }
-
-      $("#modalEventos").modal("show");
-    });   
-
     // Tarjeta CRM
     $(document).on( "click", ".cardsButtons", function(){
       $(".cardsButtons").css("backgroundColor", "")
       $(this).css("backgroundColor", "#e9ecef;")
     });
 
-    const loadCards = function(data){
-      $("#cotizacionesNumber").html(data.cotizacion);
-      $("#recordatorioNumber").html(data.tarea.tarea);
-      $("#pendienteNumber").html(data.tarea.pendientes);
-      $("#completadoNumber").html(data.tarea.completadas);
-
-      $("#pqrNumber").html(data.pqr.pqr);
-      $("#pqrPendienteNumber").html(data.pqr.pendiente);
-      $("#pqrCerradoNumber").html(data.pqr.cerrados);
-
-      $("#gestionNumber").html(data.visita);
-      $("#correoNumber").html(data.llamada);
-      $("#llamadaNumber").html(data.correo);
-
-    }
-
-    // CRM sección 2 (Cartera)
-    const paginatorCrmDetail = function (state) {
-      switch (state) {
-        case 1:
-          $(".nav-item2").removeClass("navCustom");
-          $(".nav-item1").addClass("navCustom");
-
-          $("#indicatorsCRM").fadeIn();
-          printTableCotizaciones();
-          break
-        case 2:
-          $(".nav-item1").removeClass("navCustom");
-          $(".nav-item2").addClass("navCustom");
-
-          $("#indicatorsCRM").fadeOut();
-          prepareDataCartera();
-          break
-      }
-    }
-
-    $(document).on( "click", ".rowCartera", function(){
-      loadTable("tablaFactura", carteraJSON.detailPurse);
-    });
-
-    // Sidebar Maestros
-    const showSidebarCRM = function (x) { // TODO sidebar
-      let state = $("#sidebarCRM").attr("sidebarState");
-
-      if (state == "closed") {
-        $("#sidebarCRM").attr("sidebarState", "open");
-        $("#sidebarCRM" ).css('right', 0); 
-        $("#sidebarCRM" ).show("slide", { direction: "right" }, 400);
-      }
-      if (state == "open") {
-        $("#sidebarCRM").attr("sidebarState", "closed");
-        $("#sidebarCRM" ).hide("slide", { direction: "right" }, 400);
-      }
-    }
-
-    const loadMastersSidebar = function (master) {
-      for (let i = 1; i <= 10; i++) {
-        for (let e = 0; e < master.length; e++) {
-          if (master[e].id_crm_master == i) {
-            let element = `
-              <div Mcode="${master[e].code}" Mdesc="${master[e].description}" Mid="${master[e].id}" Mcomp="${master[e].id_company}" Mcrm="${master[e].id_crm_master}"  class="d-flex justify-content-between w-100">
-                <div class="masterEdit"><span class="stringP1"> ${master[e].code}</span> - <span class="stringP2">${master[e].description}</span> </div>
-                <div class="deleteMaster ms-1"><i class="fas fa-trash mt-1"></i></div>
-              </div>
-            `;
-            $(`[idMaster='${i}']`).append(element);
-            // Referencias para el boton de crear
-            var masterRef = master[e].id_company;
-            var crmRef = master[e].id_crm_master;
-          }
-          // Añadir boton crear final
-          if (e === master.length - 1) {
-            button = `<button Mcomp="${masterRef}" Mcrm="${crmRef}" class="btn btn-outline-primary createMaster" style="width: 100px; margin: 0 auto">Crear</button>`;
-            $(`[idMaster='${i}']`).append(button);
-          }
-        }
-      }
-    }
 
     let dataMaster = {};
     $(document).on( "click", ".masterEdit", function(){
@@ -2200,25 +1704,6 @@
       }
     }
 
-    let dataMasterNew = {};
-    $(document).on( "click", ".createMaster", function(){
-      $("#descripcionMasters").val("");
-      $("#codigoMasters").val("");
-
-      $("#createMasterButton").show();
-      $("#editMasterButton").hide();
-
-      dataMasterNew.id_company = $(this).attr("Mcomp");
-      dataMasterNew.id_crm_master = $(this).attr("Mcrm");
-      dataMasterNew.id_table = 18;
-
-      $("#createMasterModalTitle1").html("");
-      $("#createMasterModalTitle2").html("");
-      $("#createMasterModalTitle1").append(" Crear ")
-      $("#createMasterModalTitle2").append($(this).parent().attr("nameMaster"));
-      $("#modalMasters").modal("show");
-    });
-
     const createMaster = async function () {
       if ($("#codigoMasters").val() == "" && $("#descripcionMasters").val() == "") {return;}
 
@@ -2244,35 +1729,8 @@
       } 
     }
 
-    let dataMasterDelete = {};
-    $(document).on( "click", ".deleteMaster", async function(){
-      Swal.fire({
-        title: '¿Está seguro de eliminar esta propiedad?',
-        showDenyButton: true,
-        confirmButtonText: 'Eliminar',
-      }).then( async (result) => {
-        if (result.isConfirmed) {
-          dataMasterDelete.id = Number($(this).parent().attr("Mid"));
-          dataMasterDelete.id_table = 18;
-
-          const rawResponse = await fetch('/crm/master/delete', {
-            method: 'POST',
-            headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
-            body: JSON.stringify(dataMasterDelete)
-          });
-          const response = await rawResponse.json();
-
-          if (response.result.success) {
-            $(this).parent().remove();
-          } else {
-            console.error("Error eliminando master")
-          }
-        } 
-      });
-    });
-
-    // Permissions
-    const handlePermissions = function (data) {
+        // Permissions
+        const handlePermissions = function (data) {
       let permissions = data.user[0].permission;
       let permissionIndex; 
 
@@ -2391,21 +1849,51 @@
       };
     }
 
-    const getCrmMasters = async function () {
-      const rawResponse = await fetch("/crm/master");
-      const response = await rawResponse.json();
-      loadMastersSidebar(response.result.master[0].master)
-    }
+    let dataMasterNew = {};
+    $(document).on( "click", ".createMaster", function(){
+      $("#descripcionMasters").val("");
+      $("#codigoMasters").val("");
 
-    const getDataCrm = async function () {
-      const rawResponse = await fetch(`/crm/data/${startDateCrm}/${endDateCrm}`)
-      const response = await rawResponse.json();
+      $("#createMasterButton").show();
+      $("#editMasterButton").hide();
 
-      loadCRM(response.result.user[0]);
+      dataMasterNew.id_company = $(this).attr("Mcomp");
+      dataMasterNew.id_crm_master = $(this).attr("Mcrm");
+      dataMasterNew.id_table = 18;
 
-      $("#editViewDateContainer").show();
-      $("#loadingViewDateContainer").hide();
-    }
+      $("#createMasterModalTitle1").html("");
+      $("#createMasterModalTitle2").html("");
+      $("#createMasterModalTitle1").append(" Crear ")
+      $("#createMasterModalTitle2").append($(this).parent().attr("nameMaster"));
+      $("#modalMasters").modal("show");
+    });
+
+    let dataMasterDelete = {};
+    $(document).on( "click", ".deleteMaster", async function(){
+      Swal.fire({
+        title: '¿Está seguro de eliminar esta propiedad?',
+        showDenyButton: true,
+        confirmButtonText: 'Eliminar',
+      }).then( async (result) => {
+        if (result.isConfirmed) {
+          dataMasterDelete.id = Number($(this).parent().attr("Mid"));
+          dataMasterDelete.id_table = 18;
+
+          const rawResponse = await fetch('/crm/master/delete', {
+            method: 'POST',
+            headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+            body: JSON.stringify(dataMasterDelete)
+          });
+          const response = await rawResponse.json();
+
+          if (response.result.success) {
+            $(this).parent().remove();
+          } else {
+            console.error("Error eliminando master")
+          }
+        } 
+      });
+    });
 
     // Sidebar
     $(document).on('click', function(e) { // Cerrar sidebar 
@@ -2432,6 +1920,94 @@
       $("#carteraTableContainer").show();
     })
 
+    $('#exportdashboardBtn').on('click', async function () {
+      let response = await fetch(`https://api.pedbox.co:8590/getDateUser?export=true&id=${session.user.id}&type_user=${session.user.type_user}&id_company=${session.user.id_company}&date_begin=${startDateCrm}&date_end=${endDateCrm}&crm=1`);
+      window.open(response.url, "_blank");
+    })
+
+    $('#exportdashboarDetaildBtn').on('click', async function () {
+      let response = await fetch(`https://api.pedbox.co:8590/export_activity_monitoring?export=true&id_company=${session.user.id_company}&id_person=${dataCheckboxTable.join()}&date_begin=${startDateCrm}&date_end=${endDateCrm}`);
+      window.open(response.url, "_blank");
+    })
+
+    $('#exportCartera').on('click', async function () {
+      let response = await fetch(`https://api.pedbox.co:8590/get_purse_seller?url_client=${session.user.url_client}?wsdl&nit=${$('#selectUsersCartera').find(":selected").val()}&export=true&type=xls&hideNit=false&url_logo=${session.user.url_logo}`);
+      window.open(response.url, "_blank");
+    })
+
+    $('#exportCarteraPdf').on('click', async function () {
+      let response = await fetch(`https://api.pedbox.co:8590/get_purse_seller?url_client=${session.user.url_client}?wsdl&nit=${$('#selectUsersCartera').find(":selected").val()}&export=true&type=pdf&hideNit=false&url_logo=${session.user.url_logo}`);
+      window.open(response.url, "_blank");
+    })
+
+    $(document).on('click', '.rowDetail', function (e) {
+      if (e.target.className == 'fas fa-file-pdf') { return }
+
+      let data = JSON.parse($(this).attr('data-row'));
+      let kind = $(this).attr('data-kind');
+      let dataModal = null;
+
+      switch (kind) {
+        case 'cotizacion':
+          dataModal = {
+            Vendedor: data.usuario,
+            Número: data.num_quotation,
+            Remitente: data.sender,
+            Empresa: data.bussiness_name
+          }
+          modalInfoRow(dataModal, 'Cotización')
+          break;
+
+        case 'recordatorio':
+          dataModal = {
+            Vendedor: data.usuario,
+            Nota: data.task,
+            Empresa: data.bussiness_name,
+          }
+          modalInfoRow(dataModal, 'Recordatorio')
+          break;
+
+        case 'gestion':
+          dataModal = {
+            Vendedor: data.usuario,
+            Empresa: data.bussiness_name,
+            Nota: data.task,
+            Descripción: data.description,
+            Hora_de_Inicio: data.hour_ini,
+            Hora_de_Fin: data.hour_fin,
+            Fecha_de_Vicita: data.date_visit
+          }
+          modalInfoRow(dataModal, 'Gestión')
+          break;
+
+        case 'correo':
+          dataModal = {
+            Vendedor: data.usuario,
+            Nota: data.task,
+            Empresa: data.bussiness_name,
+            Fecha: data.date_creation
+          }
+          modalInfoRow(dataModal, 'Correo')
+          break;
+          
+        case 'llamada':
+          dataModal = {
+            Vendedor: data.usuario,
+            Número: data.call_number || '-',
+            Hora_de_Inicio: data.hour_ini,
+            Hora_de_Fin: data.hour_fin,
+            Duración: data.duration,
+            Empresa: data.bussiness_name,
+            Fecha_de_Creación: data.date_creation
+          }
+          modalInfoRow(dataModal, 'Llamada')
+          break;
+          
+        default:
+          break;
+      }
+    })
+
     $(document).on("click", ".rowTableCartera", function () {
       let nit = $(this).attr("data-nit");
       let dataDetail = _.where(detailCarteraData, {nit: nit});
@@ -2445,12 +2021,8 @@
 
       getDataCrm();
       getCrmMasters()
-      // handlePermissions(objSession);
     });
-
   </script>
-
-  
 
 </body>
 </html>

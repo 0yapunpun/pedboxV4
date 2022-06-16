@@ -673,7 +673,13 @@ service.getMastersCrm = async(id_company) => {
 }
 
 service.getDataCrm = async(idUser, typeUser, idCompany, dateS, dateE) => { 
-  const url = urlKakashi+"getDateUser?id="+idUser+"&type_user="+typeUser+"&id_company=" +idCompany+"&date_begin="+dateS+"&date_end="+dateE+"&crm="+1
+  const url = urlKakashi+"getDateUser?id="+idUser+"&type_user="+typeUser+"&id_company=" +idCompany+"&date_begin="+dateS+"&date_end="+dateE+"&crm=1"
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.exportDataCrm = async(idUser, typeUser, idCompany, dateS, dateE) => { 
+  const url = urlKakashi+`getDateUser?export=true&id=${idUser}&type_user=${typeUser}&id_company=${idCompany}&date_begin=${dateS}&date_end=${dateE}&crm=1`
   console.log(url)
   const data =  await makeRequest(url);
   return data;

@@ -178,6 +178,7 @@ router.post('/crm/master/create', crmController.createCrmMaster);
 router.post('/crm/master/update', crmController.updateCrmMaster);
 router.post('/crm/master/delete', crmController.deleteCrmMaster);
 router.get('/crm/data/:dateS/:dateE', crmController.getDataCrm);
+router.get('/crm/export/:dateS/:dateE', crmController.exportDataCrm);
 router.get('/crm/detail/:dateS/:dateE/:persons', crmController.getCrmDetailMonitoring);
 router.get('/crm/detailActivity/:dateS/:dateE/:persons/:id_activity', crmController.getCrmActivityMonitoring);
 

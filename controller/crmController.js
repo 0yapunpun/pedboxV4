@@ -20,6 +20,22 @@ controller.getDataCrm = async(req, res, next) => {
   res.send(response);
 }
 
+
+controller.exportDataCrm = async(req, res, next) => {
+  let idUser = req.session.user.id;
+  let typeUser = req.session.user.type_user;
+  let id_company = req.session.user.id_company;
+  let dateS = req.params.dateS;
+  let dateE = req.params.dateE;
+
+  let response = await service.exportDataCrm(idUser, typeUser, id_company, dateS, dateE);
+
+  res.send(response);
+}
+
+
+
+
 controller.createCrmMaster = async(req, res, next) => {
   let response = await service.createCrmMaster(req.body);
   res.send(response);
