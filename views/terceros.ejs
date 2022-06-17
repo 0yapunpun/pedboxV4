@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" type="image/x-icon" href="https://app.pedbox.co/assets/logos/logo_blanco.png"/>
+  <title> Terceros  </title>
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <link href="/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="/css/nucleo-svg.css" rel="stylesheet" />
+  <link id="pagestyle" href="/css/soft-ui-dashboard.css?v=1.0.3" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/jquery-ui.min.css">
+  <link rel="stylesheet" href="/css/reports.css">
+
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.0/socket.io.js" integrity="sha512-+l9L4lMTFNy3dEglQpprf7jQBhQsQ3/WvOnjaN/+/L4i0jOstgScV0q2TjfvRF4V+ZePMDuZYIQtg5T4MKr+MQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="/js/jquery.js"></script>
+  <script src="/js/helpers.js"></script>
+
+  <!-- Color Page -->
+  <%- include('./partials/colors.ejs') %> 
+
+  <style>
+    #sidebarPage::-webkit-scrollbar{
+      display: none;
+    }  
+    #navContainer>li{
+      cursor: pointer;
+    }
+    .imgUserTable{
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+    .imgUserTable img{
+      max-width: 100%;
+      max-height: 100%;
+    }
+    #optionsBtnHeader i {
+      font-size: 20px;
+    }
+    .containerInfoContact>div{
+      width: 33%;
+    }
+  </style>
+</head>
+
+<body class="g-sidenav-show bg-gray-100">
+
+  <!-- Menu -->
+  <%- include('./partials/menu.ejs') %> 
+
+  <main class="main-content max-height-vh-100 h-100">
+
+    <!-- Cabecera -->
+    <%- include('./partials/header.ejs') %>
+  
+      <!-- Cotent -->
+      <div class="p-4">
+        <div class="d-flex justify-content-end">
+
+          <div id="navContainerParent" class="w-60 nav-wrapper position-relative end-0">
+            <ul id="navContainer" class="nav nav-pills nav-fill p-1 bg-transparent" role="tablist">
+              <li data-section="clients" class="nav-item">
+                <a class="nav-link mb-0 px-0 py-1 active " data-bs-toggle="tab" role="tab" aria-selected="true">
+                  <span class="ms-1">Clientes</span>
+                </a>
+              </li>
+              <li data-section="employes" class="nav-item">
+                <a class="nav-link mb-0 px-0 py-1 " data-bs-toggle="tab"  role="tab" aria-selected="false">
+                  <span class="ms-1">Empleados</span>
+                </a>
+              </li>
+              <li data-section="prospects" class="nav-item">
+                <a class="nav-link mb-0 px-0 py-1 " data-bs-toggle="tab"  role="tab" aria-selected="false">
+                  <span class="ms-1">Prospectos</span>
+                </a>
+              </li>
+              <li data-section="suppliers" class="nav-item">
+                <a class="nav-link mb-0 px-0 py-1 " data-bs-toggle="tab"  role="tab" aria-selected="false">
+                  <span class="ms-1">Proveedores</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="w-40" style="min-height: 50px;">
+            <div class="d-flex h-100 w-100 align-items-center justify-content-end" id="optionsBtnHeader">
+              <i id="createBtnHeader" class="fas fa-plus btnHeader" data-toggle="tooltip" title="Crear Tercero" style="cursor: pointer;"></i>
+              <i class="fas fa-download ms-3 btnHeader" data-toggle="tooltip" title="Exportar" style="cursor: pointer;"></i>
+              <i class="fas fa-wrench ms-3 me-3 btnHeader" data-toggle="tooltip" title="Configurar" style="cursor: pointer;"></i>
+              <i id="backBtnHeader" class="fas fa-angle-left ms-3 me-3" data-toggle="tooltip" title="Página principal" style="cursor: pointer; display: none;"></i>
+            </div>
+          </div>
+        </div>
+
+        <div id="tablesThirds" >
+          <div id="clientsTableContainer" >
+            <div class="card text-center p-2" id="tableContainerMargin">
+              <div>
+                <h6 class="mb-0 ms-2">Clientes</h6>
+                <table id="tClients">
+                  <thead>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Nombre</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Tipo Identificación</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Identificación</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Tipo de Tercero</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Teléfono</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Email</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder"></th>
+                  </thead>
+                  <tbody id="tBodyClients"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div id="employesTableContainer" style="display: none;">
+            <div class="card text-center p-2" id="tableContainerMargin">
+              <div>
+                <h6 class="mb-0 ms-2">Empleados</h6>
+                <table id="tEmplyes">
+                  <thead>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder"></th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Nombre</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Identificación</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Tipo de Usuario</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder"></th>
+                  </thead>
+                  <tbody id="tBodyEmployes"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div id="prospectsTableContainer" style="display: none;">
+            <div class="card text-center p-2" id="tableContainerMargin">
+              <div>
+                <h6 class="mb-0 ms-2">Prospectos</h6>
+                <table id="tProspects">
+                  <thead>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Nombre</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Teléfono</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Celular</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Email</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Dirección</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Ciudad</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder"></th>
+                  </thead>
+                  <tbody id="tBodyProspects"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div id="suppliersTableContainer" style="display: none;">
+            <div class="card text-center p-2" id="tableContainerMargin">
+              <div>
+                <h6 class="mb-0 ms-2">Proveedores</h6>
+                <table id="tSuppliers">
+                  <thead>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Nombre</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Tipo Identificación</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Identificación</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Tipo de Usuario</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Telėfono</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder">Email</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder"></th>
+                  </thead>
+                  <tbody id="tBodySuppliers"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div> 
+
+        <div id="thirdsForm" style="display: none;">
+
+          <div class="d-flex">
+          
+            <div id="formBasicInfoSection" class="card p-3 w-50 m-1">
+              <h6>Información Básica</h6>
+              <div class="d-flex gap-1">
+                <div class="w-50">
+                  <label for="">Tipo Identificación *</label>
+                  <select name="" id="fomIdentificationKind" class="form-control">
+                    <option value="1">C.C</option>
+                    <option value="2">Nit</option>
+                    <option value="3">Cédula Extranjería</option>
+                    <option value="4">Tarjeta de Identidad</option>
+                    <option value="5">Pasaporte</option>
+                  </select>
+                </div>
+                <div class="w-50">
+                  <label for="">Identificación *</label>
+                  <input type="text" id="formIdentification" class="form-control">
+                </div>
+              </div>
+              <div class="d-flex gap-1">
+                <div class="w-50">
+                  <label for="">Primer Nombre *</label>
+                  <input type="text" id="formFirstName" class="form-control">
+                </div>
+                <div class="w-50">
+                  <label for="">Segundo Nombre</label>
+                  <input type="text" id="formSecondName" class="form-control">
+                </div>
+              </div>
+              <div class="d-flex gap-1">
+                <div class="w-50">
+                  <label for="">Primer Apellido *</label>
+                  <input type="text" id="formFirstSurname" class="form-control">
+                </div>
+                <div class="w-50"> 
+                  <label for="">Segundo Apellido</label>
+                  <input type="text" id="formSecondSurname" class="form-control">
+                </div>
+              </div>
+
+              <div class="d-flex gap-1">
+                <div class="w-50">
+                  <label for="">Sexo</label>
+                  <select name="" id="" class="form-control">
+                    <option value="">Hombre</option>
+                    <option value="">Mujer</option>
+                  </select>
+                </div>
+                <div class="w-50"> 
+                  <label for="">Fecha de Nacimiento</label>
+                  <input type="date" id="formBornDate" class="form-control" >
+                </div>
+              </div>
+            </div>
+
+            <div id="formPartcularClients" class="card p-3 m-1 w-50 formParticular" style="display: none">
+              <h6>Perfil del Cliente</h6>
+              <div class="d-flex gap-1">
+                <div class="w-50">
+                  <label for="">Forma de Pago</label>
+                  <select name="" id="formClientPaymentMethod" class="form-control">
+                    <option value="0" selected>Seleccionar</option>
+                    <option value="1">Crédito</option>
+                    <option value="2">Efectivo</option>
+                    <option value="3">Cheque</option>
+                    <option value="4">Tarjeta de Crédito</option>
+                  </select>
+                </div>
+                <div class="w-50">
+                  <label for="">Plazo</label>
+                  <select name="" id="formClientLimit" class="form-control">
+                    <option value="0" selected>Seleccionar</option>
+                    <option value="1">30 días</option>
+                    <option value="2">60 días</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div class="d-flex gap-1">
+                <div class="w-50">
+                  <label for="">Descuento Comercial</label>
+                  <input type="number" id="formClientComercialDiscount" class="form-control">
+                </div>
+                <div class="w-50">
+                  <label for="">Condición</label>
+                  <select name="" id="formClientCondition" class="form-control">
+                    <option value="0" selected>Seleccionar</option>
+                    <option value="1">Pago a 30 días</option>
+                    <option value="2">Pago a 60 días</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="d-flex gap-1">
+                <div class="w-50">
+                  <label for="">Exento de IVA</label>
+                  <select name="" id="fomClientIvaExempt" class="form-control">
+                    <option value="0" selected>Seleccionar</option>
+                    <option value="1">Si</option>
+                    <option value="2">No</option>
+                  </select>
+                </div>
+                <div class="w-50">
+                  <label for="">Cupo</label>
+                  <input type="number" id="formClientCupo" class="form-control">
+                </div>
+              </div>
+            </div>
+
+            <div id="formParticularEmployes" class="card p-3 m-1 w-50 formParticular" style="display: none;">
+              <h6>Perfil del Empleado</h6>
+              <div class="d-flex gap-1">
+                <div class="w-50">
+                  <label for="">Grupo *</label>
+                  <select name="" id="formEmployeGroup" class="form-control">
+                    <option value="">C.C</option>
+                    <option value="">Nit</option>
+                    <option value="">Cédula Extranjería</option>
+                    <option value="">Tarjeta de Identidad</option>
+                    <option value="">Pasaporte</option>
+                  </select>
+                </div>
+                <div class="w-50">
+                  <label for="">Sub-Grupo *</label>
+                  <select name="" id="formEmployeSubgroup" class="form-control">
+                    <option value="">C.C</option>
+                    <option value="">Nit</option>
+                    <option value="">Cédula Extranjería</option>
+                    <option value="">Tarjeta de Identidad</option>
+                    <option value="">Pasaporte</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div class="d-flex gap-1">
+                <div class="w-50">
+                  <label for="">Cargo *</label>
+                  <select name="" id="formEmployeCargo" class="form-control">
+                    <option value="">C.C</option>
+                    <option value="">Nit</option>
+                    <option value="">Cédula Extranjería</option>
+                    <option value="">Tarjeta de Identidad</option>
+                    <option value="">Pasaporte</option>
+                  </select>
+                </div>
+                <div class="w-50">
+                  <label for="">Tipo de Usuario</label>
+                  <select name="" id="formEmployeUserKind" class="form-control">
+                    <option value="">C.C</option>
+                    <option value="">Nit</option>
+                    <option value="">Cédula Extranjería</option>
+                    <option value="">Tarjeta de Identidad</option>
+                    <option value="">Pasaporte</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-center mt-2">
+                <div class="form-check">
+                  <input type="checkbox" class="form-check-input" id="formEmployeCreateUser" >
+                  <label class="custom-control-label" for="formEmployeCreateUser">Crear Usuario</label>
+                </div>
+              </div>
+            </div>
+
+            <div id="formParticularProspect" class="card p-3 m-1 w-50 formParticular" style="display: none;">
+              <h6>Perfil del Prospecto</h6>
+              <div >
+                <div>
+                  <label for="">Origen *</label>
+                  <select name="" id="formProspectOrigin" class="form-control">
+                    <option value="">C.C</option>
+                    <option value="">Nit</option>
+                    <option value="">Cédula Extranjería</option>
+                    <option value="">Tarjeta de Identidad</option>
+                    <option value="">Pasaporte</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="">Descripción del Origen *</label>
+                  <input id="formProspectDescriptionOrigin" type="text" class="form-control">
+                </div>
+                <div>
+                  <label for="">Visible *</label>
+                  <select name="" id="formProspectVisible" class="form-control">
+                    <option value="">C.C</option>
+                    <option value="">Nit</option>
+                    <option value="">Cédula Extranjería</option>
+                    <option value="">Tarjeta de Identidad</option>
+                    <option value="">Pasaporte</option>
+                  </select>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="card p-3 m-1">
+            <h6>Datos de Contacto</h6>
+            <div class="d-flex gap-1 containerInfoContact">
+              <div>
+                <label for="">Teléfono</label>
+                <input type="text" id="formPhone" class="form-control">
+              </div>
+              <div >
+                <label for="">Celular</label>
+                <input type="text" id="formCellphone" class="form-control">
+              </div>
+              <div >
+                <label for="">Email</label>
+                <input type="text" id="formEmail" class="form-control">
+              </div>
+            </div>
+
+            <div class="d-flex gap-1 containerInfoContact">
+              <div>
+                <label for="">Dirección</label>
+                <input type="text" id="formAddres" class="form-control">
+              </div>
+              <div>
+                <label for="">Còdigo Postal</label>
+                <input type="text" id="formPostalCode" class="form-control">
+              </div>
+              <div>
+                <label for="">Pais</label>
+                <input type="text" id="formCountry" class="form-control">
+              </div>
+            </div>
+
+            <div class="d-flex gap-1 containerInfoContact">
+              <div>
+                <label for="">Departamento</label>
+                <input type="text" id="" class="form-control">
+              </div>
+              <div>
+                <label for="">Ciudad</label>
+                <input type="text" id="" class="form-control">
+              </div>
+              <div>
+                <label for="">Sitio Web</label>
+                <input type="text" id="" class="form-control">
+              </div>
+            </div>
+
+            <div class="d-flex">
+              <div class="w-100">
+                <label for="">Notas</label>
+                <textarea name="" id="" class="form-control"></textarea>
+              </div>
+            </div>
+          </div>
+          
+
+          <div class="d-flex justify-content-center gap-3 mt-2">
+            <button id="formCreateBtn" type="button" class="btn btn-primary">Crear</button>
+            <button id="formEditBtn" type="button" class="btn btn-primary">Enviar</button>
+          </div>
+        </div>
+      </div>
+
+
+    <!-- Sidebar -->
+    <div id="sidebarPage" class="sidebarPage rounded" sidebarState="closed" style="overflow-x: hidden;">
+      <div class="d-flex justify-content-center my-3" style="position: relative; margin-bottom: 40px !important">
+        <h5 id="sidebarFilterTitle" class="mt-2 mb-0" style="font-weight: 800;">Sidebar</h5>
+      </div>
+
+      <div id="sidebarContentResume">
+        <h1>aaaaa</h1>
+      </div>
+    </div>
+
+      <!-- preloader -->
+      <%- include('./partials/preloader.ejs') %> 
+      
+  </main>
+
+
+  <!-- Scripts -->
+  <script src="/js/core/popper.min.js"></script>
+  <script src="/js/core/bootstrap.min.js"></script>
+  <script src="/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="/js/plugins/choices.min.js"></script>
+  <script src="/js/soft-ui-dashboard.min.js?v=1.0.3"></script>
+  <script src="/js/plugins/dragula/dragula.min.js"></script>
+  <script src="/js/plugins/jkanban/jkanban.js"></script>
+  <script src="/js/jquery-ui.min.js"></script>
+  <script src="/js/plugins/datatables.js"></script>
+  <script src="/js/plugins/chartjs.min.js"></script>
+  <script src="/js/underscore-min.js"></script>
+  <script src="/js/sweetalert2.all.min.js"></script>
+  <script src="/js/menu.js"></script>
+    
+  <script>
+    let masters = null;
+    let dataClients = null;
+    let dataEmployes = null;
+    let dataProspects = null;
+    let dataSuppliers = null;
+
+
+    const getData = async() => {
+      let response= await fetch(`/terceros/clients`);
+          response = await response.json();
+
+      masters = response.masters.result.state;
+      dataClients = response.clients;
+      dataEmployes = response.employes;
+      dataProspects = response.prospects;
+      dataSuppliers = response.suppliers;
+
+      printTableClients(dataClients);
+      $("#preloader").hide();
+    }
+
+    let tblClients;
+    const printTableClients = async(data) => {      
+      try {
+        tblClients.destroy();
+      } catch (error) {}
+      $("#tBodyClients").html("")
+
+      for (let i = 0; i < data.length; i++) {
+        let el = `
+          <tr>
+            <td class="text-center"> ${ data[i].bussiness_name } </td>
+            <td class="text-center"> Nit </td>
+            <td class="text-center"> ${ data[i].nit_seller} </td>
+            <td class="text-center"> Cliente </td>
+            <td class="text-center"> ${ data[i].phone || '-' }</td>
+            <td class="text-center"> ${ data[i].email || '-' }</td>
+            <td class="text-center"> a </td>
+          </tr>
+        `;
+        $("#tBodyClients").append(el)
+      }
+
+      tblClients = new simpleDatatables.DataTable("#tClients", {
+        perPageSelect: false
+      });
+    };
+
+    let tblEmployes;
+    const printTableEmployes = async(data) => {      
+      try {
+        tblEmployes.destroy();
+      } catch (error) {}
+      $("#tBodyEmployes").html("")
+
+      for (let i = 0; i < data.length; i++) {
+        let el = `
+          <tr>
+            <td class="text-center">  
+              <div class='imgUserTable'> <img src='${data[i].photo ? data[i].photo : 'https://app.pedbox.co/assets/images/avatars/profile.jpg'}'> </dv>
+            </td>
+            <td class="text-center"> ${data[i].name_person}  </td>
+            <td class="text-center"> ${ data[i].num_identification} </td>
+            <td class="text-center"> Vendedor </td>
+            <td class="text-center"> a </td>
+          </tr>
+        `;
+        $("#tBodyEmployes").append(el)
+      }
+
+      tblEmployes = new simpleDatatables.DataTable("#tEmplyes", {
+        perPageSelect: false
+      });
+    };
+
+    let tblProspects;
+    const printTableProspects = async(data) => {      
+      try {
+        tblProspects.destroy();
+      } catch (error) {}
+      $("#tBodyProspects").html("")
+
+      for (let i = 0; i < data.length; i++) {
+        let el = `
+          <tr>
+            <td class="text-center"> ${data[i].name_person}  </td>
+            <td class="text-center"> ${data[i].phone || '-'} </td>
+            <td class="text-center"> ${data[i].cellphone || '-'} </td>
+            <td class="text-center"> ${data[i].email || '-'} </td>
+            <td class="text-center"> ${data[i].address || '-'} </td>
+            <td class="text-center"> ${data[i].city || '-'} </td>
+            <td class="text-center"> a </td>
+          </tr>
+        `;
+        $("#tBodyProspects").append(el)
+      }
+
+      tblProspects = new simpleDatatables.DataTable("#tProspects", {
+        perPageSelect: false
+      });
+    };
+
+
+    let tblSuppliers;
+    const printTableSuppliers = async(data) => {      
+      try {
+        tblSuppliers.destroy();
+      } catch (error) {}
+      $("#tBodySuppliers").html("")
+
+      for (let i = 0; i < data.length; i++) {
+        let el = `
+          <tr>
+            <td class="text-center"> ${data[i].name_person}  </td>
+            <td class="text-center"> C.C </td>
+            <td class="text-center"> ${data[i].num_identification || '-'} </td>
+            <td class="text-center"> Proveedor </td>
+            <td class="text-center"> ${data[i].phone || '-'} </td>
+            <td class="text-center"> ${data[i].email || '-'} </td>
+            <td class="text-center"> a </td>
+          </tr>
+        `;
+        $("#tBodySuppliers").append(el)
+      }
+
+      tblSuppliers = new simpleDatatables.DataTable("#tSuppliers", {
+        perPageSelect: false
+      });
+    };
+
+    $('#navContainer>li').on('click', function () {
+      let section = $(this).attr('data-section');
+      switch (section) {
+        case 'clients':
+          printTableClients(dataClients);
+
+          $('#tablesThirds>div').hide()
+          $('#clientsTableContainer').show()
+          break;
+      
+        case 'employes':
+          printTableEmployes(dataEmployes)
+
+          $('#tablesThirds>div').hide()
+          $('#employesTableContainer').show()
+          break;
+
+        case 'prospects':
+          printTableProspects(dataProspects)
+
+          $('#tablesThirds>div').hide()
+          $('#prospectsTableContainer').show()
+          break;
+
+        case 'suppliers':
+          printTableSuppliers(dataSuppliers)
+
+          $('#tablesThirds>div').hide()
+          $('#suppliersTableContainer').show()
+          break;
+      }
+    })
+    
+    $('#createBtnHeader').on('click', function () {
+      if ($('#clientsTableContainer').is(':visible')) {
+        $('.formParticular').hide()
+        $('#formPartcularClients').show()
+      }
+
+      if ($('#employesTableContainer').is(':visible')) {
+        $('.formParticular').hide()
+        $('#formParticularEmployes').show()
+      }
+
+      if ($('#prospectsTableContainer').is(':visible')) {
+        $('.formParticular').hide()
+        $('#formParticularProspect').show()
+      }
+
+      if ($('#suppliersTableContainer').is(':visible')) {
+        $('.formParticular').hide()
+        $('#formBasicInfoSection').attr('style', 'width: 100% !important')
+      } else {
+        $('#formBasicInfoSection').attr('style', 'width: 50% !important')
+      }
+
+      $('.btnHeader').hide()
+      $('#backBtnHeader').show()
+
+      $('#tablesThirds').hide()
+      $('#thirdsForm').show()
+      
+      $('#navContainerParent').hide()
+    })
+
+    $('#backBtnHeader').on('click', function () {
+      $('.btnHeader').show()
+      $('#backBtnHeader').hide()
+
+      $('#tablesThirds').show()
+      $('#thirdsForm').hide()
+
+      $('#navContainerParent').show()
+
+    })
+
+    // Sidebar
+    $(document).on('click', function(e) { // Cerrar sidebar 
+      if ($("#sidebarPage").attr("sidebarState") == "open") {
+        if (!(e.target.id == "sidebarPage" || $(e.target).parents("#sidebarPage").length)) { 
+          $("#sidebarPage").attr("sidebarState", "closed");
+          $("#sidebarPage" ).hide("slide", { direction: "right" }, 300);
+        }
+      }
+    });
+
+    $(document).ready(function () {
+      $('[data-toggle="tooltip"]').tooltip();
+      $("#menuThirds").addClass("activeNav");
+      
+      getData()
+    })
+  </script>
+
+</body>
+</html>

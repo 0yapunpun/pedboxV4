@@ -40,4 +40,5 @@ controller.logout = (req, res) => {
     res.redirect('/login'); return;
   });
 }
+
 module.exports = controller

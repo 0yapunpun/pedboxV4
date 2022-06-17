@@ -9,6 +9,7 @@ const agendaController = require('../controller/agendaController.js');
 const dashboardController = require('../controller/dashboardController.js');
 const mapsController = require('../controller/mapsController.js');
 const crmController = require('../controller/crmController.js');
+const thirdsController = require('../controller/thirdsController.js');
 
 //** user
 router.get('/', viewController.login);
@@ -181,9 +182,12 @@ router.get('/crm/data/:dateS/:dateE', crmController.getDataCrm);
 router.get('/crm/export/:dateS/:dateE', crmController.exportDataCrm);
 router.get('/crm/detail/:dateS/:dateE/:persons', crmController.getCrmDetailMonitoring);
 router.get('/crm/detailActivity/:dateS/:dateE/:persons/:id_activity', crmController.getCrmActivityMonitoring);
-
 router.post('/crm/data/cartera', crmController.getCrmDetailCartera);
 router.post('/crm/export/cartera', crmController.getCrmDetailCarteraExport);
+
+//** Terceros 
+router.get('/terceros', viewController.terceros);
+router.get('/terceros/clients', thirdsController.thirdsClients);
 
 
 

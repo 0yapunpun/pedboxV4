@@ -579,8 +579,8 @@ service.getSellerClients = async(id_company, id_seller) => { //TODO
   return data;
 }
 
-service.getUsersCompany = async(id_company, Status) => { 
-  const url = urlKakashi+"get_userscompany?id_company="+id_company+"&status="+Status;
+service.getUsersCompany = async(id_company, status) => { 
+  const url = urlKakashi+"get_userscompany?id_company="+id_company+"&status="+status;
   const data =  await makeRequest(url);
   return data;
 }
@@ -760,6 +760,19 @@ service.dashboardReportProducts = async(id_company, dateS, dateE, seller) => {
 
 service.dashboardOrderDetail = async(id_company, pedido, tipo) => { 
   const url = urlPedbox1+"dashboardorderdetail?id_empresa="+id_company+"&pedido="+pedido+"&tipo="+tipo;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+// ** Terceros
+service.thirdsClients = async(id_company, type_person) => { 
+  const url = urlKakashi+`get_person?id_company=${id_company}&limit=100&type_person=${type_person}&seller=0`;
+  const data =  await makeRequest(url);
+  return data;
+}
+
+service.thirdsMasters = async(id_company) => { 
+  const url = urlKakashi+`get_master_contact?id_company=`+id_company;
   const data =  await makeRequest(url);
   return data;
 }

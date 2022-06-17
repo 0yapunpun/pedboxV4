@@ -206,11 +206,16 @@ controller.recorridoSeller = async(req, res, next) => { // Open specific route
   res.render('maps/recorridos', {'session': req.session, 'seller_id': req.params.id_seller});
 }
 
-//** Vistas no integradas
 controller.crm = async(req, res, next) => {
   if (!req.session.login) { return res.redirect('/login'); }
   
   res.render('crm', {'session': req.session});
+}
+
+controller.terceros = async(req, res, next) => {
+  if (!req.session.login) { return res.redirect('/login'); }
+  
+  res.render('terceros', {'session': req.session});
 }
 
 module.exports = controller

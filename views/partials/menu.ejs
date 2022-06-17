@@ -19,6 +19,15 @@
     border-radius: 0.5rem;
     box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
   }
+  tr th a{
+    text-align: center !important;
+  }
+  .dataTable-sorter::before {
+    display: none !important;
+  }
+  .dataTable-sorter::after {
+    display: none !important;
+  }
 </style>
 
 <aside id="sidebarMenu" class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 hideScroll"  style="z-index: 1; box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%); background-color: white;" >
@@ -414,6 +423,38 @@
                       </div>
                     </div>
                     <span class="nav-link-text ms-1 font-weight-bold">Recorrido Vendedores</span>
+                  </a>
+                </li>
+              <% } %>
+
+            </ul>
+          </div>
+        </li>
+      <% } %>
+
+      <%
+      permissionIndex = session.user.permission.map(e => e.code).lastIndexOf("7005_CAN_CREATE_THIRD");
+      if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
+      %>
+        <li class="nav-item">
+          <a class="nav-link"  data-bs-toggle="collapse" href="#collapseAdmin" >
+            <span class="nav-link-text ms-1 indicatorCollapse"> <h6 class="m-0 text-xs font-weight-bolder opacity-6">Administrador</h6> </span>
+          </a>
+          <div class="collapse show" id="collapseAdmin">
+            <ul class="navbar-nav">
+            
+              <%
+              permissionIndex = session.user.permission.map(e => e.code).lastIndexOf("7005_CAN_CREATE_THIRD");
+              if (permissionIndex != -1 && session.user.permission[permissionIndex].content != "N") { 
+              %>
+                <li class="nav-item" id="menuThirds">
+                  <a class="nav-link" href="/terceros" >
+                    <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center  me-2 d-flex align-items-center justify-content-center">
+                      <div style="position: relative;">
+                        <i class="fas fa-users" style="color: #252f40; font-size: 12px"></i>
+                      </div>
+                    </div>
+                    <span class="nav-link-text ms-1 font-weight-bold">Terceros</span>
                   </a>
                 </li>
               <% } %>
